@@ -1,0 +1,519 @@
+.labkey-studies-panel {
+    background-color: #ffffff
+}
+
+DIV.labkey-data-finder-outer {
+    min-height:100px;
+    min-width:400px;
+}
+
+DIV.labkey-study-cards {
+    background-color: #ffffff
+}
+
+DIV.labkey-study-facets {
+    background-color: #ffffff
+}
+
+.labkey-data-finder-inner
+{
+    background-color:#ffffff;
+    height:100%;
+    width:100%;
+}
+
+TABLE.labkey-data-finder
+{
+    height: 450px;
+    width:100%;
+    padding:3pt;
+}
+
+.labkey-filter-message
+{
+    float:left;
+}
+
+/* labkey-study-card */
+.labkey-study-card-highlight
+{
+    color:black;
+    font-variant:small-caps;
+}
+
+
+.labkey-study-card-summary,
+.labkey-study-card-accession
+{
+    float:left;
+}
+
+.labkey-study-card-goto,
+.labkey-study-card-pi
+{
+    float:right;
+}
+.labkey-study-card-divider,
+.labkey-study-card-description
+{
+    clear:both;
+}
+DIV.labkey-study-card
+{
+    background-color:#F8F8F8;
+    border:1pt solid #AAAAAA;
+    padding: 5pt;
+    margin: 5pt;
+    float:left;
+    position:relative;
+    width:171pt;
+    height:140pt;
+    overflow-y:hidden;
+}
+
+DIV.loaded,
+SPAN.loaded
+{
+    background-color:rgba(81, 158, 218, 0.2);
+}
+
+
+TD.study-panel
+{
+    vertical-align: top;
+}
+
+TD.study-panel > DIV
+{
+    height:100%;
+    overflow-y:scroll;
+}
+
+SPAN.labkey-study-search
+{
+    position: relative;
+}
+
+/* search area */
+DIV.search-box
+{
+    float:left;
+    padding:10pt;
+}
+INPUT.search-box
+{
+    width:200pt;
+}
+
+DIV.studyfinder-header
+{
+    float:left;
+    padding-right:10pt;
+}
+
+DIV.search-message
+{
+    padding-left:10pt;
+}
+
+.selection-panel
+{
+    vertical-align: text-top;
+    width:220pt;
+    height:100%;
+    background-color: white;
+}
+
+.selection-panel > DIV
+{
+    height:100%;
+    overflow-y:auto;
+}
+
+DIV.help-links
+{
+    float:right;
+    vertical-align: text-top;
+    text-align: right;
+}
+
+DIV.summary LI.member
+{
+    clear:both;
+    padding:2pt;
+    margin:1px 0px 1px 0px;
+    border:1px solid #ffffff;
+    height:14pt;
+    position:relative;
+    width:100%;
+}
+
+/* facets */
+
+.facet-selection-header
+{
+    background-color: white;
+}
+
+.clear-filter
+{
+    background-color: white;
+    float:right;
+}
+
+DIV.facet-summary,
+DIV.facet
+{
+    max-width:200pt;
+    border:solid 2pt rgb(220, 220, 220);
+}
+
+.active
+{
+    cursor:pointer;
+}
+DIV.facet-header
+{
+    padding:4pt;
+    background-color: rgb(240, 240, 240);
+}
+
+DIV.facet-header .facet-caption
+{
+    font-weight:400;
+}
+
+DIV.facet-header .labkey-filter-options
+{
+    font-size: 11px;
+    padding: 3px 0px 0px 20px;
+}
+
+DIV.facet-summary UL,
+DIV.facet UL
+{
+    list-style-type:none;
+    padding-left:0;
+    padding-right:5pt;
+    margin:0;
+}
+
+DIV.facet-summary LI.member
+{
+    clear:both;
+    cursor:default;
+    padding:2pt;
+    margin:1px 0px 1px 0px;
+    border:1px solid #ffffff;
+    height:14pt;
+    position:relative;
+    width:100%;
+}
+
+DIV.facet LI.member
+{
+    clear:both;
+    cursor:pointer;
+    padding:2pt;
+    margin:1px 0px 1px 0px;
+    border:1px solid #ffffff;
+    height:14pt;
+    position:relative;
+    width:100%;
+}
+DIV.facet.collapsed LI.member
+{
+    display:none;
+}
+DIV.facet.collapsed .fa-plus-square
+{
+    float:left;
+    display:inline;
+}
+DIV.facet.collapsed .fa-minus-square
+{
+    float:left;
+    display:none;
+}
+DIV.expanded  .fa-plus-square
+{
+    float:left;
+    display:none;
+}
+DIV.expanded  .fa-minus-square
+{
+    float:left;
+    display:inline;
+}
+DIV.facet.collapsed LI.member.selected-member
+{
+    display:block;
+}
+DIV.facet LI.member:hover SPAN.bar
+{
+    background-color:rgba(81, 158, 218, 0.2);
+}
+DIV.facet LI.empty-member
+{
+    color:#888888;
+}
+LI.member .member-indicator
+{
+    position:relative;
+    display:inline-block;
+    width:16px;
+    z-index:2;
+}
+.member-indicator.selected:after
+{
+    content:"\002713"
+}
+.member-indicator.selected:hover:after
+{
+    content:"x";
+}
+.member-indicator.not-selected:after
+{
+    content:"\0025FB"
+}
+.member-indicator.not-selected:hover:after
+{
+    content:"\002713"
+}
+.member-indicator.not-selected.none-selected:after
+{
+    content:"\002713"; color:lightgray;
+}
+LI.member .member-name
+{
+    display:inline-block;
+    position:relative;
+    max-width:150pt;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    z-index:2;
+}
+LI.member .member-count
+{
+    position:relative;
+    float:right;
+    z-index:2;
+}
+
+LI.member SPAN.bar-selected
+{
+    background-color:rgba(81, 158, 218, 0.2);
+}
+
+LI.member .bar
+{
+    height:14pt;
+    background-color:#DEDEDE;
+    position:absolute; right:0;
+    z-index:0;
+}
+
+/* filter type popup */
+DIV.labkey-filter-popup
+{
+    position: absolute;
+    min-width: 80px;
+    margin: 2px 0 0;
+    list-style: none;
+    background-color: white;
+    border-color:#b4b4b4;
+    border-width: 1px;
+    border-style: solid;
+    box-shadow: rgb(136, 136, 136) 0px 0px 6px;
+    z-index: 100;
+    -webkit-padding-start: 0px
+}
+
+
+.labkey-filter-popup > .labkey-dropdown-menu
+{
+    display: block;
+    min-width: 130px;
+}
+
+/* menus */
+.nav
+{
+    margin: 0;
+    padding-left: 0;;
+    list-style: none;
+}
+
+ul.nav
+{
+    display:block;
+}
+
+.navbar-nav > li
+{
+    float: left;
+}
+
+.navbar-nav
+{
+    float: left;
+    margin: 0;
+}
+
+.navbar-nav > li > .labkey-dropdown-menu
+{
+    margin-top : 0;
+}
+
+.labkey-filter-options > a.inactive
+{
+    color: black;
+    cursor: default;
+}
+
+.labkey-dropdown > a.labkey-disabled-text-link
+{
+    color: #C0C0C0;
+    cursor: default;
+}
+
+.labkey-dropdown:hover > .labkey-dropdown-menu-active
+{
+    display: block;
+}
+
+.labkey-dropdown-menu > li {
+    margin-right : 0px;
+}
+
+.labkey-dropdown-menu > li > a
+{
+    color: black;
+}
+
+.labkey-dropdown-menu > li > a.inactive
+{
+    color: #C0C0C0;
+    cursor: default;
+}
+
+.labkey-dropdown-menu > li.inactive:hover
+{
+    color: #C0C0C0;
+    cursor: default;
+    background-color: white;
+    border-style: none;
+    background-image: none;
+}
+
+.labkey-dropdown-menu > li:hover
+{
+    background-image: none;
+    background-color: #eaeaea;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f2f2f2), color-stop(100%, #e0e0e0));
+    background-image: -webkit-linear-gradient(top, #f2f2f2, #e0e0e0);
+    background-image: -moz-linear-gradient(top, #f2f2f2, #e0e0e0);
+    background-image: -o-linear-gradient(top, #f2f2f2, #e0e0e0);
+    background-image: linear-gradient(top, #f2f2f2, #e0e0e0);
+    border-color: #b4b4b4;
+    border-width: 1px;
+    border-style: solid;
+    padding: 0;
+}
+
+.labkey-dropdown-menu {
+    position: absolute;
+    display: none;
+    min-width: 80px;
+    margin: 2px 0 0;
+    list-style: none;
+    background-color: white;
+    border-color:#b4b4b4;
+    border-width: 1px;
+    border-style: solid;
+    padding: 0;
+    box-shadow: rgb(136, 136, 136) 0px 0px 6px;
+    z-index: 100;
+    -webkit-padding-start: 0px
+}
+
+#manageMenu > a {
+    color:black;
+    padding-right: 5px;
+}
+
+.menu-item-link {
+    line-height: 22px;
+    display: inline-block;
+    padding: 0 8px 0 8px;
+}
+
+.labkey-study-detail .x4-window-header {
+    background-color: #F8F8F8;
+    padding: 0;
+    box-shadow: #F8F8F8 0 0 0 0;
+}
+
+.labkey-study-detail {
+    border-color: #F8F8F8;
+    padding: 0;
+}
+
+div.study-demographics {
+    background-color: white;
+    padding: 10px 20px 20px 20px;
+    margin-top: 10px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.15), -1px 0 0 rgba(0,0,0,0.06), 1px 0 0 rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.12);
+}
+
+div.study-demographics h2 {
+    display: inline-block;
+    text-transform: uppercase;
+    font-weight: normal;
+    background-color: #126495;
+    color: white;
+    font-size: 13px;
+    padding: 9px 20px 7px 20px;
+    margin-top: -20px;
+    margin-left: -20px;
+}
+
+div.study-demographics h3 {
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 10px 0px 10px 50px;
+    border-bottom: 1px solid darkgray;
+}
+
+#demographics-content .detail {
+    font-size: 15px;
+    padding-left: 30px;
+    padding-bottom: 5px;
+}
+
+#demographics-content .detail div {
+    font-size: 15px;
+}
+
+#demographics-content h3 {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+#demographics-content div {
+    padding: 3px;
+}
+
+#demographics-content div.label, a.label {
+    font-size: 12px;
+    color: #a9a9a9;
+    vertical-align: text-top;
+}
+
+
+#assays-content .detail div {
+    font-size: 15px;
+    padding: 3px;
+}
