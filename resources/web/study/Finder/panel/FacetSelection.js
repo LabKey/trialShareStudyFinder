@@ -23,7 +23,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     getFacetPanelHeader : function() {
         if (!this.facetPanelHeader) {
             this.facetPanelHeader = Ext4.create("LABKEY.study.panel.FacetPanelHeader", {
-
+                dataModuleName: this.dataModuleName
             });
         }
         return this.facetPanelHeader;
@@ -32,7 +32,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     getFacetSelectionSummary: function() {
         if (!this.facetSelectionSummary) {
             this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.SelectionSummary", {
-
+                dataModuleName: this.dataModuleName
             });
         }
         return this.facetSelectionSummary;
@@ -41,7 +41,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     getFacets : function() {
         if (!this.facets) {
             this.facets = Ext4.create("LABKEY.study.panel.Facets", {
-
+                dataModuleName: this.dataModuleName
             });
         }
         return this.facets;

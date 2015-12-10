@@ -8,6 +8,8 @@ Ext4.define("LABKEY.study.panel.Studies", {
 
     padding: "5 0 0 0",
 
+    dataModuleName: 'study',
+
     initComponent : function() {
         this.items = [
             this.getStudyPanelHeader(),
@@ -19,7 +21,7 @@ Ext4.define("LABKEY.study.panel.Studies", {
     getStudyPanelHeader : function() {
         if (!this.studyPanelHeader) {
             this.studyPanelHeader = Ext4.create("LABKEY.study.panel.StudyPanelHeader", {
-                searchTerms: "testing",
+                dataModuleName: this.dataModuleName,
                 padding: 8
             });
         }
@@ -29,7 +31,7 @@ Ext4.define("LABKEY.study.panel.Studies", {
     getStudyCards : function() {
         if (!this.studyCards) {
             this.studyCards = Ext4.create("LABKEY.study.panel.StudyCards", {
-
+                dataModuleName: this.dataModuleName
             });
         }
         return this.studyCards;

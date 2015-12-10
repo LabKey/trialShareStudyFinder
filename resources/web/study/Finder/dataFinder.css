@@ -89,12 +89,18 @@ TD.study-panel > DIV
     overflow-y:scroll;
 }
 
+TABLE.labkey-study-search
+{
+    margin: 5px 0px 0px 5px;
+}
+
 SPAN.labkey-study-search
 {
     position: relative;
 }
 
 /* search area */
+TD.search-box,
 DIV.search-box
 {
     float:left;

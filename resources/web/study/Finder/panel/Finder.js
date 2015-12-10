@@ -17,6 +17,8 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     height: '500px',
 
+    dataModuleName: 'study',
+
     initComponent : function() {
 
         this.items = [
@@ -34,6 +36,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 region: 'west',
                 width: '21%',
                 maxWidth: '265px',
+                dataModuleName: this.dataModuleName,
                 showParticipantFilters : this.showParticipantFilters
             });
         }
@@ -46,6 +49,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
             this.studiesPanel = Ext4.create("LABKEY.study.panel.Studies", {
                 studySubsets : this.studySubsets,
                 showSearch : this.showSearch,
+                dataModuleName: this.dataModuleName,
                 region: 'center',
                 width: '80%',
                 id: 'studies-view'
@@ -53,11 +57,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
         }
         STUDIES = this.studiesPanel;
         return this.studiesPanel;
-    },
-
-    startTutorial : function() {
-        LABKEY.help.Tour.show("LABKEY.tour.dataFinder");
-        return false;
     }
 
 });

@@ -20,7 +20,7 @@ Ext4.define("LABKEY.study.panel.SelectionSummary", {
             '       </div>',
             '</div>',
             {
-                formatNumber :  Ext4.util.Format.numberRenderer('0,000'),
+                formatNumber :  Ext4.util.Format.numberRenderer('0,000')
             }
     ),
 
@@ -33,21 +33,4 @@ Ext4.define("LABKEY.study.panel.SelectionSummary", {
         studyCount: 4,
         participantCount: 10000
     }
-    //tpl : new Ext4.XTemplate(
-    //        '<div id="selectionPanel" style="background-color: white; border:none">',
-    //        '       <div id="summaryArea" class="facet-summary" >',
-    //        '           <div class="facet-header"><span class="facet-caption">Summary</span></div>',
-    //        '           <ul>',
-    //        '               <li class="member">',
-    //        '                   <span class="member-name">Studies</span>',
-    //        '                   <span class="member-count">{studyCount}</span>',
-    //        '               </li>',
-    //        '               <li class="member">',
-    //        '                   <span class="member-name">Subjects</span>',
-    //        '                   <span class="member-count">{participantCount}</span>',
-    //        '               </li>',
-    //        '           </ul>',
-    //        '       </div>',
-    //        '</div>'
-    //)
 });

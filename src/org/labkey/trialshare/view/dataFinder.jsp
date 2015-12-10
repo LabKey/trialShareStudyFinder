@@ -30,6 +30,7 @@
         resources.add(ClientDependency.fromPath("study/Finder/data/Facet.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/FacetMember.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/StudyCard.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/data/StudySubset.js"));
 
         resources.add(ClientDependency.fromPath("study/Finder/panel/FacetPanelHeader.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/FacetPanelHeader2.js"));
@@ -51,7 +52,8 @@
     Ext4.onReady(function ()
     {
         DataFinder.finderView = Ext4.create('LABKEY.study.panel.Finder', {
-            renderTo    : 'dataFinderWrapper'
+            renderTo    : 'dataFinderWrapper',
+            dataModuleName: 'trialshare'
         });
     });
 </script>

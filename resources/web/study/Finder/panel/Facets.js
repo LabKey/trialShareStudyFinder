@@ -8,6 +8,8 @@ Ext4.define("LABKEY.study.panel.Facets", {
 
     itemSelector: 'div.facet',
 
+    dataModuleName: 'study',
+
     autoScroll: true,
 
     studyData : [],
@@ -17,7 +19,7 @@ Ext4.define("LABKEY.study.panel.Facets", {
         autoLoad: true,
         proxy : {
             type: "ajax",
-            url:  LABKEY.ActionURL.buildURL("trialshare", "getStudyFacets", LABKEY.containerPath),
+            url:  LABKEY.ActionURL.buildURL('trialshare', "studyFacets.api", LABKEY.containerPath),
             reader: {
                 type: 'json',
                 root: 'data'

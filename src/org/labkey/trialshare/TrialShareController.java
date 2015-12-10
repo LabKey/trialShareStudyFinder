@@ -33,6 +33,7 @@ import org.labkey.api.view.VBox;
 import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
 import org.labkey.trialshare.data.StudyFacetMember;
+import org.labkey.trialshare.data.StudySubset;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -66,7 +67,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class GetStudiesAction extends ApiAction<StudiesForm>
+    public class StudiesAction extends ApiAction<StudiesForm>
     {
 
         @Override
@@ -114,7 +115,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class GetStudyFacetsAction extends ApiAction
+    public class StudyFacetsAction extends ApiAction
     {
 
         @Override
@@ -219,5 +220,32 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+    @RequiresPermission(ReadPermission.class)
+    public class StudySubsetsAction extends ApiAction
+    {
+
+        @Override
+        public Object execute(Object o, BindException errors) throws Exception
+        {
+            List<StudySubset> subsets = new ArrayList<>();
+            StudySubset subset = new StudySubset();
+            subset.setId("all");
+            subset.setName("All");
+
+            subsets.add(subset);
+
+            subset = new StudySubset();
+            subset.setId("operational");
+            subset.setName("Operational");
+            subsets.add(subset);
+
+            subset = new StudySubset();
+            subset.setId("public");
+            subset.setName("Public");
+            subsets.add(subset);
+            return success(subsets);
+
+        }
+    }
 
 }

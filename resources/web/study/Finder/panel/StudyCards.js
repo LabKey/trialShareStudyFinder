@@ -14,12 +14,14 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
 
     autoScroll: true,
 
+    dataModuleName: 'study',
+
     store : Ext4.create('Ext.data.Store', {
         model: 'LABKEY.study.data.StudyCard',
         autoLoad: true,
         proxy : {
             type: "ajax",
-            url:  LABKEY.ActionURL.buildURL("trialshare", "getStudies", LABKEY.containerPath),
+            url:  LABKEY.ActionURL.buildURL('trialshare', "studies.api", LABKEY.containerPath),
             reader: {
                 type: 'json',
                 root: 'data'
@@ -72,7 +74,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             autoScroll: true,
             loader: {
                 autoLoad: true,
-                url: 'trialshare-studyDetail.view?_frame=none&studyId=' + studyId
+                url: this.dataModuleName + '-studyDetail.view?_frame=none&studyId=' + studyId
             }
         });
         var viewScroll = Ext4.getBody().getScroll();
@@ -93,5 +95,13 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             this.detailShowing.destroy();
             this.detailShowing = null;
         }
+    },
+
+    initComponent: function()
+    {
+        console.log("in StudyCards dataModuleName is " + this.dataModuleName);
+        this.getStore().load();
+        this.callParent();
+
     }
 });
