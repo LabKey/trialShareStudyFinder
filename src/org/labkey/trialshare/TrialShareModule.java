@@ -21,8 +21,11 @@ import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
+import org.labkey.api.view.SimpleWebPartFactory;
 import org.labkey.api.view.WebPartFactory;
+import org.labkey.trialshare.view.DataFinderWebPart;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -49,11 +52,14 @@ public class TrialShareModule extends DefaultModule
         return true;
     }
 
-    @Override
     @NotNull
+    @Override
     protected Collection<WebPartFactory> createWebPartFactories()
     {
-        return Collections.emptyList();
+        ArrayList<WebPartFactory> list = new ArrayList<>();
+        SimpleWebPartFactory factory = new SimpleWebPartFactory("TrialShare Data Finder", WebPartFactory.LOCATION_BODY, DataFinderWebPart.class, null);
+        list.add(factory);
+        return list;
     }
 
     @Override

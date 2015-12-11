@@ -34,6 +34,7 @@ import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
 import org.labkey.trialshare.data.StudyFacetMember;
 import org.labkey.trialshare.data.StudySubset;
+import org.labkey.trialshare.view.DataFinderWebPart;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -63,6 +64,24 @@ public class TrialShareController extends SpringActionController
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
             return new JspView("/org/labkey/trialshare/view/dataFinder.jsp");
+        }
+    }
+
+
+    @RequiresPermission(ReadPermission.class)
+    public class DataFinderAction extends SimpleViewAction
+    {
+        public ModelAndView getView(Object o, BindException errors) throws Exception
+        {
+            setTitle("Data Finder");
+            DataFinderWebPart wp = new DataFinderWebPart(getContainer());
+            wp.setIsAutoResize(true);
+            return wp;
+        }
+
+        public NavTree appendNavTrail(NavTree root)
+        {
+            return root;
         }
     }
 
@@ -112,6 +131,47 @@ public class TrialShareController extends SpringActionController
                     "ClinTrials.gov #: NCT00320606");
         }
         return study;
+    }
+
+    @RequiresPermission(ReadPermission.class)
+    public class StudyFacetMembersAction extends ApiAction
+    {
+        @Override
+        public Object execute(Object o, BindException errors) throws Exception
+        {
+            List<StudyFacetMember> members = new ArrayList<>();
+
+            StudyFacetMember member = new StudyFacetMember();
+            member.setName("Member 1.1");
+            member.setCount(10000);
+            member.setUniqueName("Member11");
+            StudyFacetBean facet = new StudyFacetBean();
+            facet.setName("Facet1");
+            facet.setCaption("Facet 1");
+            member.setFacet(facet);
+            members.add(member);
+
+            member = new StudyFacetMember();
+            member.setName("Member 1.2");
+            members.add(member);
+            member.setCount(0);
+            member.setUniqueName("Member12");
+            member.setFacet(facet);
+            members.add(member);
+
+            member = new StudyFacetMember();
+            member.setName("Member 2.1");
+            member.setCount(12);
+            member.setUniqueName("Member21");
+
+            StudyFacetBean facet2 = new StudyFacetBean();
+            facet2.setName("Facet2");
+            facet2.setCaption("Facet 2");
+            member.setFacet(facet2);
+            members.add(member);
+
+            return success(members);
+        }
     }
 
     @RequiresPermission(ReadPermission.class)
