@@ -77,7 +77,6 @@ SPAN.loaded
     background-color:rgba(81, 158, 218, 0.2);
 }
 
-
 TD.study-panel
 {
     vertical-align: top;
@@ -163,7 +162,6 @@ DIV.summary LI.member
 
 .clear-filter
 {
-    background-color: white;
     float:right;
 }
 
@@ -193,6 +191,51 @@ DIV.facet-header .labkey-filter-options
 {
     font-size: 11px;
     padding: 3px 0px 0px 20px;
+}
+
+.x4-grid-row {
+    border-width: 0px;
+}
+
+.x4-grid-cell-special .x4-grid-cell-inner {
+    background-color: white;
+}
+
+.x4-grid-group-hd {
+    background-color:rgb(240, 240, 240);
+}
+
+.x4-grid-cell-special {
+    border-right-width: 0px;
+}
+
+.x4-grid-group-hd .x4-grid-group-title {
+    background-position: left 28%
+}
+
+.labkey-study-facets .x-grid-cell {
+    background-color: #ffa;
+    border-bottom-color: #ffc;
+    border-top-color: #ff5;
+    color: #009;
+}
+
+.facet-selection-header .inactive,
+.facet-header .inactive
+{
+    cursor:default;
+    color:grey;
+}
+
+/*.facet-header .inactive*/
+/*{*/
+    /*display:none;*/
+    /*cursor:default;*/
+/*}*/
+
+.facet-header .active
+{
+    display:inline-block;
 }
 
 DIV.facet-summary UL,
@@ -255,6 +298,7 @@ DIV.facet.collapsed LI.member.selected-member
 {
     display:block;
 }
+SPAN.member:hover SPAN.bar,
 DIV.facet LI.member:hover SPAN.bar
 {
     background-color:rgba(81, 158, 218, 0.2);
@@ -300,6 +344,8 @@ LI.member .member-name
     white-space: nowrap;
     z-index:2;
 }
+
+SPAN.member .member-count,
 LI.member .member-count
 {
     position:relative;
@@ -307,11 +353,13 @@ LI.member .member-count
     z-index:2;
 }
 
+SPAN.member SPAN.bar-selected,
 LI.member SPAN.bar-selected
 {
     background-color:rgba(81, 158, 218, 0.2);
 }
 
+SPAN.member .bar,
 LI.member .bar
 {
     height:14pt;
@@ -372,7 +420,7 @@ ul.nav
     margin-top : 0;
 }
 
-.labkey-filter-options > a.inactive
+.labkey-filter-options > span.inactive
 {
     color: black;
     cursor: default;

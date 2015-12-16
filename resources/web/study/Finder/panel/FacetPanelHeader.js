@@ -5,8 +5,8 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
     data : {
         loadedStudiesShown: true,
         isGuest: false,
-        hasFilters: true,
-        showParticipantGroups: true,
+        hasFilters: false,
+        showParticipantGroups:false,
         currentGroup: {
             id: 1,
             label: "My group"
@@ -29,7 +29,7 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
         }]
     },
     tpl: new Ext4.XTemplate(
-        '<div id="filterArea" class="facet-selection-header">',
+        '<div id="filterArea" class="facet-selection-header">&nbsp;',
         '<tpl if="showParticipantGroups">',
         '   <div class="labkey-group-label"><tpl if="currentGroup.id != null">Saved group: </tpl>{currentGroup.label}</div>',
         '</tpl>',
@@ -91,10 +91,14 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
         '       </li>',
         '   </ul>',
         '   </tpl>',
-        '   <tpl if="hasFilters">',
-        '   <span class="clear-filter active" onclick="clearAllFilters(true);">[clear all]</span>',
-        '   </tpl>',
+        //'   <tpl if="hasFilters">',
+        '   <span class="clear-filter inactive">[clear all]</span>',
+        //'   <tpl else>',
+        //'   <span class="clear-filter inactive">[clear all]</span>',
+        //'   </tpl>',
         '   </div>',
         '</div>'
-    )
+    ),
+
+
 });

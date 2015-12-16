@@ -28,13 +28,17 @@
         resources.add(ClientDependency.fromPath("query/olap.js"));
         resources.add(ClientDependency.fromPath("study/Finder/dataFinder.css"));
         resources.add(ClientDependency.fromPath("study/Finder/data/Facet.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/data/FacetFilter.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/FacetMember.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/StudyCard.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/StudySubset.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/data/Facets.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/data/FacetMembers.js"));
 
         resources.add(ClientDependency.fromPath("study/Finder/panel/FacetPanelHeader.js"));
-        resources.add(ClientDependency.fromPath("study/Finder/panel/FacetPanelHeader2.js"));
+//        resources.add(ClientDependency.fromPath("study/Finder/panel/FacetPanelHeader2.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/Facets.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/panel/FacetsGrid.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/SelectionSummary.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/FacetSelection.js"));
 

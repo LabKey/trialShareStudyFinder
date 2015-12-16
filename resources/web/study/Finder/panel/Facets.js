@@ -14,27 +14,10 @@ Ext4.define("LABKEY.study.panel.Facets", {
 
     studyData : [],
 
-    store: Ext4.create('Ext.data.Store', {
-        model: 'LABKEY.study.data.Facet',
-        autoLoad: true,
-        proxy : {
-            type: "ajax",
-            url:  LABKEY.ActionURL.buildURL('trialshare', "studyFacets.api", LABKEY.containerPath),
-            reader: {
-                type: 'json',
-                root: 'data'
-            }
-        },
-        listeners: {
-            'load' : {
-                fn : function(store, records, options) {
-                    console.log('Facet store loaded');
-                    this.facetsLoaded = true;
-                },
-                scope: this
-            }
-        }
+    store: Ext4.create('LABKEY.study.store.Facets', {
+        dataModuleName: this.dataModuleName
     }),
+
     tpl: new Ext4.XTemplate(
 
             '<span id="facetPanel">',
@@ -50,12 +33,12 @@ Ext4.define("LABKEY.study.panel.Facets", {
             '       <tpl else>',
             '           <span class="facet-toggle">{name}</span>',
             '       </tpl>',
-            '       <tpl if="currentFilters && currentFilters.length &gt; 0">',
+            '       <tpl if="selectedMembers && selectedMembers.length &gt; 0">',
             '           <span class="clear-filter active">[clear]</span>',
             '       </tpl>',
             '       </div>',
 
-            '   <tpl if="currentFilters && currentFilters.length &gt; 0 && filterOptions.length &gt; 0">',
+            '   <tpl if="selectedMembers && selectedMembers.length &gt; 0 && filterOptions.length &gt; 0">',
             '       <div class="labkey-filter-options" >',
             '       <tpl if="filterOptions.length < 2">',
             '           <a onclick="displayFilterChoice(name, $event)" class="x4-menu-item-text inactive" href="#">',
@@ -77,7 +60,7 @@ Ext4.define("LABKEY.study.panel.Facets", {
             '   <tpl else>',
             '       <li id="member_{parent.name}_{uniqueName}" style="position:relative;" class="member">',
             '   </tpl>',
-            '   <tpl if="!currentFilters || !currentFilters.length">',
+            '   <tpl if="!selectedMembers || !selectedMembers.length">',
             '       <span class="active member-indicator none-selected"></span>',
             '   <tpl else>',
             '       <span class="active member-indicator not-selected"></span>',
@@ -165,7 +148,7 @@ Ext4.define("LABKEY.study.panel.Facets", {
         else if (!shiftClick)
         {
             this._clearFilter(name);
-            facet.currentFilters = [element.id]; // TODO add currentFilters to model
+            facet.selectedMembers = [element.id];
             member.selected = true; // TODO change classes here: li gets 'selected-member' and span gets 'selected'
         }
         else

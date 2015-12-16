@@ -1,5 +1,8 @@
 package org.labkey.trialshare.data;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by susanh on 12/8/15.
  */
@@ -9,6 +12,9 @@ public class StudyFacetMember
     private String uniqueName;
     private Integer count;
     private Float percent;
+    private String facetName;
+    private String facetUniqueName;
+    private List<FacetFilter> filterOptions;
 
     public Integer getCount()
     {
@@ -48,5 +54,35 @@ public class StudyFacetMember
     public void setUniqueName(String uniqueName)
     {
         this.uniqueName = uniqueName;
+    }
+
+    public String getFacetName()
+    {
+        return facetName;
+    }
+
+    public void setFacetName(String facetName)
+    {
+        this.facetName = facetName;
+    }
+
+    public String getFacetUniqueName()
+    {
+        return facetUniqueName;
+    }
+
+    public void setFacetUniqueName(String facetUniqueName)
+    {
+        this.facetUniqueName = facetUniqueName;
+    }
+
+    public List<FacetFilter> getFilterOptions()
+    {
+        return filterOptions;
+    }
+
+    public void setFilterOptions(List<FacetFilter> filterOptions)
+    {
+        this.filterOptions = filterOptions;
     }
 }

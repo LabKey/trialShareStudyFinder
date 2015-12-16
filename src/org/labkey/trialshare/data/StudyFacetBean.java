@@ -1,5 +1,7 @@
 package org.labkey.trialshare.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 /**
@@ -13,7 +15,7 @@ public class StudyFacetBean
     private String hierarchyName;
     private String levelName;
     private String allMemberName;
-    private String filterType;
+    private String defaultFilterType;
     private List<StudyFacetMember> members;
     private List<String> filterOptions;
 
@@ -27,6 +29,7 @@ public class StudyFacetBean
         this.caption = caption;
     }
 
+    @JsonIgnore
     public List<StudyFacetMember> getMembers()
     {
         return members;
@@ -67,14 +70,14 @@ public class StudyFacetBean
         this.filterOptions = filterOptions;
     }
 
-    public String getFilterType()
+    public String getDefaultFilterType()
     {
-        return filterType;
+        return defaultFilterType;
     }
 
-    public void setFilterType(String filterType)
+    public void setDefaultFilterType(String defaultFilterType)
     {
-        this.filterType = filterType;
+        this.defaultFilterType = defaultFilterType;
     }
 
     public String getHierarchyName()

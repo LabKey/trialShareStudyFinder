@@ -7,25 +7,30 @@ import java.util.List;
  */
 public class StudyBean
 {
-    private String accession;
+    private String shortName;
+    private String studyId;
     private String title;
+    private Boolean hasManuscript; // TODO generalize?
     private String investigator;
     private String url;
     private Boolean isLoaded;
     private String description;
     private String briefDescription;
-    private List<StudyPersonnelBean> personnel;
-    private List<StudyPubmedBean> pubmed;
-    private String labelPrefix = null; // common prefix used in labeling studies
+    private String studyIdPrefix = null; // common prefix used in labeling studies
+    private String availability;
 
-    public String getAccession()
+    private List<StudyPersonnelBean> personnel; // TODO remove?
+    private List<StudyPubmedBean> pubmed;
+
+
+    public String getStudyId()
     {
-        return accession;
+        return studyId;
     }
 
-    public void setAccession(String accession)
+    public void setStudyId(String studyId)
     {
-        this.accession = accession;
+        this.studyId = studyId;
     }
 
     public String getInvestigator()
@@ -108,14 +113,44 @@ public class StudyBean
         this.pubmed = pubmed;
     }
 
-    public String getLabelPrefix()
+    public String getStudyIdPrefix()
     {
-        return labelPrefix;
+        return studyIdPrefix;
     }
 
-    public void setLabelPrefix(String labelPrefix)
+    public void setStudyIdPrefix(String studyIdPrefix)
     {
-        this.labelPrefix = labelPrefix;
+        this.studyIdPrefix = studyIdPrefix;
+    }
+
+    public Boolean getHasManuscript()
+    {
+        return hasManuscript;
+    }
+
+    public void setHasManuscript(Boolean hasManuscript)
+    {
+        this.hasManuscript = hasManuscript;
+    }
+
+    public String getShortName()
+    {
+        return shortName;
+    }
+
+    public void setShortName(String shortName)
+    {
+        this.shortName = shortName;
+    }
+
+    public String getAvailability()
+    {
+        return availability;
+    }
+
+    public void setAvailability(String availability)
+    {
+        this.availability = availability;
     }
 }
 

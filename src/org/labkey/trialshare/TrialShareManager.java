@@ -16,6 +16,9 @@
 
 package org.labkey.trialshare;
 
+import org.labkey.api.data.DbSchema;
+import org.labkey.api.data.DbSchemaType;
+
 public class TrialShareManager
 {
     private static final TrialShareManager _instance = new TrialShareManager();
@@ -28,5 +31,10 @@ public class TrialShareManager
     public static TrialShareManager get()
     {
         return _instance;
+    }
+
+    public static DbSchema getSchema()
+    {
+        return DbSchema.get("trialShare", DbSchemaType.Module);
     }
 }

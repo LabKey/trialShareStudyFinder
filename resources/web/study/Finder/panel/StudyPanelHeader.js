@@ -10,6 +10,11 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
 
     dataModuleName: 'study',
 
+    bubbleEvents: [
+        "studySubsetChanged",
+        "searchTermsChanged"
+    ],
+
     studySubsets : Ext4.create("Ext.data.Store", {
         autoLoad: true,
         id: 'StudySubsetStore',
@@ -65,12 +70,16 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
                 queryMode: 'local',
                 valueField: 'id',
                 displayField: 'name',
+                value: this.studySubsets.getAt(0),
                 cls: 'labkey-study-search',
                 multiSelect: false,
                 listeners: {
                     scope: this,
                     'select': function(field, newValue, oldValue, eOpts) {
                         this.onStudySubsetChanged(newValue[0])
+                    },
+                    'render': function(eOpts) {
+                        this.onStudySubsetChanged(this.studySubsets.getAt(0))
                     }
                 }
             })
@@ -94,10 +103,12 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
 
     onSearchTermsChanged: function(value) {
         console.log("Search terms changed to ", value);
+        this.fireEvent("searchTermsChanged", value);
     },
 
     onStudySubsetChanged: function(value) {
         console.log("Subset changed to ", value.data.id);
+        this.fireEvent("studySubsetChanged", value.data.id);
     },
 
     startTutorial: function() {

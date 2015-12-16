@@ -7,7 +7,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     cls: 'labkey-data-finder-view',
 
-    title: "Data Finder",
+    border: false,
 
     showParticipantFilters: false,
 
@@ -19,6 +19,8 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     dataModuleName: 'study',
 
+    autoScroll : true,
+
     initComponent : function() {
 
         this.items = [
@@ -27,6 +29,37 @@ Ext4.define('LABKEY.study.panel.Finder', {
         ];
 
         this.callParent();
+
+        this._initResize();
+
+        this.on(
+                'filterSelectionChanged', this.onFilterSelectionChange
+                //'studySubsetChanged', this.onStudySubsetChanged,
+                //'searchTermsChanged', this.onSearchTermsChanged
+        );
+    },
+
+    //onStudySubsetChanged : function(value) {
+    //    this.getStudiesPanel().getStudyCards().store.filter('availability', value);
+    //},
+    //
+    onFilterSelectionChange : function(){
+        console.log("Filter selection changed!");
+    },
+
+    _initResize : function() {
+        var resize = function(w, h) {
+            LABKEY.ext4.Util.resizeToViewport(this, w, h, 46, 32);
+        };
+
+        Ext4.EventManager.onWindowResize(resize, this);
+
+        this.on('afterrender', function() {
+            Ext4.defer(function() {
+                var size = Ext4.getBody().getBox();
+                resize.call(this, size.width, size.height);
+            }, 300, this);
+        });
     },
 
     getFacetsPanel: function() {

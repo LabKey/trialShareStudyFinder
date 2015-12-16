@@ -16,6 +16,20 @@ Ext4.define("LABKEY.study.panel.Studies", {
             this.getStudyCards()
         ];
         this.callParent();
+
+        this.on(
+                {'studySubsetChanged': this.onStudySubsetChanged,
+                 'searchTermsChanged': this.onSearchTermsChanged}
+        );
+    },
+
+    onStudySubsetChanged : function(value) {
+        this.getStudyCards().store.clearFilter();
+        this.getStudyCards().store.filter('availability', value);
+    },
+
+    onSearchTermsChanged : function(value) {
+        console.log("search terms changed to " + value)
     },
 
     getStudyPanelHeader : function() {

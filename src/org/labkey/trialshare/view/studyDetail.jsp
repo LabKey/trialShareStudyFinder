@@ -78,9 +78,9 @@
             Container studyContainer = ContainerManager.getForId((String) map.get("container"));
             String studyAccession = (String)map.get("study_accession");
             String name = (String)map.get("Label");
-            if (null == studyAccession && study.getLabelPrefix() != null && name.startsWith(study.getLabelPrefix()))
+            if (null == studyAccession && study.getStudyIdPrefix() != null && name.startsWith(study.getStudyIdPrefix()))
                 studyAccession = name;
-            if (null != studyContainer && StringUtils.equalsIgnoreCase(study.getAccession(), studyAccession))
+            if (null != studyContainer && StringUtils.equalsIgnoreCase(study.getStudyId(), studyAccession))
             {
                 studyUrl = studyContainer.getStartURL(context.getUser());
                 break;
@@ -93,7 +93,7 @@
 %>
 
 <div id="demographics" class="study-demographics">
-<h2 class="study-accession"><% if (null!=studyUrl) {%><a style="color:#fff" href="<%=h(studyUrl)%>"><%}%><%=h(study.getAccession())%><% if (null!=studyUrl) {%></a><%}%></h2>
+<h2 class="study-accession"><% if (null!=studyUrl) {%><a style="color:#fff" href="<%=h(studyUrl)%>"><%}%><%=h(study.getStudyId())%><% if (null!=studyUrl) {%></a><%}%></h2>
 <div id="demographics-content">
 <h3 class="study-title"><%=h(study.getTitle())%></h3>
     <div><%
@@ -130,7 +130,7 @@
     </div>
 
     <% if (null != studyUrl) { %>
-        <%= textLink("View study " + study.getAccession(), studyUrl.toString(), null, null, linkProps)%><br>
+        <%= textLink("View study " + study.getStudyId(), studyUrl.toString(), null, null, linkProps)%><br>
     <% } %>
 </div>
 </div>

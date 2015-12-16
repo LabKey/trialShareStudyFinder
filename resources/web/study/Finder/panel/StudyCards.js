@@ -32,22 +32,26 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     tpl: new Ext4.XTemplate(
         '<div id="studypanel">',
         '   <tpl for=".">',
-        '   <tpl if="isLoaded">',
+        '   <tpl if="hasManuscript">',
+        //    TODO this should be labkey-study-card-highlight-1 instead of loaded
         '   <div class="labkey-study-card loaded">',
         '   <tpl else>',
         '   <div class="labkey-study-card">',
         '   </tpl>',
-        '       <span class="labkey-study-card-highlight labkey-study-card-accession">{accession}</span>',
+        '       <span class="labkey-study-card-highlight labkey-study-card-accession">{studyId}</span>',
         '       <span class="labkey-study-card-highlight labkey-study-card-pi">{investigator}</span>',
         '       <hr class="labkey-study-card-divider">',
         '       <div>',
         '           <a class="labkey-text-link labkey-study-card-summary" title="click for more details">view summary</a>',
-        '           <tpl if="isLoaded && url">',
+        '           <tpl if="hasManuscript && url">',
         '           <a class="labkey-text-link labkey-study-card-goto" href="{url}">go to study</a>',
         '           </tpl>',
         '       </div>',
                 <!-- TODO this should be labkey-study-card-title -->
         '       <div class="labkey-study-card-description">{title}</div>',
+        '       <tpl if="hasManuscript">',
+        '       <br><br><span style="font-size:80%">Manuscript available</span>',
+        '       </tpl>',
         '   </div>',
         '   </tpl>',
         '</div>'
@@ -56,7 +60,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     listeners: {
         itemClick: function(view, record, item, index, e, eOpts) {
             console.log("Show study popup for record " , record);
-            this.showPopup(record.get("accession"));
+            this.showPopup(record.get("studyId"));
         }
     },
 

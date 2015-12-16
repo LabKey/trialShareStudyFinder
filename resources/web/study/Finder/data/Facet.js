@@ -1,13 +1,20 @@
 Ext4.define('LABKEY.study.data.Facet', {
     extend: 'Ext.data.Model',
 
+    idProperty : 'name',
+
     fields: [
         {name: 'name'},
-        {name: 'caption'},
         {name: 'pluralName'},
-        {name: 'filterOptions'},
+        {name: 'uniqueName'},
         {name: 'members'},
-        {name: 'currentFilters'}
+        {name: 'selectedMembers'},
+        {name: 'filterOptions'},
+        {name: 'currentFilterType'},
+        {name: 'currentFilterCaption'},
+        {name: 'summaryCount', type:'int', default: 0},
+        {name: 'allMemerCount', type:'int', default: 0}
+
     ],
 
     associations: [
@@ -25,9 +32,9 @@ Ext4.define('LABKEY.study.data.Facet', {
         },
         {
             type: 'hasMany',
-            model: 'LABKEY.study.data.FacetFilter',
-            name: 'currentFilters',
-            associationKey: 'currentFilters'
+            model: 'LABKEY.study.data.FacetMember',
+            name: 'selectedMembers',
+            associationKey: 'selectedMembers'
         }
     ]
 });
@@ -41,11 +48,3 @@ Ext4.define('LABKEY.study.data.FacetMember', {
     ]
 });
 
-
-Ext4.define('LABKEY.study.data.FacetFilter', {
-    extend: 'Ext.data.Model',
-    fields :[
-        {name: 'type'},
-        {name: 'caption'}
-    ]
-});
