@@ -43,7 +43,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         '       <hr class="labkey-study-card-divider">',
         '       <div>',
         '           <a class="labkey-text-link labkey-study-card-summary" title="click for more details">view summary</a>',
-        '           <tpl if="hasManuscript && url">',
+        '           <tpl if="url">',
         '           <a class="labkey-text-link labkey-study-card-goto" href="{url}">go to study</a>',
         '           </tpl>',
         '       </div>',

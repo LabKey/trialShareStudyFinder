@@ -160,7 +160,37 @@ DIV.summary LI.member
     background-color: white;
 }
 
-.clear-filter
+.labkey-clear-all
+{
+    float: right;
+    background-color: white;
+    background-image: none;
+    color: black;
+    border: none;
+}
+
+.labkey-clear-all .x4-btn-inner {
+    text-transform: none;
+    font-weight: normal;
+    font-size:100%;
+}
+
+.labkey-clear-all.inactive
+{
+    cursor: default;
+}
+.labkey-clear-all.inactive .x4-btn-inner
+{
+    color: grey;
+    cursor:default;
+}
+
+.labkey-clear-all.active .x4-btn-inner
+{
+    color:black;
+}
+
+.labkey-clear-filter
 {
     float:right;
 }
@@ -197,6 +227,12 @@ DIV.facet-header .labkey-filter-options
     border-width: 0px;
 }
 
+.x4-grid-row-selected .x4-grid-td {
+    background-color: white;
+}
+
+
+
 .x4-grid-cell-special .x4-grid-cell-inner {
     background-color: white;
 }
@@ -218,6 +254,12 @@ DIV.facet-header .labkey-filter-options
     border-bottom-color: #ffc;
     border-top-color: #ff5;
     color: #009;
+}
+
+a.labkey-clear-filter.inactive
+{
+    cursor:default;
+    color:grey;
 }
 
 .facet-selection-header .inactive,
@@ -294,10 +336,12 @@ DIV.expanded  .fa-minus-square
     float:left;
     display:inline;
 }
+
 DIV.facet.collapsed LI.member.selected-member
 {
     display:block;
 }
+
 SPAN.member:hover SPAN.bar,
 DIV.facet LI.member:hover SPAN.bar
 {
@@ -353,13 +397,22 @@ LI.member .member-count
     z-index:2;
 }
 
+.x4-grid-row-selected SPAN.bar,
 SPAN.member SPAN.bar-selected,
 LI.member SPAN.bar-selected
 {
     background-color:rgba(81, 158, 218, 0.2);
 }
 
-SPAN.member .bar,
+.x4-grid-row-focused .x4-grid-td,
+.x4-grid-row-before-focused .x4-grid-td,
+.x4-grid-cell
+{
+    border-bottom-style: hidden;
+    border-top-style: hidden;
+}
+
+.x4-grid-row SPAN.bar,
 LI.member .bar
 {
     height:14pt;

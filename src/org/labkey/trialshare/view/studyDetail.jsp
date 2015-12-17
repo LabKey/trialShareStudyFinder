@@ -43,7 +43,6 @@
         LinkedHashSet<ClientDependency> resources = new LinkedHashSet<>();
 
         resources.add(ClientDependency.fromPath("dataFinder.css"));
-        resources.add(ClientDependency.fromPath("immport/hipc.css"));
 
         return resources;
     }

@@ -11,7 +11,7 @@ public class StudyFacetMember
     private String name;
     private String uniqueName;
     private Integer count;
-    private Float percent;
+    private Integer percent;
     private String facetName;
     private String facetUniqueName;
     private List<FacetFilter> filterOptions;
@@ -36,12 +36,12 @@ public class StudyFacetMember
         this.name = name;
     }
 
-    public Float getPercent()
+    public Integer getPercent()
     {
         return percent;
     }
 
-    public void setPercent(Float percent)
+    public void setPercent(Integer percent)
     {
         this.percent = percent;
     }

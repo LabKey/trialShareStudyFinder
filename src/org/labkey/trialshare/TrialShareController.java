@@ -167,6 +167,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("TherapeuticArea");
             member.setFilterOptions(getFacetFilters());
             member.setCount(4);
+            member.setPercent(50);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -176,6 +177,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("TherapeuticArea");
             member.setFilterOptions(getFacetFilters());
             member.setCount(3);
+            member.setPercent(42);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -185,6 +187,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("TherapeuticArea");
             member.setFilterOptions(getFacetFilters());
             member.setCount(1);
+            member.setPercent(8);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -194,6 +197,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("TherapeuticArea");
             member.setFilterOptions(getFacetFilters());
             member.setCount(0);
+            member.setPercent(0);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -203,6 +207,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("StudyType");
             member.setFilterOptions(getFacetFilters());
             member.setCount(5);
+            member.setPercent(50);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -212,6 +217,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("StudyType");
             member.setFilterOptions(getFacetFilters());
             member.setCount(2);
+            member.setPercent(20);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -221,6 +227,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("StudyType");
             member.setFilterOptions(getFacetFilters());
             member.setCount(3);
+            member.setPercent(30);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -230,6 +237,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("AgeGroup");
             member.setFilterOptions(getFacetFilters());
             member.setCount(4);
+            member.setPercent(50);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -239,6 +247,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("AgeGroup");
             member.setFilterOptions(getFacetFilters());
             member.setCount(1);
+            member.setPercent(13);
             members.add(member);
 
             member = new StudyFacetMember();
@@ -248,6 +257,7 @@ public class TrialShareController extends SpringActionController
             member.setFacetUniqueName("AgeGroup");
             member.setFilterOptions(getFacetFilters());
             member.setCount(3);
+            member.setPercent(37);
             members.add(member);
 
             return success(members);

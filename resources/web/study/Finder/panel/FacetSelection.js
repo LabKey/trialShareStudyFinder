@@ -19,22 +19,31 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         ];
         this.callParent();
 
-        this.on(
-                'filterSelectionChanged', this.onFilterSelectionChange
+        this.on({
+            filterSelectionChanged: this.onFilterSelectionChange,
+            clearAllFilters: this.onClearAllFilters
+        }
         );
     },
+
+    onClearAllFilters: function() {
+        this.facets.clearAllFilters(true);
+        this.onFilterSelectionChange(false);
+    },
+
 
     onFilterSelectionChange: function(hasFilters) {
         console.log("FacetSelection filterSelectionChanged handler");
         if (hasFilters)
-            Ext4.get(Ext4.DomQuery.select('.clear-filter', this.id)[0]).replaceCls('inactive', 'active');
+            Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('inactive', 'active');
         else
-            Ext4.get(Ext4.DomQuery.select('.clear-filter', this.id)[0]).replaceCls('active', 'inactive')
+            Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('active', 'inactive')
 
     },
 
     getFacetPanelHeader : function() {
         if (!this.facetPanelHeader) {
+            //this.facetPanelHeader = Ext4.create("LABKEY.study.panel.FacetPanelHeaderTpl", {
             this.facetPanelHeader = Ext4.create("LABKEY.study.panel.FacetPanelHeader", {
                 dataModuleName: this.dataModuleName
             });

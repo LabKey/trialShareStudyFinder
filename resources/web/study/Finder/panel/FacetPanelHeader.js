@@ -1,104 +1,157 @@
 Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
-    extend: "Ext.Component",
+    extend: "Ext.Container",
 
     padding: "0 0 5 0",
-    data : {
-        loadedStudiesShown: true,
-        isGuest: false,
-        hasFilters: false,
-        showParticipantGroups:false,
-        currentGroup: {
-            id: 1,
-            label: "My group"
-        },
-        saveOptions: [
-            {
-                id: "save",
-                label : "Save",
-                isActive : true
-            },
-            {
-                id: "saveAs",
-                label : "Save As",
-                isActive : true
-            }
-        ],
+    bubbleEvents: ["clearAllFilters"],
 
-        groups: [{
-            label: "my first group"
-        }]
+    // TODO need to hook up the participant group functionality to the menus
+    showParticipantGroups: false,
+
+    isGuest : false,
+
+    currentGroup: {
+        id: null,
+        label: "Unsaved group"
     },
-    tpl: new Ext4.XTemplate(
-        '<div id="filterArea" class="facet-selection-header">&nbsp;',
-        '<tpl if="showParticipantGroups">',
-        '   <div class="labkey-group-label"><tpl if="currentGroup.id != null">Saved group: </tpl>{currentGroup.label}</div>',
-        '</tpl>',
-        '   <div class="navbar navbar-default ">',
-        '   <tpl if="showParticipantGroups">',
-        '   <ul class="nav navbar-nav">',
-        '   <tpl if="!isGuest">',
-        '       <li id="manageMenu" class="labkey-dropdown" ng-mouseover="openMenu($event, true)">',
-        '       <a href="#"><i class="fa fa-cog"></i></a>',
-        '       <ul class="labkey-dropdown-menu">',
-        '           <li class="x4-menu-item-text"><a class="menu-item-link" href="<%=new ActionURL("study", "manageParticipantCategories", getContainer()).toHString()%>">Manage Groups</a></li>',
-        '       </ul>',
-        '       </li>',
-        '   </tpl>',
-        '       <li id="loadMenu" class="labkey-dropdown" >',
-        '       <tpl if="loadedStudiesShown">',
-        '           <a class="labkey-text-link no-arrow" style="margin-right: 0.8em" href="#" ng-mouseover="openMenu(event, false)">Load <i class="fa fa-caret-down"></i></a>',
-        '           <tpl if="groups.length &gt; 0">',
-        '           <ul class="labkey-dropdown-menu" >',
-        '           <tpl for="groups">',
-        '               <li class="x4-menu-item-text">',
-        '                   <a class="menu-item-link" onclick="applySubjectGroupFilter()">{label}</a>',
-        '               </li>',
-        '           </tpl>',
-        '           </ul>',
-        '           </tpl>',
-        '       <tpl else>',
-        '           <a class="labkey-disabled-text-link no-arrow" style="margin-right: 0.8em" href="#" ng-mouseover="openMenu(event, false)">Load <i class="fa fa-caret-down"></i></a>',
-        '       </tpl>',
-        '       </li>',
-        '       <li id="saveMenu" class="labkey-dropdown">',
-        '       <tpl if="loadedStudiesShown">',
-        '           <a class="labkey-text-link no-arrow" style="margin-right: 0.8em" href="#" ng-mouseover="openMenu(event, false)" ng-mouseleave="closeMenu(event)">Save <i class="fa fa-caret-down"></i> </a>',
-        '           <tpl if="!isGuest">',
-        '           <ul class="labkey-dropdown-menu">',
-        '               <tpl for="saveOptions">',
-        '                   <tpl if="isActive">',
-        '               <li class="x4-menu-item-text">',
-        '                   <a class="menu-item-link" onclick="saveSubjectGroup(id, $event)">{label}</a>',
-        '               </li>',
-        '                   <tpl else>',
-        '               <li class="x4-menu-item-text inactive">',
-        '                   <a class="menu-item-link inactive" onclick="saveSubjectGroup(id, $event)">{label}</a>',
-        '               </li>',
-        '                   </tpl>',
-        '               </tpl>',
-        '           </ul>',
-        '           </tpl>',
-        '       <tpl else>',
-        '           <a class="labkey-disabled-text-link no-arrow" style="margin-right: 0.8em" href="#" ng-mouseover="openMenu($event, false)" ng-mouseleave="closeMenu($event)">Save <i class="fa fa-caret-down"></i> </a>',
-        '       </tpl>',
-        '       <tpl if="isGuest">',
-        '           <ul class="labkey-dropdown-menu">',
-        '               <li class="x4-menu-item-text">',
-        '                   <span class="menu-item-link">You must be logged in to save a group.</span>',
-        '               </li>',
-        '           </ul>',
-        '       </tpl>',
-        '       </li>',
-        '   </ul>',
-        '   </tpl>',
-        //'   <tpl if="hasFilters">',
-        '   <span class="clear-filter inactive">[clear all]</span>',
-        //'   <tpl else>',
-        //'   <span class="clear-filter inactive">[clear all]</span>',
-        //'   </tpl>',
-        '   </div>',
-        '</div>'
-    ),
 
+    saveOptions: [
+        {
+            id: "save",
+            label : "Save",
+            isActive : true
+        },
+        {
+            id: "saveAs",
+            label : "Save As",
+            isActive : false
+        }
+    ],
 
+    initComponent: function() {
+        this.items = [];
+        if (this.showParticipantGroups)
+        {
+            this.items.push(
+                {
+                    xtype: 'component',
+                    html: (this.currentGroup.id != null ? 'Saved Group: ' : '') + this.currentGroup.label
+                }
+            );
+
+            this.items.push(
+                {
+                    xtype: 'component',
+                    html: '<span id="manageMenu"><i class="fa fa-cog"></i></span>'
+                }
+            );
+
+            this.items.push(
+                {
+                    xtype: 'component',
+                    html: '<span id="loadMenu">Load</span>'
+                }
+            );
+
+            this.items.push(
+                {
+                    xtype: 'component',
+                    html: '<span id="saveMenu">Save</span>'
+                }
+            );
+        }
+        this.items.push(
+                Ext4.create("Ext.button.Button", {
+                    text: '[clear all]',
+                    cls: 'labkey-clear-all inactive',
+                    scope: this,
+                    handler: function() {
+                        this.fireEvent("clearAllFilters", false);
+                    }
+                })
+        );
+        this.callParent();
+
+    }
+
+    // TODO to hook up the menus, we'll want to use a mechanism like this
+    //getLoadMenuTitle : function () {
+    //    if (!this.loadMenuTitle)
+    //    {
+    //        this.loadMenu = Ext.create('Ext.menu.Menu', {
+    //            // NOTE: consider replacing the action class here with a id based-method
+    //            cls: 'labkey-dropdown',
+    //            showSeparator: false
+    //        });
+    //
+    //        this.groupingMenuTitle = Ext.create('Ext.Component', {
+    //            data: {},
+    //            tpl: new Ext.XTemplate(
+    //                    '<tpl if="showMenu == true">',
+    //                    '<span class="menutitle showgroupingmenu">',
+    //                    '<span class="label">{text:htmlEncode}</span>',
+    //                    '<img class="down-arrow" src="' + LABKEY.contextPath + '/argos/images/argos_dropdown_arrow.png" />',
+    //                    '</span>',
+    //                    '<tpl else>',
+    //                    '<span class="menutitle">',
+    //                    '<span class="label">{text:htmlEncode}</span>',
+    //                    '</span>',
+    //                    '</tpl>'
+    //            )
+    //        });
+    //
+    //        this.groupingMenu.on('afterrender', function() {
+    //            Ext.iterate(this.availableGroupings, function (group) {
+    //                this.groupingMenu.add({value: group, text: this.groupingLookupMap[group].label});
+    //            }, this);
+    //        }, this);
+    //
+    //        this.groupingMenu.on('click', function(menu, item) {
+    //            this.selectedGrouping = item.value;
+    //            this.dirty = true;
+    //            this._refresh();
+    //        }, this);
+    //    }
+    //
+    //    return this.groupingMenuTitle;
+    //},
+    //
+    //showGroupingMenu : function () {
+    //    var boxPos = this.getGroupingMenuTitle().getBox();
+    //    this.groupingMenu.showAt([boxPos.x, boxPos.y + boxPos.height + 6]);
+    //},
+    //
+    //getGroupingMenuPanel : function () {
+    //    if (!this.groupingMenuPanel)
+    //    {
+    //        this.groupingMenuPanel = Ext.create('Ext.panel.Panel', {
+    //            minWidth : 400,
+    //            border : false,
+    //            layout : {type: 'hbox', align: 'stretch'},
+    //            items :[
+    //                this.getChartCategoryBox(),
+    //                {
+    //                    xtype : 'container',
+    //                    minWidth : 200,
+    //                    cls : 'groupingmenupanel',
+    //                    items : [this.getGroupingMenuTitle()]
+    //                }]
+    //        });
+    //    }
+    //
+    //    return this.groupingMenuPanel;
+    //},
+    //
+    //updateGroupingMenuTitle : function() {
+    //    var showMenu = this.availableGroupings.length > 1;
+    //
+    //    this.getGroupingMenuTitle().update({
+    //        value: this.selectedGrouping,
+    //        text: this.selectedGrouping ? this.groupingLookupMap[this.selectedGrouping].label : null,
+    //        showMenu: showMenu
+    //    });
+    //
+    //    if (showMenu) {
+    //        this.getGroupingMenuTitle().getEl().down('.menutitle').on('click', this.showGroupingMenu, this);
+    //    }
+    //}
 });

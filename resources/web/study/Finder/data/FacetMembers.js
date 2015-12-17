@@ -192,13 +192,13 @@ Ext4.define('LABKEY.study.store.FacetMembers', {
             dim.data.summaryCount = 0;
             dim.data.allMemberCount = 0;
         }
-        for (var i = 0; i < this.count(); i++) {
-            this.getAt(i).data.count = 0;
-            this.getAt(i).data.percent = 0;
+        for (d = 0; d < this.count(); d++) {
+            this.getAt(d).data.count = 0;
+            this.getAt(d).data.percent = 0;
         }
 
-        var positions = cellSetHelper.getRowPositionsOneLevel(cellSet);
-        var data = cellSetHelper.getDataOneColumn(cellSet, 0);
+        var positions = this.getRowPositionsOneLevel(cellSet);
+        var data = this.getDataOneColumn(cellSet, 0);
         var max = 0;
         for (var i = 0; i < positions.length; i++)
         {
@@ -248,6 +248,48 @@ Ext4.define('LABKEY.study.store.FacetMembers', {
         //if (!isSavedGroup)
         //    this.changeSubjectGroup();
         //this.doneRendering();
+    },
+
+    getRowPositions : function(cellSet)
+    {
+        return cellSet.axes[1].positions;
+    },
+
+    getRowPositionsOneLevel : function(cellSet)
+    {
+        var positions = cellSet.axes[1].positions;
+        if (positions.length > 0 && positions[0].length > 1)
+        {
+            console.log("warning: rows have nested members");
+            throw "illegal state";
+        }
+        return positions.map(function(inner){return inner[0]});
+    },
+
+    getData : function(cellSet,defaultValue)
+    {
+        var cells = cellSet.cells;
+        var ret = cells.map(function(row)
+        {
+            return row.map(function(col){return col.value ? col.value : defaultValue;});
+        });
+        return ret;
+    },
+
+    getDataOneColumn : function(cellSet,defaultValue)
+    {
+        var cells = cellSet.cells;
+        if (cells.length > 0 && cells[0].length > 1)
+        {
+            console.log("warning cellSet has more than one column");
+            throw "illegal state";
+        }
+        var ret = cells.map(function(row)
+        {
+            return row[0].value ? row[0].value : defaultValue;
+        });
+        return ret;
     }
+
 
 });

@@ -30,6 +30,8 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
         this.callParent();
 
+        this.getCubeDefinition();
+
         this._initResize();
 
         this.on(
@@ -38,6 +40,16 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 //'searchTermsChanged', this.onSearchTermsChanged
         );
     },
+
+    getCubeDefinition: function() {
+        //this.cube = LABKEY.query.olap.CubeManager.getCube({
+        //    configId: 'TrialShare:/StudyCube',
+        //    schemaName: 'TrialShare',
+        //    name: 'StudyCube',
+        //    deferLoad: false
+        //});
+    },
+
 
     //onStudySubsetChanged : function(value) {
     //    this.getStudiesPanel().getStudyCards().store.filter('availability', value);
