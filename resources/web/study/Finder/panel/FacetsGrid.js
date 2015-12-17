@@ -42,15 +42,15 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             cls:'facet',
             tpl: new Ext4.XTemplate(
                     '   <tpl if="count==0">',
-                    '       <span class="labkey-facet-member member empty-member">',
+                    '       <span class="labkey-facet-member labkey-empty-member">',
                     '   <tpl else>',
-                    '       <span class="labkey-facet-member member">',
+                    '       <span class="labkey-facet-member">',
                     '   </tpl>',
-                    '       <span class="labkey-facet-member-name member-name">{name}</span>',
+                    '       <span class="labkey-facet-member-name">{name}</span>',
                     '       &nbsp;',
-                    '       <span class="labkey-facet-member-count member-count">{count:this.formatNumber}</span>',
+                    '       <span class="labkey-facet-member-count">{count:this.formatNumber}</span>',
                     '   <tpl if="count">',
-                    '       <span class="labkey-facet-percet-bar bar" style="width:{percent}%;"></span>',
+                    '       <span class="labkey-facet-percent-bar" style="width:{percent}%;"></span>',
                     '   </tpl>',
                     '       </span>',
                     {
@@ -66,9 +66,9 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         id: 'facetMemberGrouping',
 
         groupHeaderTpl: new Ext4.XTemplate(
-            '<div class="facet-header facet-toggle" id="{name:this.genId}">',
-            '       <div class="facet-caption facet-toggle">',
-            '           <span class="facet-toggle">{name}</span>',
+            '<div class="labkey-facet-header" id="{name:this.genId}">',
+            '       <div class="labkey-facet-caption">',
+            '           <span>{name}</span>',
             '           <span class="labkey-clear-filter inactive">[clear]</span>',
             '       </div>',
             '       <div class="labkey-filter-options"></div>',
@@ -203,9 +203,6 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             });
         }
         filterOptionsMenu.showAt(event.xy);
-
-        //if (event.stopPropagation)
-        //    event.stopPropagation();
     },
 
     clearAllFilters : function (updateCounts) {

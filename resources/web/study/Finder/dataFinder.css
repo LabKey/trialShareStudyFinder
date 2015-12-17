@@ -77,16 +77,17 @@ SPAN.loaded
     background-color:rgba(81, 158, 218, 0.2);
 }
 
-TD.study-panel
-{
-    vertical-align: top;
-}
+/*TD.labkey-study-panel,*/
+/*TD.study-panel*/
+/*{*/
+    /*vertical-align: top;*/
+/*}*/
 
-TD.study-panel > DIV
-{
-    height:100%;
-    overflow-y:scroll;
-}
+/*TD.study-panel > DIV*/
+/*{*/
+    /*height:100%;*/
+    /*overflow-y:scroll;*/
+/*}*/
 
 TABLE.labkey-study-search
 {
@@ -99,23 +100,26 @@ SPAN.labkey-study-search
 }
 
 /* search area */
+TD.labkey-search-box,
 TD.search-box,
 DIV.search-box
 {
     float:left;
     padding:10pt;
 }
+INPUT.labkey-search-box,
 INPUT.search-box
 {
     width:200pt;
 }
 
-DIV.studyfinder-header
-{
-    float:left;
-    padding-right:10pt;
-}
+/*DIV.studyfinder-header*/
+/*{*/
+    /*float:left;*/
+    /*padding-right:10pt;*/
+/*}*/
 
+DIV.labkey-search-message,
 DIV.search-message
 {
     padding-left:10pt;
@@ -135,12 +139,12 @@ DIV.search-message
     overflow-y:auto;
 }
 
-DIV.help-links
-{
-    float:right;
-    vertical-align: text-top;
-    text-align: right;
-}
+/*DIV.help-links*/
+/*{*/
+    /*float:right;*/
+    /*vertical-align: text-top;*/
+    /*text-align: right;*/
+/*}*/
 
 DIV.summary LI.member
 {
@@ -206,46 +210,50 @@ DIV.facet
 {
     cursor:pointer;
 }
+
+.labkey-facet-header,
 DIV.facet-header
 {
     padding:4pt;
     background-color: rgb(240, 240, 240);
 }
 
+.labkey-facet-header .labkey-facet-caption,
 DIV.facet-header .facet-caption
 {
     font-weight:400;
 }
 
+.labkey-facet-header .labkey-filter-options,
 DIV.facet-header .labkey-filter-options
 {
     font-size: 11px;
     padding: 3px 0px 0px 20px;
 }
 
-.x4-grid-row {
+.labkey-study-facets .x4-grid-row {
     border-width: 0px;
 }
 
-.x4-grid-row-selected .x4-grid-td {
+.labkey-study-facets .x4-grid-row-selected .x4-grid-td {
     background-color: white;
 }
 
 
 
-.x4-grid-cell-special .x4-grid-cell-inner {
+.labkey-study-facets .x4-grid-cell-special .x4-grid-cell-inner {
     background-color: white;
 }
 
-.x4-grid-group-hd {
+.labkey-study-facets .x4-grid-group-hd {
     background-color:rgb(240, 240, 240);
 }
 
-.x4-grid-cell-special {
+.labkey-study-facets .x4-grid-cell-special {
     border-right-width: 0px;
 }
 
-.x4-grid-group-hd .x4-grid-group-title {
+.labkey-study-facets .x4-grid-group-hd .x4-grid-group-title {
     background-position: left 28%
 }
 
@@ -256,25 +264,21 @@ DIV.facet-header .labkey-filter-options
     color: #009;
 }
 
-a.labkey-clear-filter.inactive
-{
-    cursor:default;
-    color:grey;
-}
+/*a.labkey-clear-filter.inactive*/
+/*{*/
+    /*cursor:default;*/
+    /*color:grey;*/
+/*}*/
 
 .facet-selection-header .inactive,
+.labkey-facet-header .inactive,
 .facet-header .inactive
 {
     cursor:default;
     color:grey;
 }
 
-/*.facet-header .inactive*/
-/*{*/
-    /*display:none;*/
-    /*cursor:default;*/
-/*}*/
-
+.labkey-facet-header .active,
 .facet-header .active
 {
     display:inline-block;
@@ -342,11 +346,13 @@ DIV.facet.collapsed LI.member.selected-member
     display:block;
 }
 
-SPAN.member:hover SPAN.bar,
+SPAN.labkey-facet-member:hover SPAN.labkey-facet-percent-bar,
 DIV.facet LI.member:hover SPAN.bar
 {
     background-color:rgba(81, 158, 218, 0.2);
 }
+
+.labkey-empty-member,
 DIV.facet LI.empty-member
 {
     color:#888888;
@@ -378,6 +384,9 @@ LI.member .member-indicator
 {
     content:"\002713"; color:lightgray;
 }
+
+SPAN.member .labkey-facet-member-name,
+SPAN.labkey-facet-member  .labkey-facet-member-name,
 LI.member .member-name
 {
     display:inline-block;
@@ -389,7 +398,8 @@ LI.member .member-name
     z-index:2;
 }
 
-SPAN.member .member-count,
+SPAN.member .labkey-facet-member-count,
+SPAN.labkey-facet-member  .labkey-facet-member-count,
 LI.member .member-count
 {
     position:relative;
@@ -397,8 +407,9 @@ LI.member .member-count
     z-index:2;
 }
 
-.x4-grid-row-selected SPAN.bar,
+.x4-grid-row-selected SPAN.labkey-facet-percent-bar,
 SPAN.member SPAN.bar-selected,
+SPAN.labkey-facet-member  SPAN.bar-selected,
 LI.member SPAN.bar-selected
 {
     background-color:rgba(81, 158, 218, 0.2);
@@ -412,7 +423,7 @@ LI.member SPAN.bar-selected
     border-top-style: hidden;
 }
 
-.x4-grid-row SPAN.bar,
+.x4-grid-row SPAN.labkey-facet-percent-bar,
 LI.member .bar
 {
     height:14pt;
@@ -618,7 +629,6 @@ div.study-demographics h3 {
     color: #a9a9a9;
     vertical-align: text-top;
 }
-
 
 #assays-content .detail div {
     font-size: 15px;

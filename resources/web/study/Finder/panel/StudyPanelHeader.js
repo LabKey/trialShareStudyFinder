@@ -44,11 +44,11 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         if (!this.searchBox) {
             this.searchBox = Ext4.create('Ext.form.field.Text', {
                 emptyText:'Studies',
-                cls: 'search-box',
+                cls: 'labkey-search-box',
                 fieldLabel: '<i class="fa fa-search"></i>',
                 labelWidth: "10px",
                 labelSeparator: '',
-                fieldCls: 'search-box',
+                fieldCls: 'labkey-search-box',
                 id: 'searchTerms',
                 listeners: {
                     scope: this,
