@@ -1,0 +1,53 @@
+<Schema name="ITN" description="TrialShare Data Finder">
+
+   <Cube name="StudyCube" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
+
+        <Table schema="lists" name="StudyProperties" >
+        </Table>
+
+        <Dimension name="Study" visible="true" highCardinality="false" foreignKey="StudyId">
+            <Hierarchy hasAll="true" primaryKey="StudyId">
+                <Level name="Study" visible="true" column="study" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
+            <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="StudyId">
+                <Level name="Therapeutic Area" visible="true" column="therapeuticArea" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
+            <Hierarchy name="Public" hasAll="true" primaryKey="StudyId">
+                <Level name="Public" visible="true" column="public" type="Boolean" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
+            <Hierarchy name="Manuscript" hasAll="true" primaryKey="StudyId">
+                <Level name="Manuscript" visible="true" column="manuscript" type="Boolean" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
+            <Hierarchy name="Study Type" hasAll="true" primaryKey="StudyId">
+                <Level name="StudyType" visible="true"  type="String" column="studyType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <Hierarchy name="Enrollment" hasAll="true" primaryKey="StudyId">
+                <Level name="Enrollment" visible="true"  type="Integer" column="enrollment" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <Hierarchy name="Condition" hasAll="true" primaryKey="StudyId">
+                <Table name="studyCondition" schema="lists"/>
+                <Level name="Condition" visible="true" table="studyCondition" type="String" column="condition" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <Hierarchy name="AgeGroup" hasAll="true" primaryKey="StudyId">
+                <Table name="studyAgeGroup" schema="lists"/>
+                <Level name="AgeGroup" visible="true" table="studyAgeGroup" type="String" column="ageGroup" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <Hierarchy name="Phase" hasAll="true" primaryKey="StudyId">
+                <Table name="studyPhase" schema="lists"/>
+                <Level name="Phase" visible="true" table="studyPhase" type="String" column="Phase" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+        </Dimension>
+
+
+        <Measure name="RowCount" column="StudyId" aggregator="count" visible="true">
+        </Measure>
+
+    </Cube>
+
+
+</Schema>

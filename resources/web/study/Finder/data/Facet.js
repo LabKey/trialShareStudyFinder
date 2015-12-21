@@ -6,14 +6,18 @@ Ext4.define('LABKEY.study.data.Facet', {
     fields: [
         {name: 'name'},
         {name: 'pluralName'},
-        {name: 'uniqueName'},
         {name: 'members'},
         {name: 'selectedMembers'},
-        {name: 'filterOptions'},
+        {name: 'memberMap'},
         {name: 'currentFilterType'},
         {name: 'currentFilterCaption'},
         {name: 'summaryCount', type:'int', default: 0},
-        {name: 'allMemerCount', type:'int', default: 0}
+        {name: 'allMemberCount', type:'int', default: 0},
+        {name: 'hierarchy'},
+        {name: 'hierarchyName'},
+        {name: 'levelName'},
+        {name: 'allMemberName'},
+        {name: 'ordinal'}
 
     ],
 
@@ -39,12 +43,4 @@ Ext4.define('LABKEY.study.data.Facet', {
     ]
 });
 
-Ext4.define('LABKEY.study.data.FacetMember', {
-    extend: 'Ext.data.Model',
-
-    fields: [
-        {name: 'name'},
-        {name: 'count'}
-    ]
-});
 

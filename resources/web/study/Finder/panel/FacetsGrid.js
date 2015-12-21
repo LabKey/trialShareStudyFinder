@@ -13,7 +13,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     dataModuleName: 'study',
 
-    autoScroll: true,
+    autoScroll: false,
 
     bubbleEvents : ["filterSelectionChanged"],
 
@@ -46,8 +46,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                     '   <tpl else>',
                     '       <span class="labkey-facet-member">',
                     '   </tpl>',
-                    '       <span class="labkey-facet-member-name">{name}</span>',
-                    '       &nbsp;',
+                    '       <span class="labkey-facet-member-name">{name}&nbsp;</span>',
                     '       <span class="labkey-facet-member-count">{count:this.formatNumber}</span>',
                     '   <tpl if="count">',
                     '       <span class="labkey-facet-percent-bar" style="width:{percent}%;"></span>',
@@ -85,7 +84,8 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
     },
 
     statics: {
-        headerLookup: {}
+        headerLookup: {},
+        groupExpansionLookup: {} // TODO
     },
 
     initComponent: function() {
@@ -94,9 +94,6 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         this.store = Ext4.create('LABKEY.study.store.FacetMembers', {
             dataModuleName: this.dataModuleName
         });
-        //this.store.proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "studyFacetMembers.api", LABKEY.containerPath);
-
-        this.store.load();
 
         this.callParent();
 
@@ -110,6 +107,11 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         this.getSelectionModel().on('selectionchange', this.onSelectionChange, this);
     },
 
+    onCubeReady : function(mdx) {
+        this.facetStore.mdx = mdx;
+        this.facetStore.loadFromCube();
+    },
+
     onSelectionChange: function(selModel, records) {
         this.facetStore.clearAllSelectedMembers();
         if (records.length > 0)
@@ -117,7 +119,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         for (var f = 0; f < this.facetStore.count(); f++) {
             this.updateFacetHeader(this.facetStore.getAt(f).data.name, true);
         }
-        this.store.updateCountsAsync();
+        this.facetStore.updateCountsAsync();
 
         this.fireEvent("filterSelectionChanged", this.hasFilters());
     },
@@ -164,7 +166,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         if (isExpanded && selectedMembers && selectedMembers.length > 1)
         {
             html += '<span class="labkey-filter-caption">' + facet.get("currentFilterCaption") + '</span>';
-            if (facet.get("filterOptions").length > 1)
+            if (facet.filterOptionsStore.count() > 1)
                 html += '&nbsp;<i class="fa fa-caret-down"></i>';
         }
         Ext4.get(Ext4.DomQuery.select('.labkey-filter-options', LABKEY.study.panel.FacetsGrid.headerLookup[facetName])[0]).setHTML(html);
@@ -179,8 +181,8 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             console.error("could not find facet " + facetName);
             return;
         }
-        var filterOptions = facet.get("filterOptions");
-        if (filterOptions.length < 2)
+        var filterOptions = facet.filterOptionsStore;
+        if (filterOptions.count() < 2)
             return;
 
         var filterOptionsMenu = Ext4.create('Ext.menu.Menu', {
@@ -191,15 +193,15 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         filterOptionsMenu.on('click', function(menu, item) {
                     facet.data.currentFilterType = item.value;
                     facet.data.currentFilterCaption = item.text;
-                    this.updateCurrentFacetOption(facetName);
+                    this.updateCurrentFacetOption(facetName, true);
                 },
                 this
         );
 
-        for (var i = 0; i < filterOptions.length; i++) {
+        for (var i = 0; i < filterOptions.count(); i++) {
             filterOptionsMenu.add({
-                value: filterOptions[i].get("type"),
-                text: filterOptions[i].get("caption")
+                value: filterOptions.getAt(i).get("type"),
+                text: filterOptions.getAt(i).get("caption")
             });
         }
         filterOptionsMenu.showAt(event.xy);
@@ -214,7 +216,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             this.clearFilter(name);
         }
         if (updateCounts)
-            this.store.updateCountsAsync();
+            this.facetStore.updateCountsAsync();
         this.fireEvent("filterSelectionCleared", false);
     },
 
@@ -228,7 +230,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             }
         }
 
-        this.updateFacetHeader(facetName);
+        this.updateFacetHeader(facetName, true);
         this.fireEvent("filterSelectionCleared", this.hasFilters(facetName));
     },
 

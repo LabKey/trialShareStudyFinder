@@ -33,7 +33,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         '<div id="studypanel">',
         '   <tpl for=".">',
         '   <tpl if="hasManuscript">',
-        //    TODO this should be labkey-study-card-highlight-1 instead of loaded
+        //    TODO this should be something like labkey-study-card-highlight-1 instead of loaded
         '   <div class="labkey-study-card loaded">',
         '   <tpl else>',
         '   <div class="labkey-study-card">',

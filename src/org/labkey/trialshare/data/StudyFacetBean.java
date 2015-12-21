@@ -10,34 +10,24 @@ import java.util.List;
 public class StudyFacetBean
 {
     private String name;
-    private String caption;
     private String pluralName;
     private String hierarchyName;
     private String levelName;
     private String allMemberName;
-    private String defaultFilterType;
-    private List<StudyFacetMember> members;
-    private List<String> filterOptions;
+    private FacetFilter.Type defaultFilterType;
+    private List<FacetFilter> filterOptions;
+    private Integer ordinal;
 
-    public String getCaption()
-    {
-        return caption;
-    }
+    public StudyFacetBean() {}
 
-    public void setCaption(String caption)
-    {
-        this.caption = caption;
-    }
-
-    @JsonIgnore
-    public List<StudyFacetMember> getMembers()
-    {
-        return members;
-    }
-
-    public void setMembers(List<StudyFacetMember> members)
-    {
-        this.members = members;
+    public StudyFacetBean(String name, String pluralName, String hierarchyName, String levelName, String allMembersName, FacetFilter.Type defaultFilterType, Integer ordinal) {
+        this.name = name;
+        this.pluralName = pluralName;
+        this.hierarchyName = hierarchyName;
+        this.levelName = levelName;
+        this.allMemberName = allMembersName;
+        this.defaultFilterType = defaultFilterType;
+        this.ordinal = ordinal;
     }
 
     public String getName()
@@ -60,22 +50,22 @@ public class StudyFacetBean
         this.allMemberName = allMemberName;
     }
 
-    public List<String> getFilterOptions()
+    public List<FacetFilter> getFilterOptions()
     {
         return filterOptions;
     }
 
-    public void setFilterOptions(List<String> filterOptions)
+    public void setFilterOptions(List<FacetFilter> filterOptions)
     {
         this.filterOptions = filterOptions;
     }
 
-    public String getDefaultFilterType()
+    public FacetFilter.Type getDefaultFilterType()
     {
         return defaultFilterType;
     }
 
-    public void setDefaultFilterType(String defaultFilterType)
+    public void setDefaultFilterType(FacetFilter.Type defaultFilterType)
     {
         this.defaultFilterType = defaultFilterType;
     }
@@ -108,5 +98,15 @@ public class StudyFacetBean
     public void setPluralName(String pluralName)
     {
         this.pluralName = pluralName;
+    }
+
+    public Integer getOrdinal()
+    {
+        return ordinal;
+    }
+
+    public void setOrdinal(Integer ordinal)
+    {
+        this.ordinal = ordinal;
     }
 }

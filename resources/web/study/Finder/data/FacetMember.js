@@ -1,4 +1,4 @@
-Ext4.define('LABKEY.study.data.FacetMember2', {
+Ext4.define('LABKEY.study.data.FacetMember', {
     extend: 'Ext.data.Model',
 
     idProperty : 'uniqueName',
@@ -8,16 +8,9 @@ Ext4.define('LABKEY.study.data.FacetMember2', {
         {name: 'uniqueName'},
         {name: 'count'},
         {name: 'percent'},
+        {name: 'facet'},
         {name: 'facetName'},
-        {name: 'facetUniqueName'}
-    ],
-
-    associations: [
-        {
-            type: 'hasMany',
-            model: 'LABKEY.study.data.FacetFilter',
-            name: 'filterOptions',
-            associationKey: 'filterOptions'
-        }
+        {name: 'level'}
     ]
+
 });

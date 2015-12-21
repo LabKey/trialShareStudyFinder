@@ -12,6 +12,7 @@ public class FacetFilter
 
     private Type _type;
     private String _caption;
+    private Boolean _default;
 
     public String getCaption()
     {
@@ -31,5 +32,15 @@ public class FacetFilter
     public void setType(Type type)
     {
         _type = type;
+    }
+
+    public Boolean geDefault()
+    {
+        return _default;
+    }
+
+    public void setDefault(Boolean aDefault)
+    {
+        _default = aDefault;
     }
 }

@@ -42,14 +42,30 @@ Ext4.define('LABKEY.study.panel.Finder', {
     },
 
     getCubeDefinition: function() {
-        //this.cube = LABKEY.query.olap.CubeManager.getCube({
-        //    configId: 'TrialShare:/StudyCube',
-        //    schemaName: 'TrialShare',
-        //    name: 'StudyCube',
-        //    deferLoad: false
-        //});
+        var me = this;
+        this.cube = LABKEY.query.olap.CubeManager.getCube({
+            configId: 'TrialShare:/StudyCube',
+            schemaName: 'lists',
+            name: 'StudyCube',
+            deferLoad: false
+        });
+        this.cube.onReady(function (m)
+        {
+            me.mdx = m;
+            me.onCubeReady();
+            //this.loadFilterState();
+
+            //this.onStudySubsetChanged();
+            // doShowAllStudiesChanged() has side-effect of calling updateCountsAsync()
+            //$scope.updateCountsAsync();
+        });
     },
 
+
+    onCubeReady: function() {
+        this.getFacetsPanel().onCubeReady(this.mdx);
+        //this.getStudiesPanel().onCubeReady(this.cube);
+    },
 
     //onStudySubsetChanged : function(value) {
     //    this.getStudiesPanel().getStudyCards().store.filter('availability', value);

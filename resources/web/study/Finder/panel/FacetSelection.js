@@ -11,6 +11,8 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     padding: "10 8 8 10",
 
+    autoScroll: true,
+
     initComponent : function() {
         this.items = [
             this.getFacetPanelHeader(),
@@ -24,6 +26,10 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
             clearAllFilters: this.onClearAllFilters
         }
         );
+    },
+
+    onCubeReady: function(mdx) {
+        this.getFacets().onCubeReady(mdx);
     },
 
     onClearAllFilters: function() {

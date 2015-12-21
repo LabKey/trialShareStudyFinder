@@ -22,6 +22,10 @@ DIV.labkey-study-facets {
     width:100%;
 }
 
+.labkey-data-finder-outer .x4-border-layout-ct
+{
+    background-color:#ffffff;
+}
 TABLE.labkey-data-finder
 {
     height: 450px;
@@ -257,19 +261,6 @@ DIV.facet-header .labkey-filter-options
     background-position: left 28%
 }
 
-.labkey-study-facets .x-grid-cell {
-    background-color: #ffa;
-    border-bottom-color: #ffc;
-    border-top-color: #ff5;
-    color: #009;
-}
-
-/*a.labkey-clear-filter.inactive*/
-/*{*/
-    /*cursor:default;*/
-    /*color:grey;*/
-/*}*/
-
 .facet-selection-header .inactive,
 .labkey-facet-header .inactive,
 .facet-header .inactive
@@ -392,7 +383,7 @@ LI.member .member-name
     display:inline-block;
     position:relative;
     max-width:150pt;
-    overflow-x: hidden;
+    /*overflow-x: hidden;*/
     text-overflow: ellipsis;
     white-space: nowrap;
     z-index:2;
@@ -415,9 +406,14 @@ LI.member SPAN.bar-selected
     background-color:rgba(81, 158, 218, 0.2);
 }
 
-.x4-grid-row-focused .x4-grid-td,
-.x4-grid-row-before-focused .x4-grid-td,
-.x4-grid-cell
+.labkey-study-facets .x4-grid-view
+{
+    overflow: hidden;
+}
+
+.labkey-study-facets .x4-grid-row-focused .x4-grid-td,
+.labkey-study-facets .x4-grid-row-before-focused .x4-grid-td,
+.labkey-study-facets .x4-grid-cell
 {
     border-bottom-style: hidden;
     border-top-style: hidden;

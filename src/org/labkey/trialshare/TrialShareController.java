@@ -165,7 +165,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Transplant");
             member.setFacetName("Therapeutic Area");
             member.setFacetUniqueName("TherapeuticArea");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             member.setCount(4);
             member.setPercent(50);
             members.add(member);
@@ -175,7 +175,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Autoimmune");
             member.setFacetName("Therapeutic Area");
             member.setFacetUniqueName("TherapeuticArea");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             member.setCount(3);
             member.setPercent(42);
             members.add(member);
@@ -185,7 +185,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Allergy");
             member.setFacetName("Therapeutic Area");
             member.setFacetUniqueName("TherapeuticArea");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             member.setCount(1);
             member.setPercent(8);
             members.add(member);
@@ -195,7 +195,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("T1DM");
             member.setFacetName("Therapeutic Area");
             member.setFacetUniqueName("TherapeuticArea");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             member.setCount(0);
             member.setPercent(0);
             members.add(member);
@@ -205,7 +205,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Interventional");
             member.setFacetName("Study Type");
             member.setFacetUniqueName("StudyType");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             member.setCount(5);
             member.setPercent(50);
             members.add(member);
@@ -215,7 +215,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Observational");
             member.setFacetName("Study Type");
             member.setFacetUniqueName("StudyType");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             member.setCount(2);
             member.setPercent(20);
             members.add(member);
@@ -225,7 +225,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Expanded Access");
             member.setFacetName("Study Type");
             member.setFacetUniqueName("StudyType");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             member.setCount(3);
             member.setPercent(30);
             members.add(member);
@@ -235,7 +235,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Adult");
             member.setFacetName("Age Group");
             member.setFacetUniqueName("AgeGroup");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             member.setCount(4);
             member.setPercent(50);
             members.add(member);
@@ -245,7 +245,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Child");
             member.setFacetName("Age Group");
             member.setFacetUniqueName("AgeGroup");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             member.setCount(1);
             member.setPercent(13);
             members.add(member);
@@ -255,7 +255,7 @@ public class TrialShareController extends SpringActionController
             member.setUniqueName("Senior");
             member.setFacetName("Age Group");
             member.setFacetUniqueName("AgeGroup");
-            member.setFilterOptions(getFacetFilters());
+            member.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             member.setCount(3);
             member.setPercent(37);
             members.add(member);
@@ -265,17 +265,26 @@ public class TrialShareController extends SpringActionController
     }
 
 
-    private List<FacetFilter> getFacetFilters()
+    private List<FacetFilter> getFacetFilters(Boolean includeAnd, Boolean includeOr, FacetFilter.Type defaultType)
     {
         List<FacetFilter> filterOptions = new ArrayList<>();
-        FacetFilter filter = new FacetFilter();
-        filter.setType(FacetFilter.Type.OR);
-        filter.setCaption("is any of");
-        filterOptions.add(filter);
-        filter = new FacetFilter();
-        filter.setType(FacetFilter.Type.AND);
-        filter.setCaption("is all of");
-        filterOptions.add(filter);
+        FacetFilter filter;
+        if (includeOr)
+        {
+            filter = new FacetFilter();
+            filter.setType(FacetFilter.Type.OR);
+            filter.setCaption("is any of");
+            filter.setDefault(FacetFilter.Type.OR == defaultType);
+            filterOptions.add(filter);
+        }
+        if (includeAnd)
+        {
+            filter = new FacetFilter();
+            filter.setType(FacetFilter.Type.AND);
+            filter.setCaption("is all of");
+            filter.setDefault(FacetFilter.Type.AND == defaultType);
+            filterOptions.add(filter);
+        }
         return filterOptions;
     }
 
@@ -288,40 +297,26 @@ public class TrialShareController extends SpringActionController
         public Object execute(Object o, BindException errors) throws Exception
         {
             List<StudyFacetBean> facets = new ArrayList<>();
-            StudyFacetBean facet = new StudyFacetBean();
-            facet.setName("Facet1");
-            facet.setCaption("Facet 1");
+            StudyFacetBean facet;
 
-            List<StudyFacetMember> members = new ArrayList<>();
-            StudyFacetMember member = new StudyFacetMember();
-            member.setName("Member 1.1");
-            member.setCount(10000);
-            member.setUniqueName("Member11");
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Member 1.2");
-            members.add(member);
-            member.setCount(0);
-            member.setUniqueName("Member12");
-            facet.setMembers(members);
-
+            facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Study.Therapeutic Area", "Therapeutic Area", "[Study.Therapeutic Area][(All)]", FacetFilter.Type.OR, 1);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-
-            StudyFacetBean facet2 = new StudyFacetBean();
-            facet2.setName("Facet2");
-            facet2.setCaption("Facet 2");
-
-            members = new ArrayList<StudyFacetMember>();
-            member = new StudyFacetMember();
-            member.setName("Member 2.1");
-            member.setCount(12);
-            member.setUniqueName("Member21");
-            members.add(member);
-            facet2.setMembers(members);
-
-            facets.add(facet2);
-
+            facet = new StudyFacetBean("Study Type", "Study Types", "Study.Study Type", "StudyType", "[Study.Study Type][(All)]", FacetFilter.Type.OR, 2);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Condition", "Conditions", "Study.Condition", "Condition", "[Study.Condition][(All)]", FacetFilter.Type.OR, 5);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Age Group", "Age Groups", "Study.AgeGroup", "AgeGroup", "[Study.AgeGroup][(All)]", FacetFilter.Type.OR, 3);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Phase", "Phases", "Study.Phase", "Phase", "[Study.Phase][(All)]", FacetFilter.Type.OR, 4);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Study", "Studies", "Study", "Study", "[Study].[(All)]", FacetFilter.Type.OR, null);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
 
             return success(facets);
         }
