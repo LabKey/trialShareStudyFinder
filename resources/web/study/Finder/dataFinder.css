@@ -626,7 +626,6 @@ div.labkey-study-details h2.labkey-study-short-name {
     font-size: 13px;
     padding: 9px 20px 7px 20px;
     float: right;
-    color: black;
     margin-right: -20px;
     margin-top: -10px;
 }
@@ -638,6 +637,10 @@ div.labkey-study-details h3 {
     font-weight: normal;
     padding: 10px 0px 10px 50px;
     border-bottom: 1px solid darkgray;
+}
+
+#labkey-study-details-content {
+    padding-top: 1em;
 }
 
 #labkey-study-details-content .detail {
