@@ -15,36 +15,36 @@
  */
 package org.labkey.trialshare.data;
 
-public class StudyPubmedBean
+public class StudyPublicationBean
 {
-    String study_accession;
-    String pubmed_id;
+    String studyId;
+    String url;
+    String pubmedId;
     String authors;
     String issue;
     String journal;
     String pages;
     String title;
     String year;
-    int worksspace_id;
 
-    public String getStudy_accession()
+    public String getStudyId()
     {
-        return study_accession;
+        return studyId;
     }
 
-    public void setStudy_accession(String study_accession)
+    public void setStudyId(String studyId)
     {
-        this.study_accession = study_accession;
+        this.studyId = studyId;
     }
 
-    public String getPubmed_id()
+    public String getPubmedId()
     {
-        return pubmed_id;
+        return pubmedId;
     }
 
-    public void setPubmed_id(String pubmed_id)
+    public void setPubmedId(String pubmedId)
     {
-        this.pubmed_id = pubmed_id;
+        this.pubmedId = pubmedId;
     }
 
     public String getAuthors()
@@ -107,13 +107,4 @@ public class StudyPubmedBean
         this.year = year;
     }
 
-    public int getWorksspace_id()
-    {
-        return worksspace_id;
-    }
-
-    public void setWorksspace_id(int worksspace_id)
-    {
-        this.worksspace_id = worksspace_id;
-    }
 }

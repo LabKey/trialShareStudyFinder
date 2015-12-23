@@ -27,10 +27,12 @@
         resources.add(ClientDependency.fromPath("clientapi/ext4"));
         resources.add(ClientDependency.fromPath("query/olap.js"));
         resources.add(ClientDependency.fromPath("study/Finder/dataFinder.css"));
+        resources.add(ClientDependency.fromPath("study/Finder/trialShare.css"));
         resources.add(ClientDependency.fromPath("study/Finder/data/Facet.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/FacetFilter.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/FacetMember.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/StudyCard.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/data/Studies.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/StudySubset.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/Facets.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/FacetMembers.js"));
@@ -42,9 +44,9 @@
         resources.add(ClientDependency.fromPath("study/Finder/panel/SelectionSummary.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/FacetSelection.js"));
 
-        resources.add(ClientDependency.fromPath("study/Finder/panel/StudyCards.js"));
-        resources.add(ClientDependency.fromPath("study/Finder/panel/StudyPanelHeader.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/Studies.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/panel/StudyPanelHeader.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/panel/StudyCards.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/Finder.js"));
         return resources;
     }

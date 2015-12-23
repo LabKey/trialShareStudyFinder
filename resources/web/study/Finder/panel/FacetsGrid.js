@@ -77,6 +77,11 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                         var id = Ext4.id();
                         LABKEY.study.panel.FacetsGrid.headerLookup[name] = id;
                         return id;
+                    },
+                    makeFilterOptions: function(name) {
+                        var facetStore = Ext4.getStore("facets");
+                        var facet = facetStore.get(name);
+                        // TODO render menu or not
                     }
                 }
             )
@@ -84,8 +89,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
     },
 
     statics: {
-        headerLookup: {},
-        groupExpansionLookup: {} // TODO
+        headerLookup: {}
     },
 
     initComponent: function() {
@@ -147,7 +151,14 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         }
     },
 
+    updateFacetHeaders: function() {
+        this.facetStore.each(function(facet) {
+            this.updateFacetHeaders(facet.get("name"), facet.get("isExpanded"));
+        }, this);
+    },
+
     updateFacetHeader: function(facetName, isExpanded) {
+
         if (this.hasFilters(facetName))
         {
             Ext4.get(Ext4.DomQuery.select('.labkey-clear-filter', LABKEY.study.panel.FacetsGrid.headerLookup[facetName])[0]).replaceCls('inactive', 'active');
@@ -157,6 +168,9 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             Ext4.get(Ext4.DomQuery.select('.labkey-clear-filter', LABKEY.study.panel.FacetsGrid.headerLookup[facetName])[0]).replaceCls('active', 'inactive');
         }
         this.updateCurrentFacetOption(facetName, isExpanded);
+        var facet = this.facetStore.getById(facetName);
+        if (facet)
+            facet.set("isExpanded", isExpanded);
     },
 
     updateCurrentFacetOption: function(facetName, isExpanded) {

@@ -53,15 +53,36 @@ TABLE.labkey-data-finder
 }
 
 .labkey-study-card-goto,
-.labkey-study-card-pi
+.labkey-study-card-pi,
+.labkey-study-card-short-name
 {
     float:right;
 }
+
+.labkey-study-card-shortName
+{
+    float:right;
+}
+
+.labkey-study-icon
+{
+    height: 25px;
+    float: right;
+}
+
 .labkey-study-card-divider,
+.labkey-study-card-title,
 .labkey-study-card-description
 {
     clear:both;
 }
+
+.labkey-text-link.labkey-study-card-manuscript
+{
+    float:right;
+    margin-top: 10px;
+}
+
 DIV.labkey-study-card
 {
     background-color:#F8F8F8;
@@ -75,6 +96,7 @@ DIV.labkey-study-card
     overflow-y:hidden;
 }
 
+DIV.manuscript-highlight,
 DIV.loaded,
 SPAN.loaded
 {
@@ -243,7 +265,9 @@ DIV.facet-header .labkey-filter-options
     background-color: white;
 }
 
-
+.labkey-study-facets .x4-grid-row-selected .labkey-facet-percent-bar {
+    background-color: rgba(81, 158, 218, 0.2);
+}
 
 .labkey-study-facets .x4-grid-cell-special .x4-grid-cell-inner {
     background-color: white;
@@ -423,7 +447,7 @@ LI.member SPAN.bar-selected
 LI.member .bar
 {
     height:14pt;
-    background-color:#DEDEDE;
+    background-color:rgba(222,222,222,0.3);
     position:absolute; right:0;
     z-index:0;
 }
@@ -574,14 +598,14 @@ ul.nav
     padding: 0;
 }
 
-div.study-demographics {
+div.labkey-study-details {
     background-color: white;
     padding: 10px 20px 20px 20px;
     margin-top: 10px;
     box-shadow: 0 1px 1px rgba(0,0,0,0.15), -1px 0 0 rgba(0,0,0,0.06), 1px 0 0 rgba(0,0,0,0.06), 0 1px 0 rgba(0,0,0,0.12);
 }
 
-div.study-demographics h2 {
+div.labkey-study-details h2.labkey-study-accession {
     display: inline-block;
     text-transform: uppercase;
     font-weight: normal;
@@ -593,7 +617,22 @@ div.study-demographics h2 {
     margin-left: -20px;
 }
 
-div.study-demographics h3 {
+div.labkey-study-details h2.labkey-study-short-name {
+    display: inline-block;
+    text-transform: uppercase;
+    font-weight: normal;
+    background-color: #126495;
+    color: white;
+    font-size: 13px;
+    padding: 9px 20px 7px 20px;
+    float: right;
+    color: black;
+    margin-right: -20px;
+    margin-top: -10px;
+}
+
+
+div.labkey-study-details h3 {
     text-transform: uppercase;
     font-size: 14px;
     font-weight: normal;
@@ -601,32 +640,38 @@ div.study-demographics h3 {
     border-bottom: 1px solid darkgray;
 }
 
-#demographics-content .detail {
+#labkey-study-details-content .detail {
     font-size: 15px;
     padding-left: 30px;
     padding-bottom: 5px;
 }
 
-#demographics-content .detail div {
+#labkey-study-details-content .detail div {
     font-size: 15px;
 }
 
-#demographics-content h3 {
+#labkey-study-details-content h3 {
     margin-bottom: 0.5em;
     margin-top: 0.5em;
 }
 
-#demographics-content div {
+#labkey-study-details-content div {
     padding: 3px;
 }
 
-#demographics-content div.label, a.label {
+#labkey-study-details-content div.label, a.label {
     font-size: 12px;
     color: #a9a9a9;
     vertical-align: text-top;
 }
 
-#assays-content .detail div {
+#labkey-study-assays-content .detail div {
     font-size: 15px;
     padding: 3px;
+}
+
+.labkey-study-manuscript-header {
+    color: #cc541f;
+    font-size: 120%;
+    font-variant: small-caps;
 }

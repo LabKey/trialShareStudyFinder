@@ -10,6 +10,8 @@ Ext4.define("LABKEY.study.panel.Studies", {
 
     dataModuleName: 'study',
 
+    autoScroll: true,
+
     initComponent : function() {
         this.items = [
             this.getStudyPanelHeader(),
@@ -17,15 +19,23 @@ Ext4.define("LABKEY.study.panel.Studies", {
         ];
         this.callParent();
 
+        this.getStudyCards().store.addListener('filterChange',this.onFilterSelectionChanged, this);
         this.on(
                 {'studySubsetChanged': this.onStudySubsetChanged,
-                 'searchTermsChanged': this.onSearchTermsChanged}
+                 'searchTermsChanged': this.onSearchTermsChanged,
+                 'filterSelectionChanged': this.onFilterSelectionChanged
+                }
         );
     },
 
-    onStudySubsetChanged : function(value) {
-        this.getStudyCards().store.clearFilter();
-        this.getStudyCards().store.filter('availability', value);
+    onFilterSelectionChanged: function() {
+        console.log('filterChange happened!')
+    },
+
+    onStudySubsetChanged : function(selectedSubset) {
+        if (!selectedSubset)
+            selectedSubset = this.getStudyPanelHeader().getStudySubsetMenu().getValue();
+        this.getStudyCards().store.updateFilters(null, selectedSubset);
     },
 
     onSearchTermsChanged : function(value) {

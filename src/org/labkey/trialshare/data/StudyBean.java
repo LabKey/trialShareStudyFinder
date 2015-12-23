@@ -13,14 +13,19 @@ public class StudyBean
     private Boolean hasManuscript; // TODO generalize?
     private String investigator;
     private String url;
+    private String iconUrl;
     private Boolean isLoaded;
     private String description;
     private String briefDescription;
     private String studyIdPrefix = null; // common prefix used in labeling studies
     private String availability;
+    private Boolean isPublic;
+    private Integer participantCount;
+    private Boolean isSelected = true;
 
     private List<StudyPersonnelBean> personnel; // TODO remove?
-    private List<StudyPubmedBean> pubmed;
+    private List<StudyPublicationBean> publications;
+    private Integer manuscriptCount;
 
 
     public String getStudyId()
@@ -103,14 +108,14 @@ public class StudyBean
         this.personnel = personnel;
     }
 
-    public List<StudyPubmedBean> getPubmed()
+    public List<StudyPublicationBean> getPublications()
     {
-        return pubmed;
+        return publications;
     }
 
-    public void setPubmed(List<StudyPubmedBean> pubmed)
+    public void setPublications(List<StudyPublicationBean> publications)
     {
-        this.pubmed = pubmed;
+        this.publications = publications;
     }
 
     public String getStudyIdPrefix()
@@ -151,6 +156,56 @@ public class StudyBean
     public void setAvailability(String availability)
     {
         this.availability = availability;
+    }
+
+    public String getIconUrl()
+    {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl)
+    {
+        this.iconUrl = iconUrl;
+    }
+
+    public Integer getManuscriptCount()
+    {
+        return manuscriptCount;
+    }
+
+    public void setManuscriptCount(Integer manuscriptCount)
+    {
+        this.manuscriptCount = manuscriptCount;
+    }
+
+    public Boolean getIsPublic()
+    {
+        return isPublic;
+    }
+
+    public void setIsPublic(Boolean aPublic)
+    {
+        isPublic = aPublic;
+    }
+
+    public Integer getParticipantCount()
+    {
+        return participantCount;
+    }
+
+    public void setParticipantCount(Integer participantCount)
+    {
+        this.participantCount = participantCount;
+    }
+
+    public Boolean getIsSelected()
+    {
+        return isSelected;
+    }
+
+    public void setIsSelected(Boolean selected)
+    {
+        isSelected = selected;
     }
 }
 

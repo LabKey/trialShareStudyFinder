@@ -33,7 +33,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     },
 
     onClearAllFilters: function() {
-        this.facets.clearAllFilters(true);
+        this.getFacets().clearAllFilters(true);
         this.onFilterSelectionChange(false);
     },
 
@@ -43,8 +43,16 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         if (hasFilters)
             Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('inactive', 'active');
         else
-            Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('active', 'inactive')
+            Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('active', 'inactive');
+        this.updateSummaryPanel(); // TODO is this necessary?
+    },
 
+    updateSummaryPanel : function() {
+        var studiesStore = Ext4.getStore("studies");
+        this.getFacetSelectionSummary().update({
+            studyCount: studiesStore.count(),
+            participantCount: studiesStore.sum("participantCount")
+        });
     },
 
     getFacetPanelHeader : function() {
@@ -59,8 +67,13 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     getFacetSelectionSummary: function() {
         if (!this.facetSelectionSummary) {
+            var studiesStore = Ext4.getStore("studies");
             this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.SelectionSummary", {
-                dataModuleName: this.dataModuleName
+                dataModuleName: this.dataModuleName,
+                data: {
+                    studyCount: studiesStore.count(),
+                    participantCount: studiesStore.sum("participantCount")
+                }
             });
         }
         return this.facetSelectionSummary;

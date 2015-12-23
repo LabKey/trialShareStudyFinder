@@ -21,8 +21,13 @@ import org.labkey.api.action.Marshaller;
 import org.labkey.api.action.ReturnUrlForm;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
+import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.SqlExecutor;
+import org.labkey.api.data.TableSelector;
 import org.labkey.api.gwt.client.util.StringUtils;
+import org.labkey.api.query.DefaultSchema;
+import org.labkey.api.query.FieldKey;
+import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
@@ -34,20 +39,24 @@ import org.labkey.api.view.VBox;
 import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
-import org.labkey.trialshare.data.StudyFacetMember;
+import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.data.StudySubset;
 import org.labkey.trialshare.view.DataFinderWebPart;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Marshal(Marshaller.Jackson)
 public class TrialShareController extends SpringActionController
 {
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(TrialShareController.class);
     public static final String NAME = "trialshare";
+
+    public enum DetailType { publications, study };
 
     public TrialShareController()
     {
@@ -95,9 +104,25 @@ public class TrialShareController extends SpringActionController
         public Object execute(StudiesForm form, BindException errors) throws Exception
         {
             List<StudyBean> studies = new ArrayList<StudyBean>();
-            studies.add(getStudy("ITN029ST"));
-            studies.add(getStudy("ITN021AI"));
-            studies.add(getStudy("ITN033AI"));
+//            studies.add(getStudy("ITN029ST"));
+//            studies.add(getStudy("ITN021AI"));
+//            studies.add(getStudy("ITN033AI"));
+            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
+            studies  = (new TableSelector(coreSchema.getSchema("lists").getTable("studyProperties"))).getArrayList(StudyBean.class);
+            List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("studyManuscripts")).getArrayList(StudyPublicationBean.class));
+            Map<String, Integer> pubCounts = new HashMap<>();
+            for (StudyPublicationBean pub : publications) {
+                if (pubCounts.get(pub.getStudyId()) == null)
+                    pubCounts.put(pub.getStudyId(), 0);
+                int count = pubCounts.get(pub.getStudyId());
+                pubCounts.put(pub.getStudyId(), count + 1);
+            }
+            for (StudyBean study : studies) {
+                if (pubCounts.get(study.getStudyId()) == null)
+                    study.setManuscriptCount(0);
+                else
+                    study.setManuscriptCount(pubCounts.get(study.getStudyId()));
+            }
 
             return success(studies);
         }
@@ -114,6 +139,7 @@ public class TrialShareController extends SpringActionController
         if (studyId.equals("ITN029ST"))
         {
             study.setStudyId("ITN029ST");
+            study.setShortName("WISP-R");
             study.setInvestigator("Sandy Feng, MD, PhD");
             study.setTitle("Immunosuppression Withdrawal for Pediatric Living-donor Liver Transplant Recipients");
             study.setDescription("This is a prospective multicenter, open-label, single-arm trial in which 20 pediatric recipients of parental living-donor liver allografts will undergo gradual withdrawal of immunosuppression with the goal of complete withdrawal. Patients on stable immunosuppression regimens with good organ function and no evidence of acute or chronic rejection or other forms of allograft dysfunction will be enrolled. Participants will undergo gradual withdrawal of immunosuppression and will be followed for a minimum of 4 years after completion of immunosuppression withdrawal. Immunologic and genetic profiles will be collected at multiple time points and compared between tolerant and nontolerant participants.");
@@ -125,6 +151,7 @@ public class TrialShareController extends SpringActionController
         else if (studyId.equals("ITN021AI"))
         {
             study.setStudyId("ITN021AI");
+            study.setShortName("RAVE");
             study.setInvestigator("John H. Stone, MD, MPH");
             study.setTitle("Rituximab for ANCA-Associated Vasculitis");
             study.setIsLoaded(false);
@@ -141,6 +168,9 @@ public class TrialShareController extends SpringActionController
         else if (studyId.equals("ITN033AI"))
         {
             study.setStudyId("ITN033AI");
+            study.setShortName("Halt-MS");
+            study.setIconUrl("https://www.itntrialshare.org/files/Studies/ITN033AIOPR/Study%20Data/@files/studyDocs/ITN033AI%20HALT-MS%20250px.gif");
+            study.setManuscriptCount(3);
             study.setInvestigator("Richard A. Nash, MD");
             study.setTitle("High Dose Immunosuppression and Autologous Transplantation for Multiple Sclerosis");
             study.setIsLoaded(false);
@@ -152,117 +182,6 @@ public class TrialShareController extends SpringActionController
         return study;
     }
 
-    @RequiresPermission(ReadPermission.class)
-    public class StudyFacetMembersAction extends ApiAction
-    {
-        @Override
-        public Object execute(Object o, BindException errors) throws Exception
-        {
-            List<StudyFacetMember> members = new ArrayList<>();
-
-            StudyFacetMember member = new StudyFacetMember();
-            member.setName("Transplant");
-            member.setUniqueName("Transplant");
-            member.setFacetName("Therapeutic Area");
-            member.setFacetUniqueName("TherapeuticArea");
-            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            member.setCount(4);
-            member.setPercent(50);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Autoimmune");
-            member.setUniqueName("Autoimmune");
-            member.setFacetName("Therapeutic Area");
-            member.setFacetUniqueName("TherapeuticArea");
-            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            member.setCount(3);
-            member.setPercent(42);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Allergy");
-            member.setUniqueName("Allergy");
-            member.setFacetName("Therapeutic Area");
-            member.setFacetUniqueName("TherapeuticArea");
-            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            member.setCount(1);
-            member.setPercent(8);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("T1DM");
-            member.setUniqueName("T1DM");
-            member.setFacetName("Therapeutic Area");
-            member.setFacetUniqueName("TherapeuticArea");
-            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            member.setCount(0);
-            member.setPercent(0);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Interventional");
-            member.setUniqueName("Interventional");
-            member.setFacetName("Study Type");
-            member.setFacetUniqueName("StudyType");
-            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            member.setCount(5);
-            member.setPercent(50);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Observational");
-            member.setUniqueName("Observational");
-            member.setFacetName("Study Type");
-            member.setFacetUniqueName("StudyType");
-            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            member.setCount(2);
-            member.setPercent(20);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Expanded Access");
-            member.setUniqueName("Expanded Access");
-            member.setFacetName("Study Type");
-            member.setFacetUniqueName("StudyType");
-            member.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            member.setCount(3);
-            member.setPercent(30);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Adult");
-            member.setUniqueName("Adult");
-            member.setFacetName("Age Group");
-            member.setFacetUniqueName("AgeGroup");
-            member.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            member.setCount(4);
-            member.setPercent(50);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Child");
-            member.setUniqueName("Child");
-            member.setFacetName("Age Group");
-            member.setFacetUniqueName("AgeGroup");
-            member.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            member.setCount(1);
-            member.setPercent(13);
-            members.add(member);
-
-            member = new StudyFacetMember();
-            member.setName("Senior");
-            member.setUniqueName("Senior");
-            member.setFacetName("Age Group");
-            member.setFacetUniqueName("AgeGroup");
-            member.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            member.setCount(3);
-            member.setPercent(37);
-            members.add(member);
-
-            return success(members);
-        }
-    }
 
 
     private List<FacetFilter> getFacetFilters(Boolean includeAnd, Boolean includeOr, FacetFilter.Type defaultType)
@@ -322,21 +241,31 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+
     @RequiresPermission(ReadPermission.class)
     public class StudyDetailAction extends SimpleViewAction<StudyIdForm>
     {
-        StudyIdForm _form;
-        StudyBean _study = new StudyBean();
+        StudyBean _study;
+        String _studyId;
+
+        @Override
+        public void validate(StudyIdForm form, BindException errors)
+        {
+            _studyId = (null==form) ? null : form.getStudyId();
+            if (StringUtils.isEmpty(_studyId))
+                errors.reject(ERROR_MSG, "Study not specified");
+        }
 
         @Override
         public ModelAndView getView(StudyIdForm form, BindException errors) throws Exception
         {
-            _form = form;
+            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
+            QuerySchema listSchema = coreSchema.getSchema("lists");
+            _study  = (new TableSelector(listSchema.getTable("studyProperties"))).getObject(_studyId, StudyBean.class);
 
-            String studyId = (null==form) ? null : form.getStudyId();
-            if (StringUtils.isEmpty(studyId))
-                throw new NotFoundException("study not specified");
-
+            SimpleFilter filter = new SimpleFilter();
+            filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
+            _study.setPublications((new TableSelector(listSchema.getTable("studyManuscripts"), filter, null)).getArrayList(StudyPublicationBean.class));
 //            _study.study = (new TableSelector(DbSchema.get("immport").getTable("study"))).getObject(studyId, StudyBean.class);
 //            if (null == _study.study)
 //                throw new NotFoundException("study not found: " + form.getStudy());
@@ -345,13 +274,17 @@ public class TrialShareController extends SpringActionController
 //            _study.personnel = (new TableSelector(DbSchema.get("immport").getTable("study_personnel"),filter,null)).getArrayList(StudyPersonnelBean.class);
 //            _study.pubmed = (new TableSelector(DbSchema.get("immport").getTable("study_pubmed"),filter,null)).getArrayList(StudyPubmedBean.class);
 
-            _study = getStudy(studyId);
+//            _study = getStudy(studyId);
             VBox v = new VBox();
-            if (null != _form.getReturnActionURL())
+            if (null != form.getReturnActionURL())
             {
-                v.addView(new HtmlView(PageFlowUtil.textLink("back",_form.getReturnActionURL()) + "<br>"));
+                v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
             }
-            v.addView(new JspView<StudyBean>("/org/labkey/trialshare/view/studyDetail.jsp", _study));
+            if (form.getDetailType() == DetailType.study)
+                v.addView(new JspView<StudyBean>("/org/labkey/trialshare/view/studyDetail.jsp", _study));
+            else if (form.getDetailType() == DetailType.publications)
+                v.addView(new JspView<StudyBean>("/org/labkey/trialshare/view/studyPublications.jsp", _study));
+
             return v;
         }
 
@@ -365,6 +298,7 @@ public class TrialShareController extends SpringActionController
     public static class StudyIdForm extends ReturnUrlForm
     {
         private String studyId;
+        private DetailType detailType;
 
         public StudyIdForm(){}
 
@@ -377,6 +311,16 @@ public class TrialShareController extends SpringActionController
         {
             this.studyId = studyId;
         }
+
+        public DetailType getDetailType()
+        {
+            return detailType;
+        }
+
+        public void setDetailType(DetailType detailType)
+        {
+            this.detailType = detailType;
+        }
     }
 
     @RequiresPermission(ReadPermission.class)
@@ -388,12 +332,7 @@ public class TrialShareController extends SpringActionController
         {
             List<StudySubset> subsets = new ArrayList<>();
             StudySubset subset = new StudySubset();
-//            subset.setId("all");
-//            subset.setName("All");
-//
-//            subsets.add(subset);
 
-//            subset = new StudySubset();
             subset.setId("operational");
             subset.setName("Operational");
             subset.setDefault(false);

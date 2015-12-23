@@ -14,31 +14,28 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
 
     autoScroll: true,
 
-    dataModuleName: 'study',
+    dataModuleName: 'study', // TODO is there a way to use this below?
 
-    store : Ext4.create('Ext.data.Store', {
-        model: 'LABKEY.study.data.StudyCard',
-        autoLoad: true,
-        proxy : {
-            type: "ajax",
-            url:  LABKEY.ActionURL.buildURL('trialshare', "studies.api", LABKEY.containerPath),
-            reader: {
-                type: 'json',
-                root: 'data'
-            }
-        }
+    store : Ext4.create('LABKEY.study.store.Studies', {
+        dataModuleName: this.dataModuleName
     }),
 
     tpl: new Ext4.XTemplate(
         '<div id="studypanel">',
         '   <tpl for=".">',
-        '   <tpl if="hasManuscript">',
-        //    TODO this should be something like labkey-study-card-highlight-1 instead of loaded
-        '   <div class="labkey-study-card loaded">',
+        '   <tpl if="manuscriptCount &gt; 0">',
+        '   <div class="labkey-study-card manuscript-highlight">',
         '   <tpl else>',
         '   <div class="labkey-study-card">',
         '   </tpl>',
         '       <span class="labkey-study-card-highlight labkey-study-card-accession">{studyId}</span>',
+        '       <tpl if="shortName">',
+        '           <span class="labkey-study-card-short-name">{shortName}</span>',
+        '       </tpl>',
+        '       <tpl if="iconUrl">',
+        '           &nbsp;<img src="{iconUrl}" class="labkey-study-icon"/><br>',
+        '       </tpl>',
+            '<br>',
         '       <span class="labkey-study-card-highlight labkey-study-card-pi">{investigator}</span>',
         '       <hr class="labkey-study-card-divider">',
         '       <div>',
@@ -47,26 +44,46 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         '           <a class="labkey-text-link labkey-study-card-goto" href="{url}">go to study</a>',
         '           </tpl>',
         '       </div>',
-                <!-- TODO this should be labkey-study-card-title -->
-        '       <div class="labkey-study-card-description">{title}</div>',
-        '       <tpl if="hasManuscript">',
-        '       <br><br><span style="font-size:80%">Manuscript available</span>',
-        '       </tpl>',
+        '       <div class="labkey-study-card-title">{title}</div>',
+        '       {manuscriptCount:this.displayManuscriptCount}',
         '   </div>',
         '   </tpl>',
-        '</div>'
+        '</div>',
+            {
+                displayManuscriptCount : function(count) {
+                    if (count == 0)
+                        return "";
+                    else {
+                        var text = '<a class="labkey-text-link labkey-study-card-manuscript">';
+                        if (count == 1)
+                            text += "1 manuscript available";
+                        else
+                            text += count + " manuscripts available";
+                        text += '</a>';
+                        return text;
+                    }
+                }
+            }
     ),
 
     listeners: {
-        itemClick: function(view, record, item, index, e, eOpts) {
-            console.log("Show study popup for record " , record);
-            this.showPopup(record.get("studyId"));
+        itemClick: function(view, record, item, index, event, eOpts) {
+            if (event.target.className.includes("labkey-study-card-summary"))
+            {
+                console.log("Show study popup for record " , record);
+                this.showStudyDetailPopup(record.get("studyId"));
+            }
+            else if (event.target.className.includes("labkey-study-card-manuscript"))
+            {
+                console.log("Show manuscript popup for record " , record);
+                this.showStudyManuscriptsPopup(record.get("studyId"));
+            }
         }
     },
 
-    showPopup : function(studyId)
+    showStudyDetailPopup : function(studyId)
     {
-        this.hidePopup();
+        this.hidePopup(this.detailShowing);
 
         var detailWindow = Ext4.create('Ext.window.Window', {
             width: 800,
@@ -78,7 +95,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             autoScroll: true,
             loader: {
                 autoLoad: true,
-                url: this.dataModuleName + '-studyDetail.view?_frame=none&studyId=' + studyId
+                url: this.dataModuleName + '-studyDetail.view?_frame=none&detailType=study&studyId=' + studyId
             }
         });
         var viewScroll = Ext4.getBody().getScroll();
@@ -91,21 +108,46 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         this.detailShowing.show();
     },
 
-    hidePopup: function()
+    showStudyManuscriptsPopup : function(studyId)
     {
-        if (this.detailShowing)
+        this.hidePopup(this.manuscriptsShowing);
+
+        var detailWindow = Ext4.create('Ext.window.Window', {
+            width: 800,
+            maxHeight: 600,
+            resizable: true,
+            layout: 'fit',
+            border: false,
+            cls: 'labkey-study-detail-manuscripts',
+            autoScroll: true,
+            loader: {
+                autoLoad: true,
+                url: this.dataModuleName + '-studyDetail.view?_frame=none&detailType=publications&studyId=' + studyId
+            }
+        });
+        var viewScroll = Ext4.getBody().getScroll();
+        var viewSize = Ext4.getBody().getViewSize();
+        var region = [viewScroll.left, viewScroll.top, viewScroll.left + viewSize.width, viewScroll.top + viewSize.height];
+        var proposedXY = [region[0] + viewSize.width / 2 - 400, region[1] + viewSize.height / 2 - 300];
+        proposedXY[1] = Math.max(region[1], Math.min(region[3] - 400, proposedXY[1]));
+        detailWindow.setPosition(proposedXY);
+        this.manuscriptsShowing = detailWindow;
+        this.manuscriptsShowing.show();
+    },
+
+    hidePopup: function(popup)
+    {
+        if (popup)
         {
-            this.detailShowing.hide();
-            this.detailShowing.destroy();
-            this.detailShowing = null;
+            popup.hide();
+            popup.destroy();
+            popup = null;
         }
     },
 
     initComponent: function()
     {
-        console.log("in StudyCards dataModuleName is " + this.dataModuleName);
         this.getStore().load();
         this.callParent();
-
     }
 });
