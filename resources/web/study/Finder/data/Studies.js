@@ -25,15 +25,25 @@ Ext4.define('LABKEY.study.store.Studies', {
         if (selectedSubset)
             this.selectedSubset = selectedSubset;
         var study;
+
+        this.clearFilter();
         for (var i = 0; i < this.count(); i++) {
             study = this.getAt(i);
             study.set("isSelected", this.selectedStudies[study.get("shortName")] !== undefined);
         }
-        this.clearFilter(true);
+
         this.filter([
                 {property: 'isSelected', value: true},
                 {property: 'isPublic', value: this.selectedSubset !== "operational"}
         ]);
+    },
+
+    selectAll : function() {
+        for (var i = 0; i < this.count(); i++) {
+            study = this.getAt(i);
+            study.set("isSelected", true);
+        }
     }
+
 
 });

@@ -69,7 +69,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
     },
 
     onStudySubsetChanged : function(value) {
-        this.getFacetsPanel().updateSummaryPanel();
+        this.getFacetsPanel().onStudySubsetChanged();
     },
 
     onFilterSelectionChange : function(){

@@ -54,7 +54,6 @@ Ext4.define('LABKEY.study.store.Facets', {
         if (this.isLoaded && this.mdx)
         {
             var cube = this.mdx._cube;
-            console.log("cube is ready now!");
             var facetMembersStore = Ext4.getStore("facetMembers");
             for (var f = 0; f < this.count(); f++)
             {
@@ -76,8 +75,6 @@ Ext4.define('LABKEY.study.store.Facets', {
                         level: src.level.uniqueName,
                         count: 0,
                         percent: 0,
-                        //filteredCount: -1,
-                        //selectedCount: -1,
                         facetName: facet.get("name"),
                         facet : facet
                     };
@@ -103,11 +100,27 @@ Ext4.define('LABKEY.study.store.Facets', {
         return optionsStore.getAt(0);
     },
 
+    getStudySubsetFilter: function() {
+        var studiesStore = Ext4.getStore("studies");
+        if (studiesStore.selectedSubset == "operational")
+            return {level: "[Study.Public].[Public]", members: ["[Study.Public].[false]"]};
+        else
+            return {level: "[Study.Public].[Public]", members: ["[Study.Public].[true]"]};
+    },
+
     updateCountsAsync: function (isSavedGroup)
     {
+        if (!this.isLoaded || !this.mdx)
+        {
+            console.log("Store not ready for count update.  Please try again later.");
+            return;
+        }
+
         var facetStore = this;
         var intersectFilters = [];
         var i, f, facet;
+
+        intersectFilters.push(this.getStudySubsetFilter());
         for (f = 0; f < facetStore.count(); f++)
         {
             facet = facetStore.getAt(f);
@@ -122,14 +135,15 @@ Ext4.define('LABKEY.study.store.Facets', {
                 //    this.updateCountsZero();
                 //    return;
                 //}
-                var uniqueNames = selectedMembers.map(function(m){return m.uniqueName;});
-                if (this.filterByLevel != "[Study].[Study]")
-                    intersectFilters.push({
-                        level: this.filterByLevel,
-                        membersQuery: {level: "[Study].[Study]", members: uniqueNames}
-                    });
-                else
-                    intersectFilters.push({level: "[Study].[Study]", members: uniqueNames});
+                // TODO seems unnecessary if we always pass in all of the names.
+                //var uniqueNames = facet.data.members.map(function(m){return m.uniqueName;});
+                //if (this.filterByLevel != "[Study].[Study]")
+                //    intersectFilters.push({
+                //        level: this.filterByLevel,
+                //        membersQuery: {level: "[Study].[Study]", members: uniqueNames}
+                //    });
+                //else
+                //    intersectFilters.push({level: "[Study].[Study]", members: uniqueNames});
             }
             else
             {
