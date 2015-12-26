@@ -7,13 +7,13 @@ Ext4.define('LABKEY.study.data.StudyCard', {
         {name: 'studyId'},
         {name: 'title'},
         {name: 'url'},
+        {name: 'externalUrl'},
+        {name: 'externalUrlDescription'},
         {name: 'shortName'},
         {name: 'iconUrl'},
         {name: 'investigator'},
-        {name: 'hasManuscript', type: 'boolean'},
-        {name: 'isLoaded', type: 'boolean'}, // TODO isHighlighted
-        {name: 'availability'},
         {name: 'isPublic', type: 'boolean'},
+        {name: 'abstractCount', type: 'int'},
         {name: 'manuscriptCount', type: 'int'},
         {name: 'participantCount', type: 'int'},
         {name: 'isSelected', type: 'boolean'}

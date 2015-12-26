@@ -17,78 +17,48 @@
 %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="org.labkey.api.data.Container" %>
-<%@ page import="org.labkey.api.data.ContainerFilter" %>
-<%@ page import="org.labkey.api.data.ContainerFilterable" %>
-<%@ page import="org.labkey.api.data.ContainerManager" %>
-<%@ page import="org.labkey.api.data.TableInfo" %>
-<%@ page import="org.labkey.api.data.TableSelector" %>
-<%@ page import="org.labkey.api.query.DefaultSchema" %>
-<%@ page import="org.labkey.api.query.QuerySchema" %>
+<%@ page import="org.labkey.api.util.Pair" %>
 <%@ page import="org.labkey.api.view.ActionURL" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.ViewContext" %>
-<%@ page import="java.util.Collection" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
 <%@ page import="org.labkey.api.view.template.ClientDependency" %>
-<%@ page import="java.util.LinkedHashSet" %>
+<%@ page import="org.labkey.trialshare.TrialShareController" %>
 <%@ page import="org.labkey.trialshare.data.StudyBean" %>
 <%@ page import="org.labkey.trialshare.data.StudyPersonnelBean" %>
 <%@ page import="org.labkey.trialshare.data.StudyPublicationBean" %>
+<%@ page import="java.net.URL" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.LinkedHashSet" %>
+<%@ page import="java.util.Map" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%!
     public LinkedHashSet<ClientDependency> getClientDependencies()
     {
         LinkedHashSet<ClientDependency> resources = new LinkedHashSet<>();
 
-        resources.add(ClientDependency.fromPath("dataFinder.css"));
-        resources.add(ClientDependency.fromPath("trialShare.css"));
+        resources.add(ClientDependency.fromPath("study/Finder/dataFinder.css"));
+        resources.add(ClientDependency.fromPath("study/Finder/trialShare.css"));
 
         return resources;
     }
 %>
 <%
-    JspView<StudyBean> me = (JspView) HttpView.currentView();
+    JspView<TrialShareController.StudyDetailBean> me = (JspView) HttpView.currentView();
 
     ViewContext context = HttpView.currentContext();
     Container c = context.getContainer();
-    StudyBean study = me.getModelBean();
+    TrialShareController.StudyDetailBean studyDetail = me.getModelBean();
+    StudyBean study = studyDetail.getStudy();
     String descriptionHTML;
     if (!StringUtils.isEmpty(study.getDescription()))
         descriptionHTML= study.getDescription();
     else
         descriptionHTML = h(study.getBriefDescription());
 
-    ActionURL studyUrl = null;
-//    if (!c.isRoot())
-//    {
-//        String comma = "\n";
-//        Container p = c.getProject();
-//        QuerySchema s = DefaultSchema.get(context.getUser(), p).getSchema("study");
-//        TableInfo sp = s.getTable("StudyProperties");
-//        if (sp.supportsContainerFilter())
-//        {
-//            ContainerFilter cf = new ContainerFilter.AllInProject(context.getUser());
-//            ((ContainerFilterable) sp).setContainerFilter(cf);
-//        }
-//        Collection<Map<String, Object>> maps = new TableSelector(sp).getMapCollection();
-//        for (Map<String, Object> map : maps)
-//        {
-//            Container studyContainer = ContainerManager.getForId((String) map.get("container"));
-//            String studyAccession = (String)map.get("study_accession");
-//            String name = (String)map.get("Label");
-//            if (null == studyAccession && study.getStudyIdPrefix() != null && name.startsWith(study.getStudyIdPrefix()))
-//                studyAccession = name;
-//            if (null != studyContainer && StringUtils.equalsIgnoreCase(study.getStudyId(), studyAccession))
-//            {
-//                studyUrl = studyContainer.getStartURL(context.getUser());
-//                break;
-//            }
-//        }
-//    }
+    ActionURL studyUrl = study.getUrl(c, context.getUser());
 
-    String publicationsTitle = "Manuscripts and Abstracts";
+    String publicationsSectionTitle = "Manuscripts and Abstracts";
     Map<String, String> linkProps = new HashMap<>();
     linkProps.put("target", "_blank");
 %>
@@ -97,9 +67,10 @@
 <h2 class="labkey-study-accession"><% if (null!=studyUrl) {%><a style="color:#fff" href="<%=h(studyUrl)%>"><%}%><%=h(study.getStudyId())%><% if (null!=studyUrl) {%></a><%}%></h2>
 <h2 class="labkey-study-short-name"><% if (null!=study.getShortName()) {%><a style="color:#fff" href="<%=h(study.getShortName())%>"><%}%><%=h(study.getShortName())%><% if (null!=study.getShortName()) {%></a><%}%></h2>
 <div id="labkey-study-details-content">
-<% if (null != study.getIconUrl()) {%><img src="<%=study.getIconUrl()%>"/><%}%>
+<% if (null != study.getIconUrl()) {%><img src="<%=h(study.getIconUrl())%>"/><%}%>
 <h3 class="study-title"><%=h(study.getTitle())%></h3>
     <div><%
+
         if (null != study.getPersonnel())
         {
             for (StudyPersonnelBean p : study.getPersonnel())
@@ -113,20 +84,43 @@
                 }
             }
         }
+        %><%
+        if (studyDetail.getDetailType() == TrialShareController.DetailType.study)
+        {
         %><div class="labkey-study-description"><%=text(descriptionHTML)%></div>
+        <%
+        }
+        %>
         <div class="labkey-study-papers"><%
         if (null != study.getPublications() && study.getPublications().size() > 0)
         {
-            %><span class="labkey-study-manuscript-header"><%=h(publicationsTitle)%></span><%
+            %><span class="labkey-study-publication-header"><%=h(publicationsSectionTitle)%></span><%
             for (StudyPublicationBean pub : study.getPublications())
             {
                 if (pub.getTitle() != null)
                 {
-                %><p><span style="font-size:80%;"><span class="labkey-manuscript-journal" style="text-decoration:underline;"><%=h(pub.getJournal())%></span> <span class="labkey-manuscript-year"><%=h(pub.getYear())%></span></span><br/><%
-                %><span class="labkey-manuscript-title"><%=h(pub.getTitle())%></span><%
+                %><p><span class="labkey-publication-journal"><%=h(pub.getJournal())%></span> <span class="labkey-publication-year"><%=h(pub.getYear())%></span><br/><%
+                %><span class="labkey-publication-title"><%=h(pub.getTitle())%></span><%
+                    if (!StringUtils.isEmpty(pub.getCitation()))
+                    {
+                        %><br/><span class="labkey-publication-citation"><%=h(pub.getCitation())%></span><%
+                    }
+                %><%
+                    if (!StringUtils.isEmpty(pub.getAuthor()))
+                    {
+                        %><br/><span class="labkey-publication-author"><%=h(pub.getAuthor())%></span><%
+                    }
+                %><%
                     if (!StringUtils.isEmpty(pub.getPubmedId()))
                     {
                         %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPubmedId(), null, null, linkProps)%><%
+                    }
+                    for (Pair<String, String> urlData : pub.getUrls())
+                    {
+                        if (urlData != null && !StringUtils.isEmpty(urlData.second))
+                        {
+                        %><br/><%=textLink(h(urlData.second), urlData.first, null, null, linkProps)%><%
+                        }
                     }
                 %></p><%
                 }
@@ -137,6 +131,18 @@
 
     <% if (null != studyUrl) { %>
         <%= textLink("View study " + study.getStudyId(), studyUrl.toString(), null, null, linkProps)%><br>
+    <% } %>
+    <%
+        if (null != study.getExternalUrl())
+        {
+            String text = study.getExternalUrlDescription();
+            if (StringUtils.isEmpty(text))
+            {
+                URL url = new URL(study.getExternalUrl());
+                text = "View study at " + url.getHost();
+            }
+    %>
+        <%= textLink(text, study.getExternalUrl(), null, null, linkProps)%><br>
     <% } %>
 </div>
 </div>

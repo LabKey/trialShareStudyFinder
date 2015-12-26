@@ -15,17 +15,24 @@
  */
 package org.labkey.trialshare.data;
 
+import org.labkey.api.util.Pair;
+
 public class StudyPublicationBean
 {
-    String studyId;
-    String url;
-    String pubmedId;
-    String authors;
-    String issue;
-    String journal;
-    String pages;
-    String title;
-    String year;
+    // common fields
+    private String studyId;
+    private String pubmedId;
+    private String author;
+    private String issue;
+    private String journal;
+    private String pages;
+    private String title;
+    private String year;
+    // the first item in the pair is the link; the second is the description (link text)
+    private Pair<String, String>[] urls = new Pair[5];
+
+    // TrialShare fields
+    private String citation;
 
     public String getStudyId()
     {
@@ -47,14 +54,14 @@ public class StudyPublicationBean
         this.pubmedId = pubmedId;
     }
 
-    public String getAuthors()
+    public String getAuthor()
     {
-        return authors;
+        return author;
     }
 
-    public void setAuthors(String authors)
+    public void setAuthor(String author)
     {
-        this.authors = authors;
+        this.author = author;
     }
 
     public String getIssue()
@@ -107,4 +114,100 @@ public class StudyPublicationBean
         this.year = year;
     }
 
+    public String getCitation()
+    {
+        return citation;
+    }
+
+    public void setCitation(String citation)
+    {
+        this.citation = citation;
+    }
+
+    public void setDescription1(String description1)
+    {
+        setUrlText(0, description1);
+    }
+
+    public Pair<String, String>[] getUrls()
+    {
+        return urls;
+    }
+
+    public void setUrls(Pair<String, String>[] urls)
+    {
+        this.urls = urls;
+    }
+
+    private void setUrlText(int index, String description)
+    {
+        if (description.equals("&nbsp;"))
+            description = "";
+        Pair<String, String> urlData = urls[index];
+        if (urlData == null)
+        {
+            urlData = new Pair<>(null, description);
+            urls[index] = urlData;
+        }
+        else
+        {
+            urlData.second = description;
+        }
+    }
+
+    private void setUrlLink(int index, String link)
+    {
+        Pair<String, String> urlData = urls[index];
+        if (urlData == null)
+        {
+            urlData = new Pair<>(link, null);
+            urls[index] = urlData;
+        }
+        else
+        {
+            urlData.first = link;
+        }
+    }
+
+    public void setDescription2(String description2)
+    {
+        setUrlText(1, description2);
+    }
+
+    public void setDescription3(String description3)
+    {
+        setUrlText(2, description3);
+    }
+
+
+    public void setLink1(String link1)
+    {
+        setUrlLink(0, link1);
+    }
+
+
+    public void setLink2(String link2)
+    {
+        setUrlLink(1, link2);
+    }
+
+
+    public void setLink3(String link3)
+    {
+        setUrlLink(2, link3);
+    }
+
+    public boolean hasPubmedLink()
+    {
+        return getPubmedLink() != null;
+    }
+
+    public String getPubmedLink()
+    {
+        for (Pair<String, String> urlData : urls) {
+            if (urlData != null && urlData.first != null && urlData.first.contains("pubmed"))
+                return urlData.first;
+        }
+        return null;
+    }
 }

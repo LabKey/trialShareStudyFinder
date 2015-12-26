@@ -23,8 +23,8 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     tpl: new Ext4.XTemplate(
         '<div id="studypanel">',
         '   <tpl for=".">',
-        '   <tpl if="manuscriptCount &gt; 0">',
-        '   <div class="labkey-study-card manuscript-highlight">',
+        '   <tpl if="manuscriptCount + abstractCount &gt; 0">',
+        '   <div class="labkey-study-card labkey-publication-highlight">',
         '   <tpl else>',
         '   <div class="labkey-study-card">',
         '   </tpl>',
@@ -42,7 +42,10 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         '           </tpl>',
         '       </div>',
         '       <div class="labkey-study-card-title">{title}</div>',
+        '       <div class="labkey-study-card-publications">',
         '       {manuscriptCount:this.displayManuscriptCount}',
+        '       {abstractCount:this.displayAbstractCount}',
+        '       </div>',
         '   </div>',
         '   </tpl>',
         '</div>',
@@ -51,11 +54,24 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
                     if (count == 0)
                         return "";
                     else {
-                        var text = '<a class="labkey-text-link labkey-study-card-manuscript">';
+                        var text = '<a class="labkey-text-link labkey-study-card-pub-count">';
                         if (count == 1)
                             text += "1 manuscript available";
                         else
                             text += count + " manuscripts available";
+                        text += '</a>';
+                        return text;
+                    }
+                },
+                displayAbstractCount : function(count) {
+                    if (count == 0)
+                        return "";
+                    else {
+                        var text = '<a class="labkey-text-link labkey-study-card-pub-count">';
+                        if (count == 1)
+                            text += "1 abstract available";
+                        else
+                            text += count + " abstracts available";
                         text += '</a>';
                         return text;
                     }
@@ -70,7 +86,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
                 console.log("Show study popup for record " , record);
                 this.showStudyDetailPopup(record.get("studyId"));
             }
-            else if (event.target.className.includes("labkey-study-card-manuscript"))
+            else if (event.target.className.includes("labkey-study-card-pub-count"))
             {
                 console.log("Show manuscript popup for record " , record);
                 this.showStudyManuscriptsPopup(record.get("studyId"));

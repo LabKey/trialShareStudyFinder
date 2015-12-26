@@ -31,10 +31,10 @@ import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
+import org.labkey.api.util.Pair;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
-import org.labkey.api.view.NotFoundException;
 import org.labkey.api.view.VBox;
 import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.StudyBean;
@@ -110,18 +110,28 @@ public class TrialShareController extends SpringActionController
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             studies  = (new TableSelector(coreSchema.getSchema("lists").getTable("studyProperties"))).getArrayList(StudyBean.class);
             List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("studyManuscripts")).getArrayList(StudyPublicationBean.class));
-            Map<String, Integer> pubCounts = new HashMap<>();
+            Map<String, Pair<Integer, Integer>> pubCounts = new HashMap<>();
             for (StudyPublicationBean pub : publications) {
                 if (pubCounts.get(pub.getStudyId()) == null)
-                    pubCounts.put(pub.getStudyId(), 0);
-                int count = pubCounts.get(pub.getStudyId());
-                pubCounts.put(pub.getStudyId(), count + 1);
+                    pubCounts.put(pub.getStudyId(), new Pair<>(0,0));
+                Pair<Integer, Integer> countPair =  pubCounts.get(pub.getStudyId());
+                if (pub.hasPubmedLink())
+                    countPair.first += 1;
+                else
+                    countPair.second += 1;
+
             }
             for (StudyBean study : studies) {
                 if (pubCounts.get(study.getStudyId()) == null)
+                {
                     study.setManuscriptCount(0);
+                    study.setAbstractCount(0);
+                }
                 else
-                    study.setManuscriptCount(pubCounts.get(study.getStudyId()));
+                {
+                    study.setManuscriptCount(pubCounts.get(study.getStudyId()).first);
+                    study.setAbstractCount(pubCounts.get(study.getStudyId()).second);
+                }
             }
 
             return success(studies);
@@ -145,8 +155,7 @@ public class TrialShareController extends SpringActionController
             study.setDescription("This is a prospective multicenter, open-label, single-arm trial in which 20 pediatric recipients of parental living-donor liver allografts will undergo gradual withdrawal of immunosuppression with the goal of complete withdrawal. Patients on stable immunosuppression regimens with good organ function and no evidence of acute or chronic rejection or other forms of allograft dysfunction will be enrolled. Participants will undergo gradual withdrawal of immunosuppression and will be followed for a minimum of 4 years after completion of immunosuppression withdrawal. Immunologic and genetic profiles will be collected at multiple time points and compared between tolerant and nontolerant participants.");
             study.setIsLoaded(true);
             study.setAvailability("operational");
-            study.setHasManuscript(true);
-            study.setUrl("https://www.itntrialshare.org/project/Studies/ITN029STOPR/Study%20Data/begin.view");
+            study.setExternalUrl("https://www.itntrialshare.org/project/Studies/ITN029STOPR/Study%20Data/begin.view");
         }
         else if (studyId.equals("ITN021AI"))
         {
@@ -156,7 +165,6 @@ public class TrialShareController extends SpringActionController
             study.setTitle("Rituximab for ANCA-Associated Vasculitis");
             study.setIsLoaded(false);
             study.setAvailability("public");
-            study.setHasManuscript(false);
             study.setDescription("Current conventional therapies for ANCA-associated vasculitis (AAV) are associated with high incidences of treatment failure, disease relapse, substantial toxicity, and patient morbidity and mortality. Rituximab is a monoclonal antibody used to treat non-Hodgkin's lymphoma. This study will evaluate the efficacy of rituximab with glucocorticoids in inducing disease remission in adults with severe forms of AAV (WG and MPA).\n" +
                     "\n" +
                     "The study consists of two phases: a 6-month remission induction phase, followed by a 12-month remission maintenance phase. All participants will receive at least 1 g of pulse IV methylprednisolone or a dose-equivalent of another glucocorticoid preparation. Depending on the participant's condition, he or she may receive up to 3 days of IV methylprednisolone for a total of 3 g of methylprednisolone (or a dose-equivalent). During the remission induction phase, all participants will receive oral prednisone daily (1 mg/kg/day, not to exceed 80 mg/day). Prednisone tapering will be completed by the Month 6 study visit.\n" +
@@ -175,9 +183,8 @@ public class TrialShareController extends SpringActionController
             study.setTitle("High Dose Immunosuppression and Autologous Transplantation for Multiple Sclerosis");
             study.setIsLoaded(false);
             study.setAvailability("operational");
-            study.setHasManuscript(false);
             study.setDescription("This study is a prospective, multicenter Phase II clinical trial evaluating high-dose immunosuppressive therapy (HDIT) using Carmustine, Etoposide, Cytarabine, and Melphalan (BEAM) plus Thymoglobulin (rATG) with autologous transplantation of CD34+ HCT for the treatment of poor-risk MS. The active treatment period will be approximately 3 months from the time of initiation of mobilization to the day of discharge after transplant. Subjects will be followed up to 60 months (5 years) after transplant. Total study duration will be 60 months after the last subject is transplanted.");
-            study.setUrl("https://www.itntrialshare.org/project/Studies/ITN033AIOPR/Study%20Data/begin.view");
+            study.setExternalUrl("https://www.itntrialshare.org/project/Studies/ITN033AIOPR/Study%20Data/begin.view");
         }
         return study;
     }
@@ -241,11 +248,35 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+    public static class StudyDetailBean
+    {
+        private StudyBean _study;
+        private DetailType _detailType;
+
+        public DetailType getDetailType()
+        {
+            return _detailType;
+        }
+
+        public void setDetailType(DetailType detailType)
+        {
+            _detailType = detailType;
+        }
+
+        public StudyBean getStudy()
+        {
+            return _study;
+        }
+
+        public void setStudy(StudyBean study)
+        {
+            _study = study;
+        }
+    }
 
     @RequiresPermission(ReadPermission.class)
     public class StudyDetailAction extends SimpleViewAction<StudyIdForm>
     {
-        StudyBean _study;
         String _studyId;
 
         @Override
@@ -259,13 +290,15 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(StudyIdForm form, BindException errors) throws Exception
         {
+
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             QuerySchema listSchema = coreSchema.getSchema("lists");
-            _study  = (new TableSelector(listSchema.getTable("studyProperties"))).getObject(_studyId, StudyBean.class);
+            StudyBean study = (new TableSelector(listSchema.getTable("studyProperties"))).getObject(_studyId, StudyBean.class);
+
 
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
-            _study.setPublications((new TableSelector(listSchema.getTable("studyManuscripts"), filter, null)).getArrayList(StudyPublicationBean.class));
+            study.setPublications((new TableSelector(listSchema.getTable("studyManuscripts"), filter, null)).getArrayList(StudyPublicationBean.class));
 //            _study.study = (new TableSelector(DbSchema.get("immport").getTable("study"))).getObject(studyId, StudyBean.class);
 //            if (null == _study.study)
 //                throw new NotFoundException("study not found: " + form.getStudy());
@@ -280,10 +313,10 @@ public class TrialShareController extends SpringActionController
             {
                 v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
             }
-            if (form.getDetailType() == DetailType.study)
-                v.addView(new JspView<StudyBean>("/org/labkey/trialshare/view/studyDetail.jsp", _study));
-            else if (form.getDetailType() == DetailType.publications)
-                v.addView(new JspView<StudyBean>("/org/labkey/trialshare/view/studyPublications.jsp", _study));
+            StudyDetailBean bean = new StudyDetailBean();
+            bean.setStudy(study);
+            bean.setDetailType(form.getDetailType());
+            v.addView(new JspView<StudyDetailBean>("/org/labkey/trialshare/view/studyDetail.jsp", bean));
 
             return v;
         }

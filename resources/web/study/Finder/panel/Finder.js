@@ -21,6 +21,8 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     autoScroll : true,
 
+    searchTerms : '',
+
     initComponent : function() {
 
         this.items = [
@@ -36,8 +38,8 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
         this.on({
                     filterSelectionChanged: this.onFilterSelectionChange,
-                    studySubsetChanged: this.onStudySubsetChanged
-                    //searchTermsChanged: this.onSearchTermsChanged
+                    studySubsetChanged: this.onStudySubsetChanged,
+                    searchTermsChanged: this.onSearchTermsChanged
                 }
         );
     },
@@ -77,80 +79,60 @@ Ext4.define('LABKEY.study.panel.Finder', {
         this.getStudiesPanel().onFilterSelectionChanged();
     },
 
-//    $scope.onStudySubsetChanged = function ()
-//{
-//    if ($scope.localStorageService.isSupported)
-//        $scope.localStorageService.add("studySubset", $scope.studySubset);
-//    // if there are search terms, just act as if the search terms have changed
-//    if ($scope.searchTerms)
-//    {
-//        $scope.onSearchTermsChanged();
-//    }
-//    else
-//    {
-//        $scope.clearStudyFilter();
-//    }
-//};
-//
-//$scope.doSearchTermsChanged_promise = null;
-//
-//$scope.doSearchTermsChanged = function ()
-//{
-//    if ($scope.doSearchTermsChanged_promise)
-//    {
-//        // UNDONE:cancel doesn't seem to really be supported for $http
-//        //$scope.http.cancel($scope.doSearchTermsChanged_promise);
-//    }
-//
-//    if (!$scope.searchTerms)
-//    {
-//        $scope.searchMessage = "";
-//        $scope.clearStudyFilter();
-//        return;
-//    }
-//
-//    var scope = $scope;
-//    var url = LABKEY.ActionURL.buildURL("search", "json", "/home/", {
-//        "category": "immport_study",
-//        "scope": "Folder",
-//        "q": $scope.searchTerms
-//    });
-//    var promise = $scope.http.get(url);
-//    $scope.doSearchTermsChanged_promise = promise;
-//    promise.success(function (data)
-//    {
-//        // NOOP if we're not current (poor man's cancel)
-//        if (promise != $scope.doSearchTermsChanged_promise)
-//            return;
-//        $scope.doSearchTermsChanged_promise = null;
-//        var hits = data.hits;
-//        var searchStudies = [];
-//        var found = {};
-//        for (var h = 0; h < hits.length; h++)
-//        {
-//            var id = hits[h].id;
-//            var accession = id.substring(id.lastIndexOf(':') + 1);
-//            if (found[accession])
-//                continue;
-//            found[accession] = true;
-//            searchStudies.push("[Study].[" + accession + "]");
-//        }
-//        if (!searchStudies.length)
-//        {
-//            $scope.setStudyFilter(searchStudies);
-//            $scope.searchMessage = 'No studies match your search criteria';
-//        }
-//        else
-//        {
-//            $scope.searchMessage = '';
-//            // intersect with study subset list
-//            var result = $scope.intersect(searchStudies, $scope.getStudySubsetList());
-//            if (!result.length)
-//                $scope.searchMessage = 'No studies match your search criteria';
-//            $scope.setStudyFilter(result);
-//        }
-//    });
-//};
+    onSearchTermsChanged: function(searchTerms) {
+
+        if (!searchTerms)
+        {
+            this.searchMessage = "";
+            this.clearStudyFilter();
+            return;
+        }
+
+        var url = LABKEY.ActionURL.buildURL("search", "json", "/home/", {
+            "category": "List",
+            "scope": "Folder",
+            "q": searchTerms
+        });
+        Ext4.Ajax.request({
+            url: url,
+            success: function (response)
+            {
+                //// NOOP if we're not current (poor man's cancel)
+                //if (promise != $scope.doSearchTermsChanged_promise)
+                //    return;
+                //$scope.doSearchTermsChanged_promise = null;
+                var data = Ext4.decode(response.responseText);
+                var hits = data.hits;
+                var searchStudies = [];
+                var found = {};
+                for (var h = 0; h < hits.length; h++)
+                {
+                    var id = hits[h].id;
+                    var accession = id.substring(id.lastIndexOf(':') + 1);
+                    if (found[accession])
+                        continue;
+                    found[accession] = true;
+                    searchStudies.push("[Study].[" + accession + "]");
+                }
+                if (!searchStudies.length)
+                {
+                    console.log("No studies match your search criteria");
+                    //$scope.setStudyFilter(searchStudies);
+                    //$scope.searchMessage = 'No studies match your search criteria';
+                }
+                else
+                {
+                    console.log("found " + searchStudies.length + " studies matching terms " + searchTerms);
+                    //$scope.searchMessage = '';
+                    //// intersect with study subset list
+                    //var result = $scope.intersect(searchStudies, $scope.getStudySubsetList());
+                    //if (!result.length)
+                    //    $scope.searchMessage = 'No studies match your search criteria';
+                    //$scope.setStudyFilter(result);
+                }
+            }
+        });
+    },
 
     _initResize : function() {
         var resize = function(w, h) {
