@@ -4,17 +4,17 @@ Ext4.define("LABKEY.study.panel.SelectionSummary", {
     alias : 'widget.facet-selection-summary',
 
     tpl: new Ext4.XTemplate(
-            '<div id="selectionPanel" style="background-color: white; border:none">',
-            '       <div id="summaryArea" class="facet-summary" >',
-            '           <div class="facet-header"><span class="facet-caption">Summary</span></div>',
+            '<div id="selectionPanel">',
+            '       <div id="summaryArea" class="labkey-facet-summary" >',
+            '           <div class="labkey-facet-header"><span class="labkey-facet-caption">Summary</span></div>',
             '           <ul>',
-            '               <li class="member">',
-            '                   <span class="member-name">Studies</span>',
-            '                   <span id="memberCount" class="member-count">{studyCount:this.getStudyCount}</span>',
+            '               <li class="labkey-facet-member">',
+            '                   <span class="labkey-facet-member-name">Studies</span>',
+            '                   <span id="memberCount" class="labkey-facet-member-count">{studyCount:this.getStudyCount}</span>',
             '               </li>',
-            '               <li class="member">',
-            '                   <span class="member-name">Subjects</span>',
-            '                   <span id="participantCount" class="member-count">{participantCount:this.getParticipantCount}</span>',
+            '               <li class="labkey-facet-member">',
+            '                   <span class="labkey-facet-member-name">Subjects</span>',
+            '                   <span id="participantCount" class="labkey-facet-member-count">{participantCount:this.getParticipantCount}</span>',
             '               </li>',
             '           </ul>',
             '       </div>',
@@ -46,8 +46,8 @@ Ext4.define("LABKEY.study.panel.SelectionSummary", {
     initComponent: function() {
         Ext4.getStore('studies').addListener('filterChange',this.onFilterSelectionChanged, this);
     },
+
     onFilterSelectionChanged : function() {
-        console.log("in SelectionSummary with filterChange");
         this.update();
     }
 });

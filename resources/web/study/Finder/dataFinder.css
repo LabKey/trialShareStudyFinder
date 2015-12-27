@@ -119,27 +119,28 @@ SPAN.labkey-study-search
 }
 
 /* search area */
-TD.labkey-search-box,
-TD.search-box,
-DIV.search-box
+TD.labkey-search-box
 {
     float:left;
     padding:10pt;
 }
-INPUT.labkey-search-box,
-INPUT.search-box
+INPUT.labkey-search-box
 {
     width:200pt;
 }
 
-
-DIV.labkey-search-message,
-DIV.search-message
+DIV.labkey-search-message
 {
     padding-left:10pt;
 }
 
-.selection-panel
+/*.labkey-facet-selection-summary*/
+/*{*/
+    /*background-color: white;*/
+    /*border:none*/
+/*}*/
+
+.labkey-facet-selection-panel
 {
     vertical-align: text-top;
     width:220pt;
@@ -147,7 +148,7 @@ DIV.search-message
     background-color: white;
 }
 
-.selection-panel > DIV
+.labkey-facet-selection-panel > DIV
 {
     height:100%;
     overflow-y:auto;
@@ -160,7 +161,7 @@ DIV.search-message
     /*text-align: right;*/
 /*}*/
 
-DIV.summary LI.member
+DIV.labkey-facet-summary LI.labkey-facet-member
 {
     clear:both;
     padding:2pt;
@@ -213,7 +214,7 @@ DIV.summary LI.member
     float:right;
 }
 
-DIV.facet-summary,
+DIV.labkey-facet-summary,
 DIV.facet
 {
     max-width:200pt;
@@ -232,6 +233,7 @@ DIV.facet-header
     background-color: rgb(240, 240, 240);
 }
 
+.labkey-facet-header .labkey-facet-caption,
 .labkey-facet-header .labkey-facet-caption,
 DIV.facet-header .facet-caption
 {
@@ -281,14 +283,12 @@ DIV.facet-header .labkey-filter-options
     color:grey;
 }
 
-.labkey-facet-header .active,
-.facet-header .active
+.labkey-facet-header .active
 {
     display:inline-block;
 }
 
-DIV.facet-summary UL,
-DIV.facet UL
+DIV.labkey-facet-summary UL
 {
     list-style-type:none;
     padding-left:0;
@@ -296,7 +296,7 @@ DIV.facet UL
     margin:0;
 }
 
-DIV.facet-summary LI.member
+DIV.labkey-facet-summary LI.member
 {
     clear:both;
     cursor:default;
@@ -360,7 +360,7 @@ DIV.facet LI.empty-member
 {
     color:#888888;
 }
-LI.member .member-indicator
+LI.labkey-facet-member .member-indicator
 {
     position:relative;
     display:inline-block;
@@ -390,7 +390,7 @@ LI.member .member-indicator
 
 SPAN.member .labkey-facet-member-name,
 SPAN.labkey-facet-member  .labkey-facet-member-name,
-LI.member .member-name
+LI.labkey-facet-member .labkey-facet-member-name
 {
     display:inline-block;
     position:relative;
@@ -403,7 +403,7 @@ LI.member .member-name
 
 SPAN.member .labkey-facet-member-count,
 SPAN.labkey-facet-member  .labkey-facet-member-count,
-LI.member .member-count
+LI.labkey-facet-member .labkey-facet-member-count
 {
     position:relative;
     float:right;
@@ -413,7 +413,7 @@ LI.member .member-count
 .x4-grid-row-selected SPAN.labkey-facet-percent-bar,
 SPAN.member SPAN.bar-selected,
 SPAN.labkey-facet-member  SPAN.bar-selected,
-LI.member SPAN.bar-selected
+LI.labkey-facet-member SPAN.bar-selected
 {
     background-color:rgba(81, 158, 218, 0.2);
 }
@@ -432,7 +432,7 @@ LI.member SPAN.bar-selected
 }
 
 .x4-grid-row SPAN.labkey-facet-percent-bar,
-LI.member .bar
+LI.labkey-facet-member .bar
 {
     height:14pt;
     background-color:rgba(222,222,222,0.3);

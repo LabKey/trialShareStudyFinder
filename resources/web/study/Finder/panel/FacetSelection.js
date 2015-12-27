@@ -7,7 +7,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     alias : 'widget.study-facet-selection-panel',
 
-    cls: 'selection-panel',
+    cls: 'labkey-facet-selection-panel',
 
     padding: "10 8 8 10",
 
@@ -70,7 +70,8 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     getFacets : function() {
         if (!this.facets) {
             this.facets = Ext4.create("LABKEY.study.panel.FacetsGrid", {
-                dataModuleName: this.dataModuleName
+                dataModuleName: this.dataModuleName,
+                olapConfig: this.olapConfig
             });
         }
         return this.facets;

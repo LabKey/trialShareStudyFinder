@@ -81,7 +81,6 @@ Ext4.define('LABKEY.study.store.Facets', {
                     if (facet.get("name") != "Study")
                         facetMembersStore.add(member);
                     facet.data.members.push(member);
-                    facet.data.memberMap[member.uniqueName] = member;
                 }
                 if (facet.get("name") == "Study") {
                     facet.data.selectedMembers = facet.data.members;

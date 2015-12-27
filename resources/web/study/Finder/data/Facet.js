@@ -5,21 +5,19 @@ Ext4.define('LABKEY.study.data.Facet', {
 
     fields: [
         {name: 'name'},
-        {name: 'pluralName'}, // TODO not currently used
+        {name: 'pluralName'}, // not currently used
         {name: 'members'},
         {name: 'selectedMembers'},
         {name: 'filterOptions'},
-        {name: 'memberMap'}, // TODO is this used?
         {name: 'currentFilterType'},
         {name: 'currentFilterCaption'},
-        {name: 'allMemberCount', type:'int', defaultValue: 0}, // TODO not currently used
+        {name: 'allMemberCount', type:'int', defaultValue: 0}, // set but not currently used
         {name: 'hierarchy'},
         {name: 'hierarchyName'},
         {name: 'levelName'},
         {name: 'allMemberName'},
         {name: 'ordinal'},
         {name: 'isExpanded', type:'boolean', defaultValue: true}
-
     ],
 
     associations: [

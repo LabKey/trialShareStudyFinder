@@ -17,7 +17,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     height: '500px',
 
-    dataModuleName: 'study',
+    dataModuleName: 'study', // TODO
 
     autoScroll : true,
 
@@ -47,9 +47,9 @@ Ext4.define('LABKEY.study.panel.Finder', {
     getCubeDefinition: function() {
         var me = this;
         this.cube = LABKEY.query.olap.CubeManager.getCube({
-            configId: 'TrialShare:/StudyCube',
-            schemaName: 'lists',
-            name: 'StudyCube',
+            configId: this.olapConfig.configId,
+            schemaName: this.olapConfig.schemaName,
+            name: this.olapConfig.name,
             deferLoad: false
         });
         this.cube.onReady(function (m)
@@ -67,7 +67,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     onCubeReady: function() {
         this.getFacetsPanel().onCubeReady(this.mdx);
-        //this.getStudiesPanel().onCubeReady(this.cube);
     },
 
     onStudySubsetChanged : function(value) {
@@ -157,7 +156,8 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 width: '21%',
                 maxWidth: '265px',
                 dataModuleName: this.dataModuleName,
-                showParticipantFilters : this.showParticipantFilters
+                showParticipantFilters : this.showParticipantFilters,
+                olapConfig: this.olapConfig
             });
         }
         FACETS = this.facetsPanel;

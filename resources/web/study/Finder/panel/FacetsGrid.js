@@ -8,7 +8,6 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     ui: 'custom',
 
-    //itemSelector: 'div.facet',
     itemSelector: 'span.labkey-facet-member',
 
     dataModuleName: 'study',
@@ -103,7 +102,6 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                         }
                         html += '</div>';
                         return html;
-                        //Ext4.get(Ext4.DomQuery.select('.labkey-filter-options', LABKEY.study.panel.FacetsGrid.headerLookup[facetName])[0]).setHTML(html);
                     }
                 }
             )
@@ -167,7 +165,6 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         var facet;
         for (var f = 0; f < this.facetStore.count(); f++) {
             facet = this.facetStore.getAt(f);
-            //this.updateFacetHeader(facet.data.name, facet.get("isExpanded"));
         }
         this.facetStore.updateCountsAsync();
 

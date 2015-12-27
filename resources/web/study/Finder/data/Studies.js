@@ -3,7 +3,7 @@ Ext4.define('LABKEY.study.store.Studies', {
     storeId: 'studies',
     model: 'LABKEY.study.data.StudyCard',
     autoLoad: false,
-    dataModuleName: this.dataModuleName,
+    dataModuleName: "trialshare", // TODO how can this be used below?
     selectedStudies : {},
     selectedSubset : 'public',
     proxy : {
