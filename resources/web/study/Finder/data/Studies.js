@@ -2,7 +2,7 @@ Ext4.define('LABKEY.study.store.Studies', {
     extend: 'Ext.data.Store',
     storeId: 'studies',
     model: 'LABKEY.study.data.StudyCard',
-    autoLoad: true,
+    autoLoad: false,
     dataModuleName: this.dataModuleName,
     selectedStudies : {},
     selectedSubset : 'public',
@@ -43,7 +43,10 @@ Ext4.define('LABKEY.study.store.Studies', {
             study = this.getAt(i);
             study.set("isSelected", true);
         }
-    }
+    },
 
+    selectSubset : function(subsetId, subset) {
+
+    }
 
 });

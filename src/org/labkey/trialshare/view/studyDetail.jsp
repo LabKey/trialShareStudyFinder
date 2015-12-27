@@ -50,13 +50,11 @@
     Container c = context.getContainer();
     TrialShareController.StudyDetailBean studyDetail = me.getModelBean();
     StudyBean study = studyDetail.getStudy();
-    String descriptionHTML;
-    if (!StringUtils.isEmpty(study.getDescription()))
-        descriptionHTML= study.getDescription();
-    else
+    String descriptionHTML = study.getDescription(c, context.getUser());
+    if (StringUtils.isEmpty(descriptionHTML))
         descriptionHTML = h(study.getBriefDescription());
 
-    ActionURL studyUrl = study.getUrl(c, context.getUser());
+    String studyUrl = study.getUrl(c, context.getUser());
 
     String publicationsSectionTitle = "Manuscripts and Abstracts";
     Map<String, String> linkProps = new HashMap<>();
@@ -130,7 +128,7 @@
     </div>
 
     <% if (null != studyUrl) { %>
-        <%= textLink("View study " + study.getStudyId(), studyUrl.toString(), null, null, linkProps)%><br>
+        <%= textLink("View study " + study.getShortName(), studyUrl, null, null, linkProps)%><br>
     <% } %>
     <%
         if (null != study.getExternalUrl())

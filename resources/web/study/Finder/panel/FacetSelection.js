@@ -24,8 +24,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         this.on({
             filterSelectionChanged: this.onFilterSelectionChange,
             clearAllFilters: this.onClearAllFilters
-        }
-        );
+        });
     },
 
     onCubeReady: function(mdx) {
@@ -52,7 +51,6 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     getFacetPanelHeader : function() {
         if (!this.facetPanelHeader) {
-            //this.facetPanelHeader = Ext4.create("LABKEY.study.panel.FacetPanelHeaderTpl", {
             this.facetPanelHeader = Ext4.create("LABKEY.study.panel.FacetPanelHeader", {
                 dataModuleName: this.dataModuleName
             });
@@ -62,7 +60,6 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     getFacetSelectionSummary: function() {
         if (!this.facetSelectionSummary) {
-            var studiesStore = Ext4.getStore("studies");
             this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.SelectionSummary", {
                 dataModuleName: this.dataModuleName
             });
@@ -72,14 +69,10 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     getFacets : function() {
         if (!this.facets) {
-            //this.facets = Ext4.create("LABKEY.study.panel.Facets", {
-            //    dataModuleName: this.dataModuleName
-            //});
             this.facets = Ext4.create("LABKEY.study.panel.FacetsGrid", {
                 dataModuleName: this.dataModuleName
             });
         }
-        FG = this.facets;
         return this.facets;
     }
 

@@ -34,12 +34,11 @@
         resources.add(ClientDependency.fromPath("study/Finder/data/StudyCard.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/Studies.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/StudySubset.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/data/StudySubsets.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/Facets.js"));
         resources.add(ClientDependency.fromPath("study/Finder/data/FacetMembers.js"));
 
-//        resources.add(ClientDependency.fromPath("study/Finder/panel/FacetPanelHeaderTpl.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/FacetPanelHeader.js"));
-//        resources.add(ClientDependency.fromPath("study/Finder/panel/Facets.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/FacetsGrid.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/SelectionSummary.js"));
         resources.add(ClientDependency.fromPath("study/Finder/panel/FacetSelection.js"));

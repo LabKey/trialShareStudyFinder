@@ -10,9 +10,10 @@ import org.labkey.api.data.TableSelector;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
-import org.labkey.api.view.ActionURL;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class StudyBean
     private String shortName;
     private String studyId;
     private String title;
+    private String url;
     private String investigator;
     private String externalUrl;
     private String externalUrlDescription;
@@ -35,12 +37,13 @@ public class StudyBean
     private String availability;
     private Boolean isPublic;
     private Integer participantCount;
-    private Boolean isSelected = true;
 
     private List<StudyPersonnelBean> personnel;
     private List<StudyPublicationBean> publications;
     private Integer manuscriptCount;
     private Integer abstractCount;
+
+    public final static String studyIdField = "StudyId";
 
 
     public String getStudyId()
@@ -93,15 +96,6 @@ public class StudyBean
         isLoaded = loaded;
     }
 
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
 
     public String getBriefDescription()
     {
@@ -213,21 +207,43 @@ public class StudyBean
         this.participantCount = participantCount;
     }
 
-    public Boolean getIsSelected()
+    public void setUrl(String url)
     {
-        return isSelected;
+        this.url = url;
     }
 
-    public void setIsSelected(Boolean selected)
+    public String getUrl()
     {
-        isSelected = selected;
+        return this.url;
     }
 
-    public ActionURL getUrl(Container c, User user)
+    public String getUrl(Container c, User user)
+    {
+        if (url == null)
+        {
+            Collection<Map<String, Object>> maps = getStudyProperties(c, user);
+            for (Map<String, Object> map : maps)
+            {
+                Container studyContainer = ContainerManager.getForId((String) map.get("container"));
+                String studyId = (String) map.get(studyIdField);
+                String name = (String) map.get("Label");
+                if (null == studyId && getStudyIdPrefix() != null && name.startsWith(getStudyIdPrefix()))
+                    studyId = name;
+                if (null != studyContainer && StringUtils.equalsIgnoreCase(getStudyId(), studyId))
+                {
+                    url = studyContainer.getStartURL(user).toString();
+                    break;
+                }
+            }
+        }
+        return url;
+    }
+
+
+    public static Collection<Map<String, Object>> getStudyProperties(Container c, User user)
     {
         if (!c.isRoot())
         {
-            String comma = "\n";
             Container p = c.getProject();
             QuerySchema s = DefaultSchema.get(user, p).getSchema("study");
             TableInfo sp = s.getTable("StudyProperties");
@@ -236,23 +252,53 @@ public class StudyBean
                 ContainerFilter cf = new ContainerFilter.AllInProject(user);
                 ((ContainerFilterable) sp).setContainerFilter(cf);
             }
-            Collection<Map<String, Object>> maps = new TableSelector(sp).getMapCollection();
+            return new TableSelector(sp).getMapCollection();
+        }
+        return Collections.emptyList();
+    }
+
+
+    public static Map<String, String> getStudyUrls(Container c, User user, String idField)
+    {
+        Map<String, String> studyUrls = new HashMap<>();
+        Collection<Map<String, Object>> maps = getStudyProperties(c, user);
+        for (Map<String, Object> map : maps)
+        {
+            Container studyContainer = ContainerManager.getForId((String) map.get("container"));
+            String studyId = (String) map.get(idField);
+
+            if (null != studyContainer && studyId != null)
+            {
+                studyUrls.put(studyId, studyContainer.getStartURL(user).toString());
+            }
+        }
+        return studyUrls;
+    }
+
+    public String getDescription(Container c, User user)
+    {
+        if (description == null)
+        {
+            Collection<Map<String, Object>> maps = getStudyProperties(c, user);
             for (Map<String, Object> map : maps)
             {
                 Container studyContainer = ContainerManager.getForId((String) map.get("container"));
-                String studyAccession = (String)map.get("study_accession");
-                // TODO study properties does not have the studyId in it...
-                String name = (String)map.get("Label");
-                if (null == studyAccession && getStudyIdPrefix() != null && name.startsWith(getStudyIdPrefix()))
-                    studyAccession = name;
+                String studyAccession = (String)map.get(studyIdField);
                 if (null != studyContainer && StringUtils.equalsIgnoreCase(getStudyId(), studyAccession))
                 {
-                    return studyContainer.getStartURL(user);
+                    description = (String) map.get("description");
+                    break;
                 }
             }
         }
-        return null;
+        return description;
     }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
 
     public String getExternalUrlDescription()
     {

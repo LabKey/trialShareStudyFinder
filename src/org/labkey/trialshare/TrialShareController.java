@@ -22,7 +22,6 @@ import org.labkey.api.action.ReturnUrlForm;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
 import org.labkey.api.data.SimpleFilter;
-import org.labkey.api.data.SqlExecutor;
 import org.labkey.api.data.TableSelector;
 import org.labkey.api.gwt.client.util.StringUtils;
 import org.labkey.api.query.DefaultSchema;
@@ -103,12 +102,8 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(StudiesForm form, BindException errors) throws Exception
         {
-            List<StudyBean> studies = new ArrayList<StudyBean>();
-//            studies.add(getStudy("ITN029ST"));
-//            studies.add(getStudy("ITN021AI"));
-//            studies.add(getStudy("ITN033AI"));
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
-            studies  = (new TableSelector(coreSchema.getSchema("lists").getTable("studyProperties"))).getArrayList(StudyBean.class);
+            List<StudyBean> studies  = (new TableSelector(coreSchema.getSchema("lists").getTable("studyProperties"))).getArrayList(StudyBean.class);
             List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("studyManuscripts")).getArrayList(StudyPublicationBean.class));
             Map<String, Pair<Integer, Integer>> pubCounts = new HashMap<>();
             for (StudyPublicationBean pub : publications) {
@@ -121,7 +116,9 @@ public class TrialShareController extends SpringActionController
                     countPair.second += 1;
 
             }
+            Map<String, String> studyUrls = StudyBean.getStudyUrls(getContainer(), getUser(), StudyBean.studyIdField);
             for (StudyBean study : studies) {
+                study.setUrl(studyUrls.get(study.getStudyId()));
                 if (pubCounts.get(study.getStudyId()) == null)
                 {
                     study.setManuscriptCount(0);
@@ -138,57 +135,9 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+
     public static class StudiesForm
     {}
-
-    private StudyBean getStudy(String studyId)
-    {
-        SqlExecutor executor = new SqlExecutor(TrialShareManager.getSchema());
-
-        StudyBean study = new StudyBean();
-        if (studyId.equals("ITN029ST"))
-        {
-            study.setStudyId("ITN029ST");
-            study.setShortName("WISP-R");
-            study.setInvestigator("Sandy Feng, MD, PhD");
-            study.setTitle("Immunosuppression Withdrawal for Pediatric Living-donor Liver Transplant Recipients");
-            study.setDescription("This is a prospective multicenter, open-label, single-arm trial in which 20 pediatric recipients of parental living-donor liver allografts will undergo gradual withdrawal of immunosuppression with the goal of complete withdrawal. Patients on stable immunosuppression regimens with good organ function and no evidence of acute or chronic rejection or other forms of allograft dysfunction will be enrolled. Participants will undergo gradual withdrawal of immunosuppression and will be followed for a minimum of 4 years after completion of immunosuppression withdrawal. Immunologic and genetic profiles will be collected at multiple time points and compared between tolerant and nontolerant participants.");
-            study.setIsLoaded(true);
-            study.setAvailability("operational");
-            study.setExternalUrl("https://www.itntrialshare.org/project/Studies/ITN029STOPR/Study%20Data/begin.view");
-        }
-        else if (studyId.equals("ITN021AI"))
-        {
-            study.setStudyId("ITN021AI");
-            study.setShortName("RAVE");
-            study.setInvestigator("John H. Stone, MD, MPH");
-            study.setTitle("Rituximab for ANCA-Associated Vasculitis");
-            study.setIsLoaded(false);
-            study.setAvailability("public");
-            study.setDescription("Current conventional therapies for ANCA-associated vasculitis (AAV) are associated with high incidences of treatment failure, disease relapse, substantial toxicity, and patient morbidity and mortality. Rituximab is a monoclonal antibody used to treat non-Hodgkin's lymphoma. This study will evaluate the efficacy of rituximab with glucocorticoids in inducing disease remission in adults with severe forms of AAV (WG and MPA).\n" +
-                    "\n" +
-                    "The study consists of two phases: a 6-month remission induction phase, followed by a 12-month remission maintenance phase. All participants will receive at least 1 g of pulse IV methylprednisolone or a dose-equivalent of another glucocorticoid preparation. Depending on the participant's condition, he or she may receive up to 3 days of IV methylprednisolone for a total of 3 g of methylprednisolone (or a dose-equivalent). During the remission induction phase, all participants will receive oral prednisone daily (1 mg/kg/day, not to exceed 80 mg/day). Prednisone tapering will be completed by the Month 6 study visit.\n" +
-                    "\n" +
-                    "Next, participants will be randomly assigned to one of two arms. Arm 1 participants will receive rituximab (375 mg/m2) infusions once weekly for 4 weeks and cyclophosphamide (CYC) placebo daily for 3 to 6 months. Arm 2 participants will receive rituximab placebo infusions once weekly for 4 weeks and CYC daily for 3 to 6 months. During the remission maintenance phase, participants in Arm 1 will discontinue CYC placebo and start oral azathioprine (AZA) placebo daily until Month 18. Participants in Arm 2 will discontinue CYC and start AZA daily until Month 18. Participants who fail treatment before Month 6 will be crossed over to the other treatment arm unless there are specific contraindications.\n" +
-                    "\n" +
-                    "All participants will be followed for at least 18 months. Initially, study visits are weekly, progressing to monthly and then quarterly visits as the study proceeds. Blood collection will occur at each study visit.");
-        }
-        else if (studyId.equals("ITN033AI"))
-        {
-            study.setStudyId("ITN033AI");
-            study.setShortName("Halt-MS");
-            study.setIconUrl("https://www.itntrialshare.org/files/Studies/ITN033AIOPR/Study%20Data/@files/studyDocs/ITN033AI%20HALT-MS%20250px.gif");
-            study.setManuscriptCount(3);
-            study.setInvestigator("Richard A. Nash, MD");
-            study.setTitle("High Dose Immunosuppression and Autologous Transplantation for Multiple Sclerosis");
-            study.setIsLoaded(false);
-            study.setAvailability("operational");
-            study.setDescription("This study is a prospective, multicenter Phase II clinical trial evaluating high-dose immunosuppressive therapy (HDIT) using Carmustine, Etoposide, Cytarabine, and Melphalan (BEAM) plus Thymoglobulin (rATG) with autologous transplantation of CD34+ HCT for the treatment of poor-risk MS. The active treatment period will be approximately 3 months from the time of initiation of mobilization to the day of discharge after transplant. Subjects will be followed up to 60 months (5 years) after transplant. Total study duration will be 60 months after the last subject is transplanted.");
-            study.setExternalUrl("https://www.itntrialshare.org/project/Studies/ITN033AIOPR/Study%20Data/begin.view");
-        }
-        return study;
-    }
-
 
 
     private List<FacetFilter> getFacetFilters(Boolean includeAnd, Boolean includeOr, FacetFilter.Type defaultType)
@@ -231,13 +180,16 @@ public class TrialShareController extends SpringActionController
             facet = new StudyFacetBean("Study Type", "Study Types", "Study.Study Type", "StudyType", "[Study.Study Type][(All)]", FacetFilter.Type.OR, 2);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Condition", "Conditions", "Study.Condition", "Condition", "[Study.Condition][(All)]", FacetFilter.Type.OR, 5);
+            facet = new StudyFacetBean("Assay", "Assays", "Study.Assay", "Assay", "[Study.Assay][(All)]", FacetFilter.Type.OR, 3);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Age Group", "Age Groups", "Study.AgeGroup", "AgeGroup", "[Study.AgeGroup][(All)]", FacetFilter.Type.OR, 3);
+            facet = new StudyFacetBean("Condition", "Conditions", "Study.Condition", "Condition", "[Study.Condition][(All)]", FacetFilter.Type.OR, 6);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Phase", "Phases", "Study.Phase", "Phase", "[Study.Phase][(All)]", FacetFilter.Type.OR, 4);
+            facet = new StudyFacetBean("Age Group", "Age Groups", "Study.AgeGroup", "AgeGroup", "[Study.AgeGroup][(All)]", FacetFilter.Type.OR, 5);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Phase", "Phases", "Study.Phase", "Phase", "[Study.Phase][(All)]", FacetFilter.Type.OR, 5);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
             facet = new StudyFacetBean("Study", "Studies", "Study", "Study", "[Study].[(All)]", FacetFilter.Type.OR, null);
@@ -366,10 +318,13 @@ public class TrialShareController extends SpringActionController
             List<StudySubset> subsets = new ArrayList<>();
             StudySubset subset = new StudySubset();
 
-            subset.setId("operational");
-            subset.setName("Operational");
-            subset.setDefault(false);
-            subsets.add(subset);
+            if (!getUser().isGuest())
+            {
+                subset.setId("operational");
+                subset.setName("Operational");
+                subset.setDefault(false);
+                subsets.add(subset);
+            }
 
             subset = new StudySubset();
             subset.setId("public");

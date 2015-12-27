@@ -15,19 +15,7 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         "searchTermsChanged"
     ],
 
-    studySubsets : Ext4.create("Ext.data.Store", {
-        autoLoad: true,
-        id: 'StudySubsetStore',
-        model: 'LABKEY.study.data.StudySubset',
-        proxy: {
-            type: 'ajax',
-            url: LABKEY.ActionURL.buildURL('trialshare', "studySubsets.api", LABKEY.containerPath),
-            reader: {
-                type: 'json',
-                root: 'data'
-            }
-        }
-    }),
+    studySubsets : Ext4.create('LABKEY.study.store.StudySubsets'),
 
     initComponent: function() {
         this.items = [];
@@ -63,14 +51,14 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
     },
 
     getStudySubsetMenu: function() {
-        if (!this.studySubsetMenu && this.studySubsets.count() > 0) {
+        if (!this.studySubsetMenu) {
             this.studySubsetMenu = Ext4.create('Ext.form.ComboBox', {
                 store: this.studySubsets,
                 name : 'studySubsetSelect',
                 queryMode: 'local',
                 valueField: 'id',
                 displayField: 'name',
-                value: this.studySubsets.getAt(0),
+                value: this.studySubsets.defaultValue,
                 cls: 'labkey-study-search',
                 multiSelect: false,
                 listeners: {
@@ -79,7 +67,8 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
                         this.onStudySubsetChanged(newValue[0])
                     },
                     'render': function(eOpts) {
-                        this.onStudySubsetChanged(this.studySubsets.getAt(0))
+                        if (this.studySubsets.defaultValue)
+                            this.onStudySubsetChanged(this.studySubsets.defaultValue)
                     }
                 }
             })
@@ -107,7 +96,6 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
     },
 
     onStudySubsetChanged: function(value) {
-        console.log("Subset changed to ", value.data.id);
         this.fireEvent("studySubsetChanged", value.data.id);
     },
 
