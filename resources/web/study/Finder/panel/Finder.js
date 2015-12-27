@@ -160,7 +160,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 olapConfig: this.olapConfig
             });
         }
-        FACETS = this.facetsPanel;
         return this.facetsPanel;
     },
 
@@ -175,7 +174,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 id: 'studies-view'
             });
         }
-        STUDIES = this.studiesPanel;
         return this.studiesPanel;
     }
 

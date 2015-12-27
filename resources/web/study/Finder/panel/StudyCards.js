@@ -83,12 +83,10 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         itemClick: function(view, record, item, index, event, eOpts) {
             if (event.target.className.includes("labkey-study-card-summary"))
             {
-                console.log("Show study popup for record " , record);
                 this.showStudyDetailPopup(record.get("studyId"));
             }
             else if (event.target.className.includes("labkey-study-card-pub-count"))
             {
-                console.log("Show manuscript popup for record " , record);
                 this.showStudyManuscriptsPopup(record.get("studyId"));
             }
         }
