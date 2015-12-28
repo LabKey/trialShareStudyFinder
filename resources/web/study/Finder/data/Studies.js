@@ -3,12 +3,12 @@ Ext4.define('LABKEY.study.store.Studies', {
     storeId: 'studies',
     model: 'LABKEY.study.data.StudyCard',
     autoLoad: false,
-    dataModuleName: "trialshare", // TODO how can this be used below?
+    dataModuleName: "study",
     selectedStudies : {},
     selectedSubset : 'public',
     proxy : {
         type: "ajax",
-        url: LABKEY.ActionURL.buildURL('trialshare', "studies.api", LABKEY.containerPath),
+        //url: set before calling "load".
         reader: {
             type: 'json',
             root: 'data'
@@ -48,5 +48,4 @@ Ext4.define('LABKEY.study.store.Studies', {
     selectSubset : function(subsetId, subset) {
 
     }
-
 });

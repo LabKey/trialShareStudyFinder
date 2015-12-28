@@ -11,7 +11,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     padding: "10 8 8 10",
 
-    autoScroll: true,
+    autoScroll: false,
 
     initComponent : function() {
         this.items = [

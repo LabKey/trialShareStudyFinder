@@ -2,7 +2,12 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
 
     extend: 'Ext.Container',
 
-    layout: { type: 'hbox', align: 'stretch'},
+    layout: {
+        type: 'hbox',
+        align: 'stretch'
+    },
+
+    showSearch : true,
 
     showHelpLinks: true,
 
@@ -15,15 +20,25 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         "searchTermsChanged"
     ],
 
-    studySubsets : Ext4.create('LABKEY.study.store.StudySubsets'),
 
     initComponent: function() {
+
+        this.studySubsets = Ext4.create('LABKEY.study.store.StudySubsets', {
+            dataModuleName : this.dataModuleName
+        });
         this.items = [];
         this.items.push(this.getSearchBox());
         if (this.getStudySubsetMenu())
             this.items.push(this.getStudySubsetMenu());
         if (this.showHelpLinks)
             this.items.push(this.getHelpLinks());
+
+        this.studySubsets.on(
+                'load', function(store) {
+                    this.getStudySubsetMenu().setValue(store.defaultValue);
+                },
+                this
+        );
 
         this.callParent();
     },
@@ -36,6 +51,8 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
                 fieldLabel: '<i class="fa fa-search"></i>',
                 labelWidth: "10px",
                 labelSeparator: '',
+                disabled: !this.showSearch,
+                hidden: !this.showSearch,
                 fieldCls: 'labkey-search-box',
                 id: 'searchTerms',
                 listeners: {

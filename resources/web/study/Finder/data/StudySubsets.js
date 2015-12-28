@@ -7,7 +7,7 @@ Ext4.define('LABKEY.study.store.StudySubsets', {
     defaultValue: null,
     proxy: {
         type: 'ajax',
-        url: LABKEY.ActionURL.buildURL('trialshare', "studySubsets.api", LABKEY.containerPath),
+        //url: set in constructor below
         reader: {
             type: 'json',
             root: 'data'
@@ -28,5 +28,10 @@ Ext4.define('LABKEY.study.store.StudySubsets', {
             },
             scope: this
         }
+    },
+
+    constructor: function(config) {
+        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "studySubsets.api", LABKEY.containerPath);
+        this.callParent(config);
     }
 });

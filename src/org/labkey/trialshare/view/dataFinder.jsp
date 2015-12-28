@@ -63,8 +63,9 @@
             olapConfig : {
                 configId: 'TrialShare:/StudyCube',
                 schemaName: 'lists',
-                name: 'StudyCube',
-            }
+                name: 'StudyCube'
+            },
+            showSearch: false
         });
     });
 </script>

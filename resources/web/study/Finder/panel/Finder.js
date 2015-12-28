@@ -17,7 +17,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     height: '500px',
 
-    dataModuleName: 'study', // TODO
+    dataModuleName: 'study',
 
     autoScroll : true,
 
@@ -89,7 +89,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
         var url = LABKEY.ActionURL.buildURL("search", "json", "/home/", {
             "category": "List",
-            "scope": "Folder",
             "q": searchTerms
         });
         Ext4.Ajax.request({

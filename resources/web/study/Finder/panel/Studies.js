@@ -10,6 +10,8 @@ Ext4.define("LABKEY.study.panel.Studies", {
 
     dataModuleName: 'study',
 
+    showSearch : true,
+
     autoScroll: true,
 
     initComponent : function() {
@@ -46,7 +48,8 @@ Ext4.define("LABKEY.study.panel.Studies", {
         if (!this.studyPanelHeader) {
             this.studyPanelHeader = Ext4.create("LABKEY.study.panel.StudyPanelHeader", {
                 dataModuleName: this.dataModuleName,
-                padding: 8
+                padding: 8,
+                showSearch : this.showSearch
             });
         }
         return this.studyPanelHeader;

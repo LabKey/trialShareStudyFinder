@@ -12,7 +12,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     dataModuleName: 'study',
 
-    autoScroll: false,
+    autoScroll: true,
 
     bubbleEvents : ["filterSelectionChanged"],
 
@@ -127,11 +127,12 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
     },
 
     initComponent: function() {
-        this.facetStore = Ext4.create("LABKEY.study.store.Facets");
-
-        this.store = Ext4.create('LABKEY.study.store.FacetMembers', {
-            dataModuleName: this.dataModuleName
+        this.facetStore = Ext4.create("LABKEY.study.store.Facets", {
+            dataModuleName: this.dataModuleName,
+            olapConfig: this.olapConfig
         });
+
+        this.store = Ext4.create('LABKEY.study.store.FacetMembers');
 
         this.callParent();
 

@@ -14,7 +14,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
 
     autoScroll: true,
 
-    dataModuleName: 'study', // TODO is there a way to use this below?
+    dataModuleName: 'study',
 
     store : Ext4.create('LABKEY.study.store.Studies', {
         dataModuleName: this.dataModuleName
@@ -156,9 +156,16 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         }
     },
 
-    initComponent: function()
+    initComponent: function(config)
     {
+        this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "studies.api", LABKEY.containerPath);
         this.getStore().load();
         this.callParent();
+    },
+
+    constructor: function(config)
+    {
+        this.dataModuleName = config.dataModuleName;
+        this.callParent(config);
     }
 });

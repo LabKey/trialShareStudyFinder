@@ -8,7 +8,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     countDistinctLevel : '[Study].[Study]',
     filterByFacetUniqueName : '[Study]',
     olapConfig : {
-        configId: 'TrialShare:/StudyCube',
+        configId: 'Study:/StudyCube',
         schemaName: 'lists',
         name: 'StudyCube'
     },
@@ -17,7 +17,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     proxy : {
         type: "ajax",
-        url:  LABKEY.ActionURL.buildURL("trialshare", "studyFacets.api", LABKEY.containerPath),
+        //url:  // set in constructor
         reader: {
             type: 'json',
             root: 'data'
@@ -376,6 +376,13 @@ Ext4.define('LABKEY.study.store.Facets', {
             return row[0].value ? row[0].value : defaultValue;
         });
         return ret;
+    },
+
+    constructor: function(config)
+    {
+        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "studyFacets.api", LABKEY.containerPath);
+        this.olapConfig = config.olapConfig;
+        this.callParent(config);
     }
 
 });
