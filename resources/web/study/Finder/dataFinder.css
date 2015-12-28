@@ -209,6 +209,7 @@ DIV.labkey-facet-summary
 
 .labkey-study-facets .x4-grid-row-selected .x4-grid-td {
     background-color: white;
+    background-image: none;
 }
 
 .labkey-study-facets .x4-grid-row-selected .labkey-facet-percent-bar {
@@ -217,10 +218,13 @@ DIV.labkey-facet-summary
 
 .labkey-study-facets .x4-grid-cell-special .x4-grid-cell-inner {
     background-color: white;
+    background-image: none;
 }
 
 .labkey-study-facets .x4-grid-group-hd {
     background-color:rgb(240, 240, 240);
+    border-color: #7c7c7c;
+    border-bottom-width:1px;
 }
 
 .labkey-study-facets .x4-grid-cell-special {
@@ -283,10 +287,10 @@ LI.labkey-facet-member .member-indicator
 SPAN.labkey-facet-member  .labkey-facet-member-name,
 LI.labkey-facet-member .labkey-facet-member-name
 {
-    display:inline-block;
+    display:inline;
     position:relative;
     max-width:150pt;
-    /*overflow-x: hidden;*/
+    overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     z-index:2;
@@ -318,7 +322,10 @@ LI.labkey-facet-member SPAN.bar-selected
 {
     border-bottom-style: hidden;
     border-top-style: hidden;
+    background-image: none;
+    background-color: white;
 }
+
 
 .x4-grid-row SPAN.labkey-facet-percent-bar,
 LI.labkey-facet-member .bar

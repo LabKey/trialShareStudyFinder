@@ -92,7 +92,8 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                         var selectedMembers = facet.get("selectedMembers");
                         var html = '<div class="labkey-filter-options">';
 
-                        if (facet.get("isExpanded") && selectedMembers && selectedMembers.length > 1)
+                        //if (facet.get("isExpanded") && selectedMembers && selectedMembers.length > 1)
+                        if ( selectedMembers && selectedMembers.length > 1)
                         {
                             var pointerClass = (facet.filterOptionsStore.count() < 2) ? "inactive" : "active";
 
