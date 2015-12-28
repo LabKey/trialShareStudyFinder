@@ -1,6 +1,7 @@
 package org.labkey.trialshare.data;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerFilter;
 import org.labkey.api.data.ContainerFilterable;
@@ -10,6 +11,9 @@ import org.labkey.api.data.TableSelector;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
+import org.labkey.api.services.ServiceRegistry;
+import org.labkey.api.wiki.WikiRendererType;
+import org.labkey.api.wiki.WikiService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -287,12 +291,31 @@ public class StudyBean
                 if (null != studyContainer && StringUtils.equalsIgnoreCase(getStudyId(), studyAccession))
                 {
                     description = (String) map.get("description");
+                    if (description != null) {
+                        String rendererType = (String) map.get("descriptionRendererType");
+                        description = getFormattedHtml(rendererType == null ? null : WikiRendererType.valueOf(rendererType), description);
+                    }
                     break;
                 }
             }
+
         }
         return description;
     }
+
+    private String getFormattedHtml(WikiRendererType rendererType, String markup)
+    {
+        WikiService wikiService = ServiceRegistry.get().getService(WikiService.class);
+
+        if (null == wikiService)
+            return null;
+
+        if (rendererType == null)
+            rendererType = wikiService.getDefaultMessageRendererType();
+
+        return wikiService.getFormattedHtml(rendererType, markup);
+    }
+
 
     public void setDescription(String description)
     {
