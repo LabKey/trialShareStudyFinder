@@ -12,9 +12,6 @@
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="StudyId">
                 <Level name="Therapeutic Area" visible="true" column="therapeuticArea" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
-            <Hierarchy name="Manuscript" hasAll="true" primaryKey="StudyId">
-                <Level name="Manuscript" visible="true" column="hasManuscript" type="Boolean" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-            </Hierarchy>
             <Hierarchy name="Study Type" hasAll="true" primaryKey="StudyId">
                 <Level name="StudyType" visible="true"  type="String" column="studyType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
