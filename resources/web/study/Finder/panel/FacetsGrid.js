@@ -10,8 +10,6 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     itemSelector: 'span.x4-grid-data-row',
 
-    dataModuleName: 'study',
-
     autoScroll: true,
 
     bubbleEvents : ["filterSelectionChanged"],
@@ -119,7 +117,8 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                 return facetStore.getById(facetName).data.selectedMembers.length > 0;
             else {
                 for (var i = 0; i < facetStore.count(); i++) {
-                    if (facetStore.getAt(i).data.selectedMembers.length > 0)
+                    var facet = facetStore.getAt(i);
+                    if (facet.get("name") != "Study" && facetStore.getAt(i).data.selectedMembers.length > 0)
                         return true;
                 }
                 return false;
@@ -165,10 +164,6 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         this.facetStore.clearAllSelectedMembers();
         if (records.length > 0)
             this.facetStore.selectMembers(records);
-        var facet;
-        for (var f = 0; f < this.facetStore.count(); f++) {
-            facet = this.facetStore.getAt(f);
-        }
         this.facetStore.updateCountsAsync();
 
         this.fireEvent("filterSelectionChanged", LABKEY.study.panel.FacetsGrid.hasFilters());
@@ -247,14 +242,14 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             var name = this.facetStore.getAt(i).get("name");
             //if (name == "Study")
             //    continue;
-            this.clearFilter(name);
+            this.clearFilter(name, true);
         }
         if (updateCounts)
             this.facetStore.updateCountsAsync();
-        this.fireEvent("filterSelectionCleared", false);
+        this.fireEvent("filterSelectionChanged", false);
     },
 
-    clearFilter : function (facetName) {
+    clearFilter : function (facetName, suppressEvent) {
         var facet = this.facetStore.getById(facetName);
         facet.data.selectedMembers = [];
         for (var i = 0; i < this.store.count(); i++) {
@@ -264,7 +259,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             }
         }
 
-        this.updateFacetHeader(facetName, true);
-        this.fireEvent("filterSelectionCleared",  LABKEY.study.panel.FacetsGrid.hasFilters(facetName));
+        if (!suppressEvent)
+            this.fireEvent("filterSelectionChanged",  LABKEY.study.panel.FacetsGrid.hasFilters());
     }
 });
