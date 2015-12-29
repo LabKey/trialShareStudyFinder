@@ -27,7 +27,9 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
             dataModuleName : this.dataModuleName
         });
         this.items = [];
-        this.items.push(this.getSearchBox());
+        var searchBox = this.getSearchBox();
+        if (searchBox)
+            this.items.push(searchBox);
         if (this.getStudySubsetMenu())
             this.items.push(this.getStudySubsetMenu());
         if (this.showHelpLinks)
@@ -44,7 +46,7 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
     },
 
     getSearchBox : function() {
-        if (!this.searchBox) {
+        if (!this.searchBox && this.showSearch) {
             this.searchBox = Ext4.create('Ext.form.field.Text', {
                 emptyText:'Studies',
                 cls: 'labkey-search-box',
