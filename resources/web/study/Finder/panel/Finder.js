@@ -37,7 +37,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
         this._initResize();
 
         this.on({
-                    filterSelectionChanged: this.onFilterSelectionChange,
+                    //filterSelectionChanged: this.onFilterSelectionChange,
                     studySubsetChanged: this.onStudySubsetChanged,
                     searchTermsChanged: this.onSearchTermsChanged
                 }
@@ -73,10 +73,10 @@ Ext4.define('LABKEY.study.panel.Finder', {
         this.getFacetsPanel().onStudySubsetChanged();
     },
 
-    onFilterSelectionChange : function(){
-        console.log("Filter selection changed!");
-        this.getStudiesPanel().onFilterSelectionChanged();
-    },
+    //onFilterSelectionChange : function(){
+    //    console.log("Filter selection changed!");
+    //    this.getStudiesPanel().onFilterSelectionChanged();
+    //},
 
     onSearchTermsChanged: function(searchTerms) {
 

@@ -41,7 +41,6 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     },
 
     onFilterSelectionChange: function(hasFilters) {
-        console.log("FacetSelection filterSelectionChanged handler");
         if (hasFilters)
             Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('inactive', 'active');
         else

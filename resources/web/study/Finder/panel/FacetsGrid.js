@@ -8,7 +8,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     ui: 'custom',
 
-    itemSelector: 'span.labkey-facet-member',
+    itemSelector: 'span.x4-grid-data-row',
 
     dataModuleName: 'study',
 
@@ -38,7 +38,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             dataIndex: 'name',
             sortable: false,
             menuDisabled: true,
-            cls:'facet',
+            cls:'labkey-facet',
             tpl: new Ext4.XTemplate(
                     '   <tpl if="count==0">',
                     '       <span class="labkey-facet-member labkey-empty-member">',

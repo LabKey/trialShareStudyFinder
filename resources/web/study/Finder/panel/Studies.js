@@ -21,18 +21,18 @@ Ext4.define("LABKEY.study.panel.Studies", {
         ];
         this.callParent();
 
-        this.getStudyCards().store.addListener('filterChange',this.onFilterSelectionChanged, this);
+        //this.getStudyCards().store.addListener('filterChange',this.onFilterSelectionChanged, this);
         this.on(
                 {'studySubsetChanged': this.onStudySubsetChanged,
-                 'searchTermsChanged': this.onSearchTermsChanged,
-                 'filterSelectionChanged': this.onFilterSelectionChanged
+                 'searchTermsChanged': this.onSearchTermsChanged
+                 //'filterSelectionChanged': this.onFilterSelectionChanged
                 }
         );
     },
 
-    onFilterSelectionChanged: function() {
-        console.log('filterChange happened!')
-    },
+    //onFilterSelectionChanged: function() {
+    //    console.log('filterChange happened!')
+    //},
 
     onStudySubsetChanged : function(selectedSubset) {
         if (!selectedSubset)
