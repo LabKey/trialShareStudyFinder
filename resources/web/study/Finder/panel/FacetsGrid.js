@@ -97,9 +97,10 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                         {
                             var pointerClass = (facet.filterOptionsStore.count() < 2) ? "inactive" : "active";
 
-                            html += '<span class="labkey-filter-caption ' + pointerClass + '">' + facet.get("currentFilterCaption") + '</span>';
+                            html += '<span class="labkey-filter-caption ' + pointerClass + '">' + facet.get("currentFilterCaption");
                             if (facet.filterOptionsStore.count() > 1)
-                                html += '&nbsp;<i class="fa fa-caret-down"></i>';
+                                html += '&nbsp;<i class="fa fa-caret-down labkey-filter-caption"></i>';
+                            html +=  '</span>';
                         }
                         html += '</div>';
                         return html;
