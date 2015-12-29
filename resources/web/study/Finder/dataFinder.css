@@ -115,7 +115,6 @@ DIV.labkey-search-message
 .labkey-facet-selection-panel
 {
     vertical-align: text-top;
-    width:220pt;
     height:100%;
     background-color: white;
 }
@@ -123,6 +122,7 @@ DIV.labkey-search-message
 .labkey-facet-selection-panel > DIV
 {
     height:100%;
+    /*max-width:200pt;*/
     overflow-y:auto;
 }
 
@@ -177,7 +177,7 @@ DIV.labkey-facet-summary LI.labkey-facet-member
 
 DIV.labkey-facet-summary
 {
-    max-width:200pt;
+    /*max-width:200pt;*/
     border:solid 2pt rgb(220, 220, 220);
 }
 
@@ -189,6 +189,7 @@ DIV.labkey-facet-summary
 .labkey-facet-header
 {
     padding:4pt;
+    /*max-width: 185pt;*/
     background-color: rgb(240, 240, 240);
 }
 
