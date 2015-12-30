@@ -152,7 +152,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
             this.facetsPanel = Ext4.create("LABKEY.study.panel.FacetSelection", {
                 region: 'west',
-                width: '21%',
+                width: '20%',
                 maxWidth: '265px',
                 dataModuleName: this.dataModuleName,
                 showParticipantFilters : this.showParticipantFilters,

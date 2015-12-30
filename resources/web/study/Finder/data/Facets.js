@@ -225,20 +225,8 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     updateCountsZero : function ()
     {
-        var facetStore = Ext4.getStore("facets");
         var facetMembersStore = Ext4.getStore("facetMembers");
-        var f, member, facet;
-        for (f = 0; f < facetStore.count(); f++)
-        {
-            facet = facetStore.getAt(f);
-            for (var m = 0; m < facetMembersStore.count(); m++)
-            {
-                member = facetMembersStore.getAt(m);
-                member.set("count",  0);
-                member.set("percent", 0);
-            }
-        }
-
+        facetMembersStore.zeroCounts();
         //this.saveFilterState();
         //this.updateContainerFilter();
         //this.changeSubjectGroup();
@@ -249,10 +237,11 @@ Ext4.define('LABKEY.study.store.Facets', {
     updateCountsUnion : function (cellSet, isSavedGroup)
     {
         var facet, member, f, m;
-        // map from hierarchyName to dataspace dimension
+        // map from hierarchyName to facet
         var map = {};
         var facetStore = this;
         var facetMembersStore = Ext4.getStore("facetMembers");
+        facetMembersStore.suspendEvents(false);
 
         // clear old subjects and counts (to be safe)
         //this.subjects.length = 0;
@@ -264,11 +253,8 @@ Ext4.define('LABKEY.study.store.Facets', {
                 facet.data.selectedMembers = [];
             }
         }
-        for (m = 0; m < facetMembersStore.count(); m++) {
-            facetMembersStore.getAt(m).set("count",  0);
-            facetMembersStore.getAt(m).set("percent", 0);
-        }
 
+        this.updateCountsZero();
         var positions = this.getRowPositionsOneLevel(cellSet);
         var data = this.getDataOneColumn(cellSet, 0);
         var max = 0;
@@ -286,19 +272,19 @@ Ext4.define('LABKEY.study.store.Facets', {
                 facet = map[hierarchyName];
                 var count = data[i];
                 member = facetMembersStore.getById(resultMember.uniqueName);
-                if (!member)
+                if (facet.get("name") == "Study")
+                {
+                    selectedStudies[resultMember.name] = resultMember;
+                    facet.data.selectedMembers.push(resultMember);
+                }
+                else if (!member)
                 {
                     // might be an all member
-                    if (facet.data.allMemberName == resultMember.uniqueName)
-                        facet.data.allMemberCount = count;
-                    else if (facet.get("name") == "Study")
-                    {
-                        selectedStudies[resultMember.name] = resultMember;
-                        facet.data.selectedMembers.push(resultMember);
-                    }
-                    else if (-1 == resultMember.uniqueName.indexOf("#") && "(All)" != resultMember.name)
+                    //if (facet.data.allMemberName == resultMember.uniqueName)
+                    //    facet.data.allMemberCount = count;
+                    //else
+                    if (-1 == resultMember.uniqueName.indexOf("#") && "(All)" != resultMember.name)
                         console.log("member not found: " + resultMember.uniqueName);
-
                 }
                 else
                 {
@@ -322,6 +308,8 @@ Ext4.define('LABKEY.study.store.Facets', {
             }
         }
 
+        facetMembersStore.resumeEvents();
+        facetMembersStore.fireEvent("refresh");
 
         this.updateStudyFilter(selectedStudies);
 
@@ -356,11 +344,10 @@ Ext4.define('LABKEY.study.store.Facets', {
     getData : function(cellSet,defaultValue)
     {
         var cells = cellSet.cells;
-        var ret = cells.map(function(row)
+        return cells.map(function(row)
         {
             return row.map(function(col){return col.value ? col.value : defaultValue;});
         });
-        return ret;
     },
 
     getDataOneColumn : function(cellSet,defaultValue)
@@ -371,11 +358,10 @@ Ext4.define('LABKEY.study.store.Facets', {
             console.log("warning cellSet has more than one column");
             throw "illegal state";
         }
-        var ret = cells.map(function(row)
+        return cells.map(function(row)
         {
             return row[0].value ? row[0].value : defaultValue;
         });
-        return ret;
     },
 
     constructor: function(config)

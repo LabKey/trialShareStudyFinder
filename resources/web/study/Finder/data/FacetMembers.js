@@ -20,7 +20,14 @@ Ext4.define('LABKEY.study.store.FacetMembers', {
 
             }
         }
-    ]
+    ],
+
+    zeroCounts : function() {
+        this.each(function(record) {
+            record.set("count", 0);
+            record.set("percent", 0);
+        });
+    }
 
 
 });
