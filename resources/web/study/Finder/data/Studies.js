@@ -4,6 +4,7 @@ Ext4.define('LABKEY.study.store.Studies', {
     model: 'LABKEY.study.data.StudyCard',
     autoLoad: false,
     dataModuleName: "study",
+    isLoaded: false,
     selectedStudies : {},
     selectedSubset : 'public',
     proxy : {
@@ -18,6 +19,16 @@ Ext4.define('LABKEY.study.store.Studies', {
         property: 'studyId',
         direction: 'ASC'
     }],
+
+    listeners: {
+        'load' : {
+            fn : function(store, records, options) {
+                store.isLoaded = true;
+                store.updateFilters(this.selectedSubset ? null : {}); // initial load should have no studies selected
+            },
+            scope: this
+        }
+    },
 
     updateFilters: function(selectedStudies, selectedSubset) {
         if (selectedStudies)
