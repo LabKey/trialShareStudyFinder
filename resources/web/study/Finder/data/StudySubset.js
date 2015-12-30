@@ -4,6 +4,6 @@ Ext4.define('LABKEY.study.data.StudySubset', {
     fields: [
         {name: 'id'},
         {name: 'name'},
-        {name: 'default', type:'boolean'}
+        {name: 'isDefault', type:'boolean'}
     ]
 });

@@ -7,7 +7,7 @@ public class StudySubset
 {
     private String _id;
     private String _name;
-    private Boolean _default;
+    private Boolean _isDefault;
 
     public String getName()
     {
@@ -29,13 +29,13 @@ public class StudySubset
         _id = id;
     }
 
-    public Boolean getDefault()
+    public Boolean getIsDefault()
     {
-        return _default;
+        return _isDefault;
     }
 
-    public void setDefault(Boolean aDefault)
+    public void setIsDefault(Boolean isDefault)
     {
-        _default = aDefault;
+        _isDefault = isDefault;
     }
 }

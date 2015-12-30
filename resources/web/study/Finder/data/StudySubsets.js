@@ -19,7 +19,7 @@ Ext4.define('LABKEY.study.store.StudySubsets', {
                 store.isLoaded = true;
                 for (var i = 0; i < records.length; i++)
                 {
-                    if (records[i].data.default)
+                    if (records[i].data.isDefault)
                     {
                         store.defaultValue = records[i];
                         break;

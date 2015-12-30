@@ -93,7 +93,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     getDefaultFilterOption : function(optionsStore) {
         for (var i = 0; i < optionsStore.count(); i++) {
-            if (optionsStore.getAt(i).data.default)
+            if (optionsStore.getAt(i).data.isDefault)
                 return optionsStore.getAt(i);
         }
         return optionsStore.getAt(0);
