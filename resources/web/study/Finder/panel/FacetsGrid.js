@@ -10,7 +10,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     itemSelector: 'span.x4-grid-data-row',
 
-    autoScroll: true,
+    autoScroll: false,
 
     bubbleEvents : ["filterSelectionChanged"],
 
@@ -143,7 +143,21 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             scope: this
         });
 
-        this.getSelectionModel().on('selectionchange', this.onSelectionChange, this);
+        var facetSelectionChange = function() {
+            this.facetStore.updateCountsAsync();
+            this.fireEvent("filterSelectionChanged", LABKEY.study.panel.FacetsGrid.hasFilters());
+        };
+
+        var facetChangeTask = new Ext4.util.DelayedTask(facetSelectionChange, this);
+
+        this.getSelectionModel().on('selectionchange', function(selModel, records){
+            this.facetStore.clearAllSelectedMembers();
+            if (records.length > 0)
+                this.facetStore.selectMembers(records);
+            facetChangeTask.delay(500);
+        }, this);
+
+        //this.getSelectionModel().on('selectionchange', this.onSelectionChange, this);
     },
 
     onCubeReady : function(mdx) {
