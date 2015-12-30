@@ -322,14 +322,14 @@ public class TrialShareController extends SpringActionController
             {
                 subset.setId("operational");
                 subset.setName("Operational");
-                subset.setDefault(false);
+                subset.setIsDefault(false);
                 subsets.add(subset);
             }
 
             subset = new StudySubset();
             subset.setId("public");
             subset.setName("Public");
-            subset.setDefault(true);
+            subset.setIsDefault(true);
             subsets.add(subset);
             return success(subsets);
         }
