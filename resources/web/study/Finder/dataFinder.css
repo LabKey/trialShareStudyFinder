@@ -292,6 +292,7 @@ LI.labkey-facet-member .labkey-facet-member-name
     position:relative;
     max-width:150pt;
     overflow-x: hidden;
+    overflow-y: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     z-index:2;
