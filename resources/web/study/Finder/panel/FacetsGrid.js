@@ -239,11 +239,10 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
     clearAllFilters : function (updateCounts) {
         for (var i = 0; i < this.facetStore.count(); i++)
         {
-            var name = this.facetStore.getAt(i).get("name");
-            //if (name == "Study")
-            //    continue;
-            this.clearFilter(name, true);
+            var facet = this.facetStore.getAt(i);
+            facet.data.selectedMembers = [];
         }
+        this.getSelectionModel().deselectAll(false);
         if (updateCounts)
             this.facetStore.updateCountsAsync();
         this.fireEvent("filterSelectionChanged", false);

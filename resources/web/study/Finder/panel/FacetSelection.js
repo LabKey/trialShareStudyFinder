@@ -32,8 +32,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     },
 
     onClearAllFilters: function() {
-        this.getFacets().clearAllFilters(true);
-        this.onFilterSelectionChange(false);
+        this.getFacets().clearAllFilters(false);
     },
 
     onStudySubsetChanged: function() {
