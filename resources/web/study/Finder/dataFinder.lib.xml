@@ -23,7 +23,7 @@
         <script path="study/Finder/panel/StudyPanelHeader.js"/>
         <script path="study/Finder/panel/StudyCards.js"/>
         <script path="study/Finder/panel/Finder.js"/>
-        <script path="study/Finder/view/DataFinderTour.js"/>
+        <script path="study/Finder/view/dataFinderTour.js"/>
     </library>
     <dependencies>
         <dependency path="internal/jQuery"/>
