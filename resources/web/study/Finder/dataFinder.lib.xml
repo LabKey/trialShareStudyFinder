@@ -1,0 +1,34 @@
+<libraries xmlns="http://labkey.org/clientLibrary/xml/">
+    <!-- If you modify this file in any way, confirm the changes are reflected in labkey.js -->
+    <library compileInProductionMode="true">
+
+        <script path="study/Finder/dataFinder.css"/>
+        <script path="study/Finder/trialShare.css"/>
+        <script path="study/Finder/data/Facet.js"/>
+        <script path="study/Finder/data/FacetFilter.js"/>
+        <script path="study/Finder/data/FacetMember.js"/>
+        <script path="study/Finder/data/StudyCard.js"/>
+        <script path="study/Finder/data/Studies.js"/>
+        <script path="study/Finder/data/StudySubset.js"/>
+        <script path="study/Finder/data/StudySubsets.js"/>
+        <script path="study/Finder/data/Facets.js"/>
+        <script path="study/Finder/data/FacetMembers.js"/>
+
+        <script path="study/Finder/panel/FacetPanelHeader.js"/>
+        <script path="study/Finder/panel/FacetsGrid.js"/>
+        <script path="study/Finder/panel/SelectionSummary.js"/>
+        <script path="study/Finder/panel/FacetSelection.js"/>
+
+        <script path="study/Finder/panel/Studies.js"/>
+        <script path="study/Finder/panel/StudyPanelHeader.js"/>
+        <script path="study/Finder/panel/StudyCards.js"/>
+        <script path="study/Finder/panel/Finder.js"/>
+        <script path="study/Finder/view/dataFinderTour.js"/>
+    </library>
+    <dependencies>
+        <dependency path="internal/jQuery"/>
+        <dependency path="Ext4"/>
+        <dependency path="clientapi/ext4"/>
+        <dependency path="query/olap.js"/>
+    </dependencies>
+</libraries>
