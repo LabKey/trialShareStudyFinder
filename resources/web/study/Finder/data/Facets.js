@@ -317,6 +317,9 @@ Ext4.define('LABKEY.study.store.Facets', {
         //this.updateContainerFilter();
         //if (!isSavedGroup)
         //    this.changeSubjectGroup();
+
+
+        LABKEY.Utils.signalWebDriverTest('dataFinderCountsUpdated');
     },
 
     updateStudyFilter : function(selectedStudies) {
