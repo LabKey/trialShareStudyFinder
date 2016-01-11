@@ -218,36 +218,35 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     }
 
     @Test
-    @Ignore("Not yet working")
     public void testSelection()
     {
         DataFinderPage finder = new DataFinderPage(this);
         finder.selectStudySubset("Public");
 
-        Map<DataFinderPage.Dimension, DataFinderPage.DimensionPanel> dimensionPanels = finder.getAllDimensionPanels();
-
-        String selectedAgeGroup = dimensionPanels.get(DataFinderPage.Dimension.AGE_GROUP).selectFirstIntersectingMeasure();
-        dimensionPanels.get(DataFinderPage.Dimension.PHASE).selectFirstIntersectingMeasure();
+        DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
+        facets.toggleFacet(DataFinderPage.Dimension.AGE_GROUP, "Adult");
+        facets.toggleFacet(DataFinderPage.Dimension.PHASE, "Phase 1");
 
         assertCountsSynced(finder);
 
-        dimensionPanels.get(DataFinderPage.Dimension.PHASE).clearFilters();
-        assertEquals("Clearing Phase filters did not remove selection",  Collections.emptyList(), dimensionPanels.get(DataFinderPage.Dimension.PHASE).getSelectedValues());
+        facets.clearFilter(DataFinderPage.Dimension.PHASE);
+
+        assertEquals("Clearing Phase filters did not remove selection",  Collections.emptyList(), facets.getSelectedMembers(DataFinderPage.Dimension.PHASE));
 
         // re-select
-        String selectedGender = dimensionPanels.get(DataFinderPage.Dimension.PHASE).selectFirstIntersectingMeasure();
-        dimensionPanels.get(DataFinderPage.Dimension.AGE_GROUP).deselectMember(selectedAgeGroup);
-        assertEquals("Clearing selection did not remove selection", Collections.emptyList(), dimensionPanels.get(DataFinderPage.Dimension.AGE_GROUP).getSelectedValues());
-        assertEquals("Clearing selection removed other filter", Collections.singletonList(selectedGender), dimensionPanels.get(DataFinderPage.Dimension.PHASE).getSelectedValues());
+        facets.toggleFacet(DataFinderPage.Dimension.PHASE, "Phase 1");
+        // deselect
+        facets.toggleFacet(DataFinderPage.Dimension.AGE_GROUP, "Adult");
+        assertEquals("Clearing selection did not remove selection", Collections.emptyList(), facets.getSelectedMembers(DataFinderPage.Dimension.AGE_GROUP));
+        assertEquals("Clearing selection removed other filter", Collections.singletonList("Phase 1"), facets.getSelectedMembers(DataFinderPage.Dimension.PHASE));
 
         finder.clearAllFilters();
-        assertEquals("Clearing all filters didn't clear selection", Collections.emptyList(), dimensionPanels.get(DataFinderPage.Dimension.PHASE).getSelectedValues());
+        assertEquals("Clearing all filters didn't clear selection", Collections.emptyList(), facets.getSelectedMembers(DataFinderPage.Dimension.PHASE));
 
         assertCountsSynced(finder);
     }
 
     @Test
-    @Ignore("Not yet working")
     public void testSelectingEmptyMeasure()
     {
         Map<DataFinderPage.Dimension, Integer> expectedCounts = new HashMap<>();
@@ -257,9 +256,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName());
         finder.selectStudySubset("Operational");
 
-        Map<DataFinderPage.Dimension, DataFinderPage.DimensionPanel> dimensionPanels = finder.getAllDimensionPanels();
+        DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
+        facets.toggleFacet(DataFinderPage.Dimension.ASSAY, "ELISA");
 
-        dimensionPanels.get(DataFinderPage.Dimension.ASSAY).selectMember("ELISA");
 
         List<DataFinderPage.StudyCard> filteredStudyCards = finder.getStudyCards();
         assertEquals("Study cards visible after selection", 0, filteredStudyCards.size());
@@ -267,12 +266,15 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         Map<DataFinderPage.Dimension, Integer> filteredSummaryCounts = finder.getSummaryCounts();
         assertEquals("Wrong counts after selecting empty measure", expectedCounts, filteredSummaryCounts);
 
-        for (DataFinderPage.DimensionPanel panel : dimensionPanels.values())
+        for (DataFinderPage.Dimension dimension : DataFinderPage.Dimension.values())
         {
-            Map<String, Integer> memberCounts = panel.getMemberCounts();
-            for (Map.Entry<String, Integer> memberCount : memberCounts.entrySet())
+            if (dimension.getHierarchyName() != null)
             {
-                assertEquals("Wrong counts for member " + memberCount.getKey() + " of dimension " + panel.getDimension() + " after selecting empty measure", 0, memberCount.getValue().intValue());
+                Map<String, Integer> memberCounts = facets.getMemberCounts(dimension);
+                for (Map.Entry<String, Integer> memberCount : memberCounts.entrySet())
+                {
+                    assertEquals("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure", 0, memberCount.getValue().intValue());
+                }
             }
         }
     }
@@ -372,13 +374,14 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     public void testNavigationDoesNotRemoveFinderFilter()
     {
         DataFinderPage finder = new DataFinderPage(this);
-        Map<DataFinderPage.Dimension, DataFinderPage.DimensionPanel> dimensionPanels = finder.getAllDimensionPanels();
-        dimensionPanels.get(DataFinderPage.Dimension.THERAPEUTIC_AREA).selectFirstIntersectingMeasure();
+        DataFinderPage.FacetGrid facetsGrid = finder.getFacetsGrid();
+        facetsGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
 
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getSelectionValues();
+
+        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
         clickTab("Manage");
         clickTab("Overview");
-        assertEquals("Navigation cleared study finder filter", selections, finder.getSelectionValues());
+        assertEquals("Navigation cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
     }
 
     @Test
@@ -386,12 +389,12 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     public void testRefreshDoesNotRemoveFinderFilter()
     {
         DataFinderPage finder = new DataFinderPage(this);
-        Map<DataFinderPage.Dimension, DataFinderPage.DimensionPanel> dimensionPanels = finder.getAllDimensionPanels();
-        dimensionPanels.get(DataFinderPage.Dimension.THERAPEUTIC_AREA).selectFirstIntersectingMeasure();
+        DataFinderPage.FacetGrid facetsGrid = finder.getFacetsGrid();
+        facetsGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
 
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getSelectionValues();
+        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
         refresh();
-        assertEquals("'Refresh' cleared study finder filter", selections, finder.getSelectionValues());
+        assertEquals("'Refresh' cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
     }
 
     @Test
@@ -399,13 +402,13 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     public void testBackDoesNotRemoveFinderFilter()
     {
         DataFinderPage finder = new DataFinderPage(this);
-        Map<DataFinderPage.Dimension, DataFinderPage.DimensionPanel> dimensionPanels = finder.getAllDimensionPanels();
-        dimensionPanels.get(DataFinderPage.Dimension.THERAPEUTIC_AREA).selectFirstIntersectingMeasure();
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        facetGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
 
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getSelectionValues();
+        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
         clickTab("Manage");
         goBack();
-        assertEquals("'Back' cleared study finder filter", selections, finder.getSelectionValues());
+        assertEquals("'Back' cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
     }
 
     @Test
@@ -413,12 +416,12 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     public void testFinderWebPartAndActionShareFilter()
     {
         DataFinderPage finder = new DataFinderPage(this);
-        Map<DataFinderPage.Dimension, DataFinderPage.DimensionPanel> dimensionPanels = finder.getAllDimensionPanels();
-        dimensionPanels.get(DataFinderPage.Dimension.THERAPEUTIC_AREA).selectFirstIntersectingMeasure();
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        facetGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
 
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getSelectionValues();
+        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
         DataFinderPage.goDirectlyToPage(this, getProjectName());
-        assertEquals("WebPart study finder filter didn't get applied", selections, finder.getSelectionValues());
+        assertEquals("WebPart study finder filter didn't get applied", selections, finder.getFacetsGrid().getSelectedMembers());
     }
 
 
@@ -432,10 +435,14 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         finder.clearAllFilters();
         assertEquals("Group label not as expected", "Unsaved Group", finder.getGroupLabel());
 
-        Map<DataFinderPage.Dimension, DataFinderPage.DimensionPanel> dimensionPanels = finder.getAllDimensionPanels();
         Map<DataFinderPage.Dimension, List<String>> selections = new HashMap<>();
-        selections.put(DataFinderPage.Dimension.AGE_GROUP, Collections.singletonList(dimensionPanels.get(DataFinderPage.Dimension.AGE_GROUP).selectFirstIntersectingMeasure()));
-        selections.put(DataFinderPage.Dimension.CONDITION, Collections.singletonList(dimensionPanels.get(DataFinderPage.Dimension.CONDITION).selectFirstIntersectingMeasure()));
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        facetGrid.toggleFacet(DataFinderPage.Dimension.AGE_GROUP, "Adult");
+        facetGrid.toggleFacet(DataFinderPage.Dimension.CONDITION, "Acute Kidney Injury");
+
+        selections.put(DataFinderPage.Dimension.AGE_GROUP, Collections.singletonList("Adult"));
+        selections.put(DataFinderPage.Dimension.CONDITION, Collections.singletonList("Acute Kidney Injury"));
+
         Map<DataFinderPage.Dimension, Integer> summaryCounts = finder.getSummaryCounts();
 
         // click on "Save" menu and assert "Save" is not active then assert "Save as" is active
@@ -466,7 +473,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         // assert the selected items are the same and the counts are the same as before.
         assertEquals("Summary counts not as expected after load", summaryCounts, finder.getSummaryCounts());
-        assertEquals("Selected items not as expected after load", selections, finder.getSelectionValues());
+        assertEquals("Selected items not as expected after load", selections, finder.getFacetsGrid().getSelectedMembers());
         // assert that "Save" is now active in the menu
         saveMenu = finder.getMenu(DataFinderPage.Locators.saveMenu);
         saveMenu.toggleMenu();
@@ -475,10 +482,11 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         // Choose another dimension and save the summary counts
         log("selecting an Assay filter");
-        selections.put(DataFinderPage.Dimension.ASSAY, Collections.singletonList(dimensionPanels.get(DataFinderPage.Dimension.ASSAY).selectFirstIntersectingMeasure()));
+        facetGrid.toggleFacet(DataFinderPage.Dimension.ASSAY, "FCM");
+        selections.put(DataFinderPage.Dimension.ASSAY, Collections.singletonList("FCM"));
         summaryCounts = finder.getSummaryCounts();
         log("Selections is now " + selections);
-        assertEquals("Selected items not as expected after assay selection", selections, finder.getSelectionValues());
+        assertEquals("Selected items not as expected after assay selection", selections, finder.getFacetsGrid().getSelectedMembers());
 
         // Save the filter
         saveMenu = finder.getMenu(DataFinderPage.Locators.saveMenu);
@@ -496,7 +504,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         // assert that the selections are as expected.
         assertEquals("Summary counts not as expected after load", summaryCounts, finder.getSummaryCounts());
-        assertEquals("Selected items not as expected after load", selections, finder.getSelectionValues());
+        assertEquals("Selected items not as expected after load", selections, finder.getFacetsGrid().getSelectedMembers());
 
         // manage group and delete the group that was created
         DataFinderPage.GroupMenu manageMenu = finder.getMenu(DataFinderPage.Locators.manageMenu);

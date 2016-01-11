@@ -1,7 +1,7 @@
 package org.labkey.test.pages.trialshare;
 
 import com.google.common.base.Predicate;
-import org.apache.commons.lang3.SystemUtils;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -11,11 +11,8 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,20 +61,6 @@ public class DataFinderPage extends LabKeyPage
         {
             _ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT);
         }
-//        Locator.XPathLocator listItem = Ext4Helper.Locators.comboListItemSelected().withText(text);
-//        WebElement element = listItem.waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-//        boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
-//
-//        if (!elementAlreadySelected)
-//        {
-//            _test.doAndWaitForPageSignal(() -> _ext4Helper.selectComboBoxItem(Locators.studySubsetCombo, text), COUNT_SIGNAL);
-//        }
-//        String selectedText = _test.getSelectedOptionText(Locators.studySubsetChooser);
-//        if (!selectedText.equals(text))
-//        {
-//            _test.doAndWaitForPageSignal(() -> _test.selectOptionByText(Locators.studySubsetChooser, text), COUNT_SIGNAL);
-//        }
-
     }
 
     @LogMethod
@@ -123,7 +106,7 @@ public class DataFinderPage extends LabKeyPage
     public Map<Dimension, Integer> getSummaryCounts()
     {
         WebElement summaryElement = Locators.summaryArea.findElement(_test.getDriver());
-        DimensionPanel summary = new DimensionPanel(summaryElement);
+        SummaryPanel summary = new SummaryPanel(summaryElement);
 
         Map<Dimension, Integer> countMap = new HashMap<>();
         for (String value : summary.getValues())
@@ -149,57 +132,11 @@ public class DataFinderPage extends LabKeyPage
         return studyCards;
     }
 
-    public List<DimensionMember> getSelectedMembers()
+    public FacetGrid getFacetsGrid()
     {
-        List<DimensionMember> members = new ArrayList<>();
-        for (WebElement el : Locators.selection.findElements(_test.getDriver()))
-        {
-            members.add(new DimensionMember(el));
-        }
-        return members;
+        return new FacetGrid(Locators.facetPanel.findElement(_test.getDriver()));
     }
 
-    public Map<Dimension, List<String>> getSelectionValues()
-    {
-        Map<Dimension, List<String>> selectionValues = new HashMap<>();
-
-        for (DimensionMember member : getSelectedMembers())
-        {
-            List<String> values = selectionValues.get(member.getDimension());
-            if (values == null)
-            {
-                values = new ArrayList<>();
-                selectionValues.put(member.getDimension(), values);
-            }
-            values.add(member.getName());
-        }
-
-        return selectionValues;
-    }
-
-//    public DimensionPanel getFacetsGrid()
-//    {
-//        return new DimensionPanel(Locators.facetPanel.findElement(_test.getDriver()));
-//    }
-
-    public Map<Dimension, DimensionPanel> getAllDimensionPanels()
-    {
-        return getDimensionPanels(Locators.facetHeader);
-    }
-
-    public Map<Dimension, DimensionPanel> getDimensionPanels(Locator locator)
-    {
-        List<WebElement> dimensionPanelEls = locator.findElements(_test.getDriver());
-        Map<Dimension, DimensionPanel> dimensionPanels = new HashMap<>();
-
-        for (WebElement el : dimensionPanelEls)
-        {
-            DimensionPanel panel = new DimensionPanel(el);
-            dimensionPanels.put(panel.getDimension(), panel);
-        }
-
-        return dimensionPanels;
-    }
 
     public void clearAllFilters()
     {
@@ -250,10 +187,7 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.CssLocator studyCard = studyFinder.append(Locator.css(".labkey-study-card"));
         public static final Locator.CssLocator selectionPanel = studyFinder.append(Locator.css(".labkey-facet-selection-panel"));
         public static final Locator.CssLocator facetPanel = selectionPanel.append(Locator.css(" .labkey-study-facets"));
-        public static final Locator.CssLocator facetHeader = Locator.css(".x4-grid-group-title");
-//        public static final Locator.CssLocator facet = facetPanel.append(" .labkey-facet-header");
         public static final Locator.CssLocator summaryArea = selectionPanel.append(Locator.css("#summaryArea"));
-        public static final Locator.CssLocator selection = facetPanel.append(Locator.css(" .selected-member"));
         public static final Locator.CssLocator activeClearAll = Locator.css(".labkey-clear-all.active");
         public static final Locator.CssLocator groupLabel = Locator.css(".labkey-group-label");
         public static final Locator.NameLocator groupLabelInput = Locator.name("groupLabel");
@@ -265,25 +199,32 @@ public class DataFinderPage extends LabKeyPage
 
     public enum Dimension
     {
-        STUDIES("studies"),
-        SUBJECTS("subjects"),
-        THERAPEUTIC_AREA("therapeutic area"),
-        STUDY_TYPE("study type"),
-        ASSAY("assay"),
-        AGE_GROUP("age group"),
-        PHASE("phase"),
-        CONDITION("condition");
+        STUDIES("studies", null),
+        SUBJECTS("subjects", null),
+        THERAPEUTIC_AREA("therapeutic area", "Study.Therapeutic Area"),
+        STUDY_TYPE("study type", "Study.Study Type"),
+        ASSAY("assay", "Study.Assay"),
+        AGE_GROUP("age group", "Study.AgeGroup"),
+        PHASE("phase", "Study.Phase"),
+        CONDITION("condition", "Study.Condition");
 
         private String caption;
+        private String hierarchyName;
 
-        Dimension(String caption)
+        Dimension(String caption, String hierarchyName)
         {
             this.caption = caption;
+            this.hierarchyName = hierarchyName;
         }
 
         public String getCaption()
         {
             return caption;
+        }
+
+        public String getHierarchyName()
+        {
+            return hierarchyName;
         }
 
         public static Dimension fromString(String value)
@@ -366,26 +307,138 @@ public class DataFinderPage extends LabKeyPage
         }
     }
 
-    public class DimensionPanel extends Component
+    public class FacetGrid extends Component
+    {
+
+        private WebElement grid;
+        private Locators locators;
+
+        public FacetGrid(WebElement grid)
+        {
+            this.grid = grid;
+            this.locators = new Locators();
+        }
+
+        @Override
+        public WebElement getComponentElement()
+        {
+            return this.grid;
+        }
+
+        public void toggleFacet(Dimension dimension, String name)
+        {
+            Locator.XPathLocator rowLocator = locators.facetMember(dimension, name);
+            _test.scrollIntoView(rowLocator);
+            WebElement row = rowLocator.findElement(_test.getDriver());
+
+            _test.doAndWaitForPageSignal(() -> row.click(), COUNT_SIGNAL);
+        }
+
+        public void clearFilter(Dimension dimension)
+        {
+            WebElement clearEl = locators.facetClear(dimension).findElement(_test.getDriver());
+            Assert.assertFalse("Attempting to clear filter that is not active", clearEl.getAttribute("class").contains("inactive"));
+            clearEl.click();
+        }
+
+        public Map<Dimension, List<String>> getSelectedMembers()
+        {
+            Map<Dimension, List<String>> selections = new HashMap<>();
+            for (Dimension dimension : Dimension.values())
+            {
+                if (dimension.getHierarchyName() != null)
+                {
+                    selections.put(dimension, getSelectedMembers(dimension));
+                }
+            }
+            return selections;
+
+        }
+
+        public List<String> getSelectedMembers(Dimension dimension)
+        {
+            List<WebElement> selectedElements =  locators.facetMemberSelected(dimension).findElements(_test.getDriver());
+            List<String> selectedNames = new ArrayList<>();
+            for (WebElement element: selectedElements)
+            {
+                selectedNames.add(locators.memberName.findElement(element).getText());
+            }
+            return selectedNames;
+        }
+
+        public Map<String, Integer> getMemberCounts(Dimension dimension)
+        {
+            List<WebElement> memberElements = locators.facetMembers(dimension).findElements(_test.getDriver());
+            Map<String, Integer> countMap = new HashMap<>();
+            for (WebElement member : memberElements)
+            {
+                String name = locators.memberName.findElement(member).getText();
+                Integer count = Integer.valueOf(locators.memberCount.findElement(member).getText());
+                countMap.put(name, count);
+            }
+            return countMap;
+
+        }
+
+        private class Locators
+        {
+            public Locator.XPathLocator facetMemberRow(Dimension dimension, String name)
+            {
+                return Locator.tagWithAttribute("tr", "data-recordid", "[" + dimension.getHierarchyName() + "].[" + name + "]");
+            }
+
+            public Locator.XPathLocator facetMember(Dimension dimension, String name)
+            {
+                return facetMemberRow(dimension, name).append("//span[contains(@class, 'labkey-facet-member')]");
+            }
+
+            public Locator.XPathLocator facetGroup(Dimension dimension)
+            {
+                return new Locator.XPathLocator("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]");
+            }
+
+            public Locator.XPathLocator facetGroupTitle(Dimension dimension)
+            {
+                //tr[contains(@data-recordid,"Study.Therapeutic Area")]//div[@class="x4-grid-group-title"]
+                return facetGroup(dimension).append("//div[@class='x4-grid-group-title']");
+            }
+
+            public Locator.XPathLocator facetClear(Dimension dimension)
+            {
+                return new Locator.XPathLocator("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]//span[contains(@class,'labkey-clear-filter')]");
+            }
+
+            public Locator.XPathLocator facetMemberSelected(Dimension dimension)
+            {
+                //tr[contains(@data-recordid, 'Therapeutic Area')][contains(@class, 'x4-grid-row-selected')]
+                return facetGroup(dimension).append("[contains(@class, 'x4-grid-row-selected')]");
+            }
+
+            public Locator.XPathLocator facetMembers(Dimension dimension)
+            {
+
+                return facetGroup(dimension).append("//span[contains(concat(' ', normalize-space(@class), ' '), ' labkey-facet-member ')]");
+            }
+
+            public Locator.CssLocator memberCount = Locator.css(".labkey-facet-member-count");
+            public Locator.CssLocator memberName = Locator.css(".labkey-facet-member-name");
+            public Locator.CssLocator emptyMemberName = Locator.css(".labkey-empty-member .labkey-facet-member-name");
+            public Locator.CssLocator nonEmptyMemberName = Locator.css(".labkey-facet-member:not(.labkey-empty-member) .labkey-facet-member-name");
+            public Locator.CssLocator selectedMemberName = Locator.css(".x4-grid-row-selected .labkey-facet-member-name");
+            public Locator.CssLocator nonEmptyNonSelectedMemberName = Locator.css(".x4-grid-row:not(.x4-grid-row-selected) .labkey-facet-member:not(.labkey-empty-member) .labkey-member-name");
+        }
+    }
+
+    public class SummaryPanel extends Component
     {
         private WebElement panel;
         private Elements elements;
         private Dimension dimension;
 
-        private DimensionPanel(WebElement panel)
+        private SummaryPanel(WebElement panel)
         {
             this.panel = panel;
             elements = new Elements();
-        }
-
-        public Dimension getDimension()
-        {
-            if (dimension == null)
-            {
-                dimension = Dimension.fromString(findElement(elements.dimension).getText());
-            }
-
-            return dimension;
         }
 
         @Override
@@ -396,138 +449,12 @@ public class DataFinderPage extends LabKeyPage
 
         public List<String> getValues()
         {
-            displayDimension();
             return _test.getTexts(findElements(elements.member));
-        }
-
-        public List<String> getEmptyValues()
-        {
-            displayDimension();
-            return _test.getTexts(findElements(elements.emptyMemberName));
-        }
-
-        public List<String> getNonEmptyValues()
-        {
-            displayDimension();
-            return _test.getTexts(findElements(elements.nonEmptyMemberName));
-        }
-
-        public List<String> getSelectedValues()
-        {
-            displayDimension();
-            return _test.getTexts(findElements(elements.selectedMemberName));
-        }
-
-        public void displayDimension()
-        {
-            if (!isDisplayed())
-            {
-                WebElement caption = findElement(elements.facetCaption);
-                caption.click();
-            }
-        }
-
-        public boolean isDisplayed()
-        {
-            return !this.panel.getAttribute("class").contains("collapsed");
-        }
-
-        public String selectFirstIntersectingMeasure()
-        {
-            displayDimension();
-
-            WebElement el = findElement(elements.nonEmptyNonSelectedMemberName);
-            String value = el.getText();
-
-            addToSelection(el);
-
-            waitForSelection(value);
-            return value;
-        }
-
-        public Map<String, Integer> getMemberCounts()
-        {
-            displayDimension();
-            Map<String, Integer> countMap = new HashMap<>();
-            List<WebElement> members = findElements(elements.member);
-            for (WebElement member : members)
-            {
-                String[] parts = member.getText().split("\n");
-                String name = parts[0].trim();
-                Integer count = Integer.valueOf(parts[1].trim());
-                countMap.put(name, count);
-            }
-
-            return countMap;
-        }
-
-        public void selectMember(String memberName)
-        {
-            displayDimension();
-            select(findElement(elements.memberName.withText(memberName)));
-            waitForSelection(memberName);
-        }
-
-        public void deselectMember(String memberName)
-        {
-            WebElement member = findElement(elements.member.containing(memberName));
-            WebElement check = member.findElement(By.cssSelector(elements.selectedMemberCheck.getLocatorString()));
-            select(check);
-        }
-
-        public void addToSelection(String value)
-        {
-            displayDimension();
-            addToSelection(findElement(elements.member.withText(value)));
-            waitForSelection(value);
-        }
-
-        public void clearFilters()
-        {
-            select(findElement(elements.clearFilters));
-        }
-
-        private void select(final WebElement value)
-        {
-            _test.doAndWaitForPageSignal(value::click, COUNT_SIGNAL);
-        }
-
-        private void addToSelection(final WebElement value)
-        {
-            _test.doAndWaitForPageSignal(() -> controlClick(value), COUNT_SIGNAL);
-        }
-
-        private void controlClick(WebElement el)
-        {
-            Keys multiSelectKey;
-            if (SystemUtils.IS_OS_MAC)
-                multiSelectKey = Keys.COMMAND;
-            else
-                multiSelectKey = Keys.CONTROL;
-
-            Actions builder = new Actions(_test.getDriver());
-            builder.keyDown(multiSelectKey).build().perform();
-            el.click();
-            builder.keyUp(multiSelectKey).build().perform();
-        }
-
-        private void waitForSelection(String value)
-        {
-            elements.selectedMemberName.containing(value).waitForElement(panel, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
 
         private class Elements
         {
-            public Locator.CssLocator facetCaption = Locator.css(".labkey-facet-caption");
-            public Locator.CssLocator dimension = Locator.css(".labkey-facet-caption > span");
             public Locator.CssLocator member = Locator.css(".labkey-facet-member");
-            public Locator.CssLocator memberName = Locator.css(".labkey-facet-member-name");
-            public Locator.CssLocator selectedMemberCheck = Locator.css(".labkey-facet-member .labkey-facet-member-indicator.selected");
-            public Locator.CssLocator emptyMemberName = Locator.css(".labkey-empty-member .labkey-facet-member-name");
-            public Locator.CssLocator nonEmptyMemberName = Locator.css(".labkey-facet-member:not(.labkey-empty-member) .labkey-facet-member-name");
-            public Locator.CssLocator nonEmptyNonSelectedMemberName = Locator.css(".x4-grid-row:not(.x4-grid-row-selected) .labkey-facet-member:not(.labkey-empty-member) .labkey-member-name");
-            public Locator.CssLocator selectedMemberName = Locator.css(".x4-grid-row-selected .labkey-member-name");
-            public Locator.CssLocator clearFilters = Locator.css(".labkey-clear-filter");
         }
     }
 
@@ -589,54 +516,6 @@ public class DataFinderPage extends LabKeyPage
             public Locator shortName = Locator.css(".labkey-study-card-short-name");
             public Locator PI = Locator.css(".labkey-study-card-pi");
             public Locator title = Locator.css(".labkey-study-card-title");
-        }
-    }
-
-    public class DimensionMember extends Component
-    {
-        private final Elements elements;
-        private final WebElement memberElement;
-        private Dimension dimension;
-
-        private DimensionMember(final WebElement memberElement)
-        {
-            this.memberElement = memberElement;
-            elements = new Elements();
-            parseMemberId();
-        }
-
-        private void parseMemberId()
-        {
-            String id = this.memberElement.getAttribute("id");
-            String[] parts = id.split("_");
-            this.dimension = Dimension.fromString(parts[1]);
-        }
-
-        @Override
-        public WebElement getComponentElement()
-        {
-            return memberElement;
-        }
-
-        public Dimension getDimension()
-        {
-            return dimension;
-        }
-
-        public String getName()
-        {
-            return elements.memberName.findElement(memberElement).getText();
-        }
-
-        public Integer getCount()
-        {
-            return Integer.parseInt(elements.memberCount.findElement(memberElement).getText());
-        }
-
-        private class Elements
-        {
-            public Locator memberName = Locator.css(".member-name");
-            public Locator memberCount = Locator.css(".member-count");
         }
     }
 }

@@ -10,7 +10,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     itemSelector: 'span.x4-grid-data-row',
 
-    autoScroll: false,
+    autoScroll: true,
 
     bubbleEvents : ["filterSelectionChanged"],
 
@@ -43,7 +43,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                     '   <tpl else>',
                     '       <span class="labkey-facet-member">',
                     '   </tpl>',
-                    '       <span class="labkey-facet-member-name" title="{name}">{name}&nbsp;</span>',
+                    '       <span class="labkey-facet-member-name" title="{name}">{name}</span>',
                     '       <span class="labkey-facet-member-count">{count:this.formatNumber}</span>',
                     '   <tpl if="count">',
                     '       <span class="labkey-facet-percent-bar" style="width:{percent}%;"></span>',
