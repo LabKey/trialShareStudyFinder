@@ -2,12 +2,17 @@ package org.labkey.test.components.trialshare;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
+import org.labkey.test.components.ComponentElements;
+import org.labkey.test.selenium.LazyWaitingWebElement;
+import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class StudySummaryPanel
+public abstract class StudySummaryPanel extends Component
 {
     protected BaseWebDriverTest _test;
     protected WebElement _panel;
@@ -16,37 +21,43 @@ public abstract class StudySummaryPanel
     {
         _test = test;
         _panel = Locators.self.waitForElement(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        elements().accession.waitForElement(_panel, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        elements().accession.isDisplayed();
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _panel;
     }
 
     public String getAccession()
     {
-        return elements().accession.findElement(_panel).getText();
+        return elements().accession.getText();
     }
 
     public String getShortName()
     {
-        return elements().shortName.findElement(_panel).getText();
+        return elements().shortName.getText();
     }
 
     public String getTitle()
     {
-        return elements().title.findElement(_panel).getText();
+        return elements().title.getText();
     }
 
     public String getPI()
     {
-        return elements().PI.findElement(_panel).getText();
+        return elements().PI.getText();
     }
 
     public String getOrganization()
     {
-        return elements().organization.findElement(_panel).getText();
+        return elements().organization.getText();
     }
 
     public List<Paper> getPapers()
     {
-        List<WebElement> paperEls = elements().paper.findElements(_panel);
+        List<WebElement> paperEls = Locator.css(".labkey-study-papers > p").findElements(_panel);
         List<Paper> papers = new ArrayList<>();
 
         for (WebElement el : paperEls)
@@ -62,14 +73,19 @@ public abstract class StudySummaryPanel
         return new Elements();
     }
 
-    protected class Elements
+    protected class Elements extends ComponentElements
     {
-        Locator.CssLocator accession = Locator.css(".labkey-study-accession");
-        Locator.CssLocator shortName = Locator.css(".labkey-study-short-name");
-        Locator.CssLocator title = Locator.css(".labkey-study-title");
-        Locator.CssLocator PI = Locator.css(".labkey-study-pi");
-        Locator.CssLocator organization = Locator.css(".labkey-study-organization");
-        Locator.CssLocator paper = Locator.css(".labkey-study-papers > p");
+        @Override
+        protected SearchContext getContext()
+        {
+            return _panel;
+        }
+
+        WebElement accession = new LazyWaitingWebElement(Locator.css(".labkey-study-accession"), this);
+        WebElement shortName = new LazyWebElement(Locator.css(".labkey-study-short-name"), this);
+        WebElement title = new LazyWebElement(Locator.css(".labkey-study-title"), this);
+        WebElement PI = new LazyWebElement(Locator.css(".labkey-study-pi"), this);
+        WebElement organization = new LazyWebElement(Locator.css(".labkey-study-organization"), this);
     }
 
     private static class Locators

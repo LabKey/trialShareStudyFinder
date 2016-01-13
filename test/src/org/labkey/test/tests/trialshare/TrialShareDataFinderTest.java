@@ -29,7 +29,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
-import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.components.study.StudyOverviewWebPart;
 import org.labkey.test.components.trialshare.StudySummaryWindow;
 import org.labkey.test.pages.study.ManageParticipantGroupsPage;
@@ -57,7 +56,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-@Category({InDevelopment.class, Git.class})
+@Category({Git.class})
 public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadOnlyTest
 {
     private static final String MODULE_NAME = "TrialShare";
