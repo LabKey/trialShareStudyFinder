@@ -100,15 +100,26 @@
         <%
             if (!publication.getStudies().isEmpty())
             {
-        %><span class="labkey-publication-detail-label">Studies</span>
+        %>
+        <div>
+            <span class="labkey-publication-detail-label">Studies</span>
         <%
                 for (StudyBean study : publication.getStudies())
                 {
+                    if (study.getUrl(getContainer(), getUser()) != null)
+                    {
+        %><span class="labkey-study-short-name"><a href="<%=h(study.getUrl())%>"%><%=h(study.getShortName())%></a></span>
+        <%
+                    }
+                    else
+                    {
         %><span class="labkey-study-short-name"><%=h(study.getShortName())%></span>
         <%
+                    }
                 }
             }
         %>
+        </div>
         <%
             if (!StringUtils.isEmpty(publication.getAbstractText()))
             {
