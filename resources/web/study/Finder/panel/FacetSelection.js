@@ -58,9 +58,20 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     getFacetSelectionSummary: function() {
         if (!this.facetSelectionSummary) {
-            this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.SelectionSummary", {
-                dataModuleName: this.dataModuleName
-            });
+            if (this.olapConfig.objectName == "Study")
+            {
+                this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.SelectionSummary", {
+                    dataModuleName: this.dataModuleName,
+                    objectName: this.olapConfig.objectName
+                });
+            }
+            else
+            {
+                this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.PublicationSummary", {
+                    dataModuleName: this.dataModuleName,
+                    objectName: this.olapConfig.objectName
+                });
+            }
         }
         return this.facetSelectionSummary;
     },

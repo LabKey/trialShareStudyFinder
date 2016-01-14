@@ -1,7 +1,7 @@
 Ext4.define('LABKEY.study.store.Studies', {
     extend: 'Ext.data.Store',
-    storeId: 'studies',
-    model: 'LABKEY.study.data.StudyCard',
+    storeId: 'Study',
+    model: 'LABKEY.study.data.StudyCard', // TODO rename to "Study"
     autoLoad: false,
     dataModuleName: "study",
     isLoaded: false,
@@ -16,7 +16,7 @@ Ext4.define('LABKEY.study.store.Studies', {
         }
     },
     sorters: [{
-        property: 'studyId',
+        property: 'shortName',
         direction: 'ASC'
     }],
 

@@ -24,7 +24,8 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
     initComponent: function() {
 
         this.studySubsets = Ext4.create('LABKEY.study.store.StudySubsets', {
-            dataModuleName : this.dataModuleName
+            dataModuleName : this.dataModuleName,
+            objectName: this.objectName
         });
         this.items = [];
         var searchBox = this.getSearchBox();
@@ -38,6 +39,7 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         this.studySubsets.on(
                 'load', function(store) {
                     this.getStudySubsetMenu().setValue(store.defaultValue);
+                    //this.getStudySubsetMenu().hidden = (store.count() < 2);
                 },
                 this
         );
@@ -77,9 +79,13 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
                 queryMode: 'local',
                 valueField: 'id',
                 displayField: 'name',
+                //hidden: true,
                 value: this.studySubsets.defaultValue,
                 cls: 'labkey-study-search',
                 multiSelect: false,
+                //fieldLabel: "Status",
+                //labelSeparator: '',
+                //labelCls: 'labkey-finder-label',
                 listeners: {
                     scope: this,
                     'select': function(field, newValue, oldValue, eOpts) {
@@ -99,7 +105,8 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         if (!this.helpLinks) {
             this.helpLinks = Ext4.create("Ext.button.Button", {
                 text: 'quick help',
-                cls: 'labkey-text-link',
+                cls: 'labkey-text-link labkey-finder-help',
+                componentCls: 'labkey-finder-help',
                 scope: this,
                 handler: function() {
                     this.startTutorial();

@@ -13,15 +13,20 @@
         <script path="study/Finder/data/StudySubsets.js"/>
         <script path="study/Finder/data/Facets.js"/>
         <script path="study/Finder/data/FacetMembers.js"/>
+        <script path="study/Finder/data/Publication.js"/>
+        <script path="study/Finder/data/Publications.js"/>
 
         <script path="study/Finder/panel/FacetPanelHeader.js"/>
         <script path="study/Finder/panel/FacetsGrid.js"/>
         <script path="study/Finder/panel/SelectionSummary.js"/>
+        <script path="study/Finder/panel/PublicationSummary.js"/>
         <script path="study/Finder/panel/FacetSelection.js"/>
 
         <script path="study/Finder/panel/Studies.js"/>
+        <script path="study/Finder/panel/Publications.js"/>
         <script path="study/Finder/panel/StudyPanelHeader.js"/>
         <script path="study/Finder/panel/StudyCards.js"/>
+        <script path="study/Finder/panel/PublicationCards.js"/>
         <script path="study/Finder/panel/Finder.js"/>
         <script path="study/Finder/view/dataFinderTour.js"/>
     </library>

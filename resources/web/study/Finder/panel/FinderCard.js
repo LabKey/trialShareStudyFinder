@@ -1,4 +1,4 @@
-Ext4.define('LABKEY.study.panel.Finder', {
+Ext4.define('LABKEY.study.panel.FinderCard', {
     extend: 'Ext.panel.Panel',
 
     alias: 'widget.labkey-data-finder-panel',
@@ -13,7 +13,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     height: '500px',
 
-    dataModuleName: 'study',
+    dataModuleName: null,  // the module responsible for serving up the cube data
 
     autoScroll : true,
 
@@ -22,13 +22,12 @@ Ext4.define('LABKEY.study.panel.Finder', {
     initComponent : function() {
 
         this.items = [
-            this.getFacetsPanel(),
-            //this.getCardDeckPanel()
+            this.getFacetsPanel()
         ];
 
-        if (this.olapConfig.objectName == "Study")
+        if (this.objectName == "Study")
             this.items.push(this.getStudiesPanel());
-        else if (this.olapConfig.objectName == "Publication")
+        else if (this.objectName == "Publication")
             this.items.push(this.getPublicationsPanel());
         this.callParent();
 
@@ -156,12 +155,12 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 maxWidth: '265px',
                 dataModuleName: this.dataModuleName,
                 showParticipantFilters : this.showParticipantFilters,
-                olapConfig: this.olapConfig
+                olapConfig: this.olapConfig,
+                objectName: this.objectName
             });
         }
         return this.facetsPanel;
     },
-
 
     getStudiesPanel: function() {
         if (!this.studiesPanel) {
@@ -171,7 +170,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 region: 'center',
                 width: '80%',
                 id: 'studies-view',
-                objectName: 'Study'
+                objectName: 'study'
             });
         }
         return this.studiesPanel;
@@ -186,7 +185,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 region: 'center',
                 width: '80%',
                 id: 'publication-view',
-                objectName: 'Publication'
+                objectName: 'publication'
             });
         }
         return this.studiesPanel;

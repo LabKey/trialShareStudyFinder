@@ -10,7 +10,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     itemSelector: 'span.x4-grid-data-row',
 
-    autoScroll: true,
+    autoScroll: false,
 
     bubbleEvents : ["filterSelectionChanged"],
 
@@ -118,7 +118,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             else {
                 for (var i = 0; i < facetStore.count(); i++) {
                     var facet = facetStore.getAt(i);
-                    if (facet.get("name") != "Study" && facetStore.getAt(i).data.selectedMembers.length > 0)
+                    if (facet.get("name") != facetStore.olapConfig.objectName && facetStore.getAt(i).data.selectedMembers.length > 0)
                         return true;
                 }
                 return false;
@@ -166,9 +166,9 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
     },
 
     onStudySubsetChanged: function() {
-        var studiesStore = Ext4.getStore("studies");
+        var studiesStore = Ext4.getStore(this.olapConfig.objectName);
         studiesStore.selectAll();
-        if (this.facetStore.getById("Study"))
+        if (this.facetStore.getById(this.olapConfig.objectName))
         {
             this.facetStore.updateCountsAsync();
         }

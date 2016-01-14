@@ -17,6 +17,9 @@
 %>
 <%@ page import="org.labkey.api.view.template.ClientDependency" %>
 <%@ page import="java.util.LinkedHashSet" %>
+<%@ page import="org.labkey.trialshare.TrialShareController" %>
+<%@ page import="org.labkey.api.view.JspView" %>
+<%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page extends="org.labkey.api.jsp.JspBase"%>
 <%!
     public LinkedHashSet<ClientDependency> getClientDependencies()
@@ -27,6 +30,10 @@
     }
 %>
 
+<%
+    JspView<TrialShareController.StudyCubeBean> me = (JspView) HttpView.currentView();
+    TrialShareController.StudyCubeBean studyCube = me.getModelBean();
+%>
 
 <script type="text/javascript">
     var DataFinder = {};
@@ -34,11 +41,15 @@
     {
         DataFinder.finderView = Ext4.create('LABKEY.study.panel.Finder', {
             renderTo    : 'dataFinderWrapper',
-            dataModuleName: 'trialshare',
+            dataModuleName: '<%=h(studyCube.getDataModuleName())%>',
             olapConfig : {
-                configId: 'TrialShare:/StudyCube',
-                schemaName: 'lists',
-                name: 'StudyCube'
+                configId: '<%=h(studyCube.getConfigId())%>',
+                schemaName: '<%=h(studyCube.getSchemaName())%>',
+                name: '<%=h(studyCube.getCubeName())%>',
+                filterByLevel : '<%=h(studyCube.getFilterByLevel())%>',
+                countDistinctLevel : '<%=h(studyCube.getCountDistinctLevel())%>',
+                filterByFacetUniqueName : '<%=h(studyCube.getFilterByFacetUniqueName())%>',
+                objectName : '<%=h(studyCube.getObjectName())%>'
             },
             showSearch: false
         });

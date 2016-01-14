@@ -1,0 +1,55 @@
+<Schema name="ITN" description="TrialShare Data Finder Publications">
+
+    <Cube name="PublicationCube" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
+
+        <Table schema="lists" name="ManuscriptsAndAbstracts" >
+        </Table>
+
+        <Dimension name="Publication" visible="true" highCardinality="false" foreignKey="publicationId">
+            <Hierarchy hasAll="true" primaryKey="PublicationId">
+                <Level name="Publication" visible="true" column="PublicationId" type="Integer" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
+            <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="PublicationId">
+                <Level name="Therapeutic Area" visible="true" column="therapeuticArea" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
+            <Hierarchy name="Publication Type" hasAll="true" primaryKey="PublicationId">
+                <Level name="PublicationType" visible="true"  type="String" column="publicationType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <!--<Hierarchy name="Condition" hasAll="true" primaryKey="PublicationId">-->
+                <!--<Table name="publicationCondition" schema="lists"/>-->
+                <!--<Level name="Condition" visible="true" table="publicationCondition" type="String" column="condition" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">-->
+                <!--</Level>-->
+            <!--</Hierarchy>-->
+            <Hierarchy name="Study" hasAll="true" primaryKey="PublicationId">
+                <Table name="publicationStudy" schema="lists"/>
+                <Level name="Study" visible="true" table="publicationStudy" type="String" column="ShortName" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <Hierarchy name="Year" hasAll="true" primaryKey="PublicationId">
+                <Level name="Year" visible="true" type="String" column="year" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <Hierarchy name="Journal" hasAll="true" primaryKey="PublicationId">
+                <Level name="Journal" visible="true" type="String" column="journal" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <Hierarchy name="Status" hasAll="true" primaryKey="PublicationId">
+                <Level name="Status" visible="true" type="String" column="status" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <!--<Hierarchy name="Assay" hasAll="true" primaryKey="PublicationId">-->
+                <!--<Table name="publicationAssay" schema="lists"/>-->
+                <!--<Level name="Assay" visible="true" table="publicationAssay" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>-->
+            <!--</Hierarchy>-->
+        </Dimension>
+
+
+        <Measure name="RowCount" column="PublicationId" aggregator="count" visible="true">
+        </Measure>
+
+
+    </Cube>
+
+
+</Schema>

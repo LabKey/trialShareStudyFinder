@@ -28,6 +28,7 @@ import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.RequiresPermission;
+import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.Pair;
@@ -35,6 +36,7 @@ import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
 import org.labkey.api.view.VBox;
+import org.labkey.api.view.ViewContext;
 import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
@@ -42,6 +44,7 @@ import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.data.StudySubset;
 import org.labkey.trialshare.view.DataFinderWebPart;
 import org.springframework.validation.BindException;
+import org.springframework.validation.Errors;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -56,6 +59,8 @@ public class TrialShareController extends SpringActionController
     public static final String NAME = "trialshare";
 
     public enum DetailType { publications, study };
+
+//    public enum CubeObjectType { study, publication };
 
     public TrialShareController()
     {
@@ -73,10 +78,147 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
-            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp");
+            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getStudyCubeBean(getViewContext()));
         }
     }
 
+    public static TrialShareController.StudyCubeBean getStudyCubeBean(ViewContext context)
+    {
+        String _objectName = context.getActionURL().getParameter("pageId");
+        if (_objectName == null)
+            _objectName = "studies";
+
+        TrialShareController.StudyCubeBean bean = new TrialShareController.StudyCubeBean();
+        if (_objectName.equalsIgnoreCase("studies"))
+        {
+            bean.setObjectName("Study");
+            bean.setCubeName("StudyCube");
+            bean.setConfigId("TrialShare:/StudyCube");
+            bean.setSchemaName("lists");
+            bean.setDataModuleName(TrialShareModule.NAME);
+            bean.setFilterByLevel("[Study].[Study]");
+            bean.setCountDistinctLevel("[Study].[Study]");
+            bean.setFilterByFacetUniqueName("[Study]");
+
+            bean.setShowSearch(false);
+        }
+        else if (_objectName.equalsIgnoreCase("publications"))
+        {
+            bean.setObjectName("Publication");
+            bean.setCubeName("PublicationCube");
+            bean.setConfigId("TrialShare:/PublicationCube");
+            bean.setSchemaName("lists");
+            bean.setDataModuleName(TrialShareModule.NAME);
+            bean.setFilterByLevel("[Publication].[Publication]");
+            bean.setCountDistinctLevel("[Publication].[Publication]");
+            bean.setFilterByFacetUniqueName("[Publication]");
+            bean.setShowSearch(false);
+        }
+        return bean;
+    }
+
+    public static class StudyCubeBean
+    {
+        private String _objectName;
+        private String _cubeName;
+        private String _dataModuleName;
+        private String _configId;
+        private String _schemaName;
+        private Boolean _showSearch;
+        private String _filterByLevel;
+        private String _countDistinctLevel;
+        private String _filterByFacetUniqueName;
+
+        public String getObjectName()
+        {
+            return _objectName;
+        }
+
+        public void setObjectName(String objectName)
+        {
+            _objectName = objectName;
+        }
+
+        public String getConfigId()
+        {
+            return _configId;
+        }
+
+        public void setConfigId(String configId)
+        {
+            _configId = configId;
+        }
+
+        public String getCubeName()
+        {
+            return _cubeName;
+        }
+
+        public void setCubeName(String cubeName)
+        {
+            _cubeName = cubeName;
+        }
+
+        public String getDataModuleName()
+        {
+            return _dataModuleName;
+        }
+
+        public void setDataModuleName(String dataModuleName)
+        {
+            _dataModuleName = dataModuleName;
+        }
+
+        public String getSchemaName()
+        {
+            return _schemaName;
+        }
+
+        public void setSchemaName(String schemaName)
+        {
+            _schemaName = schemaName;
+        }
+
+        public Boolean getShowSearch()
+        {
+            return _showSearch;
+        }
+
+        public void setShowSearch(Boolean showSearch)
+        {
+            _showSearch = showSearch;
+        }
+
+        public String getCountDistinctLevel()
+        {
+            return _countDistinctLevel;
+        }
+
+        public void setCountDistinctLevel(String countDistinctLevel)
+        {
+            _countDistinctLevel = countDistinctLevel;
+        }
+
+        public String getFilterByFacetUniqueName()
+        {
+            return _filterByFacetUniqueName;
+        }
+
+        public void setFilterByFacetUniqueName(String filterByFacetUniqueName)
+        {
+            _filterByFacetUniqueName = filterByFacetUniqueName;
+        }
+
+        public String getFilterByLevel()
+        {
+            return _filterByLevel;
+        }
+
+        public void setFilterByLevel(String filterByLevel)
+        {
+            _filterByLevel = filterByLevel;
+        }
+    }
 
     @RequiresPermission(ReadPermission.class)
     public class DataFinderAction extends SimpleViewAction
@@ -163,13 +305,42 @@ public class TrialShareController extends SpringActionController
         return filterOptions;
     }
 
-
     @RequiresPermission(ReadPermission.class)
-    public class StudyFacetsAction extends ApiAction
+    public class PublicationsAction extends ApiAction
     {
 
         @Override
         public Object execute(Object o, BindException errors) throws Exception
+        {
+            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
+            List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("manuscriptsAndAbstracts")).getArrayList(StudyPublicationBean.class));
+
+            return success(publications);
+        }
+    }
+
+    @RequiresPermission(ReadPermission.class)
+    public class FacetsAction extends ApiAction<CubeObjectTypeForm>
+    {
+        @Override
+        public void validateForm(CubeObjectTypeForm form, Errors errors)
+        {
+            if (form == null)
+                errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
+            else
+                form.validate(errors);
+        }
+
+        @Override
+        public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
+        {
+            if (form.getObjectName().equalsIgnoreCase("publication"))
+                return success(getPublicationFacets());
+            else
+                return success(getStudyFacets());
+        }
+
+        private List<StudyFacetBean> getStudyFacets()
         {
             List<StudyFacetBean> facets = new ArrayList<>();
             StudyFacetBean facet;
@@ -196,7 +367,42 @@ public class TrialShareController extends SpringActionController
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
 
-            return success(facets);
+            return facets;
+        }
+
+        private List<StudyFacetBean> getPublicationFacets()
+        {
+            List<StudyFacetBean> facets = new ArrayList<>();
+            StudyFacetBean facet;
+
+            facet = new StudyFacetBean("Status", "Statuses", "Publication.Status", "Status", "[Publication.Status][(All)]", FacetFilter.Type.OR, 1);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Publication.Therapeutic Area", "Therapeutic Area", "[Publication.Therapeutic Area][(All)]", FacetFilter.Type.OR, 3);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Publication Type", "Publication Types", "Publication.Publication Type", "PublicationType", "[Publication.Publication Type][(All)]", FacetFilter.Type.OR, 2);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+//            facet = new StudyFacetBean("Assay", "Assays", "Publication.Assay", "Assay", "[Publication.Assay][(All)]", FacetFilter.Type.OR, 3);
+//            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+//            facets.add(facet);
+//            facet = new StudyFacetBean("Condition", "Conditions", "Publication.Condition", "Condition", "[Publication.Condition][(All)]", FacetFilter.Type.OR, 6);
+//            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+//            facets.add(facet);
+            facet = new StudyFacetBean("Year", "Years", "Publication.Year", "Year", "[Publication.Year][(All)]", FacetFilter.Type.OR, 4);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Journal", "Journals", "Publication.Journal", "Journal", "[Publication.Journal][(All)]", FacetFilter.Type.OR, 5);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Study", "Studies", "Publication.Study", "Study", "[Publication.Study].[(All)]", FacetFilter.Type.OR, 6);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Publication", "Publications", "Publication", "Publication", "[Publication].[(All)]", FacetFilter.Type.OR, null);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            return facets;
         }
     }
 
@@ -309,29 +515,140 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class StudySubsetsAction extends ApiAction
+    public class PublicationDetailAction extends SimpleViewAction<PublicationIdForm>
+    {
+        Integer _id;
+
+        @Override
+        public void validate(PublicationIdForm form, BindException errors)
+        {
+            _id = (null==form) ? null : form.getId();
+            if (_id == null)
+                errors.reject(ERROR_MSG, "Publication not specified");
+        }
+
+        @Override
+        public ModelAndView getView(PublicationIdForm form, BindException errors) throws Exception
+        {
+
+            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
+            QuerySchema listSchema = coreSchema.getSchema("lists");
+            StudyPublicationBean publication = (new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"))).getObject(_id, StudyPublicationBean.class);
+
+            SimpleFilter filter = new SimpleFilter();
+            filter.addCondition(FieldKey.fromParts("publicationId"), _id);
+            publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
+
+
+            VBox v = new VBox();
+            if (null != form.getReturnActionURL())
+            {
+                v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
+            }
+            v.addView(new JspView<StudyPublicationBean>("/org/labkey/trialshare/view/publicationDetail.jsp", publication));
+
+            return v;
+        }
+
+        @Override
+        public NavTree appendNavTrail(NavTree root)
+        {
+            return root;
+        }
+    }
+
+
+    public static class PublicationIdForm extends ReturnUrlForm
+    {
+        private Integer id;
+
+        public PublicationIdForm(){}
+
+        public Integer getId()
+        {
+            return id;
+        }
+
+        public void setId(Integer id)
+        {
+            this.id = id;
+        }
+    }
+
+    @RequiresPermission(ReadPermission.class)
+    public class SubsetsAction extends ApiAction<CubeObjectTypeForm>
     {
 
         @Override
-        public Object execute(Object o, BindException errors) throws Exception
+        public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
         {
             List<StudySubset> subsets = new ArrayList<>();
             StudySubset subset = new StudySubset();
 
-            if (!getUser().isGuest())
+            if (form.getObjectName() == null || form.getObjectName().equalsIgnoreCase("study"))
             {
-                subset.setId("operational");
-                subset.setName("Operational");
-                subset.setIsDefault(false);
+                if (!getUser().isGuest())
+                {
+                    subset.setId("operational");
+                    subset.setName("Operational");
+                    subset.setIsDefault(false);
+                    subsets.add(subset);
+                }
+
+                subset = new StudySubset();
+                subset.setId("public");
+                subset.setName("Public");
+                subset.setIsDefault(true);
                 subsets.add(subset);
             }
+            else if (form.getObjectName().equalsIgnoreCase("publication"))
+            {
+                if (getContainer().hasPermission(getUser(), InsertPermission.class))
+                {
+                    subset.setId("all");
+                    subset.setName("All");
+                    subset.setIsDefault(true);
+                    subsets.add(subset);
+                }
 
-            subset = new StudySubset();
-            subset.setId("public");
-            subset.setName("Public");
-            subset.setIsDefault(true);
-            subsets.add(subset);
+                subset = new StudySubset();
+                subset.setId("completed");
+                subset.setName("Completed");
+                subset.setIsDefault(!getContainer().hasPermission(getUser(), InsertPermission.class));
+                subsets.add(subset);
+
+                if (getContainer().hasPermission(getUser(), InsertPermission.class))
+                {
+                    subset = new StudySubset();
+                    subset.setId("inProgress");
+                    subset.setName("In Progress");
+                    subset.setIsDefault(false);
+                    subsets.add(subset);
+                }
+            }
             return success(subsets);
+        }
+    }
+
+    public static class CubeObjectTypeForm
+    {
+        private String objectName;
+
+
+        public String getObjectName()
+        {
+            return objectName;
+        }
+
+        public void setObjectName(String objectName)
+        {
+            this.objectName = objectName;
+        }
+
+        public void validate(Errors errors)
+        {
+            if (getObjectName() == null)
+                errors.rejectValue("objectName", ERROR_REQUIRED, "Object name is required");
         }
     }
 

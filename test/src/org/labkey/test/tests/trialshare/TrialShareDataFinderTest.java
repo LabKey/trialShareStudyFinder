@@ -307,9 +307,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         StudySummaryWindow summaryWindow = studyCard.viewSummary();
 
-        assertEquals("Study card does not match summary (Accession)", studyCard.getAccession(), summaryWindow.getAccession());
-        assertEquals("Study card does not match summary (Short Name)", studyCard.getShortName(), summaryWindow.getShortName());
-        assertEquals("Study card does not match summary (Title)", studyCard.getTitle().toUpperCase(), summaryWindow.getTitle());
+        assertEquals("Study card does not match summary (Accession)", studyCard.getAccession().toLowerCase(), summaryWindow.getAccession().toLowerCase());
+        assertEquals("Study card does not match summary (Short Name)", studyCard.getShortName().toLowerCase(), summaryWindow.getShortName().toLowerCase());
+        assertEquals("Study card does not match summary (Title)", studyCard.getTitle().toUpperCase(), summaryWindow.getTitle().toUpperCase());
 //        String cardPI = studyCard.getPI();
 //        String summaryPI = summaryWindow.getPI();
 //        assertTrue("Study card does not match summary (PI)", summaryPI.contains(cardPI));

@@ -3,15 +3,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     model: 'LABKEY.study.data.Facet',
     storeId: 'facets',
     autoLoad: true,
-    dataModuleName: 'study',
-    filterByLevel : '[Study].[Study]',
-    countDistinctLevel : '[Study].[Study]',
-    filterByFacetUniqueName : '[Study]',
-    olapConfig : {
-        configId: 'Study:/StudyCube',
-        schemaName: 'lists',
-        name: 'StudyCube'
-    },
+
     mdx: null,
     isLoaded: false,
 
@@ -36,7 +28,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     clearAllSelectedMembers: function() {
         for (var f = 0; f < this.count(); f++) {
             var facet = this.getAt(f);
-            if (facet.get("name") != "Study")
+            if (facet.get("name") != this.olapConfig.objectName)
             {
                 this.getAt(f).data.selectedMembers = [];
             }
@@ -78,11 +70,11 @@ Ext4.define('LABKEY.study.store.Facets', {
                         facetName: facet.get("name"),
                         facet : facet
                     };
-                    if (facet.get("name") != "Study")
+                    if (facet.get("name") != this.olapConfig.objectName)
                         facetMembersStore.add(member);
                     facet.data.members.push(member);
                 }
-                if (facet.get("name") == "Study") {
+                if (facet.get("name") == this.olapConfig.objectName) {
                     facet.data.selectedMembers = facet.data.members;
                 }
             }
@@ -99,12 +91,27 @@ Ext4.define('LABKEY.study.store.Facets', {
         return optionsStore.getAt(0);
     },
 
+    // TODO what's the general version of this?
     getStudySubsetFilter: function() {
-        var studiesStore = Ext4.getStore("studies");
-        if (studiesStore.selectedSubset == "operational")
-            return {level: "[Study.Public].[Public]", members: ["[Study.Public].[false]"]};
+        var store = Ext4.getStore(this.olapConfig.objectName);
+        if (this.olapConfig.objectName == "Study")
+        {
+            if (store.selectedSubset == "operational")
+                return {level: "[Study.Public].[Public]", members: ["[Study.Public].[false]"]};
+            else
+                return {level: "[Study.Public].[Public]", members: ["[Study.Public].[true]"]};
+        }
         else
-            return {level: "[Study.Public].[Public]", members: ["[Study.Public].[true]"]};
+        {
+            if (store.selectedSubset == "completed")
+                return {level: "[Publication.Status].[Status]", members: ["[Publication.Status].[Complete]"]};
+            else if (store.selectedSubset == "all")
+                return {level: "[Publication.Status].[Status]", members: [
+                    "[Publication.Status].[Complete]",
+                    "[Publication.Status].[In Progress]"]};
+            else
+                return {level: "[Publication.Status].[Status]", members: ["[Publication.Status].[In Progress]"]};
+        }
     },
 
     updateCountsAsync: function (isSavedGroup)
@@ -124,7 +131,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         {
             facet = facetStore.getAt(f);
             var selectedMembers = facet.get("selectedMembers");
-            if (facet.get("name") == 'Study')
+            if (facet.get("name") == this.olapConfig.objectName)
             {
                 //if (!selectedMembers || selectedMembers.length == facet.data.members.length)
                 //    continue;
@@ -156,7 +163,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                         names.push(m.data.uniqueName)
                     });
                     intersectFilters.push({
-                        level: this.filterByLevel,
+                        level: this.olapConfig.filterByLevel,
                         membersQuery: {level: selectedMembers[0].data.level, members: names}
                     });
                 }
@@ -166,7 +173,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                     {
                         var filterMember = selectedMembers[i];
                         intersectFilters.push({
-                            level: this.filterByLevel,
+                            level: this.olapConfig.filterByLevel,
                             membersQuery: {level: filterMember.data.level, members: [filterMember.data.uniqueName]}
                         });
                     }
@@ -175,7 +182,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         }
 
         var filters = intersectFilters;
-        //if (intersectFilters.length && this.filterByLevel != "[Subject].[Subject]")
+        //if (intersectFilters.length && this.olapConfig.filterByLevel != "[Subject].[Subject]")
         //{
         //    filters = [{
         //        level: "[Subject].[Subject]",
@@ -187,13 +194,13 @@ Ext4.define('LABKEY.study.store.Facets', {
         var includeSubjectIds = false;
 
         var onRows = { operator: "UNION", arguments: [] };
-        onRows.arguments.push({level: this.filterByLevel});
+        onRows.arguments.push({level: this.olapConfig.filterByLevel});
         for (f = 0; f < facetStore.count(); f++)
         {
             facet = facetStore.getAt(f);
             if (facet.get("name") == "Subject")
                 onRows.arguments.push({level: facet.data.hierarchy.levels[0].uniqueName});
-            else if (facet.get("name") == "Study" && this.filterByLevel == "[Study].[Study]")
+            else if (facet.get("name") == this.olapConfig.objectName )
                 continue;
             else
                 onRows.arguments.push({level: facet.data.level.uniqueName});
@@ -218,7 +225,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             // query
             onRows: onRows,
             countFilter: filters,
-            countDistinctLevel: this.countDistinctLevel
+            countDistinctLevel: this.olapConfig.countDistinctLevel
         };
         this.mdx.query(config);
     },
@@ -243,13 +250,11 @@ Ext4.define('LABKEY.study.store.Facets', {
         var facetMembersStore = Ext4.getStore("facetMembers");
         facetMembersStore.suspendEvents(false);
 
-        // clear old subjects and counts (to be safe)
-        //this.subjects.length = 0;
         for (f = 0; f < facetStore.count(); f++)
         {
             facet = this.getAt(f);
             map[facet.data.hierarchy.uniqueName] = facet;
-            if (facet.get("name") == "Study") {
+            if (facet.get("name") == this.olapConfig.objectName) {
                 facet.data.selectedMembers = [];
             }
         }
@@ -258,7 +263,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         var positions = this.getRowPositionsOneLevel(cellSet);
         var data = this.getDataOneColumn(cellSet, 0);
         var max = 0;
-        var selectedStudies = {};
+        var selectedMembers = {};
         for (var i = 0; i < positions.length; i++)
         {
             var resultMember = positions[i];
@@ -272,9 +277,9 @@ Ext4.define('LABKEY.study.store.Facets', {
                 facet = map[hierarchyName];
                 var count = data[i];
                 member = facetMembersStore.getById(resultMember.uniqueName);
-                if (facet.get("name") == "Study")
+                if (facet.get("name") == this.olapConfig.objectName)
                 {
-                    selectedStudies[resultMember.name] = resultMember;
+                    selectedMembers[resultMember.name] = resultMember;
                     facet.data.selectedMembers.push(resultMember);
                 }
                 else if (!member)
@@ -298,7 +303,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         for (f = 0; f < facetStore.count(); f++)
         {
             facet = facetStore.getAt(f);
-            if (facet.data.hierarchy.uniqueName !== this.filterByFacetUniqueName)
+            if (facet.data.hierarchy.uniqueName !== this.olapConfig.filterByFacetUniqueName)
             {
                 for (m = 0; m < facet.data.members.length; m++)
                 {
@@ -311,7 +316,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         facetMembersStore.resumeEvents();
         facetMembersStore.fireEvent("refresh");
 
-        this.updateStudyFilter(selectedStudies);
+        this.updateMemberFilter(selectedMembers);
 
         //this.saveFilterState();
         //this.updateContainerFilter();
@@ -322,10 +327,10 @@ Ext4.define('LABKEY.study.store.Facets', {
         LABKEY.Utils.signalWebDriverTest('dataFinderCountsUpdated');
     },
 
-    updateStudyFilter : function(selectedStudies) {
-        var studiesStore = Ext4.getStore("studies");
-        studiesStore.selectedStudies = selectedStudies;
-        studiesStore.updateFilters(selectedStudies);
+    updateMemberFilter : function(selectedMembers) {
+        var store = Ext4.getStore(this.olapConfig.objectName);
+        store.selectedStudies = selectedMembers;
+        store.updateFilters(selectedMembers);
     },
 
     getRowPositions : function(cellSet)
@@ -369,7 +374,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     constructor: function(config)
     {
-        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "studyFacets.api", LABKEY.containerPath);
+        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "Facets.api", LABKEY.containerPath, {objectName: config.olapConfig.objectName});
         this.olapConfig = config.olapConfig;
         this.callParent(config);
     }

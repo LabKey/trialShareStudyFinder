@@ -1,4 +1,4 @@
-Ext4.define("LABKEY.study.panel.SelectionSummary", {
+Ext4.define("LABKEY.study.panel.PublicationSummary", {
     extend: 'Ext.Component',
 
     alias : 'widget.facet-selection-summary',
@@ -9,12 +9,12 @@ Ext4.define("LABKEY.study.panel.SelectionSummary", {
             '           <div class="labkey-facet-header"><span class="labkey-facet-caption">Summary</span></div>',
             '           <ul>',
             '               <li class="labkey-facet-member">',
-            '                   <span class="labkey-facet-member-name">Studies</span>',
-            '                   <span id="memberCount" class="labkey-facet-member-count">{studyCount:this.getStudyCount}</span>',
+            '                   <span class="labkey-facet-member-name">Publications</span>',
+            '                   <span id="memberCount" class="labkey-facet-member-count">{publicationCount:this.getPublicationCount}</span>',
             '               </li>',
             '               <li class="labkey-facet-member">',
-            '                   <span class="labkey-facet-member-name">Subjects</span>',
-            '                   <span id="participantCount" class="labkey-facet-member-count">{participantCount:this.getParticipantCount}</span>',
+            '                   <span class="labkey-facet-member-name">Studies</span>',
+            '                   <span id="studyCount" class="labkey-facet-member-count">{studyCount:this.getStudyCount}</span>',
             '               </li>',
             '           </ul>',
             '       </div>',
@@ -22,25 +22,26 @@ Ext4.define("LABKEY.study.panel.SelectionSummary", {
             {
                 formatNumber :  Ext4.util.Format.numberRenderer('0,000'),
 
-                getStudyCount : function(defaultValue) {
-                    var studyStore = Ext4.getStore("Study");
-                    if (!studyStore)
+                getPublicationCount : function(defaultValue) {
+                    var store = Ext4.getStore("Publication");
+                    if (!store)
                         return this.formatNumber(defaultValue);
-                    return this.formatNumber(studyStore.count());
+                    return this.formatNumber(store.count());
                 },
 
-                getParticipantCount: function(defaultValue) {
-                    var studyStore = Ext4.getStore("Study");
-                    if (!studyStore)
+                getStudyCount: function(defaultValue) {
+                    //var store = Ext4.getStore("Publication");
+                    var store = Ext4.getStore("facetMembers");
+                    if (!store)
                         return this.formatNumber(defaultValue);
-                    return this.formatNumber(studyStore.sum("participantCount"));
+                    return this.formatNumber(store.sum("count", true).Study);
                 }
             }
     ),
 
     data : {
         studyCount: 0,
-        participantCount: 0
+        publicationCount: 0
     },
 
     initComponent: function() {
