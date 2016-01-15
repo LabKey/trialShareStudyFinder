@@ -8,10 +8,6 @@ Ext4.define("LABKEY.study.panel.Publications", {
 
     padding: "5 0 0 0",
 
-    dataModuleName: 'study',
-
-    showSearch : true,
-
     autoScroll: true,
 
     initComponent : function() {

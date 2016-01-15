@@ -24,7 +24,7 @@ public class DataFinderWebPart extends JspView
     public DataFinderWebPart(Container c)
     {
         super("/org/labkey/trialshare/view/dataFinder.jsp");
-        this.setModelBean(TrialShareController.getStudyCubeBean(getViewContext()));
+        this.setModelBean(TrialShareController.getFinderBean());
 
         setTitle("Data Finder");
         setTitleHref(new ActionURL(TrialShareController.DataFinderAction.class, c));

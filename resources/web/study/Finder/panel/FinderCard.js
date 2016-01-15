@@ -25,10 +25,8 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             this.getFacetsPanel()
         ];
 
-        if (this.objectName == "Study")
-            this.items.push(this.getStudiesPanel());
-        else if (this.objectName == "Publication")
-            this.items.push(this.getPublicationsPanel());
+        this.items.push(this.getCubeMemberPanel());
+
         this.callParent();
 
         this.getCubeDefinition();
@@ -36,11 +34,10 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
         this._initResize();
 
         this.on({
-                    //filterSelectionChanged: this.onFilterSelectionChange,
-                    studySubsetChanged: this.onStudySubsetChanged,
-                    searchTermsChanged: this.onSearchTermsChanged
-                }
-        );
+            //filterSelectionChanged: this.onFilterSelectionChange,
+            studySubsetChanged: this.onSubsetChanged,
+            searchTermsChanged: this.onSearchTermsChanged
+        });
     },
 
     getCubeDefinition: function() {
@@ -48,7 +45,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
         this.cube = LABKEY.query.olap.CubeManager.getCube({
             configId: this.olapConfig.configId,
             schemaName: this.olapConfig.schemaName,
-            name: this.olapConfig.name,
+            name: this.olapConfig.cubeName,
             deferLoad: false
         });
         this.cube.onReady(function (m)
@@ -57,7 +54,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             me.onCubeReady();
             //this.loadFilterState();
 
-            //this.onStudySubsetChanged();
+            //this.onSubsetChanged();
             // doShowAllStudiesChanged() has side-effect of calling updateCountsAsync()
             //$scope.updateCountsAsync();
         });
@@ -68,8 +65,8 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
         this.getFacetsPanel().onCubeReady(this.mdx);
     },
 
-    onStudySubsetChanged : function(value) {
-        this.getFacetsPanel().onStudySubsetChanged();
+    onSubsetChanged : function(value) {
+        this.getFacetsPanel().onSubsetChanged();
     },
 
     //onFilterSelectionChange : function(){
@@ -155,17 +152,23 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 maxWidth: '265px',
                 dataModuleName: this.dataModuleName,
                 showParticipantFilters : this.showParticipantFilters,
-                olapConfig: this.olapConfig,
-                objectName: this.objectName
+                olapConfig: this.olapConfig
             });
         }
         return this.facetsPanel;
     },
 
+    getCubeMemberPanel : function() {
+        if (this.olapConfig.objectName == "Study")
+            return this.getStudiesPanel();
+        else if (this.olapConfig.objectName == "Publication")
+            return this.getPublicationsPanel();
+    },
+
     getStudiesPanel: function() {
         if (!this.studiesPanel) {
             this.studiesPanel = Ext4.create("LABKEY.study.panel.Studies", {
-                showSearch : this.showSearch,
+                showSearch : this.olapConfig.showSearch,
                 dataModuleName: this.dataModuleName,
                 region: 'center',
                 width: '80%',
@@ -177,10 +180,9 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
     },
 
     getPublicationsPanel: function() {
-        if (!this.studiesPanel) {
-            this.studiesPanel = Ext4.create("LABKEY.study.panel.Publications", {
-                //title: "Publications",
-                showSearch : this.showSearch,
+        if (!this.publicationsPanel) {
+            this.publicationsPanel = Ext4.create("LABKEY.study.panel.Publications", {
+                showSearch : this.olapConfig.showSearch,
                 dataModuleName: this.dataModuleName,
                 region: 'center',
                 width: '80%',
@@ -188,7 +190,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 objectName: 'publication'
             });
         }
-        return this.studiesPanel;
+        return this.publicationsPanel;
     }
 
 });

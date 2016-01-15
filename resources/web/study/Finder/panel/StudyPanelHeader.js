@@ -7,8 +7,6 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         align: 'stretch'
     },
 
-    showSearch : true,
-
     showHelpLinks: true,
 
     searchMessage: "",
@@ -89,11 +87,11 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
                 listeners: {
                     scope: this,
                     'select': function(field, newValue, oldValue, eOpts) {
-                        this.onStudySubsetChanged(newValue[0])
+                        this.onSubsetChanged(newValue[0])
                     },
                     'render': function(eOpts) {
                         if (this.studySubsets.defaultValue)
-                            this.onStudySubsetChanged(this.studySubsets.defaultValue)
+                            this.onSubsetChanged(this.studySubsets.defaultValue)
                     }
                 }
             })
@@ -121,7 +119,7 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         this.fireEvent("searchTermsChanged", value);
     },
 
-    onStudySubsetChanged: function(value) {
+    onSubsetChanged: function(value) {
         this.fireEvent("studySubsetChanged", value.data.id);
     },
 

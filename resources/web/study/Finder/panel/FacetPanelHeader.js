@@ -27,8 +27,39 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
         }
     ],
 
+    bubbleEvents : ["finderObjectChanged"],
+
+    setActiveCard: function(index)
+    {
+        FINDER.getLayout().setActiveItem(index);
+    },
+
     initComponent: function() {
         this.items = [];
+        this.items.push(
+            Ext4.create("Ext.button.Button", {
+                        text: 'studies',
+                        cls: 'labkey-text-link',
+                        scope: this,
+                        handler: function ()
+                        {
+                            this.fireEvent("finderObjectChanged", 0);
+                        }
+                    }
+            )
+        );
+        this.items.push(
+                Ext4.create("Ext.button.Button", {
+                            text: 'publications',
+                            cls: 'labkey-text-link',
+                            scope: this,
+                            handler: function ()
+                            {
+                                this.fireEvent("finderObjectChanged", 1);
+                            }
+                        }
+                )
+        );
         if (this.showParticipantGroups)
         {
             this.items.push(

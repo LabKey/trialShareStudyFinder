@@ -3,6 +3,8 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
 
     alias : 'widget.facet-selection-summary',
 
+    objectName: null,
+
     tpl: new Ext4.XTemplate(
             '<div id="selectionPanel">',
             '       <div id="summaryArea" class="labkey-facet-summary" >',
@@ -30,8 +32,7 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
                 },
 
                 getStudyCount: function(defaultValue) {
-                    //var store = Ext4.getStore("Publication");
-                    var store = Ext4.getStore("facetMembers");
+                    var store = Ext4.getStore("PublicationFacetMembers");
                     if (!store)
                         return this.formatNumber(defaultValue);
                     return this.formatNumber(store.sum("count", true).Study);
@@ -45,8 +46,8 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
     },
 
     initComponent: function() {
-        Ext4.getStore(this.objectName).addListener('filterChange',this.onFilterSelectionChanged, this);
         this.callParent();
+        Ext4.getStore(this.objectName).addListener('filterChange',this.onFilterSelectionChanged, this);
     },
 
     onFilterSelectionChanged : function() {

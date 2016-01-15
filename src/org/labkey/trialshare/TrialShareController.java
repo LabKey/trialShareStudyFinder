@@ -36,7 +36,6 @@ import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
 import org.labkey.api.view.VBox;
-import org.labkey.api.view.ViewContext;
 import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
@@ -78,46 +77,92 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
-            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getStudyCubeBean(getViewContext()));
+            FinderBean bean = new FinderBean();
+            bean.setDataModuleName(TrialShareModule.NAME);
+            bean.addCubeConfig(getCubeConfigBean("studies"));
+            bean.addCubeConfig(getCubeConfigBean("publications"));
+
+            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", bean);
         }
     }
 
-    public static TrialShareController.StudyCubeBean getStudyCubeBean(ViewContext context)
+    public static FinderBean getFinderBean()
     {
-        String _objectName = context.getActionURL().getParameter("pageId");
-        if (_objectName == null)
-            _objectName = "studies";
+        FinderBean bean = new FinderBean();
+        bean.setDataModuleName(TrialShareModule.NAME);
+        bean.addCubeConfig(getCubeConfigBean("studies"));
+        bean.addCubeConfig(getCubeConfigBean("publications"));
+        return bean;
+    }
 
-        TrialShareController.StudyCubeBean bean = new TrialShareController.StudyCubeBean();
-        if (_objectName.equalsIgnoreCase("studies"))
+    public static CubeConfigBean getCubeConfigBean(String objectName)
+    {
+        if (objectName == null)
+            objectName = "studies";
+
+        CubeConfigBean bean = new CubeConfigBean();
+        bean.setSchemaName("lists");
+        bean.setDataModuleName(TrialShareModule.NAME);
+        bean.setShowSearch(false);
+        bean.setShowParticipantFilters(false);
+
+        if (objectName.equalsIgnoreCase("studies"))
         {
             bean.setObjectName("Study");
             bean.setCubeName("StudyCube");
             bean.setConfigId("TrialShare:/StudyCube");
             bean.setSchemaName("lists");
-            bean.setDataModuleName(TrialShareModule.NAME);
             bean.setFilterByLevel("[Study].[Study]");
             bean.setCountDistinctLevel("[Study].[Study]");
             bean.setFilterByFacetUniqueName("[Study]");
-
-            bean.setShowSearch(false);
+            bean.setIsDefault(true);
         }
-        else if (_objectName.equalsIgnoreCase("publications"))
+        else if (objectName.equalsIgnoreCase("publications"))
         {
             bean.setObjectName("Publication");
             bean.setCubeName("PublicationCube");
             bean.setConfigId("TrialShare:/PublicationCube");
-            bean.setSchemaName("lists");
-            bean.setDataModuleName(TrialShareModule.NAME);
             bean.setFilterByLevel("[Publication].[Publication]");
             bean.setCountDistinctLevel("[Publication].[Publication]");
             bean.setFilterByFacetUniqueName("[Publication]");
-            bean.setShowSearch(false);
+            bean.setIsDefault(false);
         }
+
         return bean;
     }
 
-    public static class StudyCubeBean
+    public static class FinderBean
+    {
+        private String _dataModuleName;
+        List<CubeConfigBean> _cubeConfigs = new ArrayList<>();
+
+        public String getDataModuleName()
+        {
+            return _dataModuleName;
+        }
+
+        public void setDataModuleName(String dataModuleName)
+        {
+            _dataModuleName = dataModuleName;
+        }
+
+        public List<CubeConfigBean> getCubeConfigs()
+        {
+            return _cubeConfigs;
+        }
+
+        public void setCubeConfigs(List<CubeConfigBean> cubeConfigs)
+        {
+            this._cubeConfigs = cubeConfigs;
+        }
+
+        public void addCubeConfig(CubeConfigBean cubeConfig)
+        {
+            _cubeConfigs.add(cubeConfig);
+        }
+    }
+
+    public static class CubeConfigBean
     {
         private String _objectName;
         private String _cubeName;
@@ -128,6 +173,8 @@ public class TrialShareController extends SpringActionController
         private String _filterByLevel;
         private String _countDistinctLevel;
         private String _filterByFacetUniqueName;
+        private Boolean _showParticipantFilters;
+        private Boolean _isDefault;
 
         public String getObjectName()
         {
@@ -217,6 +264,26 @@ public class TrialShareController extends SpringActionController
         public void setFilterByLevel(String filterByLevel)
         {
             _filterByLevel = filterByLevel;
+        }
+
+        public Boolean getShowParticipantFilters()
+        {
+            return _showParticipantFilters;
+        }
+
+        public void setShowParticipantFilters(Boolean showParticipantFilters)
+        {
+            _showParticipantFilters = showParticipantFilters;
+        }
+
+        public Boolean getIsDefault()
+        {
+            return _isDefault;
+        }
+
+        public void setIsDefault(Boolean aDefault)
+        {
+            _isDefault = aDefault;
         }
     }
 

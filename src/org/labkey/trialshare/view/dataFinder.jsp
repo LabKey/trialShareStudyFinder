@@ -15,11 +15,12 @@
      * limitations under the License.
      */
 %>
-<%@ page import="org.labkey.api.view.template.ClientDependency" %>
-<%@ page import="java.util.LinkedHashSet" %>
-<%@ page import="org.labkey.trialshare.TrialShareController" %>
-<%@ page import="org.labkey.api.view.JspView" %>
+<%@ page import="com.fasterxml.jackson.databind.ObjectMapper" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
+<%@ page import="org.labkey.api.view.JspView" %>
+<%@ page import="org.labkey.api.view.template.ClientDependency" %>
+<%@ page import="org.labkey.trialshare.TrialShareController" %>
+<%@ page import="java.util.LinkedHashSet" %>
 <%@ page extends="org.labkey.api.jsp.JspBase"%>
 <%!
     public LinkedHashSet<ClientDependency> getClientDependencies()
@@ -31,8 +32,10 @@
 %>
 
 <%
-    JspView<TrialShareController.StudyCubeBean> me = (JspView) HttpView.currentView();
-    TrialShareController.StudyCubeBean studyCube = me.getModelBean();
+    JspView<TrialShareController.FinderBean> me = (JspView) HttpView.currentView();
+    TrialShareController.FinderBean bean = me.getModelBean();
+
+    ObjectMapper jsonMapper = new ObjectMapper();
 %>
 
 <script type="text/javascript">
@@ -41,19 +44,11 @@
     {
         DataFinder.finderView = Ext4.create('LABKEY.study.panel.Finder', {
             renderTo    : 'dataFinderWrapper',
-            dataModuleName: '<%=h(studyCube.getDataModuleName())%>',
-            olapConfig : {
-                configId: '<%=h(studyCube.getConfigId())%>',
-                schemaName: '<%=h(studyCube.getSchemaName())%>',
-                name: '<%=h(studyCube.getCubeName())%>',
-                filterByLevel : '<%=h(studyCube.getFilterByLevel())%>',
-                countDistinctLevel : '<%=h(studyCube.getCountDistinctLevel())%>',
-                filterByFacetUniqueName : '<%=h(studyCube.getFilterByFacetUniqueName())%>',
-                objectName : '<%=h(studyCube.getObjectName())%>'
-            },
-            showSearch: false
+            dataModuleName: '<%=h(bean.getDataModuleName())%>',
+            cubeConfigs : <%=text(jsonMapper.writeValueAsString(bean.getCubeConfigs()))%>
         });
     });
+
 </script>
 
 <div id="dataFinderWrapper" class="labkey-data-finder-outer">
