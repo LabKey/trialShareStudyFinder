@@ -16,11 +16,6 @@
                 <Level name="PublicationType" visible="true"  type="String" column="publicationType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
-            <!--<Hierarchy name="Condition" hasAll="true" primaryKey="PublicationId">-->
-                <!--<Table name="publicationCondition" schema="lists"/>-->
-                <!--<Level name="Condition" visible="true" table="publicationCondition" type="String" column="condition" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">-->
-                <!--</Level>-->
-            <!--</Hierarchy>-->
             <Hierarchy name="Study" hasAll="true" primaryKey="PublicationId">
                 <Table name="publicationStudy" schema="lists"/>
                 <Level name="Study" visible="true" table="publicationStudy" type="String" column="ShortName" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
@@ -38,10 +33,15 @@
                 <Level name="Status" visible="true" type="String" column="status" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
-            <!--<Hierarchy name="Assay" hasAll="true" primaryKey="PublicationId">-->
-                <!--<Table name="publicationAssay" schema="lists"/>-->
-                <!--<Level name="Assay" visible="true" table="publicationAssay" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>-->
-            <!--</Hierarchy>-->
+            <Hierarchy name="Condition" hasAll="true" primaryKey="PublicationId">
+                <Table name="publicationCondition" schema="lists"/>
+                <Level name="Condition" visible="true" table="publicationCondition" type="String" column="Condition" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                </Level>
+            </Hierarchy>
+            <Hierarchy name="Assay" hasAll="true" primaryKey="PublicationId">
+                <Table name="publicationAssay" schema="lists"/>
+                <Level name="Assay" visible="true" table="publicationAssay" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
         </Dimension>
 
 

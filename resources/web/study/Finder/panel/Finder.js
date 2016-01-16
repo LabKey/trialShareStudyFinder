@@ -27,7 +27,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
         this.callParent();
 
         this._initResize();
-        FINDER = this;
 
         this.on({
             finderObjectChanged: this.updateFinderObject

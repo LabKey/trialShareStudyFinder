@@ -464,12 +464,12 @@ public class TrialShareController extends SpringActionController
             facet = new StudyFacetBean("Publication Type", "Publication Types", "Publication.Publication Type", "PublicationType", "[Publication.Publication Type][(All)]", FacetFilter.Type.OR, 2);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-//            facet = new StudyFacetBean("Assay", "Assays", "Publication.Assay", "Assay", "[Publication.Assay][(All)]", FacetFilter.Type.OR, 3);
-//            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-//            facets.add(facet);
-//            facet = new StudyFacetBean("Condition", "Conditions", "Publication.Condition", "Condition", "[Publication.Condition][(All)]", FacetFilter.Type.OR, 6);
-//            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-//            facets.add(facet);
+            facet = new StudyFacetBean("Assay", "Assays", "Publication.Assay", "Assay", "[Publication.Assay][(All)]", FacetFilter.Type.OR, 7);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Condition", "Conditions", "Publication.Condition", "Condition", "[Publication.Condition][(All)]", FacetFilter.Type.OR, 8);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
             facet = new StudyFacetBean("Year", "Years", "Publication.Year", "Year", "[Publication.Year][(All)]", FacetFilter.Type.OR, 4);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
@@ -537,15 +537,7 @@ public class TrialShareController extends SpringActionController
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
             study.setPublications((new TableSelector(listSchema.getTable("studyManuscripts"), filter, null)).getArrayList(StudyPublicationBean.class));
-//            _study.study = (new TableSelector(DbSchema.get("immport").getTable("study"))).getObject(studyId, StudyBean.class);
-//            if (null == _study.study)
-//                throw new NotFoundException("study not found: " + form.getStudy());
-//            SimpleFilter filter = new SimpleFilter();
-//            filter.addCondition(new FieldKey(null,"study_accession"),studyId);
-//            _study.personnel = (new TableSelector(DbSchema.get("immport").getTable("study_personnel"),filter,null)).getArrayList(StudyPersonnelBean.class);
-//            _study.pubmed = (new TableSelector(DbSchema.get("immport").getTable("study_pubmed"),filter,null)).getArrayList(StudyPubmedBean.class);
 
-//            _study = getStudy(studyId);
             VBox v = new VBox();
             if (null != form.getReturnActionURL())
             {
