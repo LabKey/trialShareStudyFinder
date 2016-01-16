@@ -6,8 +6,8 @@ Ext4.define('LABKEY.study.data.Publication', {
     fields : [
         {name: 'id', type:'int'},
         {name: 'studyId'},
-        {name: 'pubMedId'}, // PubMed Id (for abstracts)
-        {name: 'pmcId'},    // PubMed Central reference number (for full-text papers)
+        {name: 'pmid'}, // PubMed Id
+        {name: 'pmcid'},    // PubMed Central reference number
         {name: 'doi'},
         {name: 'author'},
         {name: 'authorAbbrev'},

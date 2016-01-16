@@ -13,6 +13,10 @@
     /*float: right;*/
 /*}*/
 
+.labkey-finder-object-selection {
+    padding-left: 10px;
+}
+
 .labkey-studies-panel {
     background-color: #ffffff
 }

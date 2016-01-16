@@ -45,7 +45,7 @@ Ext4.define('LABKEY.study.store.Studies', {
 
         this.filter([
                 {property: 'isSelected', value: true},
-                {property: 'isPublic', value: this.selectedSubset !== "operational"}
+                {property: 'isPublic', value: this.selectedSubset !== "operational"} // TODO generalize
         ]);
     },
 
@@ -54,9 +54,5 @@ Ext4.define('LABKEY.study.store.Studies', {
             study = this.getAt(i);
             study.set("isSelected", true);
         }
-    },
-
-    selectSubset : function(subsetId, subset) {
-
     }
 });

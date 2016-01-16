@@ -37,7 +37,7 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         this.studySubsets.on(
                 'load', function(store) {
                     this.getStudySubsetMenu().setValue(store.defaultValue);
-                    //this.getStudySubsetMenu().hidden = (store.count() < 2);
+                    //this.getStudySubsetMenu().setHidden(store.count() < 2);
                 },
                 this
         );

@@ -5,7 +5,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     itemId : 'labkey-data-finder-panel',
 
-    layout: 'card',
+    layout: 'vbox',
 
     cls: 'labkey-data-finder-view',
 
@@ -19,28 +19,40 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     initComponent : function() {
 
-        this.items = [];
-        var activeIndex = 0;
-        for (var i = 0; i < this.cubeConfigs.length; i++)
-        {
-            this.items.push(Ext4.create('LABKEY.study.panel.FinderCard', {
-                dataModuleName: this.dataModuleName,
-                olapConfig: this.cubeConfigs[i]
-            }));
-            if (this.cubeConfigs[i].isDefault)
-                acttiveIndex = i;
-        }
-
+        this.items = [
+                this.getObjectSelectionPanel(),
+                this.getFinderCardDeck()
+        ];
 
         this.callParent();
 
-        this.getLayout().setActiveItem(activeIndex);
         this._initResize();
         FINDER = this;
 
         this.on({
             finderObjectChanged: this.updateFinderObject
         });
+    },
+
+    getObjectSelectionPanel: function() {
+        if (!this.objectSelectionPanel) {
+
+            this.objectSelectionPanel = Ext4.create("LABKEY.study.panel.FinderObjectSelection", {
+                width: '100%',
+                cubeConfigs: this.cubeConfigs
+            });
+        }
+        return this.objectSelectionPanel;
+    },
+
+    getFinderCardDeck : function() {
+        if (!this.finderCardDeck) {
+            this.finderCardDeck = Ext4.create("LABKEY.study.panel.FinderCardDeck", {
+                cubeConfigs: this.cubeConfigs,
+                dataModuleName: this.dataModuleName
+            });
+        }
+        return this.finderCardDeck;
     },
 
     _initResize : function() {
@@ -58,9 +70,9 @@ Ext4.define('LABKEY.study.panel.Finder', {
         });
     },
 
-    updateFinderObject : function(index)
+    updateFinderObject : function(objectName)
     {
-        this.getLayout().setActiveItem(index);
+        this.getFinderCardDeck().getLayout().setActiveItem(objectName + '-finder-card');
     }
 
 });

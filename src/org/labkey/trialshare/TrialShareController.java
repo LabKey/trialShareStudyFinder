@@ -109,6 +109,7 @@ public class TrialShareController extends SpringActionController
         if (objectName.equalsIgnoreCase("studies"))
         {
             bean.setObjectName("Study");
+            bean.setObjectNamePlural("Studies");
             bean.setCubeName("StudyCube");
             bean.setConfigId("TrialShare:/StudyCube");
             bean.setSchemaName("lists");
@@ -120,6 +121,7 @@ public class TrialShareController extends SpringActionController
         else if (objectName.equalsIgnoreCase("publications"))
         {
             bean.setObjectName("Publication");
+            bean.setObjectNamePlural("Publications");
             bean.setCubeName("PublicationCube");
             bean.setConfigId("TrialShare:/PublicationCube");
             bean.setFilterByLevel("[Publication].[Publication]");
@@ -165,6 +167,7 @@ public class TrialShareController extends SpringActionController
     public static class CubeConfigBean
     {
         private String _objectName;
+        private String _objectNamePlural;
         private String _cubeName;
         private String _dataModuleName;
         private String _configId;
@@ -184,6 +187,16 @@ public class TrialShareController extends SpringActionController
         public void setObjectName(String objectName)
         {
             _objectName = objectName;
+        }
+
+        public String getObjectNamePlural()
+        {
+            return _objectNamePlural;
+        }
+
+        public void setObjectNamePlural(String objectNamePlural)
+        {
+            _objectNamePlural = objectNamePlural;
         }
 
         public String getConfigId()
