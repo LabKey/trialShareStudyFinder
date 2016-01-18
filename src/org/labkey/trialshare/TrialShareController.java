@@ -684,15 +684,15 @@ public class TrialShareController extends SpringActionController
                 }
 
                 subset = new StudySubset();
-                subset.setId("completed");
-                subset.setName("Completed");
+                subset.setId("complete");
+                subset.setName("Complete");
                 subset.setIsDefault(!getContainer().hasPermission(getUser(), InsertPermission.class));
                 subsets.add(subset);
 
                 if (getContainer().hasPermission(getUser(), InsertPermission.class))
                 {
                     subset = new StudySubset();
-                    subset.setId("inProgress");
+                    subset.setId("In Progress");
                     subset.setName("In Progress");
                     subset.setIsDefault(false);
                     subsets.add(subset);

@@ -6,7 +6,7 @@ Ext4.define('LABKEY.study.store.Publications', {
     dataModuleName: "",
     isLoaded: false,
     selectedMembers : {},
-    selectedSubset : 'completed',
+    selectedSubset : 'all',
     proxy : {
         type: "ajax",
         //url: set before calling "load".

@@ -102,12 +102,10 @@ Ext4.define('LABKEY.study.store.Facets', {
         }
         else
         {
-            if (store.selectedSubset == "completed")
-                return {level: "[Publication.Status].[Status]", members: ["[Publication.Status].[Complete]"]};
-            else if (store.selectedSubset == "all")
+            if (store.selectedSubset.toLowerCase() == "all")
                 return null;
             else
-                return {level: "[Publication.Status].[Status]", members: ["[Publication.Status].[In Progress]"]};
+                return {level: "[Publication.Status].[Status]", members: ["[Publication.Status].[" + store.selectedSubset + "]"]};
         }
     },
 

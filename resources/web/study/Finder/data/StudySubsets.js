@@ -1,7 +1,6 @@
 Ext4.define('LABKEY.study.store.StudySubsets', {
     extend: "Ext.data.Store",
     autoLoad: true,
-    id: 'StudySubsetStore',
     model: 'LABKEY.study.data.StudySubset',
     isLoaded: false,
     defaultValue: null,
