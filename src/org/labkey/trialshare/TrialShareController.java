@@ -686,31 +686,31 @@ public class TrialShareController extends SpringActionController
                 subset.setIsDefault(true);
                 subsets.add(subset);
             }
-            else if (form.getObjectName().equalsIgnoreCase("publication"))
-            {
-                if (getContainer().hasPermission(getUser(), InsertPermission.class))
-                {
-                    subset.setId("[Publication.Status].[All]");
-                    subset.setName("All");
-                    subset.setIsDefault(true);
-                    subsets.add(subset);
-                }
-
-                subset = new StudySubset();
-                subset.setId("[Publication.Status].[Complete]");
-                subset.setName("Complete");
-                subset.setIsDefault(!getContainer().hasPermission(getUser(), InsertPermission.class));
-                subsets.add(subset);
-
-                if (getContainer().hasPermission(getUser(), InsertPermission.class))
-                {
-                    subset = new StudySubset();
-                    subset.setId("[Publication.Status].[In Progress]");
-                    subset.setName("In Progress");
-                    subset.setIsDefault(false);
-                    subsets.add(subset);
-                }
-            }
+//            else if (form.getObjectName().equalsIgnoreCase("publication"))
+//            {
+//                if (getContainer().hasPermission(getUser(), InsertPermission.class))
+//                {
+//                    subset.setId("[Publication.Status].[All]");
+//                    subset.setName("All");
+//                    subset.setIsDefault(true);
+//                    subsets.add(subset);
+//                }
+//
+//                subset = new StudySubset();
+//                subset.setId("[Publication.Status].[Complete]");
+//                subset.setName("Complete");
+//                subset.setIsDefault(!getContainer().hasPermission(getUser(), InsertPermission.class));
+//                subsets.add(subset);
+//
+//                if (getContainer().hasPermission(getUser(), InsertPermission.class))
+//                {
+//                    subset = new StudySubset();
+//                    subset.setId("[Publication.Status].[In Progress]");
+//                    subset.setName("In Progress");
+//                    subset.setIsDefault(false);
+//                    subsets.add(subset);
+//                }
+//            }
             return success(subsets);
         }
     }

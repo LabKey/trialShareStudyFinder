@@ -37,7 +37,8 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         this.studySubsets.on(
                 'load', function(store) {
                     this.getStudySubsetMenu().setValue(store.defaultValue);
-                    //this.getStudySubsetMenu().setHidden(store.count() < 2);
+                    if (store.count() > 1)
+                        this.getStudySubsetMenu().show();
                 },
                 this
         );
@@ -77,13 +78,10 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
                 queryMode: 'local',
                 valueField: 'id',
                 displayField: 'name',
-                //hidden: true,
+                hidden: true,
                 value: this.studySubsets.defaultValue,
                 cls: 'labkey-study-search',
                 multiSelect: false,
-                //fieldLabel: "Status",
-                //labelSeparator: '',
-                //labelCls: 'labkey-finder-label',
                 listeners: {
                     scope: this,
                     'select': function(field, newValue, oldValue, eOpts) {
