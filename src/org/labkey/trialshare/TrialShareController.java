@@ -59,8 +59,6 @@ public class TrialShareController extends SpringActionController
 
     public enum DetailType { publications, study };
 
-//    public enum CubeObjectType { study, publication };
-
     public TrialShareController()
     {
         setActionResolver(_actionResolver);
