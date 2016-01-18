@@ -1,4 +1,4 @@
-Ext4.define('LABKEY.study.data.StudyCard', {
+Ext4.define('LABKEY.study.data.Study', {
     extend: 'Ext.data.Model',
 
     idProperty : 'studyId',

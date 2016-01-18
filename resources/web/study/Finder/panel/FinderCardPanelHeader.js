@@ -1,4 +1,4 @@
-Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
+Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
 
     extend: 'Ext.Container',
 
@@ -11,17 +11,15 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
 
     searchMessage: "",
 
-    dataModuleName: 'study',
-
     bubbleEvents: [
-        "studySubsetChanged",
+        "subsetChanged",
         "searchTermsChanged"
     ],
 
 
     initComponent: function() {
 
-        this.studySubsets = Ext4.create('LABKEY.study.store.StudySubsets', {
+        this.subsets = Ext4.create('LABKEY.study.store.Subsets', {
             dataModuleName : this.dataModuleName,
             objectName: this.objectName
         });
@@ -29,19 +27,19 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         var searchBox = this.getSearchBox();
         if (searchBox)
             this.items.push(searchBox);
-        if (this.getStudySubsetMenu())
-            this.items.push(this.getStudySubsetMenu());
+        if (this.getSubsetMenu())
+            this.items.push(this.getSubsetMenu());
         if (this.showHelpLinks)
             this.items.push(this.getHelpLinks());
 
-        this.studySubsets.on(
+        this.subsets.on(
                 'load', function(store) {
-                    this.getStudySubsetMenu().setValue(store.defaultValue);
+                    this.getSubsetMenu().setValue(store.defaultValue);
                     var objectStore = Ext4.getStore(this.objectName);
                     if (objectStore && store.defaultValue)
                         objectStore.selectedSubset = store.defaultValue.data.id;
                     if (store.count() > 1)
-                        this.getStudySubsetMenu().show();
+                        this.getSubsetMenu().show();
                 },
                 this
         );
@@ -73,16 +71,15 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
 
     },
 
-    getStudySubsetMenu: function() {
-        if (!this.studySubsetMenu) {
-            this.studySubsetMenu = Ext4.create('Ext.form.ComboBox', {
-                store: this.studySubsets,
-                name : 'studySubsetSelect',
+    getSubsetMenu: function() {
+        if (!this.subsetMenu) {
+            this.subsetMenu = Ext4.create('Ext.form.ComboBox', {
+                store: this.subsets,
                 queryMode: 'local',
                 valueField: 'id',
                 displayField: 'name',
                 hidden: true,
-                value: this.studySubsets.defaultValue,
+                value: this.subsets.defaultValue,
                 cls: 'labkey-study-search',
                 multiSelect: false,
                 listeners: {
@@ -91,13 +88,13 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
                         this.onSubsetChanged(newValue[0])
                     },
                     'render': function(eOpts) {
-                        if (this.studySubsets.defaultValue)
-                            this.onSubsetChanged(this.studySubsets.defaultValue)
+                        if (this.subsets.defaultValue)
+                            this.onSubsetChanged(this.subsets.defaultValue)
                     }
                 }
             })
         }
-        return this.studySubsetMenu;
+        return this.subsetMenu;
     },
 
     getHelpLinks: function() {
@@ -121,7 +118,7 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
     },
 
     onSubsetChanged: function(value) {
-        this.fireEvent("studySubsetChanged", value.data.id);
+        this.fireEvent("subsetChanged", value.data.id);
     },
 
     startTutorial: function() {
@@ -134,7 +131,6 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
     registerTutorial: function() {
         var $=$||jQuery;
 
-        var index = this.objectName == "Study" ? 0 : 1;
         LABKEY.help.Tour.register({
             id: "LABKEY.tour.dataFinder." + this.objectName,
             steps: [
@@ -152,14 +148,14 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
                     showNextButton: true,
                     showPrevButton: true
                 },{
-                    target: $('.labkey-facet-summary')[index],
+                    target: this.objectName.toLowerCase() + "SelectionPanel",
                     title: "Summary",
                     content: "This summary area indicates how many " + (this.objectName == "Study" ? "subjects and studies" : "publications and studies") + " match the selected criteria.",
                     placement: "right",
                     showNextButton: true,
                     showPrevButton: true
                 },{
-                    target: $('.labkey-study-facets')[index],
+                    target: $('.labkey-' + this.objectName.toLowerCase() + '-facets')[0],
                     title: "Filters",
                     content: "This is where filters are selected and applied. The numbers (also represented as the length of the gray bars) represent how many " + (this.objectName == "Study" ? "subjects" : "publications") + " will match the search if this filter is added.",
                     placement: "right",

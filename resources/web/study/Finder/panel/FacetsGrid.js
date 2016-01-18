@@ -4,7 +4,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     alias: 'widget.labkey-study-facet-panel',
 
-    cls: 'labkey-study-facets',
+    cls: 'labkey-finder-facets',
 
     ui: 'custom',
 
@@ -82,6 +82,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
     },
 
     initComponent: function() {
+        this.cls = 'labkey-finder-facets labkey-' + this.olapConfig.objectName.toLowerCase() + '-facets';
         this.facetStore = Ext4.create("LABKEY.study.store.Facets", {
             dataModuleName: this.dataModuleName,
             olapConfig: this.olapConfig,

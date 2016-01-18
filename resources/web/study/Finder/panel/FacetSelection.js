@@ -60,7 +60,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         if (!this.facetSelectionSummary) {
             if (this.olapConfig.objectName == "Study")
             {
-                this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.SelectionSummary", {
+                this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.StudySummary", {
                     dataModuleName: this.dataModuleName,
                     objectName: this.olapConfig.objectName
                 });

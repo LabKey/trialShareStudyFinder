@@ -19,10 +19,11 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     initComponent : function() {
 
-        this.items = [
-                this.getObjectSelectionPanel(),
-                this.getFinderCardDeck()
-        ];
+        this.items = [];
+
+        if (this.cubeConfigs.length > 1)
+            this.items.push(this.getObjectSelectionPanel());
+        this.items.push(this.getFinderCardDeck());
 
         this.callParent();
 

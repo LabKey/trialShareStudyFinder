@@ -1,4 +1,4 @@
-Ext4.define('LABKEY.study.data.StudySubset', {
+Ext4.define('LABKEY.study.data.Subset', {
     extend: 'Ext.data.Model',
 
     fields: [

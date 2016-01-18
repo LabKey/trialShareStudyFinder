@@ -1,7 +1,7 @@
-Ext4.define('LABKEY.study.store.StudySubsets', {
+Ext4.define('LABKEY.study.store.Subsets', {
     extend: "Ext.data.Store",
     autoLoad: true,
-    model: 'LABKEY.study.data.StudySubset',
+    model: 'LABKEY.study.data.Subset',
     isLoaded: false,
     defaultValue: null,
     proxy: {

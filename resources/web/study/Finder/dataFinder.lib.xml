@@ -7,10 +7,10 @@
         <script path="study/Finder/data/Facet.js"/>
         <script path="study/Finder/data/FacetFilter.js"/>
         <script path="study/Finder/data/FacetMember.js"/>
-        <script path="study/Finder/data/StudyCard.js"/>
+        <script path="study/Finder/data/Study.js"/>
         <script path="study/Finder/data/Studies.js"/>
-        <script path="study/Finder/data/StudySubset.js"/>
-        <script path="study/Finder/data/StudySubsets.js"/>
+        <script path="study/Finder/data/Subset.js"/>
+        <script path="study/Finder/data/Subsets.js"/>
         <script path="study/Finder/data/Facets.js"/>
         <script path="study/Finder/data/FacetMembers.js"/>
         <script path="study/Finder/data/Publication.js"/>
@@ -18,13 +18,13 @@
 
         <script path="study/Finder/panel/FacetPanelHeader.js"/>
         <script path="study/Finder/panel/FacetsGrid.js"/>
-        <script path="study/Finder/panel/SelectionSummary.js"/>
+        <script path="study/Finder/panel/StudySummary.js"/>
         <script path="study/Finder/panel/PublicationSummary.js"/>
         <script path="study/Finder/panel/FacetSelection.js"/>
 
         <script path="study/Finder/panel/Studies.js"/>
         <script path="study/Finder/panel/Publications.js"/>
-        <script path="study/Finder/panel/StudyPanelHeader.js"/>
+        <script path="study/Finder/panel/FinderCardPanelHeader.js"/>
         <script path="study/Finder/panel/StudyCards.js"/>
         <script path="study/Finder/panel/PublicationCards.js"/>
         <script path="study/Finder/panel/FinderCard.js"/>

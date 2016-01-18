@@ -1,10 +1,10 @@
-Ext4.define("LABKEY.study.panel.SelectionSummary", {
+Ext4.define("LABKEY.study.panel.StudySummary", {
     extend: 'Ext.Component',
 
     alias : 'widget.facet-selection-summary',
 
     tpl: new Ext4.XTemplate(
-            '<div id="selectionPanel">',
+            '<div id="studySelectionPanel">',
             '       <div id="summaryArea" class="labkey-facet-summary" >',
             '           <div class="labkey-facet-header"><span class="labkey-facet-caption">Summary</span></div>',
             '           <ul>',

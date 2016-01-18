@@ -21,7 +21,7 @@ Ext4.define("LABKEY.study.panel.Publications", {
 
         //this.getCards().store.addListener('filterChange',this.onFilterSelectionChanged, this);
         this.on(
-                {'studySubsetChanged': this.onStudySubsetChanged,
+                {'subsetChanged': this.onSubsetChanged,
                  'searchTermsChanged': this.onSearchTermsChanged
                  //'filterSelectionChanged': this.onFilterSelectionChanged
                 }
@@ -32,9 +32,9 @@ Ext4.define("LABKEY.study.panel.Publications", {
     //    console.log('filterChange happened!')
     //},
 
-    onStudySubsetChanged : function(selectedSubset) {
+    onSubsetChanged : function(selectedSubset) {
         if (!selectedSubset)
-            selectedSubset = this.getCardPanelHeader().getStudySubsetMenu().getValue();
+            selectedSubset = this.getCardPanelHeader().getSubsetMenu().getValue();
         this.getCards().store.updateFilters(null, selectedSubset);
     },
 
@@ -44,7 +44,7 @@ Ext4.define("LABKEY.study.panel.Publications", {
 
     getCardPanelHeader : function() {
         if (!this.cardPanelHeader) {
-            this.cardPanelHeader = Ext4.create("LABKEY.study.panel.StudyPanelHeader", {
+            this.cardPanelHeader = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
                 dataModuleName: this.dataModuleName,
                 padding: 8,
                 showSearch : this.showSearch,

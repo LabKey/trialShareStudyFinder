@@ -11,8 +11,6 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     showParticipantFilters: false,
 
-    height: '500px',
-
     dataModuleName: null,  // the module responsible for serving up the cube data
 
     autoScroll : true,
@@ -35,7 +33,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
         this.on({
             //filterSelectionChanged: this.onFilterSelectionChange,
-            studySubsetChanged: this.onSubsetChanged,
+            subsetChanged: this.onSubsetChanged,
             searchTermsChanged: this.onSearchTermsChanged
         });
     },
