@@ -172,8 +172,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 dataModuleName: this.dataModuleName,
                 region: 'center',
                 width: '80%',
-                id: 'studies-view',
-                objectName: 'study'
+                id: 'studies-view'
             });
         }
         return this.studiesPanel;
@@ -186,8 +185,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 dataModuleName: this.dataModuleName,
                 region: 'center',
                 width: '80%',
-                id: 'publication-view',
-                objectName: 'publication'
+                id: 'publication-view' // TODO is this needed?
             });
         }
         return this.publicationsPanel;

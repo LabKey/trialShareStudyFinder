@@ -37,6 +37,9 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
         this.studySubsets.on(
                 'load', function(store) {
                     this.getStudySubsetMenu().setValue(store.defaultValue);
+                    var objectStore = Ext4.getStore(this.objectName);
+                    if (objectStore && store.defaultValue)
+                        objectStore.selectedSubset = store.defaultValue.data.id;
                     if (store.count() > 1)
                         this.getStudySubsetMenu().show();
                 },
@@ -122,8 +125,57 @@ Ext4.define("LABKEY.study.panel.StudyPanelHeader", {
     },
 
     startTutorial: function() {
-        LABKEY.help.Tour.show("LABKEY.tour.dataFinder");
+        this.registerTutorial();
+        LABKEY.help.Tour.show("LABKEY.tour.dataFinder." + this.objectName);
         return false;
+    },
+
+    // TODO this is not very extensible.  Consider other options
+    registerTutorial: function() {
+        var $=$||jQuery;
+
+        var index = this.objectName == "Study" ? 0 : 1;
+        LABKEY.help.Tour.register({
+            id: "LABKEY.tour.dataFinder." + this.objectName,
+            steps: [
+                {
+                    target: $('.labkey-wp-body')[0],
+                    title: "Data Finder",
+                    content: "Welcome to the Data Finder. A tool for searching, accessing and combining data across studies.",
+                    placement: "top",
+                    showNextButton: true
+                },{
+                    target: this.objectName.toLowerCase() + "panel",
+                    title: this.objectName + " Panel",
+                    content: "This area contains short descriptions of the " + (this.objectName == "Study" ? "studies/datasets" : "publications") + " that match the selected criteria.",
+                    placement: "top",
+                    showNextButton: true,
+                    showPrevButton: true
+                },{
+                    target: $('.labkey-facet-summary')[index],
+                    title: "Summary",
+                    content: "This summary area indicates how many " + (this.objectName == "Study" ? "subjects and studies" : "publications and studies") + " match the selected criteria.",
+                    placement: "right",
+                    showNextButton: true,
+                    showPrevButton: true
+                },{
+                    target: $('.labkey-study-facets')[index],
+                    title: "Filters",
+                    content: "This is where filters are selected and applied. The numbers (also represented as the length of the gray bars) represent how many " + (this.objectName == "Study" ? "subjects" : "publications") + " will match the search if this filter is added.",
+                    placement: "right",
+                    showNextButton: this.showSearch,
+                    showPrevButton: true
+                },
+                {
+                    target: "searchTerms",
+                    title: "Quick Search",
+                    content: "Enter terms of interest to search study and data descriptions. This will find matches within the selection of filtered studies/datasets.",
+                    placement: "right",
+                    yOffset: -25,
+                    showPrevButton: true
+                }
+            ]
+        });
     }
 
 });

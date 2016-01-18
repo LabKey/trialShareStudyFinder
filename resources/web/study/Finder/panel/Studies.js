@@ -8,7 +8,7 @@ Ext4.define("LABKEY.study.panel.Studies", {
 
     padding: "5 0 0 0",
 
-    dataModuleName: 'study',
+    objectName: 'Study',
 
     showSearch : true,
 

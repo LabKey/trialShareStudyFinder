@@ -8,6 +8,8 @@ Ext4.define("LABKEY.study.panel.Publications", {
 
     padding: "5 0 0 0",
 
+    objectName: 'Publication',
+
     autoScroll: true,
 
     initComponent : function() {
@@ -46,8 +48,7 @@ Ext4.define("LABKEY.study.panel.Publications", {
                 dataModuleName: this.dataModuleName,
                 padding: 8,
                 showSearch : this.showSearch,
-                objectName: this.objectName,
-                showHelpLinks : false
+                objectName: this.objectName
             });
         }
         return this.cardPanelHeader;

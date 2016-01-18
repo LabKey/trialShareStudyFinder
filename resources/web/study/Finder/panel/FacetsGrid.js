@@ -56,65 +56,16 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         }
     ],
 
-    features: {
-        ftype: 'grouping',
-        collapsible: true,
-        id: 'facetMemberGrouping',
-
-        groupHeaderTpl: new Ext4.XTemplate(
-            '<div class="labkey-facet-header" id="{name:this.genId}">',
-            '       <div class="labkey-facet-caption">',
-            '           <span>{name}</span>',
-            '           {name:this.displayClearLabel}',
-            '       </div>',
-            '         {name:this.makeFilterOptions}',
-            '</div>',
-                {
-                    //objectName: 'Study',
-                    genId: function(name) {
-                        var id = Ext4.id();
-                        LABKEY.study.panel.FacetsGrid.headerLookup[name] = id;
-                        return id;
-                    },
-                    displayClearLabel: function(facetName) {
-                        var html = '<span class="labkey-clear-filter inactive">[clear]</span>';
-                        if (LABKEY.study.panel.FacetsGrid.hasFilters(this.objectName, facetName)) {
-                            html = '<span class="labkey-clear-filter active">[clear]</span>';
-                        }
-                        return  html;
-                    },
-                    makeFilterOptions: function(facetName) {
-                        var facetStore = Ext4.getStore(this.objectName + "Facets");
-                        var facet = facetStore.getById(facetName);
-                        var selectedMembers = facet.get("selectedMembers");
-                        var html = '<div class="labkey-filter-options">';
-
-                        //if (facet.get("isExpanded") && selectedMembers && selectedMembers.length > 1)
-                        if ( selectedMembers && selectedMembers.length > 1)
-                        {
-                            var pointerClass = (facet.filterOptionsStore.count() < 2) ? "inactive" : "active";
-
-                            html += '<span class="labkey-filter-caption ' + pointerClass + '">' + facet.get("currentFilterCaption");
-                            if (facet.filterOptionsStore.count() > 1)
-                                html += '&nbsp;<i class="fa fa-caret-down labkey-filter-caption"></i>';
-                            html +=  '</span>';
-                        }
-                        html += '</div>';
-                        return html;
-                    }
-                }
-            )
-
-    },
-
     statics: {
-        headerLookup: {},
-
         hasFilters : function(objectName, facetName) {
             var facetStore = Ext4.getStore(objectName + 'Facets');
             if (!facetStore)
             {
                 console.error("Unable to find facet store", objectName + 'Facets' );
+                return false;
+            }
+            else if (!facetStore.isLoaded)
+            {
                 return false;
             }
             if (facetName)
@@ -141,9 +92,9 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             storeId : this.olapConfig.objectName + "FacetMembers"
         });
 
-        this.callParent();
+        this.features = this.getGroupHeaderFeature(this.olapConfig.objectName);
 
-        this.features[0].groupHeaderTpl.objectName = this.olapConfig.objectName;
+        this.callParent();
 
         this.mon(this.view, {
             groupclick: this.onGroupClick,
@@ -165,8 +116,57 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                 this.facetStore.selectMembers(records);
             facetChangeTask.delay(500);
         }, this);
+    },
 
-        //this.getSelectionModel().on('selectionchange', this.onSelectionChange, this);
+
+    getGroupHeaderFeature: function(objectName) {
+        return Ext4.create('Ext.grid.feature.Grouping',
+                {
+                    ftype: 'grouping',
+                    collapsible: true,
+
+                    groupHeaderTpl: new Ext4.XTemplate(
+                            '<div class="labkey-facet-header">',
+                            '       <div class="labkey-facet-caption">',
+                            '           <span>{name}</span>',
+                            '           {[this.displayClearLabel(values)]}',
+                            '       </div>',
+                            '         {[this.makeFilterOptions(values)]}',
+                            '</div>',
+                            {
+                                objectName: objectName,
+                                displayClearLabel: function(values)
+                                {
+                                    var html = '<span class="labkey-clear-filter inactive">[clear]</span>';
+                                    if (LABKEY.study.panel.FacetsGrid.hasFilters(this.objectName, values.name))
+                                    {
+                                        html = '<span class="labkey-clear-filter active">[clear]</span>';
+                                    }
+                                    return  html;
+                                },
+                                makeFilterOptions: function(values) {
+                                    var facetStore = Ext4.getStore(this.objectName + "Facets");
+                                    var facet = facetStore.getById(values.name);
+                                    var selectedMembers = facet.get("selectedMembers");
+                                    var html = '<div class="labkey-filter-options">';
+
+                                    if ( selectedMembers && selectedMembers.length > 1)
+                                    {
+                                        var pointerClass = (facet.filterOptionsStore.count() < 2) ? "inactive" : "active";
+
+                                        html += '<span class="labkey-filter-caption ' + pointerClass + '">' + facet.get("currentFilterCaption");
+                                        if (facet.filterOptionsStore.count() > 1)
+                                            html += '&nbsp;<i class="fa fa-caret-down labkey-filter-caption"></i>';
+                                        html +=  '</span>';
+                                    }
+                                    html += '</div>';
+                                    return html;
+                                }
+                            }
+                    )
+
+                }
+        );
     },
 
     onCubeReady : function(mdx) {

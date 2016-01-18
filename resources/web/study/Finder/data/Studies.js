@@ -3,10 +3,9 @@ Ext4.define('LABKEY.study.store.Studies', {
     storeId: 'Study',
     model: 'LABKEY.study.data.StudyCard', // TODO rename to "Study"
     autoLoad: false,
-    dataModuleName: "study",
     isLoaded: false,
     selectedStudies : {},
-    selectedSubset : null,
+    selectedSubset : '[Study.Public].[true]', // TODO generalize
     proxy : {
         type: "ajax",
         //url: set before calling "load".

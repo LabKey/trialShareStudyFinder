@@ -31,7 +31,6 @@
         <script path="study/Finder/panel/FinderObjectSelection.js"/>
         <script path="study/Finder/panel/FinderCardDeck.js"/>
         <script path="study/Finder/panel/Finder.js"/>
-        <script path="study/Finder/view/dataFinderTour.js"/>
     </library>
     <dependencies>
         <dependency path="internal/jQuery"/>
