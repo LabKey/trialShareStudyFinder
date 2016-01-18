@@ -39,6 +39,7 @@ public class StudyPublicationBean
     private String year;
     private String abstractText;
     private String status;
+    private String dataUrl;
     private List<StudyBean> studies;
 
     // the first item in the pair is the link; the second is the description (link text)
@@ -314,5 +315,15 @@ public class StudyPublicationBean
     public void setStudies(List<StudyBean> studies)
     {
         this.studies = studies;
+    }
+
+    public String getDataUrl()
+    {
+        return dataUrl;
+    }
+
+    public void setDataUrl(String dataUrl)
+    {
+        this.dataUrl = dataUrl;
     }
 }
