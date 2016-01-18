@@ -10,7 +10,7 @@ LABKEY.help.Tour.register({
             placement: "top",
             showNextButton: true
         },{
-            target: "studypanel",
+            target: ["studypanel"],
             title: "Study Panel",
             content: "This area contains short descriptions of the studies/datasets that match the selected criteria.",
             placement: "top",

@@ -46,7 +46,8 @@ Ext4.define("LABKEY.study.panel.Publications", {
                 dataModuleName: this.dataModuleName,
                 padding: 8,
                 showSearch : this.showSearch,
-                objectName: this.objectName
+                objectName: this.objectName,
+                showHelpLinks : false
             });
         }
         return this.cardPanelHeader;
