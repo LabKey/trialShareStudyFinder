@@ -6,7 +6,7 @@ Ext4.define('LABKEY.study.store.Studies', {
     dataModuleName: "study",
     isLoaded: false,
     selectedStudies : {},
-    selectedSubset : 'public',
+    selectedSubset : null,
     proxy : {
         type: "ajax",
         //url: set before calling "load".
@@ -45,7 +45,7 @@ Ext4.define('LABKEY.study.store.Studies', {
 
         this.filter([
                 {property: 'isSelected', value: true},
-                {property: 'isPublic', value: this.selectedSubset !== "operational"} // TODO generalize
+                {property: 'isPublic', value: this.selectedSubset !== "[Study.Public].[false]"} // TODO generalize
         ]);
     },
 

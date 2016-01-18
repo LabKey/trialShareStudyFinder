@@ -117,6 +117,7 @@ public class TrialShareController extends SpringActionController
             bean.setCountDistinctLevel("[Study].[Study]");
             bean.setFilterByFacetUniqueName("[Study]");
             bean.setIsDefault(true);
+            bean.setSubsetLevelName("[Study.Public].[Public]");
         }
         else if (objectName.equalsIgnoreCase("publications"))
         {
@@ -128,6 +129,7 @@ public class TrialShareController extends SpringActionController
             bean.setCountDistinctLevel("[Publication].[Publication]");
             bean.setFilterByFacetUniqueName("[Publication]");
             bean.setIsDefault(false);
+            bean.setSubsetLevelName("[Publication.Status].[Status]");
         }
 
         return bean;
@@ -178,6 +180,7 @@ public class TrialShareController extends SpringActionController
         private String _filterByFacetUniqueName;
         private Boolean _showParticipantFilters;
         private Boolean _isDefault;
+        private String _subsetLevelName;
 
         public String getObjectName()
         {
@@ -297,6 +300,16 @@ public class TrialShareController extends SpringActionController
         public void setIsDefault(Boolean aDefault)
         {
             _isDefault = aDefault;
+        }
+
+        public String getSubsetLevelName()
+        {
+            return _subsetLevelName;
+        }
+
+        public void setSubsetLevelName(String subsetLevelName)
+        {
+            _subsetLevelName = subsetLevelName;
         }
     }
 
@@ -661,14 +674,14 @@ public class TrialShareController extends SpringActionController
             {
                 if (!getUser().isGuest())
                 {
-                    subset.setId("operational");
+                    subset.setId("[Study.Public].[false]");
                     subset.setName("Operational");
                     subset.setIsDefault(false);
                     subsets.add(subset);
                 }
 
                 subset = new StudySubset();
-                subset.setId("public");
+                subset.setId("[Study.Public].[true]");
                 subset.setName("Public");
                 subset.setIsDefault(true);
                 subsets.add(subset);
@@ -677,14 +690,14 @@ public class TrialShareController extends SpringActionController
             {
                 if (getContainer().hasPermission(getUser(), InsertPermission.class))
                 {
-                    subset.setId("all");
+                    subset.setId("[Publication.Status].[All]");
                     subset.setName("All");
                     subset.setIsDefault(true);
                     subsets.add(subset);
                 }
 
                 subset = new StudySubset();
-                subset.setId("complete");
+                subset.setId("[Publication.Status].[Complete]");
                 subset.setName("Complete");
                 subset.setIsDefault(!getContainer().hasPermission(getUser(), InsertPermission.class));
                 subsets.add(subset);
@@ -692,7 +705,7 @@ public class TrialShareController extends SpringActionController
                 if (getContainer().hasPermission(getUser(), InsertPermission.class))
                 {
                     subset = new StudySubset();
-                    subset.setId("In Progress");
+                    subset.setId("[Publication.Status].[In Progress]");
                     subset.setName("In Progress");
                     subset.setIsDefault(false);
                     subsets.add(subset);

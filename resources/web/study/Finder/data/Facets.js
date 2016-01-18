@@ -90,23 +90,14 @@ Ext4.define('LABKEY.study.store.Facets', {
         return optionsStore.getAt(0);
     },
 
-    // TODO what's the general version of this?
     getStudySubsetFilter: function() {
         var store = Ext4.getStore(this.olapConfig.objectName);
-        if (this.olapConfig.objectName == "Study")
-        {
-            if (store.selectedSubset == "operational") // TODO change this value to true/false
-                return {level: "[Study.Public].[Public]", members: ["[Study.Public].[false]"]};
-            else
-                return {level: "[Study.Public].[Public]", members: ["[Study.Public].[true]"]};
-        }
+
+        if (!store || !store.selectedSubset)
+            return null;
         else
-        {
-            if (store.selectedSubset.toLowerCase() == "all")
-                return null;
-            else
-                return {level: "[Publication.Status].[Status]", members: ["[Publication.Status].[" + store.selectedSubset + "]"]};
-        }
+            return {level: this.olapConfig.subsetLevelName, members: [ store.selectedSubset ]};
+
     },
 
     updateCountsAsync: function (isSavedGroup)
