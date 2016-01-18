@@ -339,7 +339,7 @@ public class TrialShareController extends SpringActionController
         {
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             List<StudyBean> studies  = (new TableSelector(coreSchema.getSchema("lists").getTable("studyProperties"))).getArrayList(StudyBean.class);
-            List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("studyManuscripts")).getArrayList(StudyPublicationBean.class));
+            List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("manuscriptsAndAbstracts")).getArrayList(StudyPublicationBean.class));
             Map<String, Pair<Integer, Integer>> pubCounts = new HashMap<>();
             for (StudyPublicationBean pub : publications) {
                 if (pubCounts.get(pub.getStudyId()) == null)
@@ -549,7 +549,7 @@ public class TrialShareController extends SpringActionController
 
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
-            study.setPublications((new TableSelector(listSchema.getTable("studyManuscripts"), filter, null)).getArrayList(StudyPublicationBean.class));
+            study.setPublications((new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"), filter, null)).getArrayList(StudyPublicationBean.class));
 
             VBox v = new VBox();
             if (null != form.getReturnActionURL())
