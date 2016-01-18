@@ -76,6 +76,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
             this.subsetMenu = Ext4.create('Ext.form.ComboBox', {
                 store: this.subsets,
                 queryMode: 'local',
+                name: 'subsetSelect',
                 valueField: 'id',
                 displayField: 'name',
                 hidden: true,

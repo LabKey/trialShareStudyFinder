@@ -183,7 +183,7 @@ public class DataFinderPage extends LabKeyPage
     {
         public static final Locator.CssLocator studyFinder = Locator.css(".labkey-data-finder-outer");
         public static final Locator.CssLocator studySearchInput = studyFinder.append(Locator.css("#searchTerms"));
-        public static final Locator.XPathLocator studySubsetCombo = Ext4Helper.Locators.formItemWithInputNamed("studySubsetSelect");
+        public static final Locator.XPathLocator studySubsetCombo = Ext4Helper.Locators.formItemWithInputNamed("subsetSelect");
         public static final Locator.CssLocator studyCard = studyFinder.append(Locator.css(".labkey-study-card"));
         public static final Locator.CssLocator selectionPanel = studyFinder.append(Locator.css(".labkey-facet-selection-panel"));
         public static final Locator.CssLocator facetPanel = selectionPanel.append(Locator.css(" .labkey-study-facets"));
