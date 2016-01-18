@@ -22,7 +22,7 @@
                 </Level>
             </Hierarchy>
             <Hierarchy name="Year" hasAll="true" primaryKey="PublicationId">
-                <Level name="Year" visible="true" type="String" column="year" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+                <Level name="Year" visible="true" type="Integer" column="year" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
             <Hierarchy name="Journal" hasAll="true" primaryKey="PublicationId">
