@@ -73,7 +73,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             else {
                 for (var i = 0; i < facetStore.count(); i++) {
                     var facet = facetStore.getAt(i);
-                    if (facet.get("name") != facetStore.olapConfig.objectName && facetStore.getAt(i).data.selectedMembers.length > 0)
+                    if (facet.get("name") != facetStore.cubeConfig.objectName && facetStore.getAt(i).data.selectedMembers.length > 0)
                         return true;
                 }
                 return false;
@@ -82,18 +82,18 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
     },
 
     initComponent: function() {
-        this.cls = 'labkey-finder-facets labkey-' + this.olapConfig.objectName.toLowerCase() + '-facets';
+        this.cls = 'labkey-finder-facets labkey-' + this.cubeConfig.objectName.toLowerCase() + '-facets';
         this.facetStore = Ext4.create("LABKEY.study.store.Facets", {
             dataModuleName: this.dataModuleName,
-            olapConfig: this.olapConfig,
-            storeId: this.olapConfig.objectName + "Facets"
+            cubeConfig: this.cubeConfig,
+            storeId: this.cubeConfig.objectName + "Facets"
         });
 
         this.store = Ext4.create('LABKEY.study.store.FacetMembers', {
-            storeId : this.olapConfig.objectName + "FacetMembers"
+            storeId : this.cubeConfig.objectName + "FacetMembers"
         });
 
-        this.features = this.getGroupHeaderFeature(this.olapConfig.objectName);
+        this.features = this.getGroupHeaderFeature(this.cubeConfig.objectName);
 
         this.callParent();
 
@@ -106,7 +106,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
         var facetSelectionChange = function() {
             this.facetStore.updateCountsAsync();
-            this.fireEvent("filterSelectionChanged", LABKEY.study.panel.FacetsGrid.hasFilters(this.olapConfig.objectName));
+            this.fireEvent("filterSelectionChanged", LABKEY.study.panel.FacetsGrid.hasFilters(this.cubeConfig.objectName));
         };
 
         var facetChangeTask = new Ext4.util.DelayedTask(facetSelectionChange, this);
@@ -176,9 +176,9 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
     },
 
     onSubsetChanged: function() {
-        var objectStore = Ext4.getStore(this.olapConfig.objectName);
+        var objectStore = Ext4.getStore(this.cubeConfig.objectName);
         objectStore.selectAll();
-        if (this.facetStore.getById(this.olapConfig.objectName))
+        if (this.facetStore.getById(this.cubeConfig.objectName))
         {
             this.facetStore.updateCountsAsync();
         }
@@ -190,7 +190,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             this.facetStore.selectMembers(records);
         this.facetStore.updateCountsAsync();
 
-        this.fireEvent("filterSelectionChanged", LABKEY.study.panel.FacetsGrid.hasFilters(this.olapConfig.objectName));
+        this.fireEvent("filterSelectionChanged", LABKEY.study.panel.FacetsGrid.hasFilters(this.cubeConfig.objectName));
     },
 
     onGroupCollapse: function(view, node, facetName, eOpts) {
@@ -282,6 +282,6 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         }
 
         if (!suppressEvent)
-            this.fireEvent("filterSelectionChanged",  LABKEY.study.panel.FacetsGrid.hasFilters(this.olapConfig.objectName));
+            this.fireEvent("filterSelectionChanged",  LABKEY.study.panel.FacetsGrid.hasFilters(this.cubeConfig.objectName));
     }
 });

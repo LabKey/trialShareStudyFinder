@@ -27,7 +27,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     clearAllSelectedMembers: function() {
         for (var f = 0; f < this.count(); f++) {
             var facet = this.getAt(f);
-            if (facet.get("name") != this.olapConfig.objectName)
+            if (facet.get("name") != this.cubeConfig.objectName)
             {
                 this.getAt(f).data.selectedMembers = [];
             }
@@ -45,7 +45,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         if (this.isLoaded && this.mdx)
         {
             var cube = this.mdx._cube;
-            var facetMembersStore = Ext4.getStore(this.olapConfig.objectName + "FacetMembers");
+            var facetMembersStore = Ext4.getStore(this.cubeConfig.objectName + "FacetMembers");
             for (var f = 0; f < this.count(); f++)
             {
                 var facet = this.getAt(f);
@@ -69,11 +69,11 @@ Ext4.define('LABKEY.study.store.Facets', {
                         facetName: facet.get("name"),
                         facet : facet
                     };
-                    if (facet.get("name") != this.olapConfig.objectName)
+                    if (facet.get("name") != this.cubeConfig.objectName)
                         facetMembersStore.add(member);
                     facet.data.members.push(member);
                 }
-                if (facet.get("name") == this.olapConfig.objectName) {
+                if (facet.get("name") == this.cubeConfig.objectName) {
                     facet.data.selectedMembers = facet.data.members;
                 }
             }
@@ -91,12 +91,12 @@ Ext4.define('LABKEY.study.store.Facets', {
     },
 
     getStudySubsetFilter: function() {
-        var store = Ext4.getStore(this.olapConfig.objectName);
+        var store = Ext4.getStore(this.cubeConfig.objectName);
 
         if (!store || !store.selectedSubset)
             return null;
         else
-            return {level: this.olapConfig.subsetLevelName, members: [ store.selectedSubset ]};
+            return {level: this.cubeConfig.subsetLevelName, members: [ store.selectedSubset ]};
 
     },
 
@@ -119,7 +119,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         {
             facet = facetStore.getAt(f);
             var selectedMembers = facet.get("selectedMembers");
-            if (facet.get("name") == this.olapConfig.objectName)
+            if (facet.get("name") == this.cubeConfig.objectName)
             {
                 //if (!selectedMembers || selectedMembers.length == facet.data.members.length)
                 //    continue;
@@ -151,7 +151,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                         names.push(m.data.uniqueName)
                     });
                     intersectFilters.push({
-                        level: this.olapConfig.filterByLevel,
+                        level: this.cubeConfig.filterByLevel,
                         membersQuery: {level: selectedMembers[0].data.level, members: names}
                     });
                 }
@@ -161,7 +161,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                     {
                         var filterMember = selectedMembers[i];
                         intersectFilters.push({
-                            level: this.olapConfig.filterByLevel,
+                            level: this.cubeConfig.filterByLevel,
                             membersQuery: {level: filterMember.data.level, members: [filterMember.data.uniqueName]}
                         });
                     }
@@ -170,25 +170,18 @@ Ext4.define('LABKEY.study.store.Facets', {
         }
 
         var filters = intersectFilters;
-        //if (intersectFilters.length && this.olapConfig.filterByLevel != "[Subject].[Subject]")
-        //{
-        //    filters = [{
-        //        level: "[Subject].[Subject]",
-        //        membersQuery: {operator: "INTERSECT", arguments: intersectFilters}
-        //    }]
-        //}
-        //
+
         // CONSIDER: Don't fetch subject IDs every time a filter is changed.
         var includeSubjectIds = false;
 
         var onRows = { operator: "UNION", arguments: [] };
-        onRows.arguments.push({level: this.olapConfig.filterByLevel});
+        onRows.arguments.push({level: this.cubeConfig.filterByLevel});
         for (f = 0; f < facetStore.count(); f++)
         {
             facet = facetStore.getAt(f);
             if (facet.get("name") == "Subject")
                 onRows.arguments.push({level: facet.data.hierarchy.levels[0].uniqueName});
-            else if (facet.get("name") == this.olapConfig.objectName )
+            else if (facet.get("name") == this.cubeConfig.objectName )
                 continue;
             else
                 onRows.arguments.push({level: facet.data.level.uniqueName});
@@ -200,9 +193,9 @@ Ext4.define('LABKEY.study.store.Facets', {
         var config =
         {
             "sql": true,
-            configId: this.olapConfig.configId,
-            schemaName: this.olapConfig.schemaName,
-            name: this.olapConfig.name,
+            configId: this.cubeConfig.configId,
+            schemaName: this.cubeConfig.schemaName,
+            name: this.cubeConfig.name,
             success: function (cellSet, mdx, config)
             {
                 this.updateCountsUnion(cellSet, isSavedGroup);
@@ -213,14 +206,14 @@ Ext4.define('LABKEY.study.store.Facets', {
             // query
             onRows: onRows,
             countFilter: filters,
-            countDistinctLevel: this.olapConfig.countDistinctLevel
+            countDistinctLevel: this.cubeConfig.countDistinctLevel
         };
         this.mdx.query(config);
     },
 
     updateCountsZero : function ()
     {
-        var facetMembersStore = Ext4.getStore(this.olapConfig.objectName + "FacetMembers");
+        var facetMembersStore = Ext4.getStore(this.cubeConfig.objectName + "FacetMembers");
         facetMembersStore.zeroCounts();
         //this.saveFilterState();
         //this.updateContainerFilter();
@@ -235,14 +228,14 @@ Ext4.define('LABKEY.study.store.Facets', {
         // map from hierarchyName to facet
         var map = {};
         var facetStore = this;
-        var facetMembersStore = Ext4.getStore(this.olapConfig.objectName + "FacetMembers");
+        var facetMembersStore = Ext4.getStore(this.cubeConfig.objectName + "FacetMembers");
         facetMembersStore.suspendEvents(false);
 
         for (f = 0; f < facetStore.count(); f++)
         {
             facet = this.getAt(f);
             map[facet.data.hierarchy.uniqueName] = facet;
-            if (facet.get("name") == this.olapConfig.objectName) {
+            if (facet.get("name") == this.cubeConfig.objectName) {
                 facet.data.selectedMembers = [];
             }
         }
@@ -265,7 +258,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                 facet = map[hierarchyName];
                 var count = data[i];
                 member = facetMembersStore.getById(resultMember.uniqueName);
-                if (facet.get("name") == this.olapConfig.objectName)
+                if (facet.get("name") == this.cubeConfig.objectName)
                 {
                     selectedMembers[resultMember.name] = resultMember;
                     facet.data.selectedMembers.push(resultMember);
@@ -291,7 +284,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         for (f = 0; f < facetStore.count(); f++)
         {
             facet = facetStore.getAt(f);
-            if (facet.data.hierarchy.uniqueName !== this.olapConfig.filterByFacetUniqueName)
+            if (facet.data.hierarchy.uniqueName !== this.cubeConfig.filterByFacetUniqueName)
             {
                 for (m = 0; m < facet.data.members.length; m++)
                 {
@@ -316,7 +309,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     },
 
     updateMemberFilter : function(selectedMembers) {
-        var store = Ext4.getStore(this.olapConfig.objectName);
+        var store = Ext4.getStore(this.cubeConfig.objectName);
         store.selectedStudies = selectedMembers;
         store.updateFilters(selectedMembers);
     },
@@ -362,7 +355,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     constructor: function(config)
     {
-        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "Facets.api", LABKEY.containerPath, {objectName: config.olapConfig.objectName});
+        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "Facets.api", LABKEY.containerPath, {objectName: config.cubeConfig.objectName});
         this.callParent([config]);
     }
 

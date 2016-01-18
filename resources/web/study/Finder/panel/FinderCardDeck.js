@@ -17,7 +17,7 @@ Ext4.define('LABKEY.study.panel.FinderCardDeck', {
         {
             this.items.push(Ext4.create('LABKEY.study.panel.FinderCard', {
                 dataModuleName: this.dataModuleName,
-                olapConfig: this.cubeConfigs[i],
+                cubeConfig: this.cubeConfigs[i],
                 itemId: this.cubeConfigs[i].objectName + '-finder-card'
             }));
             if (this.cubeConfigs[i].isDefault)

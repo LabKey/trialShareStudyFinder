@@ -41,9 +41,9 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
     getCubeDefinition: function() {
         var me = this;
         this.cube = LABKEY.query.olap.CubeManager.getCube({
-            configId: this.olapConfig.configId,
-            schemaName: this.olapConfig.schemaName,
-            name: this.olapConfig.cubeName,
+            configId: this.cubeConfig.configId,
+            schemaName: this.cubeConfig.schemaName,
+            name: this.cubeConfig.cubeName,
             deferLoad: false
         });
         this.cube.onReady(function (m)
@@ -150,23 +150,23 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 maxWidth: '265px',
                 dataModuleName: this.dataModuleName,
                 showParticipantFilters : this.showParticipantFilters,
-                olapConfig: this.olapConfig
+                cubeConfig: this.cubeConfig
             });
         }
         return this.facetsPanel;
     },
 
     getCubeMemberPanel : function() {
-        if (this.olapConfig.objectName == "Study")
+        if (this.cubeConfig.objectName == "Study")
             return this.getStudiesPanel();
-        else if (this.olapConfig.objectName == "Publication")
+        else if (this.cubeConfig.objectName == "Publication")
             return this.getPublicationsPanel();
     },
 
     getStudiesPanel: function() {
         if (!this.studiesPanel) {
             this.studiesPanel = Ext4.create("LABKEY.study.panel.Studies", {
-                showSearch : this.olapConfig.showSearch,
+                showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
                 region: 'center',
                 width: '80%',
@@ -179,7 +179,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
     getPublicationsPanel: function() {
         if (!this.publicationsPanel) {
             this.publicationsPanel = Ext4.create("LABKEY.study.panel.Publications", {
-                showSearch : this.olapConfig.showSearch,
+                showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
                 region: 'center',
                 width: '80%',
