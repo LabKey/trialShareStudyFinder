@@ -31,11 +31,19 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
                     return this.formatNumber(store.count());
                 },
 
-                getStudyCount: function(defaultValue) {
+                getStudyCount: function(defaultValue)
+                {
                     var store = Ext4.getStore("PublicationFacetMembers");
                     if (!store)
                         return this.formatNumber(defaultValue);
-                    return this.formatNumber(store.sum("count", true).Study);
+                    var count = 0;
+                    for (var i = 0; i < store.count(); i++)
+                    {
+                        var member = store.getAt(i);
+                        if (member.data.facet.data.name == "Study" && member.data.count > 0)
+                            count++;
+                    }
+                    return count;
                 }
             }
     ),
