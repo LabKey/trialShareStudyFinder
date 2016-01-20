@@ -41,6 +41,7 @@ public class StudyPublicationBean
     private String status;
     private String dataUrl;
     private List<StudyBean> studies;
+    private Boolean isHighlighted;
 
     // the first item in the pair is the link; the second is the description (link text)
     private Pair<String, String>[] urls = new Pair[5];
@@ -325,5 +326,15 @@ public class StudyPublicationBean
     public void setDataUrl(String dataUrl)
     {
         this.dataUrl = dataUrl;
+    }
+
+    public Boolean getIsHighlighted()
+    {
+        return isHighlighted;
+    }
+
+    public void setIsHighlighted(Boolean highlighted)
+    {
+        isHighlighted = highlighted;
     }
 }

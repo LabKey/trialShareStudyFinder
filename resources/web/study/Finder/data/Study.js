@@ -16,6 +16,7 @@ Ext4.define('LABKEY.study.data.Study', {
         {name: 'abstractCount', type: 'int'},
         {name: 'manuscriptCount', type: 'int'},
         {name: 'participantCount', type: 'int'},
-        {name: 'isSelected', type: 'boolean'}
+        {name: 'isSelected', type: 'boolean'},
+        {name: 'isHighlighted', type: 'boolean', defaultValue: false}
     ]
 });

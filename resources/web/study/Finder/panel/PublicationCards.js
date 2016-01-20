@@ -21,7 +21,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     tpl: new Ext4.XTemplate(
             '<div id="publicationpanel">',
             '   <tpl for=".">',
-            '   <tpl if="status==&quot;In Progress&quot;">',
+            '   <tpl if="isHighlighted">',
             '   <div class="labkey-publication-card labkey-publication-highlight">',
             '   <tpl else>',
             '   <div class="labkey-publication-card">',

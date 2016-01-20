@@ -23,7 +23,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     tpl: new Ext4.XTemplate(
         '<div id="studypanel">',
         '   <tpl for=".">',
-        '   <tpl if="manuscriptCount + abstractCount &gt; 0">',
+        '   <tpl if="isHighlighted">',
         '   <div class="labkey-study-card labkey-publication-highlight">',
         '   <tpl else>',
         '   <div class="labkey-study-card">',

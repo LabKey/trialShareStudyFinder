@@ -357,6 +357,7 @@ public class TrialShareController extends SpringActionController
                     study.setManuscriptCount(pubCounts.get(study.getStudyId()).first);
                     study.setAbstractCount(pubCounts.get(study.getStudyId()).second);
                 }
+                study.setIsHighlighted((study.getManuscriptCount() + study.getAbstractCount()) > 0);
             }
 
             return success(studies);
@@ -400,6 +401,10 @@ public class TrialShareController extends SpringActionController
         {
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("manuscriptsAndAbstracts")).getArrayList(StudyPublicationBean.class));
+            for (StudyPublicationBean publication : publications)
+            {
+                publication.setIsHighlighted(publication.getStatus().equalsIgnoreCase("in progress"));
+            }
 
             return success(publications);
         }
