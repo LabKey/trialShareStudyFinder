@@ -42,6 +42,7 @@ Ext4.define("LABKEY.study.panel.Publications", {
         console.log("search terms changed to " + value)
     },
 
+    // TODO move to base class
     getCardPanelHeader : function() {
         if (!this.cardPanelHeader) {
             this.cardPanelHeader = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
@@ -60,7 +61,6 @@ Ext4.define("LABKEY.study.panel.Publications", {
                 dataModuleName: this.dataModuleName
             });
         }
-        PC = this.cards;
         return this.cards;
     }
 });

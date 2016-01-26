@@ -62,7 +62,6 @@ Ext4.define("LABKEY.study.panel.Studies", {
                 dataModuleName: this.dataModuleName
             });
         }
-        SC = this.studyCards;
         return this.studyCards;
     }
 });
