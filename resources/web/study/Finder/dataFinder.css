@@ -501,6 +501,10 @@ div.labkey-study-details h3 {
     font-style: italic;
 }
 
+.labkey-publication-cards .x4-box-inner {
+    overflow: auto;
+}
+
 .labkey-publication-card .labkey-publication-author,
 .labkey-publication-card .labkey-publication-title,
 .labkey-publication-card .labkey-publication-citation {
