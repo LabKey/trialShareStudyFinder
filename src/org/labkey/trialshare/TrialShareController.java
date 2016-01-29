@@ -337,10 +337,11 @@ public class TrialShareController extends SpringActionController
                 if (pubCounts.get(pub.getStudyId()) == null)
                     pubCounts.put(pub.getStudyId(), new Pair<>(0,0));
                 Pair<Integer, Integer> countPair =  pubCounts.get(pub.getStudyId());
-                if (pub.hasPubmedLink())
-                    countPair.first += 1;
-                else
-                    countPair.second += 1;
+                if (pub.getPublicationType() != null)
+                    if (pub.getPublicationType().equalsIgnoreCase("Manuscript"))
+                        countPair.first += 1;
+                    else
+                        countPair.second += 1;
 
             }
             Map<String, String> studyUrls = StudyBean.getStudyUrls(getContainer(), getUser(), StudyBean.studyIdField);
@@ -618,7 +619,7 @@ public class TrialShareController extends SpringActionController
             StudyPublicationBean publication = (new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"))).getObject(_id, StudyPublicationBean.class);
 
             SimpleFilter filter = new SimpleFilter();
-            filter.addCondition(FieldKey.fromParts("publicationId"), _id);
+            filter.addCondition(FieldKey.fromParts("key"), _id);
             publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
 
 

@@ -42,6 +42,7 @@ public class StudyPublicationBean
     private String dataUrl;
     private List<StudyBean> studies;
     private Boolean isHighlighted;
+    private String publicationType;
 
     // the first item in the pair is the link; the second is the description (link text)
     private Pair<String, String>[] urls = new Pair[5];
@@ -58,7 +59,7 @@ public class StudyPublicationBean
         this.id = id;
     }
 
-    public void setPublicationId(Integer id)
+    public void setKey(Integer id)
     {
         this.id = id;
     }
@@ -336,5 +337,15 @@ public class StudyPublicationBean
     public void setIsHighlighted(Boolean highlighted)
     {
         isHighlighted = highlighted;
+    }
+
+    public String getPublicationType()
+    {
+        return publicationType;
+    }
+
+    public void setPublicationType(String publicationType)
+    {
+        this.publicationType = publicationType;
     }
 }

@@ -20,6 +20,7 @@ Ext4.define('LABKEY.study.data.Publication', {
         {name: 'status'},
         {name: 'url'},
         {name: 'dataUrl'},
+        {name: 'publicationType'},
         {name: 'isSelected', type: 'boolean', defaultValue: true},
         {name: 'isHighlighted', type: 'boolean', defaultValue: false}
     ]

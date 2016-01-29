@@ -146,7 +146,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         goToProjectHome();
         new PortalHelper(this).addWebPart(WEB_PART_NAME);
 
-        for (String studyAccession : studySubsets.get("Loaded"))
+        for (String studyAccession : loadedStudies)
         {
             File studyArchive = TestFileUtils.getSampleData(studyAccession + ".folder.zip");
             containerHelper.createSubfolder(getProjectName(), studyAccession, "Study");
