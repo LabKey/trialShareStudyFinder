@@ -4,8 +4,6 @@ Ext4.define('LABKEY.study.store.Publications', {
     model: 'LABKEY.study.data.Publication',
     autoLoad: false,
     dataModuleName: "",
-    isLoaded: false,
-    selectedMembers : {},
     selectedSubset : null,
     proxy : {
         type: "ajax",
@@ -19,16 +17,6 @@ Ext4.define('LABKEY.study.store.Publications', {
         property: 'title',
         direction: 'ASC'
     }],
-
-    listeners: {
-        'load' : {
-            fn : function(store, records, options) {
-                store.isLoaded = true;
-                //store.updateFilters(this.selectedSubset ? null : {}); // initial load should have no studies selected
-            },
-            scope: this
-        }
-    },
 
     updateFilters: function(selectedMembers, selectedSubset) {
         if (selectedMembers)
@@ -53,5 +41,10 @@ Ext4.define('LABKEY.study.store.Publications', {
             var object = this.getAt(i);
             object.set("isSelected", true);
         }
+    },
+
+    constructor: function(config) {
+        config.selectedMembers = {};
+        this.callParent(config);
     }
 });

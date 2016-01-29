@@ -2,7 +2,6 @@ Ext4.define('LABKEY.study.store.Subsets', {
     extend: "Ext.data.Store",
     autoLoad: true,
     model: 'LABKEY.study.data.Subset',
-    isLoaded: false,
     defaultValue: null,
     proxy: {
         type: 'ajax',
@@ -15,7 +14,6 @@ Ext4.define('LABKEY.study.store.Subsets', {
     listeners: {
         'load' : {
             fn : function(store, records, options) {
-                store.isLoaded = true;
                 for (var i = 0; i < records.length; i++)
                 {
                     if (records[i].data.isDefault)

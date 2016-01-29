@@ -105,7 +105,6 @@ public class TrialShareController extends SpringActionController
             bean.setObjectNamePlural("Studies");
             bean.setCubeName("StudyCube");
             bean.setConfigId("TrialShare:/StudyCube");
-            bean.setSchemaName("lists");
             bean.setFilterByLevel("[Study].[Study]");
             bean.setCountDistinctLevel("[Study].[Study]");
             bean.setFilterByFacetUniqueName("[Study]");

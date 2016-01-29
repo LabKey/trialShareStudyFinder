@@ -3,8 +3,7 @@ Ext4.define('LABKEY.study.store.Studies', {
     storeId: 'Study',
     model: 'LABKEY.study.data.Study',
     autoLoad: false,
-    isLoaded: false,
-    selectedStudies : {},
+
     selectedSubset : '[Study.Public].[true]', // TODO generalize
     proxy : {
         type: "ajax",
@@ -22,7 +21,6 @@ Ext4.define('LABKEY.study.store.Studies', {
     listeners: {
         'load' : {
             fn : function(store, records, options) {
-                store.isLoaded = true;
                 store.updateFilters(this.selectedSubset ? null : {}); // initial load should have no studies selected
             },
             scope: this
@@ -53,5 +51,10 @@ Ext4.define('LABKEY.study.store.Studies', {
             study = this.getAt(i);
             study.set("isSelected", true);
         }
+    },
+
+    constructor: function(config) {
+        config.selectedStudies = {};
+        this.callParent(config);
     }
 });
