@@ -19,6 +19,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     initComponent : function() {
 
+        this.cls += ' labkey-' +  this.cubeConfig.objectName.toLowerCase() + '-finder-card',
         this.items = [
             this.getFacetsPanel()
         ];
@@ -169,8 +170,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
                 region: 'center',
-                width: '80%',
-                id: 'studies-view'
+                width: '80%'
             });
         }
         return this.studiesPanel;
@@ -182,8 +182,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
                 region: 'center',
-                width: '80%',
-                id: 'publication-view' // TODO is this needed?
+                width: '80%'
             });
         }
         return this.publicationsPanel;
