@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.module.DefaultModule;
+import org.labkey.api.module.FolderTypeManager;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.view.SimpleWebPartFactory;
 import org.labkey.api.view.WebPartFactory;
@@ -73,6 +74,7 @@ public class TrialShareModule extends DefaultModule
     {
         // add a container listener so we'll know when our container is deleted:
         ContainerManager.addContainerListener(new TrialShareContainerListener());
+        FolderTypeManager.get().registerFolderType(this, new StudyITNFolderType(this));
     }
 
     @Override
