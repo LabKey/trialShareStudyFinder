@@ -19,7 +19,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     initComponent : function() {
 
-        this.cls += ' labkey-' +  this.cubeConfig.objectName.toLowerCase() + '-finder-card',
+        this.cls += ' labkey-' +  this.cubeConfig.objectName.toLowerCase() + '-finder-card';
         this.items = [
             this.getFacetsPanel()
         ];
