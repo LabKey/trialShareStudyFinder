@@ -42,6 +42,7 @@ public class StudyBean
     private Boolean isHighlighted;
     private Boolean isPublic;
     private Integer participantCount;
+    private String studyContainer;
 
     private List<StudyPersonnelBean> personnel;
     private List<StudyPublicationBean> publications;
@@ -341,6 +342,16 @@ public class StudyBean
     public void setExternalUrlDescription(String externalUrlDescription)
     {
         this.externalUrlDescription = externalUrlDescription;
+    }
+
+    public String getStudyContainer()
+    {
+        return studyContainer;
+    }
+
+    public void setStudyContainer(String studyContainer)
+    {
+        this.studyContainer = studyContainer;
     }
 }
 

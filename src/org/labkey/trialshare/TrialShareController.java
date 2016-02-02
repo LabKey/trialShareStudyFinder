@@ -28,7 +28,6 @@ import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.RequiresPermission;
-import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.Pair;
@@ -668,9 +667,11 @@ public class TrialShareController extends SpringActionController
             List<StudySubset> subsets = new ArrayList<>();
             StudySubset subset = new StudySubset();
 
+
             if (form.getObjectName() == null || form.getObjectName().equalsIgnoreCase("study"))
             {
-                if (!getUser().isGuest())
+                // query study properties list for StudyContainer and "isPublic"
+                if (TrialShareManager.get().canSeeOperationalStudies(getUser(), getContainer()))
                 {
                     subset.setId("[Study.Public].[false]");
                     subset.setName("Operational");
