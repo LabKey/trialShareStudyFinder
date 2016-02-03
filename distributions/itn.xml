@@ -17,7 +17,6 @@
         <copy todir="${dist.modules.dir}">
             <filelist dir="${staging.modules.dir}">
                 <file name="cloud.module" />
-                <file name="studyRedesign.module" />
                 <file name="timeline.module" />
                 <file name="trialShare.module" />
             </filelist>
