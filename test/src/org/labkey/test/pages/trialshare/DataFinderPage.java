@@ -6,6 +6,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
+import org.labkey.test.components.trialshare.PublicationDetailPanel;
 import org.labkey.test.components.trialshare.StudySummaryWindow;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Ext4Helper;
@@ -25,10 +26,12 @@ public class DataFinderPage extends LabKeyPage
     private static final String ACTION = "dataFinder";
     private static final String COUNT_SIGNAL = "dataFinderCountsUpdated";
     private static final String GROUP_UPDATED_SIGNAL = "participantGroupUpdated";
+    private boolean testingStudies = true;
 
-    public DataFinderPage(BaseWebDriverTest test)
+    public DataFinderPage(BaseWebDriverTest test, boolean testingStudies)
     {
         super(test);
+        this.testingStudies = testingStudies;
     }
 
     @Override
@@ -42,10 +45,10 @@ public class DataFinderPage extends LabKeyPage
         _test.waitForElement(LabKeyPage.Locators.pageSignal(GROUP_UPDATED_SIGNAL));
     }
 
-    public static DataFinderPage goDirectlyToPage(BaseWebDriverTest test, String containerPath)
+    public static DataFinderPage goDirectlyToPage(BaseWebDriverTest test, String containerPath, boolean testingStudies)
     {
         test.beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION));
-        return new DataFinderPage(test);
+        return new DataFinderPage(test, testingStudies);
     }
 
     public void selectStudySubset(String text)
@@ -103,9 +106,31 @@ public class DataFinderPage extends LabKeyPage
         locator.findElement(_test.getDriver()).click();
     }
 
+    public void navigateToStudies()
+    {
+        navigate("Studies");
+        assertElementVisible(DataFinderPage.Locators.studyFinder);
+    }
+
+    public void navigateToPublications()
+    {
+        navigate("Publications");
+        assertElementVisible(DataFinderPage.Locators.pubFinder);
+    }
+
+    public void navigate(String buttonText)
+    {
+        clickButton(buttonText, 0);
+    }
+
     public Map<Dimension, Integer> getSummaryCounts()
     {
-        WebElement summaryElement = Locators.summaryArea.findElement(_test.getDriver());
+        WebElement summaryElement;
+        if(testingStudies)
+            summaryElement = Locators.studySummaryArea.findElement(_test.getDriver());
+        else
+            summaryElement = Locators.pubSummaryArea.findElement(_test.getDriver());
+
         SummaryPanel summary = new SummaryPanel(summaryElement);
 
         Map<Dimension, Integer> countMap = new HashMap<>();
@@ -119,22 +144,31 @@ public class DataFinderPage extends LabKeyPage
         return countMap;
     }
 
-    public List<StudyCard> getStudyCards()
+    public List<DataCard> getDataCards()
     {
-        List<WebElement> studyCardEls = Locators.studyCard.findElements(_test.getDriver());
-        List<StudyCard> studyCards = new ArrayList<>();
+        List<WebElement> cardEls;
 
-        for (WebElement el : studyCardEls)
+        if(testingStudies)
+            cardEls = Locators.studyCard.findElements(_test.getDriver());
+        else
+            cardEls = Locators.pubCard.findElements(_test.getDriver());
+
+        List<DataCard> cards = new ArrayList<>();
+
+        for (WebElement el : cardEls)
         {
-            studyCards.add(new StudyCard(el));
+            cards.add(new DataCard(el));
         }
 
-        return studyCards;
+        return cards;
     }
 
     public FacetGrid getFacetsGrid()
     {
-        return new FacetGrid(Locators.facetPanel.findElement(_test.getDriver()));
+        if(testingStudies)
+            return new FacetGrid(Locators.studyFacetPanel.findElement(_test.getDriver()));
+        else
+            return new FacetGrid(Locators.pubFacetPanel.findElement(_test.getDriver()));
     }
 
 
@@ -181,13 +215,19 @@ public class DataFinderPage extends LabKeyPage
     
     public static class Locators
     {
-        public static final Locator.CssLocator studyFinder = Locator.css(".labkey-data-finder-outer");
+        public static final Locator.CssLocator studyFinder = Locator.css(".labkey-study-finder-card");
         public static final Locator.CssLocator studySearchInput = studyFinder.append(Locator.css("#searchTerms"));
         public static final Locator.XPathLocator studySubsetCombo = Ext4Helper.Locators.formItemWithInputNamed("subsetSelect");
         public static final Locator.CssLocator studyCard = studyFinder.append(Locator.css(".labkey-study-card"));
-        public static final Locator.CssLocator selectionPanel = studyFinder.append(Locator.css(".labkey-facet-selection-panel"));
-        public static final Locator.CssLocator facetPanel = selectionPanel.append(Locator.css(" .labkey-study-facets"));
-        public static final Locator.CssLocator summaryArea = selectionPanel.append(Locator.css("#summaryArea"));
+        public static final Locator.CssLocator studySelectionPanel = studyFinder.append(Locator.css(".labkey-facet-selection-panel"));
+        public static final Locator.CssLocator studyFacetPanel = studySelectionPanel.append(Locator.css(" .labkey-study-facets"));
+        public static final Locator.CssLocator studySummaryArea = studySelectionPanel.append(Locator.css("#summaryArea"));
+        public static final Locator.CssLocator pubFinder = Locator.css(".labkey-publication-finder-card");
+        public static final Locator.CssLocator pubSelectionPanel = pubFinder.append(Locator.css(".labkey-facet-selection-panel"));
+        public static final Locator.CssLocator pubFacetPanel = pubSelectionPanel.append(Locator.css(" .labkey-publication-facets"));
+        public static final Locator.CssLocator pubSummaryArea = pubSelectionPanel.append(Locator.css("#summaryArea"));
+        public static final Locator.CssLocator pubCard = pubFinder.append(Locator.css(".labkey-publication-card"));
+        public static final Locator.CssLocator pubCardHighlight = pubFinder.append(Locator.css(".labkey-publication-highlight"));
         public static final Locator.CssLocator activeClearAll = Locator.css(".labkey-clear-all.active");
         public static final Locator.CssLocator groupLabel = Locator.css(".labkey-group-label");
         public static final Locator.NameLocator groupLabelInput = Locator.name("groupLabel");
@@ -199,14 +239,31 @@ public class DataFinderPage extends LabKeyPage
 
     public enum Dimension
     {
+        // Common
         STUDIES("studies", null),
+
+        // Study focused.
         SUBJECTS("subjects", null),
         THERAPEUTIC_AREA("therapeutic area", "Study.Therapeutic Area"),
         STUDY_TYPE("study type", "Study.Study Type"),
         ASSAY("assay", "Study.Assay"),
         AGE_GROUP("age group", "Study.AgeGroup"),
         PHASE("phase", "Study.Phase"),
-        CONDITION("condition", "Study.Condition");
+        CONDITION("condition", "Study.Condition"),
+
+        // Publication focused.
+        PUBLICATIONS("publications", null),
+        STATUS("status", "Publication.Status"),
+        COMPLETE("complete", "Complete"),
+        IN_PROGRESS("in progress", "In Progress"),
+        PUBLICATION_TYPE("publication type", "Publication.Publication Type"),
+        PUB_THERAPEUTIC_AREA("therapeutic area", "Publication.Therapeutic Area"),
+        YEAR("year", "Publication.Year"),
+        PUBLICATION_JOURNAL("journal", "Publication.Journal"),
+        PUB_STUDY("study", "Publication.Study"),
+        PUB_ASSAY("assay", "Publication.Assay"),
+        PUB_CONDITION("condition", "Publication.Condition");
+
 
         private String caption;
         private String hierarchyName;
@@ -338,6 +395,7 @@ public class DataFinderPage extends LabKeyPage
         {
             WebElement clearEl = locators.facetClear(dimension).findElement(_test.getDriver());
             Assert.assertFalse("Attempting to clear filter that is not active", clearEl.getAttribute("class").contains("inactive"));
+            scrollIntoView(clearEl);
             clearEl.click();
         }
 
@@ -458,7 +516,7 @@ public class DataFinderPage extends LabKeyPage
         }
     }
 
-    public class StudyCard
+    public class DataCard
     {
         WebElement card;
         Elements elements;
@@ -466,7 +524,7 @@ public class DataFinderPage extends LabKeyPage
         String accession;
         String pi;
 
-        private StudyCard(WebElement card)
+        private DataCard(WebElement card)
         {
             this.card = card;
             elements = new Elements();
@@ -477,7 +535,7 @@ public class DataFinderPage extends LabKeyPage
             return card;
         }
 
-        public StudySummaryWindow viewSummary()
+        public StudySummaryWindow viewStudySummary()
         {
             elements.viewStudyLink.findElement(card).click();
             return new StudySummaryWindow(_test);
@@ -488,34 +546,52 @@ public class DataFinderPage extends LabKeyPage
             _test.clickAndWait(elements.goToStudyLink.findElement(card));
         }
 
-        public String getAccession()
+        public String getStudyAccession()
         {
-            return elements.accession.findElement(card).getText();
+            return elements.studyAccession.findElement(card).getText();
         }
 
-        public String getShortName()
+        public String getStudyShortName()
         {
-            return elements.shortName.findElement(card).getText();
+            return elements.studyShortName.findElement(card).getText();
         }
 
-        public String getPI()
+        public String getStudyPI()
         {
-            return elements.PI.findElement(card).getText();
+            return elements.studyPI.findElement(card).getText();
         }
 
         public String getTitle()
         {
-            return elements.title.findElement(card).getText();
+            if(testingStudies)
+                return elements.studyTitle.findElement(card).getText();
+            else
+                return elements.pubTitle.findElement(card).getText();
+        }
+
+        public PublicationDetailPanel viewDetail()
+        {
+            elements.pubMoreDetails.findElement(card).click();
+            return new PublicationDetailPanel(_test);
+        }
+
+        public void clickViewDocument()
+        {
+            elements.pubViewDocument.findElement(card).click();
         }
 
         private class Elements
         {
             public Locator viewStudyLink = Locator.linkWithText("view summary");
             public Locator goToStudyLink = Locator.linkWithText("go to study");
-            public Locator accession = Locator.css(".labkey-study-card-accession");
-            public Locator shortName = Locator.css(".labkey-study-card-short-name");
-            public Locator PI = Locator.css(".labkey-study-card-pi");
-            public Locator title = Locator.css(".labkey-study-card-title");
+            public Locator studyAccession = Locator.css(".labkey-study-card-accession");
+            public Locator studyShortName = Locator.css(".labkey-study-card-short-name");
+            public Locator studyPI = Locator.css(".labkey-study-card-pi");
+            public Locator studyTitle = Locator.css(".labkey-study-card-title");
+            public Locator pubTitle = Locator.css(".labkey-publication-title");
+            public Locator pubViewDocument = Locator.linkWithText("view document");
+            public Locator pubMoreDetails = Locator.linkWithText("more details");
         }
     }
+
 }
