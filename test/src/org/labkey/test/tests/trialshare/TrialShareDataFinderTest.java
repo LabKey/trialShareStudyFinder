@@ -614,7 +614,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertTrue("URL of opened windows does not go where expected.", getURL().getHost().contains("onlinelibrary.wiley.com"));
         // Close the external window.
 
-        // Why does think it is custom modules?
         getDriver().close();
         switchToMainWindow();
 
