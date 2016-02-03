@@ -397,6 +397,7 @@ public class DataFinderPage extends LabKeyPage
             Assert.assertFalse("Attempting to clear filter that is not active", clearEl.getAttribute("class").contains("inactive"));
             scrollIntoView(clearEl);
             clearEl.click();
+            waitForElement(Locator.xpath("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]//span[contains(@class,'labkey-clear-filter')][contains(@class, 'inactive')]"));
         }
 
         public Map<Dimension, List<String>> getSelectedMembers()

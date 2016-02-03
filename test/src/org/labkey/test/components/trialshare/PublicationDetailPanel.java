@@ -15,6 +15,7 @@ public class PublicationDetailPanel extends Component
     public PublicationDetailPanel(BaseWebDriverTest test)
     {
         _test = test;
+        _test.waitForElement(Locators.self);
         _panel = Locators.self.waitForElement(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
