@@ -396,7 +396,7 @@ public class DataFinderPage extends LabKeyPage
             WebElement clearEl = locators.facetClear(dimension).findElement(_test.getDriver());
             Assert.assertFalse("Attempting to clear filter that is not active", clearEl.getAttribute("class").contains("inactive"));
             scrollIntoView(clearEl);
-            clearEl.click();
+            _test.clickAt(locators.facetClear(dimension), 3, 3, 0);
             waitForElement(Locator.xpath("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]//span[contains(@class,'labkey-clear-filter')][contains(@class, 'inactive')]"));
         }
 
@@ -538,7 +538,7 @@ public class DataFinderPage extends LabKeyPage
 
         public StudySummaryWindow viewStudySummary()
         {
-            elements.viewStudyLink.findElement(card).click();
+            clickAt(elements.viewStudyLink.findElement(card), 3, 3, 0);
             return new StudySummaryWindow(_test);
         }
 
@@ -572,7 +572,7 @@ public class DataFinderPage extends LabKeyPage
 
         public PublicationDetailPanel viewDetail()
         {
-            elements.pubMoreDetails.findElement(card).click();
+            clickAt(elements.pubMoreDetails.findElement(card), 3, 3, 0);
             return new PublicationDetailPanel(_test);
         }
 
