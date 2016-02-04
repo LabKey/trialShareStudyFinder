@@ -1,4 +1,4 @@
-Ext4.define('LABKEY.study.data.StudyCard', {
+Ext4.define('LABKEY.study.data.Study', {
     extend: 'Ext.data.Model',
 
     idProperty : 'studyId',
@@ -16,6 +16,7 @@ Ext4.define('LABKEY.study.data.StudyCard', {
         {name: 'abstractCount', type: 'int'},
         {name: 'manuscriptCount', type: 'int'},
         {name: 'participantCount', type: 'int'},
-        {name: 'isSelected', type: 'boolean'}
+        {name: 'isSelected', type: 'boolean'},
+        {name: 'isHighlighted', type: 'boolean', defaultValue: false}
     ]
 });

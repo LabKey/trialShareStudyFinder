@@ -66,7 +66,7 @@
 <h2 class="labkey-study-short-name"><% if (null!=study.getShortName()) {%><a style="color:#fff" href="<%=h(study.getShortName())%>"><%}%><%=h(study.getShortName())%><% if (null!=study.getShortName()) {%></a><%}%></h2>
 <div id="labkey-study-details-content">
 <% if (null != study.getIconUrl()) {%><img src="<%=h(study.getIconUrl())%>"/><%}%>
-<h3 class="study-title"><%=h(study.getTitle())%></h3>
+<h3 class="labkey-study-title"><%=h(study.getTitle())%></h3>
     <div><%
 
         if (null != study.getPersonnel())
@@ -109,9 +109,9 @@
                         %><br/><span class="labkey-publication-author"><%=h(pub.getAuthor())%></span><%
                     }
                 %><%
-                    if (!StringUtils.isEmpty(pub.getPubmedId()))
+                    if (!StringUtils.isEmpty(pub.getPmid()))
                     {
-                        %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPubmedId(), null, null, linkProps)%><%
+                        %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPmid(), null, null, linkProps)%><%
                     }
                     for (Pair<String, String> urlData : pub.getUrls())
                     {

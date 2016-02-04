@@ -1,3 +1,22 @@
+/*.labkey-publications-panel .x4-box-item*/
+/*{*/
+    /*width: 100%*/
+/*}*/
+
+/*.labkey-publications-panel .x4-box-inner*/
+/*{*/
+    /*float: right;*/
+/*}*/
+
+/*.labkey-finder-help {*/
+    /*width: 100%;*/
+    /*float: right;*/
+/*}*/
+
+.labkey-finder-object-selection {
+    padding-left: 10px;
+}
+
 .labkey-studies-panel {
     background-color: #ffffff
 }
@@ -11,7 +30,7 @@ DIV.labkey-study-cards {
     background-color: #ffffff
 }
 
-DIV.labkey-study-facets {
+DIV.labkey-finder-facets {
     background-color: #ffffff
 }
 
@@ -35,6 +54,7 @@ DIV.labkey-study-facets {
     font-variant:small-caps;
 }
 
+.labkey-publication-goto,
 .labkey-study-card-summary,
 .labkey-study-card-accession
 {
@@ -48,6 +68,7 @@ DIV.labkey-study-facets {
     float:right;
 }
 
+.labkey-publication-title,
 .labkey-study-card-divider,
 .labkey-study-card-title,
 .labkey-study-card-description
@@ -204,35 +225,35 @@ DIV.labkey-facet-summary
     padding: 3px 0px 0px 20px;
 }
 
-.labkey-study-facets .x4-grid-row {
+.labkey-finder-facets .x4-grid-row {
     border-width: 0px;
 }
 
-.labkey-study-facets .x4-grid-row-selected .x4-grid-td {
+.labkey-finder-facets .x4-grid-row-selected .x4-grid-td {
     background-color: white;
     background-image: none;
 }
 
-.labkey-study-facets .x4-grid-row-selected .labkey-facet-percent-bar {
+.labkey-finder-facets .x4-grid-row-selected .labkey-facet-percent-bar {
     background-color: rgba(81, 158, 218, 0.2);
 }
 
-.labkey-study-facets .x4-grid-cell-special .x4-grid-cell-inner {
+.labkey-finder-facets .x4-grid-cell-special .x4-grid-cell-inner {
     background-color: white;
     background-image: none;
 }
 
-.labkey-study-facets .x4-grid-group-hd {
+.labkey-finder-facets .x4-grid-group-hd {
     background-color:rgb(240, 240, 240);
     border-color: #7c7c7c;
     border-bottom-width:1px;
 }
 
-.labkey-study-facets .x4-grid-cell-special {
+.labkey-finder-facets .x4-grid-cell-special {
     border-right-width: 0px;
 }
 
-.labkey-study-facets .x4-grid-group-hd .x4-grid-group-title {
+.labkey-finder-facets .x4-grid-group-hd .x4-grid-group-title {
     background-position: left 28%
 }
 
@@ -313,14 +334,14 @@ LI.labkey-facet-member SPAN.bar-selected
     background-color:rgba(81, 158, 218, 0.2);
 }
 
-.labkey-study-facets .x4-grid-view
+.labkey-finder-facets .x4-grid-view
 {
     overflow: hidden;
 }
 
-.labkey-study-facets .x4-grid-row-focused .x4-grid-td,
-.labkey-study-facets .x4-grid-row-before-focused .x4-grid-td,
-.labkey-study-facets .x4-grid-cell
+.labkey-finder-facets .x4-grid-row-focused .x4-grid-td,
+.labkey-finder-facets .x4-grid-row-before-focused .x4-grid-td,
+.labkey-finder-facets .x4-grid-cell
 {
     border-bottom-style: hidden;
     border-top-style: hidden;
@@ -474,10 +495,65 @@ div.labkey-study-details h3 {
     font-weight: bold;
 }
 
-.labkey-publication-citation {
 
-}
 
 .labkey-publication-author {
     font-style: italic;
+}
+
+.labkey-publication-cards .x4-box-inner {
+    overflow: auto;
+}
+
+.labkey-publication-card .labkey-publication-author,
+.labkey-publication-card .labkey-publication-title,
+.labkey-publication-card .labkey-publication-citation {
+    padding-bottom:10px;
+}
+
+.labkey-publication-card
+{
+    /*background-color:#F8F8F8;*/
+    /*border:1pt solid #AAAAAA;*/
+    border-bottom:1px solid #AAAAAA;
+    padding: 5pt;
+    margin: 5pt;
+    float:left;
+    position:relative;
+    width:90%;
+    /*width:171pt;*/
+    /*height:140pt;*/
+    overflow-y:hidden;
+}
+
+.labkey-publication-details .labkey-publication-title
+{
+    font-variant:small-caps;
+}
+
+.labkey-publication-details .labkey-publication-author,
+.labkey-publication-details .labkey-publication-identifiers,
+.labkey-publication-details .labkey-publication-citation
+{
+    padding-bottom : 5px;
+}
+
+.labkey-publication-details .labkey-publication-abstract
+{
+    padding: 10px;
+}
+
+.labkey-publication-details .labkey-publication-detail-label
+{
+    font-weight: bold;
+}
+
+.labkey-publication-details .labkey-study-short-name
+{
+    float: none;
+}
+
+.labkey-finder-label
+{
+    font-weight: bold;
 }

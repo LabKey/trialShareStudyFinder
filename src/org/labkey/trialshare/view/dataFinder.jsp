@@ -15,7 +15,11 @@
      * limitations under the License.
      */
 %>
+<%@ page import="com.fasterxml.jackson.databind.ObjectMapper" %>
+<%@ page import="org.labkey.api.view.HttpView" %>
+<%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.template.ClientDependency" %>
+<%@ page import="org.labkey.trialshare.TrialShareController" %>
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page extends="org.labkey.api.jsp.JspBase"%>
 <%!
@@ -27,6 +31,12 @@
     }
 %>
 
+<%
+    JspView<TrialShareController.FinderBean> me = (JspView) HttpView.currentView();
+    TrialShareController.FinderBean bean = me.getModelBean();
+
+    ObjectMapper jsonMapper = new ObjectMapper();
+%>
 
 <script type="text/javascript">
     var DataFinder = {};
@@ -34,15 +44,11 @@
     {
         DataFinder.finderView = Ext4.create('LABKEY.study.panel.Finder', {
             renderTo    : 'dataFinderWrapper',
-            dataModuleName: 'trialshare',
-            olapConfig : {
-                configId: 'TrialShare:/StudyCube',
-                schemaName: 'lists',
-                name: 'StudyCube'
-            },
-            showSearch: false
+            dataModuleName: '<%=h(bean.getDataModuleName())%>',
+            cubeConfigs : <%=text(jsonMapper.writeValueAsString(bean.getCubeConfigs()))%>
         });
     });
+
 </script>
 
 <div id="dataFinderWrapper" class="labkey-data-finder-outer">

@@ -1,9 +1,7 @@
-Ext4.define('LABKEY.study.store.StudySubsets', {
+Ext4.define('LABKEY.study.store.Subsets', {
     extend: "Ext.data.Store",
     autoLoad: true,
-    id: 'StudySubsetStore',
-    model: 'LABKEY.study.data.StudySubset',
-    isLoaded: false,
+    model: 'LABKEY.study.data.Subset',
     defaultValue: null,
     proxy: {
         type: 'ajax',
@@ -16,7 +14,6 @@ Ext4.define('LABKEY.study.store.StudySubsets', {
     listeners: {
         'load' : {
             fn : function(store, records, options) {
-                store.isLoaded = true;
                 for (var i = 0; i < records.length; i++)
                 {
                     if (records[i].data.isDefault)
@@ -31,7 +28,7 @@ Ext4.define('LABKEY.study.store.StudySubsets', {
     },
 
     constructor: function(config) {
-        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "studySubsets.api", LABKEY.containerPath);
+        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "subsets.api", LABKEY.containerPath, {objectName: config.objectName});
         this.callParent(config);
     }
 });

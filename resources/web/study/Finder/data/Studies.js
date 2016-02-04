@@ -1,12 +1,10 @@
 Ext4.define('LABKEY.study.store.Studies', {
     extend: 'Ext.data.Store',
-    storeId: 'studies',
-    model: 'LABKEY.study.data.StudyCard',
+    storeId: 'Study',
+    model: 'LABKEY.study.data.Study',
     autoLoad: false,
-    dataModuleName: "study",
-    isLoaded: false,
-    selectedStudies : {},
-    selectedSubset : 'public',
+
+    selectedSubset : '[Study.Public].[true]', // TODO generalize
     proxy : {
         type: "ajax",
         //url: set before calling "load".
@@ -16,14 +14,13 @@ Ext4.define('LABKEY.study.store.Studies', {
         }
     },
     sorters: [{
-        property: 'studyId',
+        property: 'shortName',
         direction: 'ASC'
     }],
 
     listeners: {
         'load' : {
             fn : function(store, records, options) {
-                store.isLoaded = true;
                 store.updateFilters(this.selectedSubset ? null : {}); // initial load should have no studies selected
             },
             scope: this
@@ -45,7 +42,7 @@ Ext4.define('LABKEY.study.store.Studies', {
 
         this.filter([
                 {property: 'isSelected', value: true},
-                {property: 'isPublic', value: this.selectedSubset !== "operational"}
+                {property: 'isPublic', value: this.selectedSubset !== "[Study.Public].[false]"} // TODO generalize
         ]);
     },
 
@@ -56,7 +53,8 @@ Ext4.define('LABKEY.study.store.Studies', {
         }
     },
 
-    selectSubset : function(subsetId, subset) {
-
+    constructor: function(config) {
+        config.selectedStudies = {};
+        this.callParent(config);
     }
 });

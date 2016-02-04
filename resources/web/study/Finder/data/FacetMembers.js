@@ -1,7 +1,7 @@
 Ext4.define('LABKEY.study.store.FacetMembers', {
     extend: 'Ext.data.Store',
     model: 'LABKEY.study.data.FacetMember',
-    storeId: 'facetMembers',
+
     autoLoad: false,
 
     groupers: [
@@ -28,6 +28,5 @@ Ext4.define('LABKEY.study.store.FacetMembers', {
             record.set("percent", 0);
         });
     }
-
 
 });

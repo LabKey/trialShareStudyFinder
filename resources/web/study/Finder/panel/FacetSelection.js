@@ -35,8 +35,8 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         this.getFacets().clearAllFilters(false);
     },
 
-    onStudySubsetChanged: function() {
-        this.getFacets().onStudySubsetChanged();
+    onSubsetChanged: function() {
+        this.getFacets().onSubsetChanged();
     },
 
     onFilterSelectionChange: function(hasFilters) {
@@ -58,9 +58,20 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     getFacetSelectionSummary: function() {
         if (!this.facetSelectionSummary) {
-            this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.SelectionSummary", {
-                dataModuleName: this.dataModuleName
-            });
+            if (this.cubeConfig.objectName == "Study")
+            {
+                this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.StudySummary", {
+                    dataModuleName: this.dataModuleName,
+                    objectName: this.cubeConfig.objectName
+                });
+            }
+            else
+            {
+                this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.PublicationSummary", {
+                    dataModuleName: this.dataModuleName,
+                    objectName: this.cubeConfig.objectName
+                });
+            }
         }
         return this.facetSelectionSummary;
     },
@@ -69,7 +80,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         if (!this.facets) {
             this.facets = Ext4.create("LABKEY.study.panel.FacetsGrid", {
                 dataModuleName: this.dataModuleName,
-                olapConfig: this.olapConfig
+                cubeConfig: this.cubeConfig
             });
         }
         return this.facets;
