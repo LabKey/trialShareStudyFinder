@@ -9,25 +9,26 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
 
     isGuest : false,
 
-    currentGroup: {
-        id: null,
-        label: "Unsaved group"
-    },
-
-    saveOptions: [
-        {
-            id: "save",
-            label : "Save",
-            isActive : true
-        },
-        {
-            id: "saveAs",
-            label : "Save As",
-            isActive : false
-        }
-    ],
-
     initComponent: function() {
+
+        //this.currentGroup = {
+        //    id: null,
+        //            label: "Unsaved group"
+        //},
+        //
+        //this.saveOptions = [
+        //    {
+        //        id: "save",
+        //        label : "Save",
+        //        isActive : true
+        //    },
+        //    {
+        //        id: "saveAs",
+        //        label : "Save As",
+        //        isActive : false
+        //    }
+        //];
+
         this.items = [];
         if (this.showParticipantGroups)
         {

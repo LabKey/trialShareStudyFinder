@@ -2,6 +2,11 @@
 
    <Cube name="StudyCube" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
 
+       <Annotations>
+           <Annotation name="SchemaName">Study</Annotation> <!-- who to ask about permissions -->
+           <Annotation name="AllowMDX">FALSE</Annotation>
+       </Annotations>
+
         <Table schema="lists" name="StudyProperties" >
         </Table>
 

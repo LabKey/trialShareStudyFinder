@@ -1,10 +1,10 @@
-Ext4.define("LABKEY.study.panel.SelectionSummary", {
+Ext4.define("LABKEY.study.panel.StudySummary", {
     extend: 'Ext.Component',
 
     alias : 'widget.facet-selection-summary',
 
     tpl: new Ext4.XTemplate(
-            '<div id="selectionPanel">',
+            '<div id="studySelectionPanel">',
             '       <div id="summaryArea" class="labkey-facet-summary" >',
             '           <div class="labkey-facet-header"><span class="labkey-facet-caption">Summary</span></div>',
             '           <ul>',
@@ -23,14 +23,14 @@ Ext4.define("LABKEY.study.panel.SelectionSummary", {
                 formatNumber :  Ext4.util.Format.numberRenderer('0,000'),
 
                 getStudyCount : function(defaultValue) {
-                    var studyStore = Ext4.getStore("studies");
+                    var studyStore = Ext4.getStore("Study");
                     if (!studyStore)
                         return this.formatNumber(defaultValue);
                     return this.formatNumber(studyStore.count());
                 },
 
                 getParticipantCount: function(defaultValue) {
-                    var studyStore = Ext4.getStore("studies");
+                    var studyStore = Ext4.getStore("Study");
                     if (!studyStore)
                         return this.formatNumber(defaultValue);
                     return this.formatNumber(studyStore.sum("participantCount"));
@@ -44,7 +44,8 @@ Ext4.define("LABKEY.study.panel.SelectionSummary", {
     },
 
     initComponent: function() {
-        Ext4.getStore('studies').addListener('filterChange',this.onFilterSelectionChanged, this);
+        Ext4.getStore(this.objectName).addListener('filterChange',this.onFilterSelectionChanged, this);
+        this.callParent();
     },
 
     onFilterSelectionChanged : function() {

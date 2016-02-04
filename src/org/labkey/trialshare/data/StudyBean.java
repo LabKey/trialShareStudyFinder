@@ -39,6 +39,7 @@ public class StudyBean
     private String briefDescription;
     private String studyIdPrefix = null; // common prefix used in labeling studies
     private String availability;
+    private Boolean isHighlighted;
     private Boolean isPublic;
     private Integer participantCount;
 
@@ -100,6 +101,15 @@ public class StudyBean
         isLoaded = loaded;
     }
 
+    public Boolean getIsHighlighted()
+    {
+        return isHighlighted;
+    }
+
+    public void setIsHighlighted(Boolean highlighted)
+    {
+        isHighlighted = highlighted;
+    }
 
     public String getBriefDescription()
     {

@@ -1,27 +1,25 @@
-Ext4.define("LABKEY.study.panel.Studies", {
+Ext4.define("LABKEY.study.panel.Publications", {
     extend: 'Ext.panel.Panel',
 
     layout : 'vbox',
     border: false,
-    alias : 'widget.labkey-studies-panel',
-    cls: 'labkey-studies-panel',
+    alias : 'widget.labkey-publications-panel',
+    cls: 'labkey-publications-panel',
 
     padding: "5 0 0 0",
 
-    objectName: 'Study',
-
-    showSearch : true,
+    objectName: 'Publication',
 
     autoScroll: true,
 
     initComponent : function() {
         this.items = [
-            this.getStudyPanelHeader(),
-            this.getStudyCards()
+            this.getCardPanelHeader(),
+            this.getCards()
         ];
         this.callParent();
 
-        //this.getStudyCards().store.addListener('filterChange',this.onFilterSelectionChanged, this);
+        //this.getCards().store.addListener('filterChange',this.onFilterSelectionChanged, this);
         this.on(
                 {'subsetChanged': this.onSubsetChanged,
                  'searchTermsChanged': this.onSearchTermsChanged
@@ -36,15 +34,16 @@ Ext4.define("LABKEY.study.panel.Studies", {
 
     onSubsetChanged : function(selectedSubset) {
         if (!selectedSubset)
-            selectedSubset = this.getStudyPanelHeader().getSubsetMenu().getValue();
-        this.getStudyCards().store.updateFilters(null, selectedSubset);
+            selectedSubset = this.getCardPanelHeader().getSubsetMenu().getValue();
+        this.getCards().store.updateFilters(null, selectedSubset);
     },
 
     onSearchTermsChanged : function(value) {
         console.log("search terms changed to " + value)
     },
 
-    getStudyPanelHeader : function() {
+    // TODO move to base class
+    getCardPanelHeader : function() {
         if (!this.cardPanelHeader) {
             this.cardPanelHeader = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
                 dataModuleName: this.dataModuleName,
@@ -56,12 +55,12 @@ Ext4.define("LABKEY.study.panel.Studies", {
         return this.cardPanelHeader;
     },
 
-    getStudyCards : function() {
-        if (!this.studyCards) {
-            this.studyCards = Ext4.create("LABKEY.study.panel.StudyCards", {
+    getCards : function() {
+        if (!this.cards) {
+            this.cards = Ext4.create("LABKEY.study.panel.PublicationCards", {
                 dataModuleName: this.dataModuleName
             });
         }
-        return this.studyCards;
+        return this.cards;
     }
 });
