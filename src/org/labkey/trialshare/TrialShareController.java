@@ -81,6 +81,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
+            setTitle("TrialShare Data Finder");
             return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean(getContainer()));
         }
     }

@@ -20,6 +20,7 @@ public abstract class StudySummaryPanel extends Component
     public StudySummaryPanel(BaseWebDriverTest test)
     {
         _test = test;
+        _test.waitForElement(Locators.self);
         _panel = Locators.self.waitForElement(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         elements().accession.isDisplayed();
     }
