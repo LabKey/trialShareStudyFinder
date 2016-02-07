@@ -387,6 +387,11 @@ public class DataFinderPage extends LabKeyPage
             return this.grid;
         }
 
+        public boolean facetIsPresent(Dimension dimension)
+        {
+            return _test.isElementPresent(locators.facetGroup(dimension));
+        }
+
         public void toggleFacet(Dimension dimension, String name)
         {
             Locator.XPathLocator rowLocator = locators.facetMember(dimension, name);

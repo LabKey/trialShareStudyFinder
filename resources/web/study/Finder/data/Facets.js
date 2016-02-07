@@ -100,6 +100,31 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     },
 
+    getCountDistinctFilters: function() {
+        var filters = [];
+        var newFilters = this.getStudySubsetFilter();
+        if (newFilters != null)
+            filters.push(newFilters);
+        newFilters = this.getCustomFilters();
+        if (newFilters != null)
+            filters.push(newFilters);
+        return filters;
+    },
+
+    getCustomFilters: function() {
+        if (LABKEY.user.canInsert)
+            return null;
+        if (this.cubeConfig.objectName == "Study")
+            return null;
+            //return {level: "[Study.Assay].[Public]", members: [ "[true]" ]};
+        else
+            return {level: "[Publication.Status].[Status]", members: [ "[Publication.Status].[Complete]" ] };
+            //return [
+            //    {level: "[Publication.Status].[Status]", members: [ "[Publication.Status].[Complete]" ] },
+            //    {level: "[Publication.Assay].[Public]", members: [ "[true]" ]}
+            //];
+    },
+
     updateCountsAsync: function (isSavedGroup)
     {
         if (!this.isLoaded || !this.mdx)
@@ -109,12 +134,9 @@ Ext4.define('LABKEY.study.store.Facets', {
         }
 
         var facetStore = this;
-        var intersectFilters = [];
+        var intersectFilters = this.getCountDistinctFilters();
         var i, f, facet;
 
-        var filter = this.getStudySubsetFilter();
-        if (filter)
-            intersectFilters.push(filter);
         for (f = 0; f < facetStore.count(); f++)
         {
             facet = facetStore.getAt(f);

@@ -29,6 +29,7 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Git;
 import org.labkey.test.components.study.StudyOverviewWebPart;
 import org.labkey.test.components.trialshare.PublicationDetailPanel;
@@ -700,6 +701,22 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         log("Validate that there are no 'In Progress' cards visible.");
         assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardHighlight);
 
+    }
+
+    @Test
+    public void testPublicationStatusForReader()
+    {
+        impersonate(PUBLIC_READER);
+        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), false);
+        log("Go to publications and clear any filters that may have been set.");
+        finder.navigateToPublications();
+        finder.clearAllFilters();
+        Map<DataFinderPage.Dimension, Integer> summaryCount = finder.getSummaryCounts();
+        DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
+        Assert.assertFalse("Status facet should not be present for someone with only read permission", fg.facetIsPresent(DataFinderPage.Dimension.STATUS));
+
+        Assert.assertEquals("Publication count should not count incomplete publications", (Integer) 127, summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS));
+        stopImpersonating();
     }
 
     @Test
