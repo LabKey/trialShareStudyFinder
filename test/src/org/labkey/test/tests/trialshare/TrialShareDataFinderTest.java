@@ -291,9 +291,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     {
         goToProjectHome();
         impersonate(PUBLIC_READER);
-        DataFinderPage finder = new DataFinderPage(this);
+        DataFinderPage finder = new DataFinderPage(this, true);
         Assert.assertFalse("Public user should not see the subset menu", finder.hasStudySubsetCombo());
-        List<DataFinderPage.DataCard> cards = finder.getStudyCards();
+        List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("Number of studies not as expected", studySubsets.get("Public").size(), cards.size());
         stopImpersonating();
         goToProjectHome();
@@ -311,10 +311,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     {
         goToProjectHome();
         impersonate(WISPR_READER);
-        DataFinderPage finder = new DataFinderPage(this);
+        DataFinderPage finder = new DataFinderPage(this, true);
         Assert.assertTrue("Operational user should see the subset menu", finder.hasStudySubsetCombo());
         finder.selectStudySubset("Operational");
-        List<DataFinderPage.StudyCard> cards = finder.getStudyCards();
+        List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("User with access to only WISP-R study should see only that study", 1, cards.size());
     }
 
@@ -334,10 +334,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         goToProjectHome(RELOCATED_DATA_FINDER_PROJECT);
         new PortalHelper(this).addWebPart(WEB_PART_NAME);
-        DataFinderPage finder = new DataFinderPage(this);
+        DataFinderPage finder = new DataFinderPage(this, true);
         Assert.assertTrue("Should see the subset dropdown", finder.hasStudySubsetCombo());
         finder.selectStudySubset("Public");
-        Assert.assertEquals("Should see all the study cards", 12, finder.getStudyCards().size());
+        Assert.assertEquals("Should see all the study cards", 12, finder.getDataCards().size());
         containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, false);
 
     }
