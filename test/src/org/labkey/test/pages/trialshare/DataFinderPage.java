@@ -48,6 +48,11 @@ public class DataFinderPage extends LabKeyPage
         return new DataFinderPage(test);
     }
 
+    public boolean hasStudySubsetCombo()
+    {
+        return _test.isElementPresent(Locators.studySubsetCombo);
+    }
+
     public void selectStudySubset(String text)
     {
         // FIXME isn't there a general method for asking "is this combo list item already selected"?

@@ -47,6 +47,7 @@ Ext4.define("LABKEY.study.panel.Publications", {
         if (!this.cardPanelHeader) {
             this.cardPanelHeader = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
                 dataModuleName: this.dataModuleName,
+                cubeContainerPath: this.cubeContainerPath,
                 padding: 8,
                 showSearch : this.showSearch,
                 objectName: this.objectName
@@ -58,7 +59,8 @@ Ext4.define("LABKEY.study.panel.Publications", {
     getCards : function() {
         if (!this.cards) {
             this.cards = Ext4.create("LABKEY.study.panel.PublicationCards", {
-                dataModuleName: this.dataModuleName
+                dataModuleName: this.dataModuleName,
+                cubeContainerPath : this.cubeContainerPath
             });
         }
         return this.cards;

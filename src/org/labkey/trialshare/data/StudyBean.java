@@ -227,6 +227,15 @@ public class StudyBean
         this.url = url;
     }
 
+    public void setUrl(User user)
+    {
+        Container studyContainer = ContainerManager.getForId(getStudyContainer());
+        if (studyContainer != null)
+        {
+            url = studyContainer.getStartURL(user).toString();
+        }
+    }
+
     public String getUrl()
     {
         return this.url;
@@ -236,19 +245,10 @@ public class StudyBean
     {
         if (url == null)
         {
-            Collection<Map<String, Object>> maps = getStudyProperties(c, user);
-            for (Map<String, Object> map : maps)
+            Container studyContainer = ContainerManager.getForId(getStudyContainer());
+            if (studyContainer != null)
             {
-                Container studyContainer = ContainerManager.getForId((String) map.get("container"));
-                String studyId = (String) map.get(studyIdField);
-                String name = (String) map.get("Label");
-                if (null == studyId && getStudyIdPrefix() != null && name.startsWith(getStudyIdPrefix()))
-                    studyId = name;
-                if (null != studyContainer && StringUtils.equalsIgnoreCase(getStudyId(), studyId))
-                {
-                    url = studyContainer.getStartURL(user).toString();
-                    break;
-                }
+                url = studyContainer.getStartURL(user).toString();
             }
         }
         return url;
@@ -272,45 +272,8 @@ public class StudyBean
         return Collections.emptyList();
     }
 
-
-    public static Map<String, String> getStudyUrls(Container c, User user, String idField)
-    {
-        Map<String, String> studyUrls = new HashMap<>();
-        Collection<Map<String, Object>> maps = getStudyProperties(c, user);
-        for (Map<String, Object> map : maps)
-        {
-            Container studyContainer = ContainerManager.getForId((String) map.get("container"));
-            String studyId = (String) map.get(idField);
-
-            if (null != studyContainer && studyId != null)
-            {
-                studyUrls.put(studyId, studyContainer.getStartURL(user).toString());
-            }
-        }
-        return studyUrls;
-    }
-
     public String getDescription(Container c, User user)
     {
-        if (description == null)
-        {
-            Collection<Map<String, Object>> maps = getStudyProperties(c, user);
-            for (Map<String, Object> map : maps)
-            {
-                Container studyContainer = ContainerManager.getForId((String) map.get("container"));
-                String studyAccession = (String)map.get(studyIdField);
-                if (null != studyContainer && StringUtils.equalsIgnoreCase(getStudyId(), studyAccession))
-                {
-                    description = (String) map.get("description");
-                    if (description != null) {
-                        String rendererType = (String) map.get("descriptionRendererType");
-                        description = getFormattedHtml(rendererType == null ? null : WikiRendererType.valueOf(rendererType), description);
-                    }
-                    break;
-                }
-            }
-
-        }
         return description;
     }
 

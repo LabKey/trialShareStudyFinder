@@ -1,3 +1,4 @@
+<%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%
     /*
      * Copyright (c) 2015 LabKey Corporation
@@ -38,6 +39,7 @@
     ObjectMapper jsonMapper = new ObjectMapper();
 %>
 
+<labkey:errors></labkey:errors>
 <script type="text/javascript">
     var DataFinder = {};
     Ext4.onReady(function ()

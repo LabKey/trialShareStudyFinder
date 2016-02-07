@@ -15,15 +15,21 @@
  */
 package org.labkey.trialshare;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.Marshal;
 import org.labkey.api.action.Marshaller;
 import org.labkey.api.action.ReturnUrlForm;
+import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
+import org.labkey.api.data.Container;
 import org.labkey.api.data.SimpleFilter;
+import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
 import org.labkey.api.gwt.client.util.StringUtils;
+import org.labkey.api.module.Module;
+import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
@@ -41,6 +47,7 @@ import org.labkey.trialshare.data.StudyFacetBean;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.data.StudySubset;
 import org.labkey.trialshare.view.DataFinderWebPart;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.web.servlet.ModelAndView;
@@ -74,20 +81,20 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
-            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean());
+            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean(getContainer()));
         }
     }
 
-    public static FinderBean getFinderBean()
+    public static FinderBean getFinderBean(Container container)
     {
         FinderBean bean = new FinderBean();
         bean.setDataModuleName(TrialShareModule.NAME);
-        bean.addCubeConfig(getCubeConfigBean("studies"));
-        bean.addCubeConfig(getCubeConfigBean("publications"));
+        bean.addCubeConfig(getCubeConfigBean("studies", container));
+        bean.addCubeConfig(getCubeConfigBean("publications", container));
         return bean;
     }
 
-    public static CubeConfigBean getCubeConfigBean(String objectName)
+    public static CubeConfigBean getCubeConfigBean(String objectName, Container container)
     {
         if (objectName == null)
             objectName = "studies";
@@ -97,6 +104,8 @@ public class TrialShareController extends SpringActionController
         bean.setDataModuleName(TrialShareModule.NAME);
         bean.setShowSearch(false);
         bean.setShowParticipantFilters(false);
+        Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
+        bean.setCubeContainer(((TrialShareModule) trialShareModule).getCubeContainer(container));
 
         if (objectName.equalsIgnoreCase("studies"))
         {
@@ -129,7 +138,7 @@ public class TrialShareController extends SpringActionController
     public static class FinderBean
     {
         private String _dataModuleName;
-        List<CubeConfigBean> _cubeConfigs = new ArrayList<>();
+        private List<CubeConfigBean> _cubeConfigs = new ArrayList<>();
 
         public String getDataModuleName()
         {
@@ -172,6 +181,8 @@ public class TrialShareController extends SpringActionController
         private Boolean _showParticipantFilters;
         private Boolean _isDefault;
         private String _subsetLevelName;
+        private String _cubeContainerPath;
+        private String _cubeContainerId;
 
         public String getObjectName()
         {
@@ -302,6 +313,36 @@ public class TrialShareController extends SpringActionController
         {
             _subsetLevelName = subsetLevelName;
         }
+
+
+        public void setCubeContainer(@Nullable Container cubeContainer)
+        {
+            if (cubeContainer != null)
+            {
+                _cubeContainerId = cubeContainer.getId();
+                _cubeContainerPath = cubeContainer.getPath();
+            }
+        }
+
+        public String getCubeContainerId()
+        {
+            return _cubeContainerId;
+        }
+
+        public void setCubeContainerId(String cubeContainerId)
+        {
+            _cubeContainerId = cubeContainerId;
+        }
+
+        public String getCubeContainerPath()
+        {
+            return _cubeContainerPath;
+        }
+
+        public void setCubeContainerPath(String cubeContainerPath)
+        {
+            _cubeContainerPath = cubeContainerPath;
+        }
     }
 
     @RequiresPermission(ReadPermission.class)
@@ -329,41 +370,57 @@ public class TrialShareController extends SpringActionController
         public Object execute(StudiesForm form, BindException errors) throws Exception
         {
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
-            List<StudyBean> studies  = (new TableSelector(coreSchema.getSchema("lists").getTable("studyProperties"))).getArrayList(StudyBean.class);
-            List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("manuscriptsAndAbstracts")).getArrayList(StudyPublicationBean.class));
-            Map<String, Pair<Integer, Integer>> pubCounts = new HashMap<>();
-            for (StudyPublicationBean pub : publications) {
-                if (pubCounts.get(pub.getStudyId()) == null)
-                    pubCounts.put(pub.getStudyId(), new Pair<>(0,0));
-                Pair<Integer, Integer> countPair =  pubCounts.get(pub.getStudyId());
-                if (pub.getPublicationType() != null)
-                    if (pub.getPublicationType().equalsIgnoreCase("Manuscript"))
-                        countPair.first += 1;
+            TableInfo studyProperties = coreSchema.getSchema("lists").getTable("studyProperties");
+
+            if (studyProperties != null)
+            {
+                List<StudyBean> studies = (new TableSelector(studyProperties)).getArrayList(StudyBean.class);
+                TableInfo publicationsList = coreSchema.getSchema("lists").getTable("manuscriptsAndAbstracts");
+                Map<String, Pair<Integer, Integer>> pubCounts = new HashMap<>();
+                if (publicationsList != null)
+                {
+                    List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
+
+                    for (StudyPublicationBean pub : publications)
+                    {
+                        if (pubCounts.get(pub.getStudyId()) == null)
+                            pubCounts.put(pub.getStudyId(), new Pair<>(0, 0));
+                        Pair<Integer, Integer> countPair = pubCounts.get(pub.getStudyId());
+                        if (pub.getPublicationType() != null)
+                            if (pub.getPublicationType().equalsIgnoreCase("Manuscript"))
+                                countPair.first += 1;
+                            else
+                                countPair.second += 1;
+
+                    }
+                }
+                for (StudyBean study : studies)
+                {
+                    study.setUrl(getUser());
+                    if (pubCounts.get(study.getStudyId()) == null)
+                    {
+                        study.setManuscriptCount(0);
+                        study.setAbstractCount(0);
+                    }
                     else
-                        countPair.second += 1;
-
-            }
-            Map<String, String> studyUrls = StudyBean.getStudyUrls(getContainer(), getUser(), StudyBean.studyIdField);
-            for (StudyBean study : studies) {
-                study.setUrl(studyUrls.get(study.getStudyId()));
-                if (pubCounts.get(study.getStudyId()) == null)
-                {
-                    study.setManuscriptCount(0);
-                    study.setAbstractCount(0);
+                    {
+                        study.setManuscriptCount(pubCounts.get(study.getStudyId()).first);
+                        study.setAbstractCount(pubCounts.get(study.getStudyId()).second);
+                    }
+                    study.setIsHighlighted((study.getManuscriptCount() + study.getAbstractCount()) > 0);
                 }
-                else
-                {
-                    study.setManuscriptCount(pubCounts.get(study.getStudyId()).first);
-                    study.setAbstractCount(pubCounts.get(study.getStudyId()).second);
-                }
-                study.setIsHighlighted((study.getManuscriptCount() + study.getAbstractCount()) > 0);
-            }
 
-            return success(studies);
+                return success(studies);
+            }
+            else
+            {
+                return new SimpleResponse(false);
+            }
         }
     }
 
 
+    // TODO remove
     public static class StudiesForm
     {}
 
@@ -399,13 +456,21 @@ public class TrialShareController extends SpringActionController
         public Object execute(Object o, BindException errors) throws Exception
         {
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
-            List<StudyPublicationBean> publications = (new TableSelector(coreSchema.getSchema("lists").getTable("manuscriptsAndAbstracts")).getArrayList(StudyPublicationBean.class));
-            for (StudyPublicationBean publication : publications)
+            TableInfo publicationsList = coreSchema.getSchema("lists").getTable("manuscriptsAndAbstracts");
+            if (publicationsList != null)
             {
-                publication.setIsHighlighted(publication.getStatus().equalsIgnoreCase("in progress"));
-            }
+                List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
+                for (StudyPublicationBean publication : publications)
+                {
+                    publication.setIsHighlighted(publication.getStatus().equalsIgnoreCase("in progress"));
+                }
 
-            return success(publications);
+                return success(publications);
+            }
+            else
+            {
+                return new SimpleResponse(false);
+            }
         }
     }
 
@@ -541,24 +606,32 @@ public class TrialShareController extends SpringActionController
 
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             QuerySchema listSchema = coreSchema.getSchema("lists");
-            StudyBean study = (new TableSelector(listSchema.getTable("studyProperties"))).getObject(_studyId, StudyBean.class);
-
-
-            SimpleFilter filter = new SimpleFilter();
-            filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
-            study.setPublications((new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"), filter, null)).getArrayList(StudyPublicationBean.class));
-
-            VBox v = new VBox();
-            if (null != form.getReturnActionURL())
+            TableInfo studyPropertiesList = listSchema.getTable("studyProperties");
+            if (studyPropertiesList != null)
             {
-                v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
-            }
-            StudyDetailBean bean = new StudyDetailBean();
-            bean.setStudy(study);
-            bean.setDetailType(form.getDetailType());
-            v.addView(new JspView<StudyDetailBean>("/org/labkey/trialshare/view/studyDetail.jsp", bean));
+                StudyBean study = (new TableSelector(listSchema.getTable("studyProperties"))).getObject(_studyId, StudyBean.class);
 
-            return v;
+
+                SimpleFilter filter = new SimpleFilter();
+                filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
+                study.setPublications((new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"), filter, null)).getArrayList(StudyPublicationBean.class));
+
+                VBox v = new VBox();
+                if (null != form.getReturnActionURL())
+                {
+                    v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
+                }
+                StudyDetailBean bean = new StudyDetailBean();
+                bean.setStudy(study);
+                bean.setDetailType(form.getDetailType());
+                v.addView(new JspView<StudyDetailBean>("/org/labkey/trialshare/view/studyDetail.jsp", bean));
+
+                return v;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         @Override
@@ -615,21 +688,29 @@ public class TrialShareController extends SpringActionController
 
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             QuerySchema listSchema = coreSchema.getSchema("lists");
-            StudyPublicationBean publication = (new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"))).getObject(_id, StudyPublicationBean.class);
-
-            SimpleFilter filter = new SimpleFilter();
-            filter.addCondition(FieldKey.fromParts("key"), _id);
-            publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
-
-
-            VBox v = new VBox();
-            if (null != form.getReturnActionURL())
+            TableInfo publicationsList = listSchema.getTable("manuscriptsAndAbstracts");
+            if (publicationsList != null)
             {
-                v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
-            }
-            v.addView(new JspView<StudyPublicationBean>("/org/labkey/trialshare/view/publicationDetail.jsp", publication));
+                StudyPublicationBean publication = (new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"))).getObject(_id, StudyPublicationBean.class);
 
-            return v;
+                SimpleFilter filter = new SimpleFilter();
+                filter.addCondition(FieldKey.fromParts("key"), _id);
+                publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
+
+
+                VBox v = new VBox();
+                if (null != form.getReturnActionURL())
+                {
+                    v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
+                }
+                v.addView(new JspView<StudyPublicationBean>("/org/labkey/trialshare/view/publicationDetail.jsp", publication));
+
+                return v;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         @Override

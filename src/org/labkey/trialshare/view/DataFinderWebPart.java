@@ -5,7 +5,6 @@ import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.ViewContext;
 import org.labkey.trialshare.TrialShareController;
-import org.labkey.trialshare.TrialShareModule;
 
 public class DataFinderWebPart extends JspView
 {
@@ -24,11 +23,12 @@ public class DataFinderWebPart extends JspView
     public DataFinderWebPart(Container c)
     {
         super("/org/labkey/trialshare/view/dataFinder.jsp");
-        this.setModelBean(TrialShareController.getFinderBean());
+        this.setModelBean(TrialShareController.getFinderBean(c));
 
         setTitle("Data Finder");
         setTitleHref(new ActionURL(TrialShareController.DataFinderAction.class, c));
     }
+
     public DataFinderWebPart(ViewContext v)
     {
         this(v.getContainer());

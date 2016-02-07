@@ -96,6 +96,11 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     {
         this.hidePopup(this.detailShowing);
 
+        var url = LABKEY.ActionURL.buildURL(this.dataModuleName, 'studyDetail.view', this.cubeContainerPath, {
+            _frame: 'none',
+            detailType: 'study',
+            studyId : studyId
+        });
         var detailWindow = Ext4.create('Ext.window.Window', {
             width: 800,
             maxHeight: 600,
@@ -106,7 +111,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             autoScroll: true,
             loader: {
                 autoLoad: true,
-                url: this.dataModuleName + '-studyDetail.view?_frame=none&detailType=study&studyId=' + studyId
+                url: url
             }
         });
         var viewScroll = Ext4.getBody().getScroll();
@@ -123,6 +128,11 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     {
         this.hidePopup(this.manuscriptsShowing);
 
+        var url = LABKEY.ActionURL.buildURL(this.dataModuleName, 'studyDetail.view', this.cubeContainerPath, {
+            _frame: 'none',
+            detailType: 'publications',
+            studyId : studyId
+        });
         var detailWindow = Ext4.create('Ext.window.Window', {
             width: 800,
             maxHeight: 600,
@@ -133,7 +143,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             autoScroll: true,
             loader: {
                 autoLoad: true,
-                url: this.dataModuleName + '-studyDetail.view?_frame=none&detailType=publications&studyId=' + studyId
+                url: url
             }
         });
         var viewScroll = Ext4.getBody().getScroll();
@@ -158,7 +168,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
 
     initComponent: function(config)
     {
-        this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "studies.api", LABKEY.containerPath);
+        this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "studies.api", this.cubeContainerPath);
         this.getStore().load();
         this.callParent();
     },
@@ -166,6 +176,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     constructor: function(config)
     {
         this.dataModuleName = config.dataModuleName;
+        this.cubeContainerPath = config.cubeContainerPath;
         this.callParent(config);
     }
 });

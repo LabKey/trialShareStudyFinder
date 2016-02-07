@@ -45,6 +45,8 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             configId: this.cubeConfig.configId,
             schemaName: this.cubeConfig.schemaName,
             name: this.cubeConfig.cubeName,
+            container: this.cubeConfig.cubeContainerId,
+            containerPath: this.cubeConfig.cubeContainerPath,
             deferLoad: false
         });
         this.cube.onReady(function (m)
@@ -169,6 +171,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             this.studiesPanel = Ext4.create("LABKEY.study.panel.Studies", {
                 showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
+                cubeContainerPath: this.cubeConfig.cubeContainerPath,
                 region: 'center',
                 width: '80%'
             });
@@ -181,6 +184,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             this.publicationsPanel = Ext4.create("LABKEY.study.panel.Publications", {
                 showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
+                cubeContainerPath: this.cubeConfig.cubeContainerPath,
                 region: 'center',
                 width: '80%'
             });

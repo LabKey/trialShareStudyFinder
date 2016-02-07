@@ -19,6 +19,7 @@ package org.labkey.trialshare;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
+import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
@@ -48,14 +49,18 @@ public class TrialShareManager
         QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
         SimpleFilter filter = new SimpleFilter();
         filter.addCondition(FieldKey.fromParts("isPublic"), false);
-        List<StudyBean> studies  = (new TableSelector(coreSchema.getSchema("lists").getTable("studyProperties"), filter, null)).getArrayList(StudyBean.class);
-        for (StudyBean study : studies)
+        TableInfo propertiesList = coreSchema.getSchema("lists").getTable("studyProperties");
+        if (propertiesList != null)
         {
-            if (study.getStudyContainer() != null)
+            List<StudyBean> studies = (new TableSelector(propertiesList, filter, null)).getArrayList(StudyBean.class);
+            for (StudyBean study : studies)
             {
-                Container studyContainer = ContainerManager.getForId(study.getStudyContainer());
-                if (studyContainer.hasPermission(user, ReadPermission.class))
-                    return true;
+                if (study.getStudyContainer() != null)
+                {
+                    Container studyContainer = ContainerManager.getForId(study.getStudyContainer());
+                    if (studyContainer.hasPermission(user, ReadPermission.class))
+                        return true;
+                }
             }
         }
 

@@ -52,10 +52,15 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         }
     },
 
-    showDetailPopup : function(studyId)
+    showDetailPopup : function(objectId)
     {
         this.hidePopup(this.detailShowing);
 
+        var url = LABKEY.ActionURL.buildURL(this.dataModuleName, 'publicationDetail.view', this.cubeContainerPath, {
+            _frame: 'none',
+            detailType: 'publication',
+            id : objectId
+        });
         var detailWindow = Ext4.create('Ext.window.Window', {
             width: 800,
             maxHeight: 600,
@@ -66,7 +71,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             autoScroll: true,
             loader: {
                 autoLoad: true,
-                url: this.dataModuleName + '-publicationDetail.view?_frame=none&detailType=publication&id=' + studyId
+                url: url
             }
         });
         var viewScroll = Ext4.getBody().getScroll();
@@ -92,7 +97,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
 
     initComponent: function(config)
     {
-        this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "publications.api", LABKEY.containerPath);
+        this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "publications.api", this.cubeContainerPath);
         this.getStore().load();
         this.callParent();
     },
@@ -100,6 +105,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     constructor: function(config)
     {
         this.dataModuleName = config.dataModuleName;
+        this.cubeContainerPath = config.cubeContainerPath;
         this.callParent(config);
     }
 });

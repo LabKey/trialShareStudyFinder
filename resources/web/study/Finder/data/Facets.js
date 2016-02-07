@@ -195,6 +195,8 @@ Ext4.define('LABKEY.study.store.Facets', {
             "sql": true,
             configId: this.cubeConfig.configId,
             schemaName: this.cubeConfig.schemaName,
+            container: this.cubeConfig.cubeContainerId,
+            containerPath : this.cubeConfig.cubeContainerPath,
             name: this.cubeConfig.name,
             success: function (cellSet, mdx, config)
             {
