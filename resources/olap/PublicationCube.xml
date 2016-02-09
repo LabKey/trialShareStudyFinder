@@ -11,7 +11,7 @@
                 <Level name="Publication" visible="true" column="Key" type="Integer" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="Key">
-                <Table name="publicationsToShow" schema="lists"/>
+                <Table name="publicationTherapeuticArea" schema="lists"/>
                 <Level name="Therapeutic Area" visible="true" column="therapeuticArea" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Publication Type" hasAll="true" primaryKey="Key">
