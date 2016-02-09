@@ -115,14 +115,12 @@ Ext4.define('LABKEY.study.store.Facets', {
         if (LABKEY.user.canInsert)
             return null;
         if (this.cubeConfig.objectName == "Study")
-            return null;
-            //return {level: "[Study.Assay].[Public]", members: [ "[true]" ]};
+            return {level: "[Study.AssayVisibility].[Visibility]", members: [ "[Study.AssayVisibility].[Public]", "[Study.AssayVisibility].[#null]" ]};
         else
-            return {level: "[Publication.Status].[Status]", members: [ "[Publication.Status].[Complete]" ] };
-            //return [
-            //    {level: "[Publication.Status].[Status]", members: [ "[Publication.Status].[Complete]" ] },
-            //    {level: "[Publication.Assay].[Public]", members: [ "[true]" ]}
-            //];
+            return [
+                {level: "[Publication.Status].[Status]", members: [ "[Publication.Status].[Complete]" ] },
+                {level: "[Publication.AssayVisibility].[Visibility]", members: [ "[Publication.AssayVisibility].[Public]", "[Publication.AssayVisibility].[#null]" ]}
+            ];
     },
 
     updateCountsAsync: function (isSavedGroup)

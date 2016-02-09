@@ -3,22 +3,25 @@
    <Cube name="StudyCube" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
 
        <Annotations>
-           <Annotation name="ContainerFilter">AllFolders</Annotation>
+           <!--<Annotation name="ContainerFilter">AllFolders</Annotation>-->
            <Annotation name="AllowMDX">FALSE</Annotation>
        </Annotations>
 
-        <Table schema="lists" name="StudyProperties" >
+        <Table schema="lists" name="StudyAssay" >
         </Table>
 
         <Dimension name="Study" visible="true" highCardinality="false" foreignKey="StudyId">
             <Hierarchy hasAll="true" primaryKey="StudyId">
-                <Level name="Container" visible="true" column="StudyContainer"/>
+                <Table name="studyProperties" schema="lists"/>
+                <!--<Level name="Container" visible="true" column="StudyContainer"/>-->
                 <Level name="Study" visible="true" column="shortName" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="StudyId">
+                <Table name="studyTherapeuticArea" schema="lists"/>
                 <Level name="Therapeutic Area" visible="true" column="therapeuticArea" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Study Type" hasAll="true" primaryKey="StudyId">
+                <Table name="studyProperties" schema="lists"/>
                 <Level name="StudyType" visible="true"  type="String" column="studyType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
@@ -38,16 +41,14 @@
                 </Level>
             </Hierarchy>
             <Hierarchy name="Public" hasAll="true" primaryKey="StudyId">
+                <Table name="studyProperties" schema="lists"/>
                 <Level name="Public" visible="true" column="isPublic" type="Boolean" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Assay" hasAll="true" primaryKey="StudyId">
-                <Table name="studyAssay" schema="lists"/>
-                <Level name="Assay" visible="true" table="studyAssay" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-                <!--<KeyExpression><SQL dialect="generic">-->
-                    <!--&lt;!&ndash;case when studyAssay.public == TRUE then studyAssay.assay&ndash;&gt;-->
-                    <!--&lt;!&ndash;else ''&ndash;&gt;-->
-                    <!--studyAssay.public == TRUE-->
-                <!--</SQL></KeyExpression>-->
+                <Level name="Assay" visible="true" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
+            <Hierarchy name="AssayVisibility" hasAll="true" primaryKey="StudyId">
+                <Level name="Visibility" visible="true"  type="String" column="Visibility" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
         </Dimension>
 

@@ -2,17 +2,20 @@
 
     <Cube name="PublicationCube" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
 
-        <Table schema="lists" name="ManuscriptsAndAbstracts" >
+        <Table schema="lists" name="PublicationAssay" >
         </Table>
 
-        <Dimension name="Publication" visible="true" highCardinality="false" foreignKey="Key">
+        <Dimension name="Publication" visible="true" highCardinality="false" foreignKey="PublicationId">
             <Hierarchy hasAll="true" primaryKey="Key">
+                <Table name="ManuscriptsAndAbstracts" schema="lists"/>
                 <Level name="Publication" visible="true" column="Key" type="Integer" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="Key">
+                <Table name="ManuscriptsAndAbstracts" schema="lists"/>
                 <Level name="Therapeutic Area" visible="true" column="therapeuticArea" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Publication Type" hasAll="true" primaryKey="Key">
+                <Table name="ManuscriptsAndAbstracts" schema="lists"/>
                 <Level name="PublicationType" visible="true"  type="String" column="publicationType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
@@ -22,14 +25,17 @@
                 </Level>
             </Hierarchy>
             <Hierarchy name="Year" hasAll="true" primaryKey="Key">
+                <Table name="ManuscriptsAndAbstracts" schema="lists"/>
                 <Level name="Year" visible="true" type="Integer" column="year" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
             <Hierarchy name="Journal" hasAll="true" primaryKey="Key">
+                <Table name="ManuscriptsAndAbstracts" schema="lists"/>
                 <Level name="Journal" visible="true" type="String" column="journal" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
             <Hierarchy name="Status" hasAll="true" primaryKey="Key">
+                <Table name="ManuscriptsAndAbstracts" schema="lists"/>
                 <Level name="Status" visible="true" type="String" column="status" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
@@ -39,8 +45,10 @@
                 </Level>
             </Hierarchy>
             <Hierarchy name="Assay" hasAll="true" primaryKey="publicationId">
-                <Table name="publicationAssay" schema="lists"/>
-                <Level name="Assay" visible="true" table="publicationAssay" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+                <Level name="Assay" visible="true" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
+            <Hierarchy name="AssayVisibility" hasAll="true" primaryKey="publicationId">
+                <Level name="Visibility" visible="true"  type="String" column="Visibility" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
         </Dimension>
 
