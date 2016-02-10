@@ -64,6 +64,8 @@ public class StudyPublicationBean
         this.id = id;
     }
 
+    public void set_Key(Integer id) { this.id = id; } // this is required because for SQLServer we alias "Key" as "_Key" in our query
+
     public String getStudyId()
     {
         return studyId;
