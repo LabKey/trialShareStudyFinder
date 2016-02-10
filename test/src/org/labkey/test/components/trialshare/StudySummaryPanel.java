@@ -4,7 +4,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
-import org.labkey.test.selenium.LazyWaitingWebElement;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -82,7 +81,7 @@ public abstract class StudySummaryPanel extends Component
             return _panel;
         }
 
-        WebElement accession = new LazyWaitingWebElement(Locator.css(".labkey-study-accession"), this);
+        WebElement accession = new LazyWebElement(Locator.css(".labkey-study-accession"), this);
         WebElement shortName = new LazyWebElement(Locator.css(".labkey-study-short-name"), this);
         WebElement title = new LazyWebElement(Locator.css(".labkey-study-title"), this);
         WebElement PI = new LazyWebElement(Locator.css(".labkey-study-pi"), this);
