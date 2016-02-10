@@ -77,6 +77,13 @@ Ext4.define('LABKEY.study.store.Facets', {
                     facet.data.selectedMembers = facet.data.members;
                 }
             }
+            facetMembersStore.filter(
+                [
+                    {filterFn: function(item) {
+                        return item.get("facet").get("displayFacet");
+                    }}
+                ]
+            );
             facetMembersStore.sort();
             this.updateCountsAsync(false);
         }
@@ -111,16 +118,53 @@ Ext4.define('LABKEY.study.store.Facets', {
         return filters;
     },
 
-    getCustomFilters: function() {
+    getCustomFilters: function()
+    {
         if (LABKEY.user.canInsert)
             return null;
         if (this.cubeConfig.objectName == "Study")
-            return {level: "[Study.AssayVisibility].[Visibility]", members: [ "[Study.AssayVisibility].[Public]", "[Study.AssayVisibility].[#null]" ]};
+        {
+            var members = this.getValidFacetMemberSubset(["[Study.AssayVisibility].[Public]", "[Study.AssayVisibility].[#null]"]);
+            if (members.length > 0)
+            {
+                return {
+                    level: "[Study.AssayVisibility].[Visibility]",
+                    members: members
+                };
+            }
+            else
+                return null;
+        }
         else
-            return [
-                {level: "[Publication.Status].[Status]", members: [ "[Publication.Status].[Complete]" ] },
-                {level: "[Publication.AssayVisibility].[Visibility]", members: [ "[Publication.AssayVisibility].[Public]", "[Publication.AssayVisibility].[#null]" ]}
-            ];
+        {
+            var filters = [];
+            var members = this.getValidFacetMemberSubset(["[Publication.Status].[Complete]"]);
+            if (members.length > 0)
+            {
+                filters.push({level: "[Publication.Status].[Status]", members: members})
+            }
+            members = this.getValidFacetMemberSubset(["[Publication.AssayVisibility].[Public]", "[Publication.AssayVisibility].[#null]"]);
+            if (members.length > 0)
+            {
+                filters.push({
+                    level: "[Publication.AssayVisibility].[Visibility]",
+                    members: members
+                });
+            }
+            return filters.length > 0 ? filters : null;
+        }
+    },
+
+    getValidFacetMemberSubset : function(possibleMembers)
+    {
+        var validMembers = [];
+        var facetMemberStore = Ext4.getStore(this.cubeConfig.objectName + "FacetMembers");
+        for (var i = 0; i < possibleMembers.length; i++)
+        {
+            if (facetMemberStore.getById(possibleMembers[i]))
+                validMembers.push(possibleMembers[i]);
+        }
+        return validMembers;
     },
 
     updateCountsAsync: function (isSavedGroup)
@@ -131,13 +175,11 @@ Ext4.define('LABKEY.study.store.Facets', {
             return;
         }
 
-        var facetStore = this;
         var intersectFilters = this.getCountDistinctFilters();
         var i, f, facet;
-
-        for (f = 0; f < facetStore.count(); f++)
+        for (f = 0; f < this.count(); f++)
         {
-            facet = facetStore.getAt(f);
+            facet = this.getAt(f);
             var selectedMembers = facet.get("selectedMembers");
             if (facet.get("name") == this.cubeConfig.objectName)
             {
@@ -196,9 +238,9 @@ Ext4.define('LABKEY.study.store.Facets', {
 
         var onRows = { operator: "UNION", arguments: [] };
         onRows.arguments.push({level: this.cubeConfig.filterByLevel});
-        for (f = 0; f < facetStore.count(); f++)
+        for (f = 0; f < this.count(); f++)
         {
-            facet = facetStore.getAt(f);
+            facet = this.getAt(f);
             if (facet.get("name") == "Subject")
                 onRows.arguments.push({level: facet.data.hierarchy.levels[0].uniqueName});
             else if (facet.get("name") == this.cubeConfig.objectName )
@@ -294,7 +336,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                     if (-1 == resultMember.uniqueName.indexOf("#") && "(All)" != resultMember.name)
                         console.log("member not found: " + resultMember.uniqueName);
                 }
-                else
+                else if (facet.get("displayFacet"))
                 {
                     member.set("count", count);
                     if (count > max)

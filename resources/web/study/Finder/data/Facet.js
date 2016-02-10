@@ -17,7 +17,8 @@ Ext4.define('LABKEY.study.data.Facet', {
         {name: 'levelName'},
         {name: 'allMemberName'},
         {name: 'ordinal'},
-        {name: 'isExpanded', type:'boolean', defaultValue: true}
+        {name: 'isExpanded', type:'boolean', defaultValue: true},
+        {name: 'displayFacet', type:'boolean', defaultValue: true}
     ],
 
     associations: [

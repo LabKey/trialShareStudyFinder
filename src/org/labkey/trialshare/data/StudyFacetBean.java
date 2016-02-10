@@ -17,6 +17,7 @@ public class StudyFacetBean
     private FacetFilter.Type defaultFilterType;
     private List<FacetFilter> filterOptions;
     private Integer ordinal;
+    private Boolean displayFacet = true;
 
     public StudyFacetBean() {}
 
@@ -108,5 +109,15 @@ public class StudyFacetBean
     public void setOrdinal(Integer ordinal)
     {
         this.ordinal = ordinal;
+    }
+
+    public Boolean getDisplayFacet()
+    {
+        return displayFacet;
+    }
+
+    public void setDisplayFacet(Boolean displayFacet)
+    {
+        this.displayFacet = displayFacet;
     }
 }

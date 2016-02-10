@@ -523,6 +523,10 @@ public class TrialShareController extends SpringActionController
             facet = new StudyFacetBean("Study", "Studies", "Study", "Study", "[Study].[(All)]", FacetFilter.Type.OR, null);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
+            facet = new StudyFacetBean("Visibility", "Visibility", "Study.AssayVisibility", "Visibility", "[Study.AssayVisibility].[(All)]", FacetFilter.Type.OR, null);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facet.setDisplayFacet(false);
+            facets.add(facet);
 
             return facets;
         }
@@ -532,12 +536,10 @@ public class TrialShareController extends SpringActionController
             List<StudyFacetBean> facets = new ArrayList<>();
             StudyFacetBean facet;
 
-            if (getContainer().hasPermission(getUser(), InsertPermission.class))
-            {
-                facet = new StudyFacetBean("Status", "Statuses", "Publication.Status", "Status", "[Publication.Status][(All)]", FacetFilter.Type.OR, 1);
-                facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-                facets.add(facet);
-            }
+            facet = new StudyFacetBean("Status", "Statuses", "Publication.Status", "Status", "[Publication.Status][(All)]", FacetFilter.Type.OR, 1);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facet.setDisplayFacet(getContainer().hasPermission(getUser(), InsertPermission.class));
+            facets.add(facet);
             facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Publication.Therapeutic Area", "Therapeutic Area", "[Publication.Therapeutic Area][(All)]", FacetFilter.Type.OR, 3);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
@@ -562,6 +564,11 @@ public class TrialShareController extends SpringActionController
             facet = new StudyFacetBean("Publication", "Publications", "Publication", "Publication", "[Publication].[(All)]", FacetFilter.Type.OR, null);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
+            facet = new StudyFacetBean("Visibility", "Visibility", "Publication.AssayVisibility", "Visibility", "[Publication.AssayVisibility].[(All)]", FacetFilter.Type.OR, null);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facet.setDisplayFacet(false);
+            facets.add(facet);
+
             return facets;
         }
     }
