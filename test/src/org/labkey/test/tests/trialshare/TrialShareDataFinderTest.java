@@ -696,7 +696,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Validate counts for 'Complete' publications.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.COMPLETE);
-        assertEquals("Expected count after filtering for 'Complete' was not as expected.", 127, counts.get("Complete").intValue());
+        assertEquals("Expected count after filtering for 'Complete' was not as expected.", 126, counts.get("Complete").intValue());
 
         log("Validate that there are no 'In Progress' cards visible.");
         assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardHighlight);
@@ -715,7 +715,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
         Assert.assertFalse("Status facet should not be present for someone with only read permission", fg.facetIsPresent(DataFinderPage.Dimension.STATUS));
 
-        Assert.assertEquals("Publication count should not count incomplete publications", (Integer) 127, summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS));
+        Assert.assertEquals("Publication count should not count incomplete publications", (Integer) 126, summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS));
         stopImpersonating();
     }
 
@@ -750,14 +750,15 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertTrue("DOI value not as expected on detail page.", detailPanel.getDOI().contains("10.1002/ART.30615"));
         assertTrue("Studies value not as expected on detail page.", detailPanel.getStudyShortName().contains("RAVE"));
 
-        log("Validate that the links actually go someplace.");
-        detailPanel.clickDOI();
-        switchToWindow(1);
-        assertTrue("URL of opened windows does not go where expected.", getURL().getHost().contains("onlinelibrary.wiley.com"));
-        // Close the external window.
-
-        getDriver().close();
-        switchToMainWindow();
+//        disabling because we don't want our tests to spam external sites
+//        log("Validate that the links actually go someplace.");
+//        detailPanel.clickDOI();
+//        switchToWindow(1);
+//        assertTrue("URL of opened windows does not go where expected.", getURL().getHost().contains("onlinelibrary.wiley.com"));
+//        // Close the external window.
+//
+//        getDriver().close();
+//        switchToMainWindow();
 
         detailPanel.closeWindow();
 

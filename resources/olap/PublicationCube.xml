@@ -44,10 +44,10 @@
                 <Level name="Condition" visible="true" table="publicationCondition" type="String" column="Condition" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
-            <Hierarchy name="Assay" hasAll="true" primaryKey="publicationId">
+            <Hierarchy name="Assay" hasAll="true">
                 <Level name="Assay" visible="true" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
-            <Hierarchy name="AssayVisibility" hasAll="true" primaryKey="publicationId">
+            <Hierarchy name="AssayVisibility" hasAll="true">
                 <Level name="Visibility" visible="true"  type="String" column="Visibility" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
         </Dimension>
