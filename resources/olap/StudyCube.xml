@@ -11,7 +11,7 @@
         </Table>
 
         <Dimension name="Study" visible="true" highCardinality="false" foreignKey="StudyId">
-            <Hierarchy hasAll="true" primaryKey="StudyId">
+            <Hierarchy hasAll="true" primaryKeyTable="studyProperties" primaryKey="StudyId">
                 <Table name="studyProperties" schema="lists"/>
                 <!--<Level name="Container" visible="true" column="StudyContainer"/>-->
                 <Level name="Study" visible="true" column="shortName" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
@@ -47,7 +47,7 @@
             <Hierarchy name="Assay" hasAll="true" primaryKey="StudyId">
                 <Level name="Assay" visible="true" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
-            <Hierarchy name="AssayVisibility" hasAll="true" primaryKey="StudyId">
+            <Hierarchy name="AssayVisibility" hasAll="true">
                 <Level name="Visibility" visible="true"  type="String" column="Visibility" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
         </Dimension>
