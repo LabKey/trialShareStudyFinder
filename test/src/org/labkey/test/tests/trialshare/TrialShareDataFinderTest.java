@@ -785,6 +785,17 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertTrue("Studies value not as expected on detail page.", detailPanel.getStudyShortName().contains("RAVE"));
 
         detailPanel.closeWindow();
+    }
+
+    @Ignore("Not yet implemented well")
+    @Test
+    public void testAssayVisibility()
+    {
+        goToProjectHome();
+        impersonate(PUBLIC_READER);
+        DataFinderPage finder = new DataFinderPage(this, true);
+        // TODO
+        stopImpersonating();
 
     }
 

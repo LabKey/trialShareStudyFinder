@@ -365,11 +365,10 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class StudiesAction extends ApiAction<StudiesForm>
+    public class StudiesAction extends ApiAction
     {
-
         @Override
-        public Object execute(StudiesForm form, BindException errors) throws Exception
+        public Object execute(Object form, BindException errors) throws Exception
         {
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             TableInfo studyProperties = coreSchema.getSchema("lists").getTable("studyProperties");
@@ -420,12 +419,6 @@ public class TrialShareController extends SpringActionController
             }
         }
     }
-
-
-    // TODO remove
-    public static class StudiesForm
-    {}
-
 
     private List<FacetFilter> getFacetFilters(Boolean includeAnd, Boolean includeOr, FacetFilter.Type defaultType)
     {
