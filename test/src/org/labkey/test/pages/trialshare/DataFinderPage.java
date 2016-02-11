@@ -28,6 +28,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -214,7 +215,7 @@ public class DataFinderPage extends LabKeyPage
                             "else" +
                             "  return true;");
                 }
-                catch (Exception recheck)
+                catch (WebDriverException recheck)
                 {
                     return false;
                 }
