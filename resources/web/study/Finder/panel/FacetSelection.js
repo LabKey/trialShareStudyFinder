@@ -1,7 +1,11 @@
 Ext4.define("LABKEY.study.panel.FacetSelection", {
     extend: 'Ext.panel.Panel',
 
-    layout: { type: 'vbox', align: 'stretch' },
+    layout: {
+        type: 'vbox',
+        align: 'stretch',
+        pack: 'start'
+    },
 
     border: false,
 
@@ -9,7 +13,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     cls: 'labkey-facet-selection-panel',
 
-    padding: "10 8 8 10",
+    padding: "5 0 5 5",
 
     autoScroll: false,
 
@@ -17,7 +21,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         this.items = [
             this.getFacetPanelHeader(),
             this.getFacetSelectionSummary(),
-            this.getFacets()
+            this.getFacetsContainer()
         ];
         this.callParent();
 
@@ -50,6 +54,8 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     getFacetPanelHeader : function() {
         if (!this.facetPanelHeader) {
             this.facetPanelHeader = Ext4.create("LABKEY.study.panel.FacetPanelHeader", {
+                objectName : this.cubeConfig.objectName,
+                width: "100%",
                 dataModuleName: this.dataModuleName
             });
         }
@@ -84,6 +90,26 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
             });
         }
         return this.facets;
+    },
+
+    getFacetsContainer: function() {
+        if (!this.facetsContainer) {
+            this.facetsContainer = {
+                xtype: 'container',
+                itemId: 'facetsContainer',
+                flex: 10,
+                autoScroll: true,
+                layout: {
+                    type: 'vbox',
+                    align: 'stretch',
+                    pack: 'start'
+                },
+                items: [
+                    this.getFacets()
+                ]
+            };
+        }
+        return this.facetsContainer;
     }
 
 });

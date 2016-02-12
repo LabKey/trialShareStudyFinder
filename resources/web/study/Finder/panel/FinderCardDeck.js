@@ -21,7 +21,7 @@ Ext4.define('LABKEY.study.panel.FinderCardDeck', {
                 itemId: this.cubeConfigs[i].objectName + '-finder-card'
             }));
             if (this.cubeConfigs[i].isDefault)
-                acttiveIndex = i;
+                activeIndex = i;
         }
 
         this.callParent();

@@ -8,7 +8,6 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
     tpl: new Ext4.XTemplate(
             '<div id="publicationSelectionPanel">',
             '       <div id="summaryArea" class="labkey-facet-summary" >',
-            '           <div class="labkey-facet-header"><span class="labkey-facet-caption">Summary</span></div>',
             '           <ul>',
             '               <li class="labkey-facet-member">',
             '                   <span class="labkey-facet-member-name">Publications</span>',

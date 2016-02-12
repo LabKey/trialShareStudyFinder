@@ -48,7 +48,7 @@ DIV.labkey-finder-facets {
 
 
 /* labkey-study-card */
-.labkey-study-card-highlight
+.labkey-study-card-header
 {
     color:black;
     font-variant:small-caps;
@@ -88,6 +88,10 @@ DIV.labkey-finder-facets {
     padding-top : 2px;
 }
 
+.labkey-study-card.labkey-study-border-highlight
+{
+    border: 2px solid #126495;
+}
 
 DIV.labkey-study-card
 {
@@ -163,7 +167,7 @@ DIV.labkey-facet-summary LI.labkey-facet-member
 .labkey-clear-all
 {
     float: right;
-    background-color: white;
+    background-color: rgb(240, 240, 240);
     background-image: none;
     color: black;
     border: none;
@@ -198,8 +202,10 @@ DIV.labkey-facet-summary LI.labkey-facet-member
 
 DIV.labkey-facet-summary
 {
-    /*max-width:200pt;*/
-    border:solid 2pt rgb(220, 220, 220);
+    border-bottom : solid 1px rgb(124,124,124);
+    border-left: solid 1px rgb(180, 180, 180);
+    border-right: solid 1px rgb(180, 180, 180);
+    border-top-width:0px;
 }
 
 .active
@@ -212,6 +218,18 @@ DIV.labkey-facet-summary
     padding:4pt;
     /*max-width: 185pt;*/
     background-color: rgb(240, 240, 240);
+}
+
+.labkey-facet-header
+{
+    padding-left: 10px;
+}
+
+.labkey-finder-card-header,
+.labkey-facet-header .x4-panel-body-default
+{
+    background-color: rgb(240, 240, 240);
+    border:none;
 }
 
 .labkey-facet-header .labkey-facet-caption
@@ -325,6 +343,7 @@ LI.labkey-facet-member .labkey-facet-member-count
     position:relative;
     float:right;
     z-index:2;
+    padding-right: 8px;
 }
 
 .x4-grid-row-selected SPAN.labkey-facet-percent-bar,
@@ -357,6 +376,7 @@ LI.labkey-facet-member .bar
     background-color:rgba(222,222,222,0.3);
     position:absolute; right:0;
     z-index:0;
+    padding-right: 8px;
 }
 
 /* filter type popup */

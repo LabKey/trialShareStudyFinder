@@ -1,7 +1,13 @@
 Ext4.define("LABKEY.study.panel.Studies", {
     extend: 'Ext.panel.Panel',
 
-    layout : 'vbox',
+
+    layout: {
+        type: 'vbox',
+        align: 'stretch',
+        pack: 'start'
+    },
+
     border: false,
     alias : 'widget.labkey-studies-panel',
     cls: 'labkey-studies-panel',
@@ -17,7 +23,7 @@ Ext4.define("LABKEY.study.panel.Studies", {
     initComponent : function() {
         this.items = [
             this.getStudyPanelHeader(),
-            this.getStudyCards()
+            this.getCardsContainer()
         ];
         this.callParent();
 
@@ -48,12 +54,31 @@ Ext4.define("LABKEY.study.panel.Studies", {
         if (!this.cardPanelHeader) {
             this.cardPanelHeader = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
                 dataModuleName: this.dataModuleName,
-                padding: 8,
                 showSearch : this.showSearch,
                 objectName: this.objectName
             });
         }
         return this.cardPanelHeader;
+    },
+
+    getCardsContainer : function() {
+        if (!this.facetsContainer) {
+            this.facetsContainer = {
+                xtype: 'container',
+                itemId: 'studyCardsContainer',
+                flex: 10,
+                autoScroll: true,
+                layout: {
+                    type: 'vbox',
+                    align: 'stretch',
+                    pack: 'start'
+                },
+                items: [
+                    this.getStudyCards()
+                ]
+            };
+        }
+        return this.facetsContainer;
     },
 
     getStudyCards : function() {

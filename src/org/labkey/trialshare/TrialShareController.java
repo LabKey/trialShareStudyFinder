@@ -437,22 +437,25 @@ public class TrialShareController extends SpringActionController
             List<StudyFacetBean> facets = new ArrayList<>();
             StudyFacetBean facet;
 
-            facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Study.Therapeutic Area", "Therapeutic Area", "[Study.Therapeutic Area][(All)]", FacetFilter.Type.OR, 1);
+            facet = new StudyFacetBean("Public", "Public", "Study.Public", "Public", "[Study.Public][(All)]", FacetFilter.Type.OR, 1);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Study Type", "Study Types", "Study.Study Type", "StudyType", "[Study.Study Type][(All)]", FacetFilter.Type.OR, 2);
+            facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Study.Therapeutic Area", "Therapeutic Area", "[Study.Therapeutic Area][(All)]", FacetFilter.Type.OR, 2);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Assay", "Assays", "Study.Assay", "Assay", "[Study.Assay][(All)]", FacetFilter.Type.OR, 3);
+            facet = new StudyFacetBean("Study Type", "Study Types", "Study.Study Type", "StudyType", "[Study.Study Type][(All)]", FacetFilter.Type.OR, 3);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Assay", "Assays", "Study.Assay", "Assay", "[Study.Assay][(All)]", FacetFilter.Type.OR, 4);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Condition", "Conditions", "Study.Condition", "Condition", "[Study.Condition][(All)]", FacetFilter.Type.OR, 6);
+            facet = new StudyFacetBean("Condition", "Conditions", "Study.Condition", "Condition", "[Study.Condition][(All)]", FacetFilter.Type.OR, 7);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Age Group", "Age Groups", "Study.AgeGroup", "AgeGroup", "[Study.AgeGroup][(All)]", FacetFilter.Type.OR, 4);
+            facet = new StudyFacetBean("Age Group", "Age Groups", "Study.AgeGroup", "AgeGroup", "[Study.AgeGroup][(All)]", FacetFilter.Type.OR, 5);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Phase", "Phases", "Study.Phase", "Phase", "[Study.Phase][(All)]", FacetFilter.Type.OR, 5);
+            facet = new StudyFacetBean("Phase", "Phases", "Study.Phase", "Phase", "[Study.Phase][(All)]", FacetFilter.Type.OR, 6);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
             facet = new StudyFacetBean("Study", "Studies", "Study", "Study", "[Study].[(All)]", FacetFilter.Type.OR, null);
@@ -669,22 +672,22 @@ public class TrialShareController extends SpringActionController
             List<StudySubset> subsets = new ArrayList<>();
             StudySubset subset = new StudySubset();
 
-            if (form.getObjectName() == null || form.getObjectName().equalsIgnoreCase("study"))
-            {
-                if (!getUser().isGuest())
-                {
-                    subset.setId("[Study.Public].[false]");
-                    subset.setName("Operational");
-                    subset.setIsDefault(false);
-                    subsets.add(subset);
-                }
-
-                subset = new StudySubset();
-                subset.setId("[Study.Public].[true]");
-                subset.setName("Public");
-                subset.setIsDefault(true);
-                subsets.add(subset);
-            }
+//            if (form.getObjectName() == null || form.getObjectName().equalsIgnoreCase("study"))
+//            {
+//                if (!getUser().isGuest())
+//                {
+//                    subset.setId("[Study.Public].[false]");
+//                    subset.setName("Operational");
+//                    subset.setIsDefault(false);
+//                    subsets.add(subset);
+//                }
+//
+//                subset = new StudySubset();
+//                subset.setId("[Study.Public].[true]");
+//                subset.setName("Public");
+//                subset.setIsDefault(true);
+//                subsets.add(subset);
+//            }
 //            else if (form.getObjectName().equalsIgnoreCase("publication"))
 //            {
 //                if (getContainer().hasPermission(getUser(), InsertPermission.class))
@@ -710,7 +713,7 @@ public class TrialShareController extends SpringActionController
 //                    subsets.add(subset);
 //                }
 //            }
-            return success(subsets);
+            return success();
         }
     }
 

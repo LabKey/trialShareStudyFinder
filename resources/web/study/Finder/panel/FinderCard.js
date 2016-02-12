@@ -21,10 +21,9 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
         this.cls += ' labkey-' +  this.cubeConfig.objectName.toLowerCase() + '-finder-card';
         this.items = [
-            this.getFacetsPanel()
+            this.getFacetsPanel(),
+            this.getCubeMemberPanel()
         ];
-
-        this.items.push(this.getCubeMemberPanel());
 
         this.callParent();
 
@@ -69,9 +68,12 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
     },
 
     //onFilterSelectionChange : function(){
-    //    console.log("Filter selection changed!");
     //    this.getStudiesPanel().onFilterSelectionChanged();
     //},
+
+    onClearAllFilters: function() {
+        this.getFacetsPanel().onClearAllFilters();
+    },
 
     onSearchTermsChanged: function(searchTerms) {
 
@@ -147,8 +149,9 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
             this.facetsPanel = Ext4.create("LABKEY.study.panel.FacetSelection", {
                 region: 'west',
-                width: '20%',
-                maxWidth: '265px',
+                flex: 1,
+                minWidth: 300,
+                maxWidth: 350,
                 dataModuleName: this.dataModuleName,
                 showParticipantFilters : this.showParticipantFilters,
                 cubeConfig: this.cubeConfig
@@ -170,7 +173,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
                 region: 'center',
-                width: '80%'
+                flex:4
             });
         }
         return this.studiesPanel;
@@ -182,7 +185,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
                 showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
                 region: 'center',
-                width: '80%'
+                flex:4
             });
         }
         return this.publicationsPanel;

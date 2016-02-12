@@ -4,6 +4,7 @@
 
         <script path="study/Finder/dataFinder.css"/>
         <script path="study/Finder/trialShare.css"/>
+        <script path="study/Finder/data/CubeConfig.js"/>
         <script path="study/Finder/data/Facet.js"/>
         <script path="study/Finder/data/FacetFilter.js"/>
         <script path="study/Finder/data/FacetMember.js"/>

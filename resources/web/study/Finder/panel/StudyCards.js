@@ -23,17 +23,13 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     tpl: new Ext4.XTemplate(
         '<div id="studypanel">',
         '   <tpl for=".">',
-        '   <tpl if="isHighlighted">',
-        '   <div class="labkey-study-card labkey-publication-highlight">',
-        '   <tpl else>',
-        '   <div class="labkey-study-card">',
-        '   </tpl>',
-        '       <span class="labkey-study-card-highlight labkey-study-card-accession">{studyId:htmlEncode}</span>',
+        '      {[this.displayCardHeader(values)]}',
+        '       <span class="labkey-study-card-header labkey-study-card-accession">{studyId:htmlEncode}</span>',
         '       <tpl if="shortName">',
         '           <span class="labkey-study-card-short-name">{shortName:htmlEncode}</span>',
         '       </tpl>',
             '<br>',
-        '       <span class="labkey-study-card-highlight labkey-study-card-pi">{investigator:htmlEncode}</span>',
+        '       <span class="labkey-study-card-header labkey-study-card-pi">{investigator:htmlEncode}</span>',
         '       <hr class="labkey-study-card-divider">',
         '       <div>',
         '           <a class="labkey-text-link labkey-study-card-summary" title="click for more details">view summary</a>',
@@ -50,6 +46,15 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         '   </tpl>',
         '</div>',
             {
+                displayCardHeader : function(values) {
+                    var cssClass = "labkey-study-card";
+                    if (values.isHighlighted)
+                        cssClass += " labkey-publication-highlight";
+                    if (values.isBorderHighlighted)
+                        cssClass += " labkey-study-border-highlight";
+                    return '<div class="' + cssClass + '">';
+                },
+
                 displayManuscriptCount : function(count) {
                     if (count == 0)
                         return "";

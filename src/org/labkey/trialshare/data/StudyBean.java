@@ -206,6 +206,11 @@ public class StudyBean
         return isPublic;
     }
 
+    public Boolean getIsBorderHighlighted()
+    {
+        return !isPublic;
+    }
+
     public void setIsPublic(Boolean aPublic)
     {
         isPublic = aPublic;
