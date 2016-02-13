@@ -39,8 +39,8 @@ public class StudyBean
     private String briefDescription;
     private String studyIdPrefix = null; // common prefix used in labeling studies
     private String availability;
-    private Boolean isHighlighted;
-    private Boolean isPublic;
+    private Boolean isHighlighted = false;
+    private Boolean isPublic = false;
     private Integer participantCount;
 
     private List<StudyPersonnelBean> personnel;

@@ -15,9 +15,9 @@
  */
 package org.labkey.trialshare.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.labkey.api.util.Pair;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,11 +41,47 @@ public class StudyPublicationBean
     private String status;
     private String dataUrl;
     private List<StudyBean> studies;
-    private Boolean isHighlighted;
+    private Boolean isHighlighted = false;
     private String publicationType;
+    private List<String> figureUrls;
 
-    // the first item in the pair is the link; the second is the description (link text)
-    private Pair<String, String>[] urls = new Pair[5];
+    public static class UrlData {
+        Integer _index;
+        String _link;
+        String _linkText;
+
+        public Integer getIndex()
+        {
+            return _index;
+        }
+
+        public void setIndex(Integer index)
+        {
+            _index = index;
+        }
+
+        public String getLink()
+        {
+            return _link;
+        }
+
+        public void setLink(String link)
+        {
+            _link = link;
+        }
+
+        public String getLinkText()
+        {
+            return _linkText;
+        }
+
+        public void setLinkText(String linkText)
+        {
+            _linkText = linkText;
+        }
+    }
+
+    private List<UrlData> urls = new ArrayList<>();
 
     private String citation;
 
@@ -207,18 +243,20 @@ public class StudyPublicationBean
 
 
     public String getUrl() {
-        if (urls[0] != null)
-            return urls[0].first;
+        for (UrlData urlData : urls)
+        {
+            if (!StringUtils.isEmpty(urlData.getLink()))
+                return urlData.getLink();
+        }
         return null;
     }
 
-    @JsonIgnore
-    public Pair<String, String>[] getUrls()
+    public List<UrlData> getUrls()
     {
         return urls;
     }
 
-    public void setUrls(Pair<String, String>[] urls)
+    public void setUrls(List<UrlData> urls)
     {
         this.urls = urls;
     }
@@ -227,16 +265,15 @@ public class StudyPublicationBean
     {
         if (description == null || description.equals("&nbsp;"))
             description = "";
-        Pair<String, String> urlData = urls[index];
+
+        UrlData urlData = getUrlData(index);
         if (urlData == null)
         {
-            urlData = new Pair<>(null, description);
-            urls[index] = urlData;
+            urlData = new UrlData();
+            urlData.setIndex(index);
+            urls.add(urlData);
         }
-        else
-        {
-            urlData.second = description;
-        }
+        urlData.setLinkText(description);
     }
 
     private void setUrlLink(int index, String link)
@@ -244,16 +281,24 @@ public class StudyPublicationBean
         if (link == null)
             return;
 
-        Pair<String, String> urlData = urls[index];
+        UrlData urlData = getUrlData(index);
         if (urlData == null)
         {
-            urlData = new Pair<>(link, null);
-            urls[index] = urlData;
+            urlData = new UrlData();
+            urlData.setIndex(index);
+            urls.add(urlData);
         }
-        else
+        urlData.setLink(link);
+    }
+
+    private UrlData getUrlData(int index)
+    {
+        for (UrlData url : urls)
         {
-            urlData.first = link;
+            if (url.getIndex() == index)
+                return url;
         }
+        return null;
     }
 
     public void setDescription2(String description2)
@@ -282,21 +327,6 @@ public class StudyPublicationBean
     public void setLink3(String link3)
     {
         setUrlLink(2, link3);
-    }
-
-    public boolean hasPubmedLink()
-    {
-        return getPubmedLink() != null;
-    }
-
-    @JsonIgnore
-    public String getPubmedLink()
-    {
-        for (Pair<String, String> urlData : urls) {
-            if (urlData != null && urlData.first != null && urlData.first.contains("pubmed"))
-                return urlData.first;
-        }
-        return null;
     }
 
     public String getStatus()

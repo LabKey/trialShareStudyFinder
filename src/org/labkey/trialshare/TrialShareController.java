@@ -28,7 +28,6 @@ import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.RequiresPermission;
-import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.Pair;
@@ -54,6 +53,8 @@ import java.util.Map;
 @Marshal(Marshaller.Jackson)
 public class TrialShareController extends SpringActionController
 {
+    public static final String OBJECT_NAME_PARAM = "object";
+
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(TrialShareController.class);
     public static final String NAME = "trialshare";
 
@@ -76,20 +77,20 @@ public class TrialShareController extends SpringActionController
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
             setTitle("TrialShare Data Finder");
-            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean());
+            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean(getViewContext().getActionURL().getParameter(OBJECT_NAME_PARAM)));
         }
     }
 
-    public static FinderBean getFinderBean()
+    public static FinderBean getFinderBean(String objectName)
     {
         FinderBean bean = new FinderBean();
         bean.setDataModuleName(TrialShareModule.NAME);
-        bean.addCubeConfig(getCubeConfigBean("studies"));
-        bean.addCubeConfig(getCubeConfigBean("publications"));
+        bean.addCubeConfig(getCubeConfigBean("studies", "studies".equalsIgnoreCase(objectName)));
+        bean.addCubeConfig(getCubeConfigBean("publications", "publications".equalsIgnoreCase(objectName)));
         return bean;
     }
 
-    public static CubeConfigBean getCubeConfigBean(String objectName)
+    public static CubeConfigBean getCubeConfigBean(String objectName, Boolean isDefault)
     {
         if (objectName == null)
             objectName = "studies";
@@ -109,7 +110,7 @@ public class TrialShareController extends SpringActionController
             bean.setFilterByLevel("[Study].[Study]");
             bean.setCountDistinctLevel("[Study].[Study]");
             bean.setFilterByFacetUniqueName("[Study]");
-            bean.setIsDefault(true);
+            bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Study.Public].[Public]");
         }
         else if (objectName.equalsIgnoreCase("publications"))
@@ -121,7 +122,7 @@ public class TrialShareController extends SpringActionController
             bean.setFilterByLevel("[Publication].[Publication]");
             bean.setCountDistinctLevel("[Publication].[Publication]");
             bean.setFilterByFacetUniqueName("[Publication]");
-            bean.setIsDefault(false);
+            bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Publication.Status].[Status]");
         }
 
@@ -602,7 +603,36 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class PublicationDetailAction extends SimpleViewAction<PublicationIdForm>
+    public class PublicationDetailsAction extends ApiAction<PublicationIdForm>
+    {
+        Integer _id;
+
+        @Override
+        public void validateForm(PublicationIdForm form, Errors errors)
+        {
+            _id = (null==form) ? null : form.getId();
+            if (_id == null)
+                errors.reject(ERROR_MSG, "Publication not specified");
+        }
+
+        @Override
+        public Object execute(PublicationIdForm form, BindException errors) throws Exception
+        {
+            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
+            QuerySchema listSchema = coreSchema.getSchema("lists");
+            StudyPublicationBean publication = (new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"))).getObject(_id, StudyPublicationBean.class);
+//          TODO  publication setDataUrl(new ActionURL());
+//          TODO add in figures URLs
+            SimpleFilter filter = new SimpleFilter();
+            filter.addCondition(FieldKey.fromParts("key"), _id);
+            publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
+
+            return success(publication);
+        }
+    }
+
+    @RequiresPermission(ReadPermission.class)
+    public class PublicationDetailViewAction extends SimpleViewAction<PublicationIdForm>
     {
         Integer _id;
 

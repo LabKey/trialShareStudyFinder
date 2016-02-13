@@ -28,6 +28,7 @@
         <script path="study/Finder/panel/FinderCardPanelHeader.js"/>
         <script path="study/Finder/panel/StudyCards.js"/>
         <script path="study/Finder/panel/PublicationCards.js"/>
+        <script path="study/Finder/panel/PublicationDetails.js"/>
         <script path="study/Finder/panel/FinderCard.js"/>
         <script path="study/Finder/panel/FinderObjectSelection.js"/>
         <script path="study/Finder/panel/FinderCardDeck.js"/>

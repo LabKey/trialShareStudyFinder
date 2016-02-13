@@ -1,0 +1,41 @@
+Ext4.define("LABKEY.study.panel.PublicationDetails", {
+    extend: "Ext.Container",
+
+    tpl: new Ext4.XTemplate(
+        '<div id="labkey-publication-details-content">',
+        '   <div class="labkey-publication-identifiers">',
+        '   <tpl if="pmid">',
+        '       <span class="labkey-publication-identifier">PMID: <a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={pmid:htmlEncode}" target="_blank">{pmid:htmlEncode}</a></span>',
+        '   </tpl>',
+        '   <tpl if="pmcid">',
+        '       <span class="labkey-publication-identifier">PMCID: <a href="http://www.ncbi.nlm.nih.gov/pmc/articles/{pmcid:htmlEncode}" target="_blank">{pmcid:htmlEncode}</a></span>',
+        '   </tpl>',
+        '   <tpl if="doi">',
+        '       <span class="labkey-publication-identifier">DOI: <a href="http://dx.doi.org/{doi:htmlEncode}" target="_blank">{doi:htmlEncode}</a></span>',
+        '   </tpl>',
+        '   </div>',
+        '   <tpl for="urls">',
+        '       <tpl if="link && linkText">',
+        '       <br/><a href="{link:htmlEncode}" target="_blank">{linkText:htmlEncode}</a>',
+        '       </tpl>',
+        '   </tpl>',
+        '   <tpl if="studies">',
+        '       <div>',
+        '       <span class="labkey-publication-detail-label">Studies</span>',
+        '       <tpl for="studies">',
+        '           <tpl if="url">',
+        '               <span class="labkey-study-short-name"><a href="{url:htmlEncode}"%>{shortName:htmlEncode}</a></span>',
+        '           <tpl else>',
+        '               <span class="labkey-study-short-name">{shortName:htmlEncode}</span>',
+        '           </tpl>',
+        '       </tpl>',
+        '       </div>',
+        '   </tpl>',
+        '   <tpl if="abstractText">',
+        '       <div class="labkey-publication-detail-label">Abstract</div>',
+        '       <div class="labkey-publication-abstract">{bstractText:htmlEncode}%></div>',
+        '   </tpl>',
+        '</div>'
+    )
+
+});
