@@ -43,7 +43,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             '       <div id="abbreviatedAuthorList" class="labkey-publication-author">{authorAbbrev:htmlEncode}</div>',
             '       <div id="fullAuthorList" class="labkey-publication-author">{author:htmlEncode}</div>',
             '       <div class="labkey-publication-citation">{citation:htmlEncode}</div>',
-            '       <div id="publicationDetails_{id}" class="labkey-publication-details collapsed"></div>',
+            '       <div id="publicationDetails_{id}" class="labkey-publication-detail collapsed"></div>',
             '   </div>',
             '   </tpl>',
             '</div>'
@@ -91,6 +91,8 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
                             Ext4.get(Ext4.DomQuery.select('#publicationDetails_' + publicationId)[0]).replaceCls('collapsed', 'expanded');
                             item.className = item.className.replace("collapsed", "expanded");
                         }
+
+                        LABKEY.Utils.signalWebDriverTest('publicationDetailsLoaded');
                     },
                     scope: this
                 });
@@ -99,6 +101,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             {
                 Ext4.get(Ext4.DomQuery.select('#publicationDetails_' + publicationId)[0]).replaceCls('collapsed', 'expanded');
                 item.className = item.className.replace("collapsed", "expanded");
+                LABKEY.Utils.signalWebDriverTest('publicationDetailsLoaded');
             }
         }
         else
