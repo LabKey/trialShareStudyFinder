@@ -5,7 +5,7 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
 
     cls: 'labkey-facet-header',
 
-    padding: "8 8 3 8",
+    padding: "8 4 3 8",
 
     bubbleEvents: ["clearAllFilters", "finderObjectChanged"],
 
@@ -40,6 +40,7 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
                     type: 'hbox',
                     align: 'stretch'
                 },
+                width: "100%",
                 items: [
                     this.getSummaryLabel(),
                     this.getCubeConfigMenu(),
@@ -69,7 +70,6 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
             this.summaryLabel = Ext4.create("Ext4.Component", {
                 html: "Summary",
                 hidden: this.cubeConfigs.count() > 1
-                //flex: 1
             });
         }
         return this.summaryLabel;
@@ -103,7 +103,6 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
                             this.onCubeConfigChanged(this.cubeConfigs.selectedValue)
                     }
                 }
-                //flex: 1
             })
         }
         return this.cubeConfigsMenu;

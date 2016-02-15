@@ -122,6 +122,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
         return this.finderCardDeck;
     },
 
+    // This seems to be necessary for Firefox (at least)
     _initResize : function() {
         var resize = function(w, h) {
             LABKEY.ext4.Util.resizeToViewport(this, w, h, 46, 32);

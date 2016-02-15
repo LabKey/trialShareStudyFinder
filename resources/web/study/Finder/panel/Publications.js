@@ -3,8 +3,7 @@ Ext4.define("LABKEY.study.panel.Publications", {
 
     layout: {
         type: 'vbox',
-        align: 'stretch',
-        pack: 'start'
+        align: 'stretch'
     },
 
     border: false,

@@ -34,6 +34,22 @@ DIV.labkey-finder-facets {
     background-color: #ffffff
 }
 
+/*.labkey-finder-facets .x4-grid-group-hd-collapsible .x4-grid-group-title*/
+/*{*/
+    /*background-image: none;*/
+    /*!*position: relative;*!*/
+/*}*/
+
+/*.labkey-finder-facets .x4-grid-group-hd-collapsible .x4-grid-group-title:before*/
+/*{*/
+    /*position: absolute;*/
+    /*font-family: 'FontAwesome';*/
+    /*top: 6px;*/
+    /*left: 6px;*/
+    /*content: "\f0fe";*/
+
+/*}*/
+
 .labkey-data-finder-inner
 {
     background-color:#ffffff;

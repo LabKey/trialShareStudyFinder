@@ -11,6 +11,7 @@ Ext4.define('LABKEY.study.panel.FinderCardDeck', {
 
     initComponent : function() {
 
+        this.width = Ext4.getBody().getWidth() - 55;
         this.items = [];
         var activeIndex = 0;
         for (var i = 0; i < this.cubeConfigs.length; i++)
@@ -28,6 +29,11 @@ Ext4.define('LABKEY.study.panel.FinderCardDeck', {
 
         this.getLayout().setActiveItem(activeIndex);
 
+        Ext4.EventManager.onWindowResize(function()
+        {
+            this.setWidth(Ext4.getBody().getWidth() - 55);
+            console.log("width", this.getWidth());
+        }, this);
     }
 });
 
