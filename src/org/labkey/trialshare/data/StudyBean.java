@@ -40,6 +40,7 @@ public class StudyBean
     private String studyIdPrefix = null; // common prefix used in labeling studies
     private String availability;
     private Boolean isHighlighted = false;
+    private String visibility;
     private Boolean isPublic = false;
     private Integer participantCount;
 
@@ -199,6 +200,16 @@ public class StudyBean
     public void setAbstractCount(Integer abstractCount)
     {
         this.abstractCount = abstractCount;
+    }
+
+    public String getVisibility()
+    {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility)
+    {
+        this.visibility = visibility;
     }
 
     public Boolean getIsPublic()

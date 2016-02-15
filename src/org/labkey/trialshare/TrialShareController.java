@@ -31,6 +31,7 @@ import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.Pair;
+import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
@@ -438,7 +439,7 @@ public class TrialShareController extends SpringActionController
             List<StudyFacetBean> facets = new ArrayList<>();
             StudyFacetBean facet;
 
-            facet = new StudyFacetBean("Public", "Public", "Study.Public", "Public", "[Study.Public][(All)]", FacetFilter.Type.OR, 1);
+            facet = new StudyFacetBean("Visibility", "Visibility", "Study.Visibility", "Visibility", "[Study.Visibility][(All)]", FacetFilter.Type.OR, 1);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
             facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Study.Therapeutic Area", "Therapeutic Area", "[Study.Therapeutic Area][(All)]", FacetFilter.Type.OR, 2);
@@ -621,7 +622,7 @@ public class TrialShareController extends SpringActionController
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             QuerySchema listSchema = coreSchema.getSchema("lists");
             StudyPublicationBean publication = (new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"))).getObject(_id, StudyPublicationBean.class);
-//          TODO  publication setDataUrl(new ActionURL());
+            publication.setDataUrl(new ActionURL("project/Studies/" + publication.getStudyId() + "/Study%20Data/begin.view?pageId=study.DATA_ANALYSIS").toString());
 //          TODO add in figures URLs
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("key"), _id);

@@ -12,6 +12,7 @@ Ext4.define('LABKEY.study.data.Study', {
         {name: 'shortName'},
         {name: 'iconUrl'},
         {name: 'investigator'},
+        {name: 'visibility'},
         {name: 'isPublic', type: 'boolean'},
         {name: 'abstractCount', type: 'int'},
         {name: 'manuscriptCount', type: 'int'},
