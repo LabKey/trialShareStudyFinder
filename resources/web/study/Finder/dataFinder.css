@@ -586,6 +586,11 @@ div.labkey-study-details h3 {
     display:inline;
 }
 
+.labkey-publication-detail.collapsed
+{
+    display:none;
+}
+
 .labkey-publication-card .labkey-publication-author,
 .labkey-publication-card .labkey-publication-title,
 .labkey-publication-card .labkey-publication-citation {
