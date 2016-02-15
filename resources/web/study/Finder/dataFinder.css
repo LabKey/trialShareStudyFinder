@@ -106,7 +106,7 @@ DIV.labkey-finder-facets {
 
 .labkey-study-card.labkey-study-border-highlight
 {
-    border: 2px solid #126495;
+    /*border: 2px solid #126495;*/
 }
 
 DIV.labkey-study-card
@@ -320,6 +320,11 @@ DIV.labkey-facet-summary LI.labkey-facet-member
     height:14pt;
     position:relative;
     width:100%;
+}
+
+.labkey-facet-summary .labkey-facet-member-name
+{
+    padding-left: 8px;
 }
 
 SPAN.labkey-facet-member:hover SPAN.labkey-facet-percent-bar
@@ -637,7 +642,7 @@ span.labkey-publication-title
 
 .labkey-publication-details .labkey-publication-detail-label
 {
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 
 .labkey-publication-details .labkey-study-short-name
