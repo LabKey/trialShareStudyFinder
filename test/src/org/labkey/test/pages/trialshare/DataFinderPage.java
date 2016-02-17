@@ -151,7 +151,7 @@ public class DataFinderPage extends LabKeyPage
     public Map<Dimension, Integer> getSummaryCounts()
     {
         WebElement summaryElement;
-        if(testingStudies)
+        if (testingStudies)
             summaryElement = DataFinderPage.Locators.studySummaryArea.findElement(_test.getDriver());
         else
             summaryElement = DataFinderPage.Locators.pubSummaryArea.findElement(_test.getDriver());
@@ -173,10 +173,16 @@ public class DataFinderPage extends LabKeyPage
     {
         List<WebElement> cardEls;
 
-        if(testingStudies)
+        if (testingStudies)
+        {
+            _test.scrollIntoView(Locators.studyCard);
             cardEls = DataFinderPage.Locators.studyCard.findElements(_test.getDriver());
+        }
         else
+        {
+            _test.scrollIntoView(Locators.pubCard);
             cardEls = DataFinderPage.Locators.pubCard.findElements(_test.getDriver());
+        }
 
         List<DataCard> cards = new ArrayList<>();
 
