@@ -561,6 +561,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertEquals("Expected count after filtering for 'In Progress' was not as expected.", 1, counts.get("In Progress").intValue());
 
         // I have no idea why assertTextPresent returned false for these strings. The below tests appear to be more reliable.
+        scrollIntoView(DataFinderPage.Locators.pubCardHighlight);
         cardText = getText(DataFinderPage.Locators.pubCardHighlight);
         assertTrue("Could not find '" + cardTitle + "' on card.", cardText.contains(cardTitle));
         assertTrue("Could not find '" + cardAuthors + "' on card.", cardText.contains(cardAuthors));
