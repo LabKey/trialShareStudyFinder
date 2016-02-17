@@ -616,7 +616,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertTrue("DOI value not as expected on detail page.", detailPanel.getDOI().contains("10.1002/ART.30615"));
         assertTrue("Studies value not as expected on detail page.", detailPanel.getStudyShortName().contains("RAVE"));
 
-
         card.hideDetail();
         Assert.assertFalse("Author value not as expected in collapsed view", detailPanel.getAuthor().contains("Cuthbertson"));
         Assert.assertFalse("PMID should not be displayed in collapsed view", detailPanel.isPMIDDisplayed());

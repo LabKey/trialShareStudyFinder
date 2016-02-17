@@ -172,23 +172,18 @@ public class DataFinderPage extends LabKeyPage
     public List<DataCard> getDataCards()
     {
         List<WebElement> cardEls;
-
-        if (testingStudies)
-        {
-            _test.scrollIntoView(Locators.studyCard);
-            cardEls = DataFinderPage.Locators.studyCard.findElements(_test.getDriver());
-        }
-        else
-        {
-            _test.scrollIntoView(Locators.pubCard);
-            cardEls = DataFinderPage.Locators.pubCard.findElements(_test.getDriver());
-        }
-
         List<DataCard> cards = new ArrayList<>();
 
-        for (WebElement el : cardEls)
+        Locator locator = testingStudies? Locators.studyCard : Locators.pubCard;
+
+        if (_test.isElementPresent(locator))
         {
-            cards.add(new DataCard(el));
+            _test.scrollIntoView(locator);
+            cardEls = locator.findElements(_test.getDriver());
+            for (WebElement el : cardEls)
+            {
+                cards.add(new DataCard(el));
+            }
         }
 
         return cards;
