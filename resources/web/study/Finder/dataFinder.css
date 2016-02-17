@@ -562,7 +562,6 @@ div.labkey-study-details h3 {
 
 .labkey-publication-card.expanded #fullAuthorList {
     display: inherit;
-    padding-bottom:10px;
 }
 
 .labkey-publication-card.collapsed .fa-plus-square
@@ -607,11 +606,6 @@ div.labkey-study-details h3 {
 .labkey-publication-card .labkey-publication-citation {
     padding-bottom:10px;
 
-}
-
-span.labkey-publication-title
-{
-    padding-left: 10px;
 }
 
 .labkey-publication-card
