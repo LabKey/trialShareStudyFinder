@@ -440,8 +440,8 @@ public class DataFinderPage extends LabKeyPage
         public void clearFilter(Dimension dimension)
         {
             WebElement clearEl = locators.facetClear(dimension).findElement(_test.getDriver());
-            Assert.assertFalse("Attempting to clear filter that is not active", clearEl.getAttribute("class").contains("inactive"));
             scrollIntoView(clearEl);
+            Assert.assertFalse("Attempting to clear filter that is not active", clearEl.getAttribute("class").contains("inactive"));
             _test.clickAt(locators.facetClear(dimension), 3, 3, 0);
             waitForElement(Locator.xpath("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]//span[contains(@class,'labkey-clear-filter')][contains(@class, 'inactive')]"));
         }
