@@ -100,6 +100,11 @@ public class StudyPublicationBean
         this.id = id;
     }
 
+    public void set_Key(Integer id)
+    {
+        this.id = id;
+    }
+
     public String getStudyId()
     {
         return studyId;
