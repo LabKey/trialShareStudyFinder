@@ -21,7 +21,7 @@ public abstract class StudySummaryPanel extends Component
         _test = test;
         _test.waitForElement(Locators.self);
         _panel = Locators.self.waitForElement(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        elements().accession.isDisplayed();
+        _test.waitForElement(Locators.accession);
     }
 
     @Override
@@ -91,6 +91,7 @@ public abstract class StudySummaryPanel extends Component
     private static class Locators
     {
         private static Locator self = Locator.css(".labkey-study-details");
+        private static Locator accession = Locator.css(".labkey-study-accession");
     }
 
     private class Paper
