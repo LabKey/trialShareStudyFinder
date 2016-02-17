@@ -562,26 +562,27 @@ div.labkey-study-details h3 {
 
 .labkey-publication-card.expanded #fullAuthorList {
     display: inherit;
+    padding-bottom:10px;
 }
 
 .labkey-publication-card.collapsed .fa-plus-square
 {
+    position:absolute;
     float:left;
     display:inherit;
 }
 .labkey-publication-card.collapsed .fa-minus-square
 {
-    float:left;
     display:none;
 }
 
 .labkey-publication-card.expanded .fa-plus-square
 {
-    float:left;
     display:none;
 }
 .labkey-publication-card.expanded .fa-minus-square
 {
+    position:absolute;
     float:left;
     display:inline;
 }
@@ -591,11 +592,21 @@ div.labkey-study-details h3 {
     display:none;
 }
 
+
+#labkey-publication-details-content,
 .labkey-publication-card .labkey-publication-author,
+.labkey-publication-card .labkey-publication-title,
+.labkey-publication-card .labkey-publication-goto,
+.labkey-publication-card .labkey-publication-goto:hover,
+.labkey-publication-card .labkey-publication-citation {
+    padding-left: 20px;
+    clear: both;
+}
+
 .labkey-publication-card .labkey-publication-title,
 .labkey-publication-card .labkey-publication-citation {
     padding-bottom:10px;
-    clear: both;
+
 }
 
 span.labkey-publication-title
@@ -645,10 +656,6 @@ span.labkey-publication-title
     padding: 10px;
 }
 
-.labkey-publication-details .labkey-publication-detail-label
-{
-    /*font-weight: bold;*/
-}
 
 .labkey-publication-details .labkey-study-short-name
 {
