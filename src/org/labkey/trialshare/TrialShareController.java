@@ -623,7 +623,7 @@ public class TrialShareController extends SpringActionController
             QuerySchema listSchema = coreSchema.getSchema("lists");
             StudyPublicationBean publication = (new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"))).getObject(_id, StudyPublicationBean.class);
             publication.setDataUrl(new ActionURL("project/Studies/" + publication.getStudyId() + "/Study%20Data/begin.view?pageId=study.DATA_ANALYSIS").toString());
-            publication.setFigureUrls(getUser());
+            publication.setThumbnails(getUser());
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("key"), _id);
             publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));

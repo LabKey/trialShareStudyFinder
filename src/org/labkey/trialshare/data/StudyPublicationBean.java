@@ -51,10 +51,11 @@ public class StudyPublicationBean
     private List<StudyBean> studies;
     private Boolean isHighlighted = false;
     private String publicationType;
-    private List<String> figureUrls;
+    private List<URLData> thumbnails;
     private String manuscriptContainer;
 
-    public static class UrlData {
+    public static class URLData
+    {
         Integer _index;
         String _link;
         String _linkText;
@@ -90,7 +91,7 @@ public class StudyPublicationBean
         }
     }
 
-    private List<UrlData> urls = new ArrayList<>();
+    private List<URLData> urls = new ArrayList<>();
 
     private String citation;
 
@@ -257,7 +258,7 @@ public class StudyPublicationBean
 
 
     public String getUrl() {
-        for (UrlData urlData : urls)
+        for (URLData urlData : urls)
         {
             if (!StringUtils.isEmpty(urlData.getLink()))
                 return urlData.getLink();
@@ -265,12 +266,12 @@ public class StudyPublicationBean
         return null;
     }
 
-    public List<UrlData> getUrls()
+    public List<URLData> getUrls()
     {
         return urls;
     }
 
-    public void setUrls(List<UrlData> urls)
+    public void setUrls(List<URLData> urls)
     {
         this.urls = urls;
     }
@@ -280,10 +281,10 @@ public class StudyPublicationBean
         if (description == null || description.equals("&nbsp;"))
             description = "";
 
-        UrlData urlData = getUrlData(index);
+        URLData urlData = getUrlData(index);
         if (urlData == null)
         {
-            urlData = new UrlData();
+            urlData = new URLData();
             urlData.setIndex(index);
             urls.add(urlData);
         }
@@ -295,19 +296,19 @@ public class StudyPublicationBean
         if (link == null)
             return;
 
-        UrlData urlData = getUrlData(index);
+        URLData urlData = getUrlData(index);
         if (urlData == null)
         {
-            urlData = new UrlData();
+            urlData = new URLData();
             urlData.setIndex(index);
             urls.add(urlData);
         }
         urlData.setLink(link);
     }
 
-    private UrlData getUrlData(int index)
+    private URLData getUrlData(int index)
     {
-        for (UrlData url : urls)
+        for (URLData url : urls)
         {
             if (url.getIndex() == index)
                 return url;
@@ -403,16 +404,16 @@ public class StudyPublicationBean
         this.manuscriptContainer = manuscriptContainer;
     }
 
-    public List<String> getFigureUrls()
+    public List<URLData> getThumbnails()
     {
-        return figureUrls;
+        return thumbnails;
     }
 
-    public void setFigureUrls(User user)
+    public void setThumbnails(User user)
     {
         if (getManuscriptContainer() == null)
             return;
-        figureUrls = new ArrayList<>();
+        thumbnails = new ArrayList<>();
         Container container = ContainerManager.getForId(getManuscriptContainer());
         if (container == null)
             return;
@@ -425,7 +426,10 @@ public class StudyPublicationBean
                 URLHelper urlHelper = ReportUtil.getThumbnailUrl(container, report);
                 if (urlHelper != null)
                 {
-                    figureUrls.add(urlHelper.toString());
+                    URLData urlData = new URLData();
+                    urlData.setLinkText(urlHelper.toString());
+                    urlData.setLink(container.getStartURL(user).addParameter("pageId","study.DATA_ANALYSIS").toString());
+                    thumbnails.add(urlData);
                 }
             }
         }

@@ -88,7 +88,7 @@
         </div>
         <%
 
-            for (StudyPublicationBean.UrlData urlData : publication.getUrls())
+            for (StudyPublicationBean.URLData urlData : publication.getUrls())
             {
                 if (urlData != null && !StringUtils.isEmpty(urlData.getLinkText()))
                 {

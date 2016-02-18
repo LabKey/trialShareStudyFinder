@@ -580,6 +580,7 @@ public class DataFinderPage extends LabKeyPage
         public StudySummaryWindow viewStudySummary()
         {
             clickAt(locators.viewStudyLink.findElement(card), 3, 3, 0);
+            sleep(1000); // HACK to see if TeamCity just needs to rest a bit
             return new StudySummaryWindow(_test);
         }
 
@@ -613,7 +614,8 @@ public class DataFinderPage extends LabKeyPage
 
         public PublicationPanel viewDetail()
         {
-            clickAt(locators.pubMoreDetails.findElement(card), 3, 3, 0);
+            locators.pubMoreDetails.findElement(card).click();
+            sleep(500); // HACK to see if TeamCity needs more time
             return new PublicationPanel(_test);
         }
 

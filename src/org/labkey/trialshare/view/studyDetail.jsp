@@ -113,7 +113,7 @@
                     {
                         %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPmid(), null, null, linkProps)%><%
                     }
-                    for (StudyPublicationBean.UrlData urlData : pub.getUrls())
+                    for (StudyPublicationBean.URLData urlData : pub.getUrls())
                     {
                         if (urlData != null && !StringUtils.isEmpty(urlData.getLink()))
                         {
