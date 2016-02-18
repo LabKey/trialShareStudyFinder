@@ -594,6 +594,7 @@ div.labkey-study-details h3 {
 
 .labkey-publication .labkey-figures-list
 {
+    padding-left: 0px;
     padding-top: 10px;
     list-style: none;
 }
@@ -605,8 +606,7 @@ div.labkey-study-details h3 {
 
 .labkey-publication-detail-label
 {
-    /*font-style: italic;*/
-    font-variant: small-caps
+    color: #3495D2;
 }
 
 .labkey-figure img
