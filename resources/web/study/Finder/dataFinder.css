@@ -97,7 +97,8 @@ DIV.labkey-finder-facets {
     margin-top: 10px;
 }
 
-.labkey-text-link.labkey-study-card-pub-count
+.labkey-text-link.labkey-study-card-abstract-count,
+.labkey-text-link.labkey-study-card-manuscript-count
 {
     float:right;
     margin-bottom: 1px;

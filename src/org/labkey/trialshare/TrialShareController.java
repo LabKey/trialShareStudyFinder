@@ -59,7 +59,41 @@ public class TrialShareController extends SpringActionController
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(TrialShareController.class);
     public static final String NAME = "trialshare";
 
-    public enum DetailType { publications, study };
+    public enum DetailType {
+        publications(null, "Manuscripts and Abstracts"),
+        study(null, "Manuscripts and Abstracts"),
+        abstracts("Abstract", "Abstracts"),
+        manuscripts("Manuscript", "Manuscripts");
+
+        private String _dbFieldValue;
+        private String _sectionHeader;
+
+        private DetailType(String dbField, String sectionHeader)
+        {
+            _dbFieldValue = dbField;
+            _sectionHeader = sectionHeader;
+        }
+
+        public String getDbFieldValue()
+        {
+            return _dbFieldValue;
+        }
+
+        public void setDbFieldValue(String dbFieldValue)
+        {
+            _dbFieldValue = dbFieldValue;
+        }
+
+        public String getSectionHeader()
+        {
+            return _sectionHeader;
+        }
+
+        public void setSectionHeader(String sectionHeader)
+        {
+            _sectionHeader = sectionHeader;
+        }
+    };
 
     public TrialShareController()
     {
@@ -553,6 +587,10 @@ public class TrialShareController extends SpringActionController
 
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
+            if (form.getDetailType().getDbFieldValue() != null)
+            {
+                filter.addCondition(FieldKey.fromParts("PublicationType"), form.getDetailType().getDbFieldValue());
+            }
             study.setPublications((new TableSelector(listSchema.getTable("manuscriptsAndAbstracts"), filter, null)).getArrayList(StudyPublicationBean.class));
 
             VBox v = new VBox();

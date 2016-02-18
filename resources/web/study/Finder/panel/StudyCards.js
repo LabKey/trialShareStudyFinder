@@ -59,7 +59,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
                     if (count == 0)
                         return "";
                     else {
-                        var text = '<a class="labkey-text-link labkey-study-card-pub-count">';
+                        var text = '<a class="labkey-text-link labkey-study-card-manuscript-count">';
                         if (count == 1)
                             text += "1 manuscript available";
                         else
@@ -72,7 +72,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
                     if (count == 0)
                         return "";
                     else {
-                        var text = '<a class="labkey-text-link labkey-study-card-pub-count">';
+                        var text = '<a class="labkey-text-link labkey-study-card-abstract-count">';
                         if (count == 1)
                             text += "1 abstract available";
                         else
@@ -90,9 +90,13 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             {
                 this.showStudyDetailPopup(record.get("studyId"));
             }
-            else if (event.target.className.includes("labkey-study-card-pub-count"))
+            else if (event.target.className.includes("labkey-study-card-manuscript-count"))
             {
-                this.showStudyManuscriptsPopup(record.get("studyId"));
+                this.showStudyManuscriptsPopup(record.get("studyId"), "manuscripts");
+            }
+            else if (event.target.className.includes("labkey-study-card-abstract-count"))
+            {
+                this.showStudyManuscriptsPopup(record.get("studyId"), "abstracts");
             }
         }
     },
@@ -124,7 +128,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         this.detailShowing.show();
     },
 
-    showStudyManuscriptsPopup : function(studyId)
+    showStudyManuscriptsPopup : function(studyId, publicationType)
     {
         this.hidePopup(this.manuscriptsShowing);
 
@@ -138,7 +142,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             autoScroll: true,
             loader: {
                 autoLoad: true,
-                url: this.dataModuleName + '-studyDetail.view?_frame=none&detailType=publications&studyId=' + studyId
+                url: this.dataModuleName + '-studyDetail.view?_frame=none&detailType=' + publicationType + '&studyId=' + studyId
             }
         });
         var viewScroll = Ext4.getBody().getScroll();

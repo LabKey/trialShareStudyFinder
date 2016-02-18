@@ -452,7 +452,6 @@ public class DataFinderPage extends LabKeyPage
                 }
             }
             return selections;
-
         }
 
         public List<String> getSelectedMembers(Dimension dimension)
