@@ -629,7 +629,7 @@ div.labkey-study-details h3 {
 
 .labkey-publication-card .labkey-publication-title,
 .labkey-publication-card .labkey-publication-citation {
-    padding-bottom:10px;
+    padding-bottom:5px;
 
 }
 
@@ -670,13 +670,19 @@ div.labkey-study-details h3 {
     padding-bottom : 5px;
 }
 
+.labkey-publication-detail .labkey-publication-studies,
+.labkey-publication-detail .labkey-publication-data-link,
 .labkey-publication-detail .labkey-publication-links,
 .labkey-publication-detail .labkey-publication-keywords,
 .labkey-publication-detail .labkey-publication-abstract
 {
-    padding-top: 10px;
+    padding-top: 8px;
 }
 
+.labkey-publication-detail .labkey-publication-abstract
+{
+    padding-bottom: 5px
+}
 
 .labkey-publication-details .labkey-study-short-name
 {
