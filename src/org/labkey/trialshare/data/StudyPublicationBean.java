@@ -16,6 +16,14 @@
 package org.labkey.trialshare.data;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.api.data.Container;
+import org.labkey.api.data.ContainerManager;
+import org.labkey.api.reports.Report;
+import org.labkey.api.reports.ReportService;
+import org.labkey.api.reports.model.ViewCategory;
+import org.labkey.api.reports.report.view.ReportUtil;
+import org.labkey.api.security.User;
+import org.labkey.api.util.URLHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +52,7 @@ public class StudyPublicationBean
     private Boolean isHighlighted = false;
     private String publicationType;
     private List<String> figureUrls;
+    private String manuscriptContainer;
 
     public static class UrlData {
         Integer _index;
@@ -382,5 +391,43 @@ public class StudyPublicationBean
     public void setPublicationType(String publicationType)
     {
         this.publicationType = publicationType;
+    }
+
+    public String getManuscriptContainer()
+    {
+        return manuscriptContainer;
+    }
+
+    public void setManuscriptContainer(String manuscriptContainer)
+    {
+        this.manuscriptContainer = manuscriptContainer;
+    }
+
+    public List<String> getFigureUrls()
+    {
+        return figureUrls;
+    }
+
+    public void setFigureUrls(User user)
+    {
+        if (getManuscriptContainer() == null)
+            return;
+        figureUrls = new ArrayList<>();
+        Container container = ContainerManager.getForId(getManuscriptContainer());
+        if (container == null)
+            return;
+        for (Report report : ReportService.get().getReports(user, container))
+        {
+            ViewCategory category = report.getDescriptor().getCategory();
+
+            if (category != null && category.getLabel().contains("Manuscript Figures"))
+            {
+                URLHelper urlHelper = ReportUtil.getThumbnailUrl(container, report);
+                if (urlHelper != null)
+                {
+                    figureUrls.add(urlHelper.toString());
+                }
+            }
+        }
     }
 }

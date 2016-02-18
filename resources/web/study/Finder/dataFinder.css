@@ -591,6 +591,23 @@ div.labkey-study-details h3 {
     display:none;
 }
 
+.labkey-publication .labkey-figures-list
+{
+    list-style: none;
+}
+
+.labkey-figures-list .labkey-figure
+{
+    display: inline;
+}
+
+.labkey-figure img
+{
+    max-height: 100px;
+    box-shadow: 1px 1px 2px 2px #ccc;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
 
 #labkey-publication-details-content,
 .labkey-publication-card .labkey-publication-author,

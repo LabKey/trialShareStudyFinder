@@ -37,7 +37,14 @@ Ext4.define("LABKEY.study.panel.PublicationDetails", {
         '   </tpl>',
         '   <tpl if="abstractText">',
         '       <div class="labkey-publication-detail-label">Abstract</div>',
-        '       <div class="labkey-publication-abstract">{bstractText:htmlEncode}%></div>',
+        '       <div class="labkey-publication-abstract">{abstractText:htmlEncode}%></div>',
+        '   </tpl>',
+        '   <tpl if="figureUrls">',
+        '   <ul class="labkey-figures-list">',
+        '   <tpl for="figureUrls">',
+        '       <li class="labkey-figure"><a href="" target="_blank"><img src="{.}"></a>',
+        '   </tpl>',
+        '   </ul>',
         '   </tpl>',
         '</div>'
     )

@@ -608,7 +608,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage.DataCard card = finder.getDataCards().get(0);
         PublicationPanel detailPanel = card.viewDetail();
 
-        assertTrue("Author value not as expected on detail page.", detailPanel.getAuthor().contains("Monach PA, Tomasson G, Specks U, Stone JH, Cuthbertson D"));
+        assertTrue("Author value not as expected on detail page: " + detailPanel.getAuthor(), detailPanel.getAuthor().contains("Monach PA, Tomasson G, Specks U, Stone JH, Cuthbertson D"));
         assertTrue("Title value not as expected on detail page.", detailPanel.getTitle().contains("Circulating markers of vascular injury and angiogenesis in Antineutrophil Cytoplasmic Antibody-Associated Vasculitis."));
         assertTrue("Citation value not as expected on detail page.", detailPanel.getCitation().contains("Arthritis Rheum 63: 3988-3997, 2011"));
         assertTrue("PMID value not as expected on detail page.", detailPanel.getPMID().contains("21953143"));
