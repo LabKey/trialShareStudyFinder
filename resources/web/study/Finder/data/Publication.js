@@ -22,7 +22,9 @@ Ext4.define('LABKEY.study.data.Publication', {
         {name: 'dataUrl'},
         {name: 'publicationType'},
         {name: 'isSelected', type: 'boolean', defaultValue: true},
-        {name: 'isHighlighted', type: 'boolean', defaultValue: false}
+        {name: 'isHighlighted', type: 'boolean', defaultValue: false},
+        {name: 'abstractText'},
+        {name: 'keywords'}
     ]
 
 });

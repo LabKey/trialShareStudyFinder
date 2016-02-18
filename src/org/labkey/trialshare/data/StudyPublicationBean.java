@@ -24,6 +24,8 @@ import org.labkey.api.reports.model.ViewCategory;
 import org.labkey.api.reports.report.view.ReportUtil;
 import org.labkey.api.security.User;
 import org.labkey.api.util.URLHelper;
+import org.labkey.api.view.ActionURL;
+import org.labkey.api.view.ViewContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +55,7 @@ public class StudyPublicationBean
     private String publicationType;
     private List<URLData> thumbnails;
     private String manuscriptContainer;
+    private String keywords;
 
     public static class URLData
     {
@@ -409,7 +412,7 @@ public class StudyPublicationBean
         return thumbnails;
     }
 
-    public void setThumbnails(User user)
+    public void setThumbnails(User user, ActionURL actionURL)
     {
         if (getManuscriptContainer() == null)
             return;
@@ -417,6 +420,10 @@ public class StudyPublicationBean
         Container container = ContainerManager.getForId(getManuscriptContainer());
         if (container == null)
             return;
+        ViewContext context = new ViewContext();
+        context.setContainer(container);
+        context.setUser(user);
+        context.setActionURL(actionURL);
         for (Report report : ReportService.get().getReports(user, container))
         {
             ViewCategory category = report.getDescriptor().getCategory();
@@ -428,10 +435,20 @@ public class StudyPublicationBean
                 {
                     URLData urlData = new URLData();
                     urlData.setLinkText(urlHelper.toString());
-                    urlData.setLink(container.getStartURL(user).addParameter("pageId","study.DATA_ANALYSIS").toString());
+                    urlData.setLink(report.getRunReportURL(context).toString());
                     thumbnails.add(urlData);
                 }
             }
         }
+    }
+
+    public String getKeywords()
+    {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords)
+    {
+        this.keywords = keywords;
     }
 }

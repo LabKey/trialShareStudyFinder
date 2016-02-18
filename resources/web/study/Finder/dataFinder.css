@@ -594,12 +594,19 @@ div.labkey-study-details h3 {
 
 .labkey-publication .labkey-figures-list
 {
+    padding-top: 10px;
     list-style: none;
 }
 
 .labkey-figures-list .labkey-figure
 {
     display: inline;
+}
+
+.labkey-publication-detail-label
+{
+    /*font-style: italic;*/
+    font-variant: small-caps
 }
 
 .labkey-figure img
@@ -663,9 +670,11 @@ div.labkey-study-details h3 {
     padding-bottom : 5px;
 }
 
-.labkey-publication-details .labkey-publication-abstract
+.labkey-publication-detail .labkey-publication-links,
+.labkey-publication-detail .labkey-publication-keywords,
+.labkey-publication-detail .labkey-publication-abstract
 {
-    padding: 10px;
+    padding-top: 10px;
 }
 
 
