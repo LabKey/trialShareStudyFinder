@@ -23,8 +23,6 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         "searchTermsChanged"
     ],
 
-    padding: "3 8 3 8",
-
     initComponent: function() {
 
         this.subsets = Ext4.create('LABKEY.study.store.Subsets', {
@@ -38,10 +36,14 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         this.items.push(this.getSubsetMenu());
         if (this.showHelpLinks)
         {
-            this.items.push(Ext4.create("Ext.Component", {
-                html: "<div></div>",
+            this.items.push({
+                // spacer
+                xtype: 'box',
+                autoEl: {
+                    tag: 'div'
+                },
                 flex: 10
-            }));
+            });
             this.items.push(this.getHelpLinks());
         }
 

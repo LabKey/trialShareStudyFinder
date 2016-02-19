@@ -10,7 +10,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     itemId : 'labkey-data-finder-panel',
 
-    layout: 'vbox',
+    layout: 'border',
 
     cls: 'labkey-data-finder-view',
 
@@ -52,76 +52,12 @@ Ext4.define('LABKEY.study.panel.Finder', {
         }
     },
 
-    getControlsPanel: function()
-    {
-        if (!this.controlsPanel)
-        {
-            this.controlsPanel = Ext4.create("LABKEY.study.panel.FinderControls");
-            //this.controlsPanel = Ext4.create("Ext.Container", {
-            //    layout: "hbox",
-            //    cls: 'labkey-controls-panel',
-            //    items: [
-            //            this.getFacetPanelHeader(),
-            //            this.getFinderCardPanelHeader()
-            //    ]
-            //});
-        }
-        return this.controlsPanel;
-    },
-
-    getFacetPanelHeader : function() {
-        if (!this.facetPanelHeader) {
-            this.facetPanelHeader = Ext4.create("LABKEY.study.panel.FacetPanelHeader", {
-                //dataModuleName: this.dataModuleName
-            });
-        }
-        return this.facetPanelHeader;
-    },
-
-    getFinderCardPanelHeader : function() {
-        if (!this.cardPanelHeaders) {
-            //this.cardPanelHeaders = {};
-            //this.cubeConfigStore.each(function(cubeConfig)
-            //{
-            //    this.cardPanelHeaders[cubeConfig.get("objectName")] = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
-            //        dataModuleName: cubeConfig.get("dataModuleName"),
-            //        padding: 8,
-            //        showSearch : cubeConfig.get("showSearch"),
-            //        objectName: cubeConfig.get("objectName"),
-            //        hidden: cubeConfig.get("objectName") != this.cubeConfigStore.selectedValue
-            //    }
-            //    );
-            //});
-            var cubeConfig = this.cubeConfigStore.getById(this.cubeConfigStore.selectedValue);
-
-            this.cardPanelHeader = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
-                dataModuleName: cubeConfig.get("dataModuleName"),
-                padding: 8,
-                showSearch : cubeConfig.get("showSearch"),
-                objectName: cubeConfig.get("objectName")
-            });
-        }
-        return this.cardPanelHeader;
-    },
-
-
-
-    getObjectSelectionPanel: function() {
-        if (!this.objectSelectionPanel) {
-
-            this.objectSelectionPanel = Ext4.create("LABKEY.study.panel.FinderObjectSelection", {
-                width: '100%',
-                cubeConfigs: this.cubeConfigs
-            });
-        }
-        return this.objectSelectionPanel;
-    },
-
     getFinderCardDeck : function() {
         if (!this.finderCardDeck) {
             this.finderCardDeck = Ext4.create("LABKEY.study.panel.FinderCardDeck", {
                 cubeConfigs: this.cubeConfigs,
-                dataModuleName: this.dataModuleName
+                dataModuleName: this.dataModuleName,
+                region: 'center'
             });
         }
         return this.finderCardDeck;

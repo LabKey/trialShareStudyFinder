@@ -10,8 +10,6 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
 
     cls: 'labkey-facet-header',
 
-    padding: "8 4 3 8",
-
     bubbleEvents: ["clearAllFilters", "finderObjectChanged"],
 
     // TODO need to hook up the participant group functionality to the menus
@@ -49,10 +47,14 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
                 items: [
                     this.getSummaryLabel(),
                     this.getCubeConfigMenu(),
-                    Ext4.create("Ext.Component", {
-                        html: "<div></div>",
+                    {
+                        // spacer
+                        xtype: 'box',
+                        autoEl: {
+                            tag: 'div'
+                        },
                         flex: 10
-                    }),
+                    },
                     Ext4.create("Ext.button.Button", {
                         text: '[clear all]',
                         cls: 'labkey-clear-all inactive',

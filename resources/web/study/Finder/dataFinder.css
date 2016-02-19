@@ -13,6 +13,12 @@
     /*float: right;*/
 /*}*/
 
+.labkey-studies-panel,
+.labkey-publications-panel
+{
+    padding: 5px 0px 0px 0px;
+}
+
 .labkey-finder-object-selection {
     padding-left: 10px;
 }
@@ -156,6 +162,7 @@ DIV.labkey-search-message
 
 .labkey-facet-selection-panel
 {
+    padding: 5px 0px 5px 5px;
     vertical-align: text-top;
     height:100%;
     background-color: white;
@@ -240,6 +247,11 @@ DIV.labkey-facet-summary
 .labkey-facet-header
 {
     padding-left: 10px;
+}
+
+.labkey-finder-card-header
+{
+    padding: 3px 8px 3px 8px;
 }
 
 .labkey-finder-card-header,

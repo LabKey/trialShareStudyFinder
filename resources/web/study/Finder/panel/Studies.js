@@ -16,8 +16,6 @@ Ext4.define("LABKEY.study.panel.Studies", {
     alias : 'widget.labkey-studies-panel',
     cls: 'labkey-studies-panel',
 
-    padding: "5 0 0 0",
-
     objectName: 'Study',
 
     showSearch : true,

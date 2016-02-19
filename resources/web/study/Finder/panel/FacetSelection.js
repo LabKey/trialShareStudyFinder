@@ -18,8 +18,6 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     cls: 'labkey-facet-selection-panel',
 
-    padding: "5 0 5 5",
-
     autoScroll: false,
 
     initComponent : function() {
@@ -99,7 +97,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     getFacetsContainer: function() {
         if (!this.facetsContainer) {
-            this.facetsContainer = {
+            this.facetsContainer = Ext4.create("Ext.Container", {
                 xtype: 'container',
                 itemId: 'facetsContainer',
                 flex: 10,
@@ -112,7 +110,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
                 items: [
                     this.getFacets()
                 ]
-            };
+            });
         }
         return this.facetsContainer;
     }

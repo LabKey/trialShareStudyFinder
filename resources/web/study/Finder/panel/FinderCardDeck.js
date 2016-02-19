@@ -34,10 +34,6 @@ Ext4.define('LABKEY.study.panel.FinderCardDeck', {
 
         this.getLayout().setActiveItem(activeIndex);
 
-        Ext4.EventManager.onWindowResize(function()
-        {
-            this.setWidth(Ext4.getBody().getWidth() - 70);
-        }, this);
     }
 });
 

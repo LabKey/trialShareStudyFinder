@@ -1,3 +1,4 @@
+// Consider: Use "cube.js" app metadata overlay paradigm
 Ext4.define('LABKEY.study.data.CubeConfig', {
     extend: 'Ext.data.Model',
     idProperty : 'objectName',

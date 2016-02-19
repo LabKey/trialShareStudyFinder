@@ -15,8 +15,6 @@ Ext4.define("LABKEY.study.panel.Publications", {
     alias : 'widget.labkey-publications-panel',
     cls: 'labkey-publications-panel',
 
-    padding: "5 0 0 0",
-
     objectName: 'Publication',
 
     autoScroll: true,
