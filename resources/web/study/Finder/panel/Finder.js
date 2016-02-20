@@ -33,9 +33,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
         this._initResize();
 
         this.on({
-            finderObjectChanged: this.updateFinderObject,
-            filterSelectionChanged: this.onFilterSelectionChange,
-            clearAllFilters: this.onClearAllFilters
+            finderObjectChanged: this.updateFinderObject
         });
     },
 
@@ -82,16 +80,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
     updateFinderObject : function(objectName)
     {
         this.getFinderCardDeck().getLayout().setActiveItem(objectName + '-finder-card');
-    },
-
-    onFilterSelectionChange: function(hasFilters)
-    {
-        this.getFacetPanelHeader().onFilterSelectionChange(hasFilters);
-    },
-
-    onClearAllFilters: function()
-    {
-        this.getFinderCardDeck().getLayout().getActiveItem().onClearAllFilters();
     }
 
 });
