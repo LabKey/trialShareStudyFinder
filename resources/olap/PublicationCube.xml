@@ -2,12 +2,18 @@
 
     <Cube name="PublicationCube" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
 
+        <Annotations>
+            <Annotation name="ContainerFilter">AllFolders</Annotation>
+            <Annotation name="AllowMDX">FALSE</Annotation>
+        </Annotations>
+
         <Table schema="lists" name="PublicationAssay" >
         </Table>
 
         <Dimension name="Publication" visible="true" highCardinality="false" foreignKey="PublicationId">
             <Hierarchy hasAll="true" primaryKey="Key">
                 <Table name="publicationsToShow" schema="lists"/>
+                <Level name="Container" visible="true" column="PermissionsContainer"/>
                 <Level name="Publication" visible="true" column="Key" type="Integer" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="Key">

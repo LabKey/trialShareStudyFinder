@@ -14,7 +14,7 @@
             <Hierarchy hasAll="true" primaryKeyTable="studyProperties" primaryKey="StudyId">
                 <Table name="studyProperties" schema="lists"/>
                 <Level name="Container" visible="true" column="StudyContainer"/>
-                <Level name="Study" visible="true" column="shortName" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+                <Level name="Study" visible="true" column="studyId" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="StudyId">
                 <Table name="studyTherapeuticArea" schema="lists"/>

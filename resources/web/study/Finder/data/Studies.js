@@ -42,7 +42,7 @@ Ext4.define('LABKEY.study.store.Studies', {
         this.clearFilter();
         for (var i = 0; i < this.count(); i++) {
             study = this.getAt(i);
-            study.set("isSelected", this.selectedStudies[study.get("shortName")] !== undefined);
+            study.set("isSelected", this.selectedStudies[study.get("studyId")] !== undefined);
         }
 
         this.filter([

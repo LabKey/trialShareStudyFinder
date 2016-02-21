@@ -43,6 +43,7 @@ public class StudyPublicationBean
     private List<StudyBean> studies;
     private Boolean isHighlighted;
     private String publicationType;
+    private String permissionsContainer;
 
     // the first item in the pair is the link; the second is the description (link text)
     private Pair<String, String>[] urls = new Pair[5];
@@ -349,5 +350,15 @@ public class StudyPublicationBean
     public void setPublicationType(String publicationType)
     {
         this.publicationType = publicationType;
+    }
+
+    public String getPermissionsContainer()
+    {
+        return permissionsContainer;
+    }
+
+    public void setPermissionsContainer(String permissionsContainer)
+    {
+        this.permissionsContainer = permissionsContainer;
     }
 }

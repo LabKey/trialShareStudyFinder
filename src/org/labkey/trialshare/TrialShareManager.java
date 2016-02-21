@@ -16,6 +16,7 @@
 
 package org.labkey.trialshare;
 
+import org.labkey.api.data.CompareType;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
@@ -27,6 +28,7 @@ import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.trialshare.data.StudyBean;
+import org.labkey.trialshare.data.StudyPublicationBean;
 
 import java.util.List;
 
@@ -58,6 +60,29 @@ public class TrialShareManager
                 if (study.getStudyContainer() != null)
                 {
                     Container studyContainer = ContainerManager.getForId(study.getStudyContainer());
+                    if (studyContainer.hasPermission(user, ReadPermission.class))
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean canSeeIncompleteManuscripts(User user, Container container)
+    {
+        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
+        SimpleFilter filter = new SimpleFilter();
+        filter.addCondition(FieldKey.fromParts("Status"), "Complete", CompareType.NEQ_OR_NULL);
+        TableInfo publicationsList = coreSchema.getSchema("lists").getTable("ManuscriptsAndAbstracts");
+        if (publicationsList != null)
+        {
+            List<StudyPublicationBean> publications = (new TableSelector(publicationsList, filter, null)).getArrayList(StudyPublicationBean.class);
+            for (StudyPublicationBean publication : publications)
+            {
+                if (publication.getPermissionsContainer() != null)
+                {
+                    Container studyContainer = ContainerManager.getForId(publication.getPermissionsContainer());
                     if (studyContainer.hasPermission(user, ReadPermission.class))
                         return true;
                 }
