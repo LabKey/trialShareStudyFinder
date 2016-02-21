@@ -37,7 +37,6 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
         this._initResize();
 
         this.on({
-            //filterSelectionChanged: this.onFilterSelectionChange,
             subsetChanged: this.onSubsetChanged,
             searchTermsChanged: this.onSearchTermsChanged
         });
@@ -55,11 +54,6 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
         {
             me.mdx = m;
             me.onCubeReady();
-            //this.loadFilterState();
-
-            //this.onSubsetChanged();
-            // doShowAllStudiesChanged() has side-effect of calling updateCountsAsync()
-            //$scope.updateCountsAsync();
         });
     },
 
@@ -71,10 +65,6 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
     onSubsetChanged : function(value) {
         this.getFacetsPanel().onSubsetChanged();
     },
-
-    //onFilterSelectionChange : function(){
-    //    this.getStudiesPanel().onFilterSelectionChanged();
-    //},
 
     onClearAllFilters: function() {
         this.getFacetsPanel().onClearAllFilters();

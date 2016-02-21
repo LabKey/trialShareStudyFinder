@@ -599,6 +599,11 @@ div.labkey-study-details h3 {
     display:inline;
 }
 
+.labkey-publication-detail
+{
+    clear: left;
+}
+
 .labkey-publication-detail.collapsed
 {
     display:none;

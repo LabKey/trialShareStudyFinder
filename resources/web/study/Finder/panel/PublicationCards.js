@@ -49,7 +49,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             '               <a class="labkey-text-link labkey-study-card-goto" target="_blank" href="{dataUrl}">view data</a>',
             '           </tpl>',
             '           </div>',
-            '           <br>',
             '           <div id="publicationDetails_{id}" class="labkey-publication-detail collapsed"></div>',
             '       </div>',
             '       </div>',
@@ -61,15 +60,15 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     listeners: {
         itemClick: function(view, record, item, index, event, eOpts)
         {
-            if (event.target.className.includes("labkey-study-card-summary"))
+            if (event.target.className.indexOf("labkey-study-card-summary") >= 0)
             {
                 this.showDetailPopup(record.get("id"));
             }
-            if (event.target.className.includes("fa-plus-square"))
+            if (event.target.className.indexOf("fa-plus-square") >= 0)
             {
                 this.toggleDetails(record.get("id"), item, true);
             }
-            else if (event.target.className.includes("fa-minus-square"))
+            else if (event.target.className.indexOf("fa-minus-square") >= 0)
             {
                 this.toggleDetails(record.get("id"), item, false);
             }

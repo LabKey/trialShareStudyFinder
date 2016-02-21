@@ -91,15 +91,15 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
 
     listeners: {
         itemClick: function(view, record, item, index, event, eOpts) {
-            if (event.target.className.includes("labkey-study-card-summary"))
+            if (event.target.className.indexOf("labkey-study-card-summary") >= 0)
             {
                 this.showStudyDetailPopup(record.get("studyId"));
             }
-            else if (event.target.className.includes("labkey-study-card-manuscript-count"))
+            else if (event.target.className.indexOf("labkey-study-card-manuscript-count") >= 0)
             {
                 this.showStudyManuscriptsPopup(record.get("studyId"), "manuscripts");
             }
-            else if (event.target.className.includes("labkey-study-card-abstract-count"))
+            else if (event.target.className.indexOf("labkey-study-card-abstract-count") >= 0)
             {
                 this.showStudyManuscriptsPopup(record.get("studyId"), "abstracts");
             }
