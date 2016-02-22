@@ -40,10 +40,9 @@
                 <Level name="Phase" visible="true" table="studyPhase" type="String" column="Phase" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
-            <Hierarchy name="Public" hasAll="true" primaryKey="StudyId">
+            <Hierarchy name="Visibility" hasAll="true">
                 <Table name="studyProperties" schema="lists"/>
-                <Level name="Public" visible="true" column="isPublic" type="Boolean" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-            </Hierarchy>
+                <Level name="Visibility" visible="true" column="visibility" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             <Hierarchy name="Assay" hasAll="true" primaryKey="StudyId">
                 <Level name="Assay" visible="true" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>

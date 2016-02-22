@@ -22,16 +22,14 @@ import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class PublicationDetailPanel extends Component
+public class PublicationPanel extends Component
 {
     protected BaseWebDriverTest _test;
     protected WebElement _panel;
 
-    public PublicationDetailPanel(BaseWebDriverTest test)
+    public PublicationPanel(BaseWebDriverTest test)
     {
         _test = test;
-        _test.waitForElement(Locators.self);
-        _panel = Locators.self.waitForElement(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
@@ -42,7 +40,7 @@ public class PublicationDetailPanel extends Component
 
     public String getAuthor()
     {
-        return getTextOfElement(Locators.author);
+        return getTextOfElement(Locators.allAuthors);
     }
 
     public String getTitle()
@@ -55,12 +53,26 @@ public class PublicationDetailPanel extends Component
         return getTextOfElement(Locators.citation);
     }
 
+    public boolean isPMIDDisplayed()
+    {
+        return _test.isElementVisible(Locators.PMID);
+    }
+
+    public int getPMIDCount()
+    {
+        return Locators.PMID.findElements(_test.getDriver()).size();
+    }
+
     public String getPMID()
     {
         return getTextOfElement(Locators.PMID);
     }
     public void clickPMID() { _test.click(Locators.PMID); }
 
+    public boolean isPMCIDDisplayed()
+    {
+        return _test.isElementVisible(Locators.PMCID);
+    }
     public String getPMCID()
     {
         return getTextOfElement(Locators.PMCID);
@@ -78,11 +90,6 @@ public class PublicationDetailPanel extends Component
         return getTextOfElement(Locators.studyShortName);
     }
 
-    public String getDetailPageText()
-    {
-        return getTextOfElement(Locators.pubDetailPanel);
-    }
-
     @LogMethod(quiet = true)
     private String getTextOfElement(Locator el)
     {
@@ -97,22 +104,16 @@ public class PublicationDetailPanel extends Component
         }
     }
 
-    public void closeWindow()
-    {
-        _test.click(Locators.closeButton);
-        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locators.pubDetailPanel.toBy()));
-    }
 
     private static class Locators
     {
-        private static Locator self = Locator.css(".labkey-publication-detail");
-        private static Locator.CssLocator pubDetailPanel = Locator.css(".labkey-publication-detail");
-        private static Locator.CssLocator author = pubDetailPanel.append(Locator.css(".labkey-publication-author"));
-        private static Locator.CssLocator title = pubDetailPanel.append(Locator.css(".labkey-publication-title"));
-        private static Locator.CssLocator citation = pubDetailPanel.append(Locator.css(".labkey-publication-citation"));
-        private static Locator.XPathLocator PMID = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')][contains(text(), 'PMID')]//a");
-        private static Locator.XPathLocator PMCID = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')][contains(text(), 'PMCID')]//a");
-        private static Locator.XPathLocator DOI = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')][contains(text(), 'DOI')]//a");
+        private static Locator.CssLocator publicationCard = Locator.css(".labkey-publication-card");
+        private static Locator.CssLocator allAuthors = publicationCard.append(Locator.css("#fullAuthorList"));
+        private static Locator.CssLocator title = publicationCard.append(Locator.css(".labkey-publication-title"));
+        private static Locator.CssLocator citation = publicationCard.append(Locator.css(".labkey-publication-citation"));
+        private static Locator.XPathLocator PMID = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')]//a[contains(text(), 'PMID')]");
+        private static Locator.XPathLocator PMCID = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')]//a[contains(text(), 'PMCID')]");
+        private static Locator.XPathLocator DOI = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')]//a[contains(text(), 'DOI')]");
         private static Locator.CssLocator studyShortName = Locator.css(".labkey-study-short-name");
         private static Locator.CssLocator closeButton = Locator.css(".x4-tool-close");
     }

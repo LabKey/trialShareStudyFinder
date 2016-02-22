@@ -17,8 +17,6 @@
 %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="org.labkey.api.data.Container" %>
-<%@ page import="org.labkey.api.util.Pair" %>
-<%@ page import="org.labkey.api.view.ActionURL" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.ViewContext" %>
@@ -56,7 +54,6 @@
 
     String studyUrl = study.getUrl(c, context.getUser());
 
-    String publicationsSectionTitle = "Manuscripts and Abstracts";
     Map<String, String> linkProps = new HashMap<>();
     linkProps.put("target", "_blank");
 %>
@@ -92,7 +89,7 @@
         <div class="labkey-study-papers"><%
         if (null != study.getPublications() && study.getPublications().size() > 0)
         {
-            %><span class="labkey-study-publication-header"><%=h(publicationsSectionTitle)%></span><%
+            %><span class="labkey-study-publication-header"><%=h(studyDetail.getDetailType().getSectionHeader())%></span><%
             for (StudyPublicationBean pub : study.getPublications())
             {
                 if (pub.getTitle() != null)
@@ -113,11 +110,11 @@
                     {
                         %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPmid(), null, null, linkProps)%><%
                     }
-                    for (Pair<String, String> urlData : pub.getUrls())
+                    for (StudyPublicationBean.URLData urlData : pub.getUrls())
                     {
-                        if (urlData != null && !StringUtils.isEmpty(urlData.second))
+                        if (urlData != null && !StringUtils.isEmpty(urlData.getLink()))
                         {
-                        %><br/><%=textLink(h(urlData.second), urlData.first, null, null, linkProps)%><%
+                        %><br/><%=textLink(h(urlData.getLinkText()), urlData.getLink(), null, null, linkProps)%><%
                         }
                     }
                 %></p><%

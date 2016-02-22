@@ -6,12 +6,14 @@
 Ext4.define("LABKEY.study.panel.Publications", {
     extend: 'Ext.panel.Panel',
 
-    layout : 'vbox',
+    layout: {
+        type: 'vbox',
+        align: 'stretch'
+    },
+
     border: false,
     alias : 'widget.labkey-publications-panel',
     cls: 'labkey-publications-panel',
-
-    padding: "5 0 0 0",
 
     objectName: 'Publication',
 
@@ -20,7 +22,7 @@ Ext4.define("LABKEY.study.panel.Publications", {
     initComponent : function() {
         this.items = [
             this.getCardPanelHeader(),
-            this.getCards()
+            this.getCardsContainer()
         ];
         this.callParent();
 
@@ -53,12 +55,31 @@ Ext4.define("LABKEY.study.panel.Publications", {
             this.cardPanelHeader = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
                 dataModuleName: this.dataModuleName,
                 cubeContainerPath: this.cubeContainerPath,
-                padding: 8,
                 showSearch : this.showSearch,
                 objectName: this.objectName
             });
         }
         return this.cardPanelHeader;
+    },
+
+    getCardsContainer : function() {
+        if (!this.facetsContainer) {
+            this.facetsContainer = {
+                xtype: 'container',
+                itemId: 'publicationCardsContainer',
+                flex: 10,
+                autoScroll: true,
+                layout: {
+                    type: 'vbox',
+                    align: 'stretch',
+                    pack: 'start'
+                },
+                items: [
+                    this.getCards()
+                ]
+            };
+        }
+        return this.facetsContainer;
     },
 
     getCards : function() {

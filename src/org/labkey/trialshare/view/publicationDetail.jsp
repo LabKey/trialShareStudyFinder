@@ -17,16 +17,15 @@
 %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="org.labkey.api.data.Container" %>
-<%@ page import="org.labkey.api.util.Pair" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.ViewContext" %>
 <%@ page import="org.labkey.api.view.template.ClientDependency" %>
+<%@ page import="org.labkey.trialshare.data.StudyBean" %>
 <%@ page import="org.labkey.trialshare.data.StudyPublicationBean" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="org.labkey.trialshare.data.StudyBean" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%!
     public LinkedHashSet<ClientDependency> getClientDependencies()
@@ -89,11 +88,11 @@
         </div>
         <%
 
-            for (Pair<String, String> urlData : publication.getUrls())
+            for (StudyPublicationBean.URLData urlData : publication.getUrls())
             {
-                if (urlData != null && !StringUtils.isEmpty(urlData.second))
+                if (urlData != null && !StringUtils.isEmpty(urlData.getLinkText()))
                 {
-                %><br/><%=textLink(h(urlData.second), urlData.first, null, null, linkProps)%><%
+                %><br/><%=textLink(h(urlData.getLinkText()), urlData.getLink(), null, null, linkProps)%><%
                 }
             }
         %>

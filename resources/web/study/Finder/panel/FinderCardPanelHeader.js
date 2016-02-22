@@ -12,6 +12,8 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         align: 'stretch'
     },
 
+    cls: 'labkey-finder-card-header',
+
     showHelpLinks: true,
 
     searchMessage: "",
@@ -20,7 +22,6 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         "subsetChanged",
         "searchTermsChanged"
     ],
-
 
     initComponent: function() {
 
@@ -33,10 +34,19 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         var searchBox = this.getSearchBox();
         if (searchBox)
             this.items.push(searchBox);
-        if (this.getSubsetMenu())
-            this.items.push(this.getSubsetMenu());
+        this.items.push(this.getSubsetMenu());
         if (this.showHelpLinks)
+        {
+            this.items.push({
+                // spacer
+                xtype: 'box',
+                autoEl: {
+                    tag: 'div'
+                },
+                flex: 10
+            });
             this.items.push(this.getHelpLinks());
+        }
 
         this.subsets.on(
                 'load', function(store) {
