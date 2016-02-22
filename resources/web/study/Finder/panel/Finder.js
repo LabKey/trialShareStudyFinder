@@ -10,7 +10,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     itemId : 'labkey-data-finder-panel',
 
-    layout: 'vbox',
+    layout: 'border',
 
     cls: 'labkey-data-finder-view',
 
@@ -22,13 +22,11 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     searchTerms : '',
 
-    initComponent : function() {
+    initComponent : function()
+    {
+        this.createCubeConfigStore(this.cubeConfigs);
 
-        this.items = [];
-
-        if (this.cubeConfigs.length > 1)
-            this.items.push(this.getObjectSelectionPanel());
-        this.items.push(this.getFinderCardDeck());
+        this.items = [this.getFinderCardDeck()];
 
         this.callParent();
 
@@ -39,27 +37,31 @@ Ext4.define('LABKEY.study.panel.Finder', {
         });
     },
 
-    getObjectSelectionPanel: function() {
-        if (!this.objectSelectionPanel) {
-
-            this.objectSelectionPanel = Ext4.create("LABKEY.study.panel.FinderObjectSelection", {
-                width: '100%',
-                cubeConfigs: this.cubeConfigs
-            });
+    createCubeConfigStore : function(cubeConfigs) {
+        this.cubeConfigStore = Ext4.create("Ext.data.Store", {
+            model: 'LABKEY.study.data.CubeConfig',
+            storeId: 'CubeConfigs',
+            data: cubeConfigs
+        });
+        for (var i = 0; i < cubeConfigs.length; i++)
+        {
+            if (cubeConfigs[i].isDefault)
+                this.cubeConfigStore.selectedValue = cubeConfigs[i].objectName;
         }
-        return this.objectSelectionPanel;
     },
 
     getFinderCardDeck : function() {
         if (!this.finderCardDeck) {
             this.finderCardDeck = Ext4.create("LABKEY.study.panel.FinderCardDeck", {
                 cubeConfigs: this.cubeConfigs,
-                dataModuleName: this.dataModuleName
+                dataModuleName: this.dataModuleName,
+                region: 'center'
             });
         }
         return this.finderCardDeck;
     },
 
+    // This seems to be necessary for Firefox (at least)
     _initResize : function() {
         var resize = function(w, h) {
             LABKEY.ext4.Util.resizeToViewport(this, w, h, 46, 32);

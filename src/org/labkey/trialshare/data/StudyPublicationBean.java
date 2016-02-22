@@ -15,9 +15,19 @@
  */
 package org.labkey.trialshare.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.labkey.api.util.Pair;
+import org.apache.commons.lang3.StringUtils;
+import org.labkey.api.data.Container;
+import org.labkey.api.data.ContainerManager;
+import org.labkey.api.reports.Report;
+import org.labkey.api.reports.ReportService;
+import org.labkey.api.reports.model.ViewCategory;
+import org.labkey.api.reports.report.view.ReportUtil;
+import org.labkey.api.security.User;
+import org.labkey.api.util.URLHelper;
+import org.labkey.api.view.ActionURL;
+import org.labkey.api.view.ViewContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,11 +51,50 @@ public class StudyPublicationBean
     private String status;
     private String dataUrl;
     private List<StudyBean> studies;
-    private Boolean isHighlighted;
+    private Boolean isHighlighted = false;
     private String publicationType;
+    private List<URLData> thumbnails;
+    private String manuscriptContainer;
+    private String keywords;
 
-    // the first item in the pair is the link; the second is the description (link text)
-    private Pair<String, String>[] urls = new Pair[5];
+    public static class URLData
+    {
+        Integer _index;
+        String _link;
+        String _linkText;
+
+        public Integer getIndex()
+        {
+            return _index;
+        }
+
+        public void setIndex(Integer index)
+        {
+            _index = index;
+        }
+
+        public String getLink()
+        {
+            return _link;
+        }
+
+        public void setLink(String link)
+        {
+            _link = link;
+        }
+
+        public String getLinkText()
+        {
+            return _linkText;
+        }
+
+        public void setLinkText(String linkText)
+        {
+            _linkText = linkText;
+        }
+    }
+
+    private List<URLData> urls = new ArrayList<>();
 
     private String citation;
 
@@ -60,6 +109,11 @@ public class StudyPublicationBean
     }
 
     public void setKey(Integer id)
+    {
+        this.id = id;
+    }
+
+    public void set_Key(Integer id)
     {
         this.id = id;
     }
@@ -207,18 +261,20 @@ public class StudyPublicationBean
 
 
     public String getUrl() {
-        if (urls[0] != null)
-            return urls[0].first;
+        for (URLData urlData : urls)
+        {
+            if (!StringUtils.isEmpty(urlData.getLink()))
+                return urlData.getLink();
+        }
         return null;
     }
 
-    @JsonIgnore
-    public Pair<String, String>[] getUrls()
+    public List<URLData> getUrls()
     {
         return urls;
     }
 
-    public void setUrls(Pair<String, String>[] urls)
+    public void setUrls(List<URLData> urls)
     {
         this.urls = urls;
     }
@@ -227,16 +283,15 @@ public class StudyPublicationBean
     {
         if (description == null || description.equals("&nbsp;"))
             description = "";
-        Pair<String, String> urlData = urls[index];
+
+        URLData urlData = getUrlData(index);
         if (urlData == null)
         {
-            urlData = new Pair<>(null, description);
-            urls[index] = urlData;
+            urlData = new URLData();
+            urlData.setIndex(index);
+            urls.add(urlData);
         }
-        else
-        {
-            urlData.second = description;
-        }
+        urlData.setLinkText(description);
     }
 
     private void setUrlLink(int index, String link)
@@ -244,16 +299,24 @@ public class StudyPublicationBean
         if (link == null)
             return;
 
-        Pair<String, String> urlData = urls[index];
+        URLData urlData = getUrlData(index);
         if (urlData == null)
         {
-            urlData = new Pair<>(link, null);
-            urls[index] = urlData;
+            urlData = new URLData();
+            urlData.setIndex(index);
+            urls.add(urlData);
         }
-        else
+        urlData.setLink(link);
+    }
+
+    private URLData getUrlData(int index)
+    {
+        for (URLData url : urls)
         {
-            urlData.first = link;
+            if (url.getIndex() == index)
+                return url;
         }
+        return null;
     }
 
     public void setDescription2(String description2)
@@ -282,21 +345,6 @@ public class StudyPublicationBean
     public void setLink3(String link3)
     {
         setUrlLink(2, link3);
-    }
-
-    public boolean hasPubmedLink()
-    {
-        return getPubmedLink() != null;
-    }
-
-    @JsonIgnore
-    public String getPubmedLink()
-    {
-        for (Pair<String, String> urlData : urls) {
-            if (urlData != null && urlData.first != null && urlData.first.contains("pubmed"))
-                return urlData.first;
-        }
-        return null;
     }
 
     public String getStatus()
@@ -347,5 +395,60 @@ public class StudyPublicationBean
     public void setPublicationType(String publicationType)
     {
         this.publicationType = publicationType;
+    }
+
+    public String getManuscriptContainer()
+    {
+        return manuscriptContainer;
+    }
+
+    public void setManuscriptContainer(String manuscriptContainer)
+    {
+        this.manuscriptContainer = manuscriptContainer;
+    }
+
+    public List<URLData> getThumbnails()
+    {
+        return thumbnails;
+    }
+
+    public void setThumbnails(User user, ActionURL actionURL)
+    {
+        if (getManuscriptContainer() == null)
+            return;
+        thumbnails = new ArrayList<>();
+        Container container = ContainerManager.getForId(getManuscriptContainer());
+        if (container == null)
+            return;
+        ViewContext context = new ViewContext();
+        context.setContainer(container);
+        context.setUser(user);
+        context.setActionURL(actionURL);
+        for (Report report : ReportService.get().getReports(user, container))
+        {
+            ViewCategory category = report.getDescriptor().getCategory();
+
+            if (category != null && category.getLabel().contains("Manuscript Figures"))
+            {
+                URLHelper urlHelper = ReportUtil.getThumbnailUrl(container, report);
+                if (urlHelper != null)
+                {
+                    URLData urlData = new URLData();
+                    urlData.setLinkText(urlHelper.toString());
+                    urlData.setLink(report.getRunReportURL(context).toString());
+                    thumbnails.add(urlData);
+                }
+            }
+        }
+    }
+
+    public String getKeywords()
+    {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords)
+    {
+        this.keywords = keywords;
     }
 }

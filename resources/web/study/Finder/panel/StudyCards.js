@@ -28,17 +28,13 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     tpl: new Ext4.XTemplate(
         '<div id="studypanel">',
         '   <tpl for=".">',
-        '   <tpl if="isHighlighted">',
-        '   <div class="labkey-study-card labkey-publication-highlight">',
-        '   <tpl else>',
-        '   <div class="labkey-study-card">',
-        '   </tpl>',
-        '       <span class="labkey-study-card-highlight labkey-study-card-accession">{studyId:htmlEncode}</span>',
+        '      {[this.displayCardHeader(values)]}',
+        '       <span class="labkey-study-card-header labkey-study-card-accession">{studyId:htmlEncode}</span>',
         '       <tpl if="shortName">',
         '           <span class="labkey-study-card-short-name">{shortName:htmlEncode}</span>',
         '       </tpl>',
             '<br>',
-        '       <span class="labkey-study-card-highlight labkey-study-card-pi">{investigator:htmlEncode}</span>',
+        '       <span class="labkey-study-card-header labkey-study-card-pi">{investigator:htmlEncode}</span>',
         '       <hr class="labkey-study-card-divider">',
         '       <div>',
         '           <a class="labkey-text-link labkey-study-card-summary" title="click for more details">view summary</a>',
@@ -55,11 +51,20 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         '   </tpl>',
         '</div>',
             {
+                displayCardHeader : function(values) {
+                    var cssClass = "labkey-study-card";
+                    if (values.isHighlighted)
+                        cssClass += " labkey-publication-highlight";
+                    if (values.isBorderHighlighted)
+                        cssClass += " labkey-study-border-highlight";
+                    return '<div class="' + cssClass + '">';
+                },
+
                 displayManuscriptCount : function(count) {
                     if (count == 0)
                         return "";
                     else {
-                        var text = '<a class="labkey-text-link labkey-study-card-pub-count">';
+                        var text = '<a class="labkey-text-link labkey-study-card-manuscript-count">';
                         if (count == 1)
                             text += "1 manuscript available";
                         else
@@ -72,7 +77,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
                     if (count == 0)
                         return "";
                     else {
-                        var text = '<a class="labkey-text-link labkey-study-card-pub-count">';
+                        var text = '<a class="labkey-text-link labkey-study-card-abstract-count">';
                         if (count == 1)
                             text += "1 abstract available";
                         else
@@ -86,13 +91,17 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
 
     listeners: {
         itemClick: function(view, record, item, index, event, eOpts) {
-            if (event.target.className.includes("labkey-study-card-summary"))
+            if (event.target.className.indexOf("labkey-study-card-summary") >= 0)
             {
                 this.showStudyDetailPopup(record.get("studyId"));
             }
-            else if (event.target.className.includes("labkey-study-card-pub-count"))
+            else if (event.target.className.indexOf("labkey-study-card-manuscript-count") >= 0)
             {
-                this.showStudyManuscriptsPopup(record.get("studyId"));
+                this.showStudyManuscriptsPopup(record.get("studyId"), "manuscripts");
+            }
+            else if (event.target.className.indexOf("labkey-study-card-abstract-count") >= 0)
+            {
+                this.showStudyManuscriptsPopup(record.get("studyId"), "abstracts");
             }
         }
     },
@@ -124,7 +133,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         this.detailShowing.show();
     },
 
-    showStudyManuscriptsPopup : function(studyId)
+    showStudyManuscriptsPopup : function(studyId, publicationType)
     {
         this.hidePopup(this.manuscriptsShowing);
 
@@ -138,7 +147,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             autoScroll: true,
             loader: {
                 autoLoad: true,
-                url: this.dataModuleName + '-studyDetail.view?_frame=none&detailType=publications&studyId=' + studyId
+                url: this.dataModuleName + '-studyDetail.view?_frame=none&detailType=' + publicationType + '&studyId=' + studyId
             }
         });
         var viewScroll = Ext4.getBody().getScroll();

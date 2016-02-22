@@ -9,7 +9,7 @@ Ext4.define('LABKEY.study.store.Studies', {
     model: 'LABKEY.study.data.Study',
     autoLoad: false,
 
-    selectedSubset : '[Study.Public].[true]', // TODO generalize
+    selectedSubset : null,
     proxy : {
         type: "ajax",
         //url: set before calling "load".
@@ -46,8 +46,7 @@ Ext4.define('LABKEY.study.store.Studies', {
         }
 
         this.filter([
-                {property: 'isSelected', value: true},
-                {property: 'isPublic', value: this.selectedSubset !== "[Study.Public].[false]"} // TODO generalize
+                {property: 'isSelected', value: true}
         ]);
     },
 
