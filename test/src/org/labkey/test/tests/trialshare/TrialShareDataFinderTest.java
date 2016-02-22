@@ -144,6 +144,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Override
     public boolean needsSetup()
     {
+
         try
         {
             return HttpStatus.SC_NOT_FOUND == WebTestHelper.getHttpGetResponse(WebTestHelper.buildURL("project", getProjectName(), "begin"));
