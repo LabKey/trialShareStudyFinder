@@ -264,16 +264,22 @@ DIV.labkey-facet-summary
 .labkey-facet-header .labkey-facet-caption
 {
     font-weight:400;
+    padding-bottom: 10px;
+}
+
+.labkey-facet-name
+{
+    float:left
 }
 
 .labkey-facet-header .labkey-filter-options
 {
     font-size: 11px;
-    padding: 3px 0px 0px 20px;
+    padding: 3px 0 0 20px;
 }
 
 .labkey-finder-facets .x4-grid-row {
-    border-width: 0px;
+    border-width: 0;
 }
 
 .labkey-finder-facets .x4-grid-row-selected .x4-grid-td {
@@ -361,6 +367,8 @@ LI.labkey-facet-member .member-indicator
 SPAN.labkey-facet-member  .labkey-facet-member-name,
 LI.labkey-facet-member .labkey-facet-member-name
 {
+    float: left;
+    padding-bottom: 3px;
     display:inline-block;
     position:relative;
     max-width:150pt;

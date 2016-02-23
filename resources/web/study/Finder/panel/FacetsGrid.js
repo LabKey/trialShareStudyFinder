@@ -134,7 +134,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                     groupHeaderTpl: new Ext4.XTemplate(
                             '<div class="labkey-facet-header">',
                             '       <div class="labkey-facet-caption">',
-                            '           <span>{name}</span>',
+                            '           <span class="labkey-facet-name">{name}</span>',
                             '           {[this.displayClearLabel(values)]}',
                             '       </div>',
                             '         {[this.makeFilterOptions(values)]}',
