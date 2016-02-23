@@ -112,8 +112,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     },
 
-    getCountDistinctFilters: function() {
-        var filters = [];
+    getCountDistinctFilters: function(filters) {
         var newFilters = this.getStudySubsetFilter();
         if (newFilters != null)
             filters.push(newFilters);
@@ -125,39 +124,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     getCustomFilters: function()
     {
-        if (LABKEY.user.canInsert)
-            return null;
-        if (this.cubeConfig.objectName == "Study")
-        {
-            var members = this.getValidFacetMemberSubset(["[Study.AssayVisibility].[Public]", "[Study.AssayVisibility].[#null]"]);
-            if (members.length > 0)
-            {
-                return {
-                    level: "[Study.AssayVisibility].[Visibility]",
-                    members: members
-                };
-            }
-            else
-                return null;
-        }
-        else
-        {
-            var filters = [];
-            var members = this.getValidFacetMemberSubset(["[Publication.Status].[Complete]"]);
-            if (members.length > 0)
-            {
-                filters.push({level: "[Publication.Status].[Status]", members: members})
-            }
-            members = this.getValidFacetMemberSubset(["[Publication.AssayVisibility].[Public]", "[Publication.AssayVisibility].[#null]"]);
-            if (members.length > 0)
-            {
-                filters.push({
-                    level: "[Publication.AssayVisibility].[Visibility]",
-                    members: members
-                });
-            }
-            return filters.length > 0 ? filters : null;
-        }
+        return null;
     },
 
     getValidFacetMemberSubset : function(possibleMembers)
@@ -180,7 +147,38 @@ Ext4.define('LABKEY.study.store.Facets', {
             return;
         }
 
-        var intersectFilters = this.getCountDistinctFilters();
+        var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "accessibleMembers.api", null, {
+            "objectName": this.cubeConfig.objectName
+        });
+        Ext4.Ajax.request({
+            url: url,
+            success: function (response)
+            {
+                var o = Ext4.decode(response.responseText);
+                if (o.success)
+                {
+                    var filters = [];
+                    for (var level in o.data)
+                    {
+                        if (o.data[level].length)
+                        {
+                            filters.push({
+                                level: level,
+                                members: o.data[level]
+                            })
+                        }
+                    }
+                    this.makeCountDistinctQuery(filters);
+                }
+
+            },
+            scope: this
+        });
+    },
+
+    makeCountDistinctQuery: function(intersectFilters)
+    {
+        this.getCountDistinctFilters(intersectFilters);
         var i, f, facet;
         for (f = 0; f < this.count(); f++)
         {
@@ -267,7 +265,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             name: this.cubeConfig.name,
             success: function (cellSet, mdx, config)
             {
-                this.updateCountsUnion(cellSet, isSavedGroup);
+                this.updateCountsUnion(cellSet);
                 //this.fireEvent("cubeReady");
             },
             scope: this,
@@ -291,7 +289,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     },
 
     /* handle query response to update all the member counts with all filters applied */
-    updateCountsUnion : function (cellSet, isSavedGroup)
+    updateCountsUnion : function (cellSet)
     {
         var facet, member, f, m;
         // map from hierarchyName to facet

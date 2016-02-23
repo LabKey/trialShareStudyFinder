@@ -26,10 +26,12 @@ import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
+import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyPublicationBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TrialShareManager
@@ -50,7 +52,7 @@ public class TrialShareManager
     {
         QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
         SimpleFilter filter = new SimpleFilter();
-        filter.addCondition(FieldKey.fromParts("isPublic"), false);
+        filter.addCondition(FieldKey.fromParts("Visibility"), "Operational");
         TableInfo propertiesList = coreSchema.getSchema("lists").getTable("studyProperties");
         if (propertiesList != null)
         {
@@ -60,7 +62,7 @@ public class TrialShareManager
                 if (study.getStudyContainer() != null)
                 {
                     Container studyContainer = ContainerManager.getForId(study.getStudyContainer());
-                    if (studyContainer.hasPermission(user, ReadPermission.class))
+                    if (studyContainer != null && studyContainer.hasPermission(user, ReadPermission.class))
                         return true;
                 }
             }
@@ -82,13 +84,46 @@ public class TrialShareManager
             {
                 if (publication.getPermissionsContainer() != null)
                 {
-                    Container studyContainer = ContainerManager.getForId(publication.getPermissionsContainer());
-                    if (studyContainer.hasPermission(user, ReadPermission.class))
+                    Container permissionsContainer = ContainerManager.getForId(publication.getPermissionsContainer());
+                    if (permissionsContainer == null || permissionsContainer.hasPermission(user, InsertPermission.class))
                         return true;
                 }
             }
         }
 
         return false;
+    }
+
+    public List<Object> getVisiblePublications(User user, Container container)
+    {
+        List<Object> publicationIds  = new ArrayList<>();
+        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
+        SimpleFilter filter = new SimpleFilter();
+        TableInfo publicationsList = coreSchema.getSchema("lists").getTable("ManuscriptsAndAbstracts");
+        if (publicationsList != null)
+        {
+            List<StudyPublicationBean> publications = (new TableSelector(publicationsList, filter, null)).getArrayList(StudyPublicationBean.class);
+            for (StudyPublicationBean publication : publications) {
+                if (publication.getShow())
+                {
+                    if (publication.getPermissionsContainer() == null)
+                        publicationIds.add("[Publication].[" + publication.getId() + "]");
+                    else
+                    {
+                        Container permissionsContainer = ContainerManager.getForId(publication.getPermissionsContainer());
+                        if (permissionsContainer == null)
+                            publicationIds.add("[Publication].[" + publication.getId() + "]");
+                        else if (publication.getStatus().equalsIgnoreCase("In Progress"))
+                        {
+                            if (permissionsContainer.hasPermission(user, InsertPermission.class))
+                                publicationIds.add("[Publication].[" + publication.getId() + "]");
+                        }
+                        else if (permissionsContainer.hasPermission(user, ReadPermission.class))
+                            publicationIds.add("[Publication].[" + publication.getId() + "]");
+                    }
+                }
+            };
+        }
+        return publicationIds;
     }
 }

@@ -240,7 +240,7 @@ public class StudyBean
 
     public void setIsPublic(Boolean aPublic)
     {
-        isPublic = aPublic;
+        isPublic = aPublic == null ? false : aPublic;
     }
 
     public Integer getParticipantCount()

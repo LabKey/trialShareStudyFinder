@@ -57,6 +57,7 @@ public class StudyPublicationBean
     private List<URLData> thumbnails;
     private String manuscriptContainer;
     private String keywords;
+    private Boolean show;
 
     public static class URLData
     {
@@ -458,5 +459,15 @@ public class StudyPublicationBean
     public void setPermissionsContainer(String permissionsContainer)
     {
         this.permissionsContainer = permissionsContainer;
+    }
+
+    public Boolean getShow()
+    {
+        return show;
+    }
+
+    public void setShow(Boolean show)
+    {
+        this.show = show;
     }
 }

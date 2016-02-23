@@ -3,7 +3,7 @@
    <Cube name="StudyCube" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
 
        <Annotations>
-           <!--<Annotation name="ContainerFilter">AllFolders</Annotation>-->
+           <Annotation name="ContainerFilter">AllFolders</Annotation>
            <Annotation name="AllowMDX">FALSE</Annotation>
        </Annotations>
 
@@ -13,7 +13,7 @@
         <Dimension name="Study" visible="true" highCardinality="false" foreignKey="StudyId">
             <Hierarchy hasAll="true" primaryKeyTable="studyProperties" primaryKey="StudyId">
                 <Table name="studyProperties" schema="lists"/>
-                <!--<Level name="Container" visible="true" column="StudyContainer"/>-->
+                <Level name="Container" visible="true" column="StudyContainer"/>
                 <Level name="Study" visible="true" column="studyId" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="StudyId">

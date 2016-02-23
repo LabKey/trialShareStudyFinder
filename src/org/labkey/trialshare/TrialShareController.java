@@ -535,6 +535,7 @@ public class TrialShareController extends SpringActionController
 
             facet = new StudyFacetBean("Visibility", "Visibility", "Study.Visibility", "Visibility", "[Study.Visibility][(All)]", FacetFilter.Type.OR, 1);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facet.setDisplayFacet(TrialShareManager.get().canSeeOperationalStudies(getUser(), getContainer()));
             facets.add(facet);
             facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Study.Therapeutic Area", "Therapeutic Area", "[Study.Therapeutic Area][(All)]", FacetFilter.Type.OR, 2);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
@@ -596,10 +597,6 @@ public class TrialShareController extends SpringActionController
             facets.add(facet);
             facet = new StudyFacetBean("Publication", "Publications", "Publication", "Publication", "[Publication].[(All)]", FacetFilter.Type.OR, null);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            facets.add(facet);
-            facet = new StudyFacetBean("Visibility", "Visibility", "Publication.AssayVisibility", "Visibility", "[Publication.AssayVisibility].[(All)]", FacetFilter.Type.OR, null);
-            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            facet.setDisplayFacet(false);
             facets.add(facet);
 
             return facets;
@@ -823,52 +820,6 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
         {
-            List<StudySubset> subsets = new ArrayList<>();
-            StudySubset subset = new StudySubset();
-
-
-//            if (form.getObjectName() == null || form.getObjectName().equalsIgnoreCase("study"))
-//            {
-//                // query study properties list for StudyContainer and "isPublic"
-//                if (TrialShareManager.get().canSeeOperationalStudies(getUser(), getContainer()))
-//                {
-//                    subset.setId("[Study.Public].[false]");
-//                    subset.setName("Operational");
-//                    subset.setIsDefault(false);
-//                    subsets.add(subset);
-//                }
-//
-//                subset = new StudySubset();
-//                subset.setId("[Study.Public].[true]");
-//                subset.setName("Public");
-//                subset.setIsDefault(true);
-//                subsets.add(subset);
-//            }
-//            else if (form.getObjectName().equalsIgnoreCase("publication"))
-//            {
-//                if (getContainer().hasPermission(getUser(), InsertPermission.class))
-//                {
-//                    subset.setId("[Publication.Status].[All]");
-//                    subset.setName("All");
-//                    subset.setIsDefault(true);
-//                    subsets.add(subset);
-//                }
-//
-//                subset = new StudySubset();
-//                subset.setId("[Publication.Status].[Complete]");
-//                subset.setName("Complete");
-//                subset.setIsDefault(!getContainer().hasPermission(getUser(), InsertPermission.class));
-//                subsets.add(subset);
-//
-//                if (getContainer().hasPermission(getUser(), InsertPermission.class))
-//                {
-//                    subset = new StudySubset();
-//                    subset.setId("[Publication.Status].[In Progress]");
-//                    subset.setName("In Progress");
-//                    subset.setIsDefault(false);
-//                    subsets.add(subset);
-//                }
-//            }
             return success();
         }
     }
@@ -894,5 +845,65 @@ public class TrialShareController extends SpringActionController
                 errors.rejectValue("objectName", ERROR_REQUIRED, "Object name is required");
         }
     }
+
+    @RequiresPermission(ReadPermission.class)
+    public class AccessibleMembersAction extends ApiAction<AccessibleMembersForm>
+    {
+        private String _objectName;
+        private String _fieldName;
+
+        @Override
+        public void validateForm(AccessibleMembersForm form, Errors errors)
+        {
+            _objectName = (null==form) ? null : form.getObjectName();
+            if (_objectName == null)
+                errors.reject(ERROR_MSG, "Object type not specified");
+            _fieldName = (null == form) ? null : form.getFieldName();
+        }
+
+        @Override
+        public Object execute(AccessibleMembersForm accessibleMembersForm, BindException errors) throws Exception
+        {
+            Map<String, Object> levelMembers = new HashMap<>();
+
+            if (_objectName.equalsIgnoreCase("publication") )
+            {
+                levelMembers.put("[Publication].[Publication]", TrialShareManager.get().getVisiblePublications(getUser(), getContainer()));
+            }
+//            else if (_objectName.equalsIgnoreCase("study"))
+//            {
+//                List<Object> membersList = new ArrayList<>();
+//                levelMembers.put("[Study].[AssayVisibility]", membersList);
+//            }
+            return success(levelMembers);
+        }
+    }
+
+    public static class AccessibleMembersForm
+    {
+        private String _objectName;
+        private String _fieldName;
+
+        public String getFieldName()
+        {
+            return _fieldName;
+        }
+
+        public void setFieldName(String fieldName)
+        {
+            _fieldName = fieldName;
+        }
+
+        public String getObjectName()
+        {
+            return _objectName;
+        }
+
+        public void setObjectName(String objectName)
+        {
+            _objectName = objectName;
+        }
+    }
+
 
 }
