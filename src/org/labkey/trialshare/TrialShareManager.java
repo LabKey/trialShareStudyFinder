@@ -29,13 +29,17 @@ import org.labkey.api.security.User;
 import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.trialshare.data.StudyBean;
+import org.labkey.trialshare.data.StudyContainer;
 import org.labkey.trialshare.data.StudyPublicationBean;
+import org.labkey.trialshare.query.TrialShareQuerySchema;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TrialShareManager
 {
+
     private static final TrialShareManager _instance = new TrialShareManager();
 
     private TrialShareManager()
@@ -52,12 +56,12 @@ public class TrialShareManager
     {
         QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
         SimpleFilter filter = new SimpleFilter();
-        filter.addCondition(FieldKey.fromParts("Visibility"), "Operational");
-        TableInfo propertiesList = coreSchema.getSchema("lists").getTable("studyProperties");
+        filter.addCondition(FieldKey.fromParts("Visibility"), TrialShareQuerySchema.OPERATIONAL_VISIBILITY);
+        TableInfo propertiesList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
         if (propertiesList != null)
         {
-            List<StudyBean> studies = (new TableSelector(propertiesList, filter, null)).getArrayList(StudyBean.class);
-            for (StudyBean study : studies)
+            List<StudyContainer> containers = (new TableSelector(propertiesList, filter, null)).getArrayList(StudyContainer.class);
+            for (StudyContainer study : containers)
             {
                 if (study.getStudyContainer() != null)
                 {
@@ -75,8 +79,8 @@ public class TrialShareManager
     {
         QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
         SimpleFilter filter = new SimpleFilter();
-        filter.addCondition(FieldKey.fromParts("Status"), "Complete", CompareType.NEQ_OR_NULL);
-        TableInfo publicationsList = coreSchema.getSchema("lists").getTable("ManuscriptsAndAbstracts");
+        filter.addCondition(FieldKey.fromParts("Status"), TrialShareQuerySchema.COMPLETED_STATUS, CompareType.NEQ_OR_NULL);
+        TableInfo publicationsList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
         if (publicationsList != null)
         {
             List<StudyPublicationBean> publications = (new TableSelector(publicationsList, filter, null)).getArrayList(StudyPublicationBean.class);
@@ -94,32 +98,62 @@ public class TrialShareManager
         return false;
     }
 
-    public List<Object> getVisiblePublications(User user, Container container)
+    public Set<Object> getVisibleStudies(User user, Container container)
     {
-        List<Object> publicationIds  = new ArrayList<>();
+        Set<Object> studyIdSet = new HashSet<>();
         QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
-        SimpleFilter filter = new SimpleFilter();
-        TableInfo publicationsList = coreSchema.getSchema("lists").getTable("ManuscriptsAndAbstracts");
+        TableInfo containerList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
+        if (containerList != null)
+        {
+            (new TableSelector(containerList, null, null)).forEachMap((map) -> {
+                String identifier = "[Study].[" + map.get("StudyId") + "]";
+                if (map.get("StudyContainer") == null)
+                {
+                    studyIdSet.add(identifier);
+                }
+                else
+                {
+                    Container permissionsContainer = ContainerManager.getForId((String) map.get("StudyContainer"));
+                    if (permissionsContainer == null)
+                        studyIdSet.add(identifier);
+                    else if (permissionsContainer.hasPermission(user, ReadPermission.class))
+                    {
+                        studyIdSet.add(identifier);
+                    }
+                }
+            }
+            );
+
+        }
+        return studyIdSet;
+    }
+
+    public Set<Object> getVisiblePublications(User user, Container container)
+    {
+        Set<Object> publicationIds  = new HashSet<>();
+        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
+        TableInfo publicationsList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
         if (publicationsList != null)
         {
-            List<StudyPublicationBean> publications = (new TableSelector(publicationsList, filter, null)).getArrayList(StudyPublicationBean.class);
+            List<StudyPublicationBean> publications = (new TableSelector(publicationsList, null, null)).getArrayList(StudyPublicationBean.class);
             for (StudyPublicationBean publication : publications) {
+                String identifier = "[Publication].[" + publication.getId() + "]";
                 if (publication.getShow())
                 {
                     if (publication.getPermissionsContainer() == null)
-                        publicationIds.add("[Publication].[" + publication.getId() + "]");
+                        publicationIds.add(identifier);
                     else
                     {
                         Container permissionsContainer = ContainerManager.getForId(publication.getPermissionsContainer());
                         if (permissionsContainer == null)
-                            publicationIds.add("[Publication].[" + publication.getId() + "]");
-                        else if (publication.getStatus().equalsIgnoreCase("In Progress"))
+                            publicationIds.add(identifier);
+                        else if (publication.getStatus().equalsIgnoreCase(TrialShareQuerySchema.IN_PROGRESS_STATUS))
                         {
                             if (permissionsContainer.hasPermission(user, InsertPermission.class))
-                                publicationIds.add("[Publication].[" + publication.getId() + "]");
+                                publicationIds.add(identifier);
                         }
                         else if (permissionsContainer.hasPermission(user, ReadPermission.class))
-                            publicationIds.add("[Publication].[" + publication.getId() + "]");
+                            publicationIds.add(identifier);
                     }
                 }
             };

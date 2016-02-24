@@ -24,6 +24,16 @@ Ext4.define('LABKEY.study.data.Study', {
         {name: 'participantCount', type: 'int'},
         {name: 'isSelected', type: 'boolean'},
         {name: 'isHighlighted', type: 'boolean', defaultValue: false},
-        {name: 'isBorderHighlighted', type: 'boolean', defaultValue: false}
+        {name: 'isBorderHighlighted', type: 'boolean', defaultValue: false},
+        {name: 'studyContainers'}
+    ],
+
+    associations: [
+        {
+            type: 'hasMany',
+            model: 'LABKEY.study.data.StudyContainer',
+            name: 'studyContainers',
+            associationKey: 'studyContainers'
+        }
     ]
 });

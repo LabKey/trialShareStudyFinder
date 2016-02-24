@@ -38,8 +38,12 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         '       <hr class="labkey-study-card-divider">',
         '       <div>',
         '           <a class="labkey-text-link labkey-study-card-summary" title="click for more details">view summary</a>',
-        '           <tpl if="url">',
+        '           <tpl if="studyContainers.length < 2">',
+        '               <tpl if="url">',
         '           <a class="labkey-text-link labkey-study-card-goto" href="{url}">go to study</a>',
+        '               </tpl>',
+        '           <tpl else>',
+        '           <a class="labkey-text-link labkey-study-card-goto labkey-study-card-goto-menu">go to study</a>',
         '           </tpl>',
         '       </div>',
         '       <div class="labkey-study-card-title">{title:htmlEncode}</div>',
@@ -91,6 +95,10 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
 
     listeners: {
         itemClick: function(view, record, item, index, event, eOpts) {
+            if (event.target.className.indexOf("labkey-study-card-goto-menu") >= 0)
+            {
+                this.displayStudyLinkChoice(record.get("studyId"), event);
+            }
             if (event.target.className.indexOf("labkey-study-card-summary") >= 0)
             {
                 this.showStudyDetailPopup(record.get("studyId"));
@@ -136,6 +144,38 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         detailWindow.setPosition(proposedXY);
         this.detailShowing = detailWindow;
         this.detailShowing.show();
+    },
+
+    displayStudyLinkChoice : function (studyId, event)
+    {
+        var study = this.getStore().getById(studyId);
+
+        if (!study)
+        {
+            console.error("could not find study " + studyId);
+            return;
+        }
+        var studyLinks = study.get("studyContainers");
+        if (studyLinks.length < 1)
+            return;
+
+        var studyLinksMenu = Ext4.create('Ext.menu.Menu', {
+            showSeparator: false
+        });
+
+        studyLinksMenu.on('click', function(menu, item) {
+                   window.open(LABKEY.ActionURL.buildURL("project", 'begin.view', item.value));
+                },
+                this
+        );
+
+        for (var i = 0; i < studyLinks.length; i++) {
+            studyLinksMenu.add({
+                value: studyLinks[i].displayName ? studyLinks[i].displayName : studyLinks[i].studyContainerPath,
+                text: studyLinks[i].studyContainerPath
+            });
+        }
+        studyLinksMenu.showAt(event.xy);
     },
 
     showStudyManuscriptsPopup : function(studyId, publicationType)

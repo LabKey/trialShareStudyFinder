@@ -15,8 +15,6 @@
  */
 package org.labkey.trialshare.data;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerFilter;
 import org.labkey.api.data.ContainerFilterable;
@@ -26,13 +24,14 @@ import org.labkey.api.data.TableSelector;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
+import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.wiki.WikiRendererType;
 import org.labkey.api.wiki.WikiService;
+import org.labkey.trialshare.query.TrialShareQuerySchema;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,14 +57,12 @@ public class StudyBean
     private String visibility;
     private Boolean isPublic = false;
     private Integer participantCount;
-    private String studyContainer;
+    private List<StudyContainer> studyContainers;
 
     private List<StudyPersonnelBean> personnel;
     private List<StudyPublicationBean> publications;
     private Integer manuscriptCount;
     private Integer abstractCount;
-
-    public final static String studyIdField = "StudyId";
 
 
     public String getStudyId()
@@ -260,10 +257,20 @@ public class StudyBean
 
     public void setUrl(User user)
     {
-        Container studyContainer = ContainerManager.getForId(getStudyContainer());
-        if (studyContainer != null)
+        this.url = null;
+        if (getStudyContainers() == null)
+            return;
+
+        for (StudyContainer container: getStudyContainers())
         {
-            url = studyContainer.getStartURL(user).toString();
+            Container studyContainer = ContainerManager.getForId(container.getStudyContainer());
+            if (studyContainer != null && studyContainer.hasPermission(user, ReadPermission.class))
+            {
+                if (container.getVisibility().equalsIgnoreCase(TrialShareQuerySchema.OPERATIONAL_VISIBILITY))
+                    this.url = studyContainer.getStartURL(user).toString();
+                else if (url == null)
+                    this.url = studyContainer.getStartURL(user).toString();
+            }
         }
     }
 
@@ -272,15 +279,11 @@ public class StudyBean
         return this.url;
     }
 
-    public String getUrl(Container c, User user)
+    public String getUrl(User user)
     {
         if (url == null)
         {
-            Container studyContainer = ContainerManager.getForId(getStudyContainer());
-            if (studyContainer != null)
-            {
-                url = studyContainer.getStartURL(user).toString();
-            }
+           setUrl(user);
         }
         return url;
     }
@@ -338,14 +341,14 @@ public class StudyBean
         this.externalUrlDescription = externalUrlDescription;
     }
 
-    public String getStudyContainer()
+    public List<StudyContainer> getStudyContainers()
     {
-        return studyContainer;
+        return studyContainers;
     }
 
-    public void setStudyContainer(String studyContainer)
+    public void setStudyContainers(List<StudyContainer> studyContainers)
     {
-        this.studyContainer = studyContainer;
+        this.studyContainers = studyContainers;
     }
 }
 
