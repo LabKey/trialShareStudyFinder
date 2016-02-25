@@ -24,6 +24,7 @@ import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
 import org.labkey.api.data.Container;
+import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
@@ -439,13 +440,17 @@ public class TrialShareController extends SpringActionController
                 {
                     List<StudyContainer> containers = (new TableSelector(studyContainersTable)).getArrayList(StudyContainer.class);
 
-                    for (StudyContainer container : containers)
+                    for (StudyContainer studyContainer : containers)
                     {
-                        if (containerMap.get(container.getStudyId()) == null)
+                        Container container = ContainerManager.getForId(studyContainer.getStudyContainer());
+                        if (container != null && container.hasPermission(getUser(), ReadPermission.class))
                         {
-                            containerMap.put(container.getStudyId(), new ArrayList<StudyContainer>());
+                            if (containerMap.get(studyContainer.getStudyId()) == null)
+                            {
+                                containerMap.put(studyContainer.getStudyId(), new ArrayList<StudyContainer>());
+                            }
+                            containerMap.get(studyContainer.getStudyId()).add(studyContainer);
                         }
-                        containerMap.get(container.getStudyId()).add(container);
                     }
                 }
                 for (StudyBean study : studies)
@@ -672,7 +677,17 @@ public class TrialShareController extends SpringActionController
                 SimpleFilter filter = new SimpleFilter();
                 filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
                 TableInfo studyContainersTable = listSchema.getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
-                study.setStudyContainers((new TableSelector(studyContainersTable, filter, null)).getArrayList(StudyContainer.class));
+                List<StudyContainer> studyContainers = (new TableSelector(studyContainersTable, filter, null)).getArrayList(StudyContainer.class);
+                List<StudyContainer> permittedContainers = new ArrayList<>();
+                for (StudyContainer studyContainer : studyContainers)
+                {
+                    Container container = ContainerManager.getForId(studyContainer.getStudyContainer());
+                    if (container != null && container.hasPermission(getUser(), ReadPermission.class))
+                    {
+                        permittedContainers.add(studyContainer);
+                    }
+                }
+                study.setStudyContainers(permittedContainers);
                 study.setUrl(getUser());
                 if (form.getDetailType().getDbFieldValue() != null)
                 {
