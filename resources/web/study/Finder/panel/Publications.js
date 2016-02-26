@@ -26,18 +26,12 @@ Ext4.define("LABKEY.study.panel.Publications", {
         ];
         this.callParent();
 
-        //this.getCards().store.addListener('filterChange',this.onFilterSelectionChanged, this);
         this.on(
                 {'subsetChanged': this.onSubsetChanged,
                  'searchTermsChanged': this.onSearchTermsChanged
-                 //'filterSelectionChanged': this.onFilterSelectionChanged
                 }
         );
     },
-
-    //onFilterSelectionChanged: function() {
-    //    console.log('filterChange happened!')
-    //},
 
     onSubsetChanged : function(selectedSubset) {
         if (!selectedSubset)

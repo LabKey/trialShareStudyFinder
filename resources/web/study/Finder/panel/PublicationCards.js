@@ -170,6 +170,13 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         this.detailsOnPage = {}; // map between publication id and boolean to indicate which publications have had details retrieved
 
         this.callParent();
+
+        this.store.addListener('filterChange',this.onFilterSelectionChanged, this);
+    },
+
+    onFilterSelectionChanged: function()
+    {
+        this.detailsOnPage = {};
     },
 
     constructor: function(config)
