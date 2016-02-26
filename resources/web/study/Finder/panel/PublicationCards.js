@@ -60,10 +60,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     listeners: {
         itemClick: function(view, record, item, index, event, eOpts)
         {
-            if (event.target.className.indexOf("labkey-study-card-summary") >= 0)
-            {
-                this.showDetailPopup(record.get("id"));
-            }
             if (event.target.className.indexOf("fa-plus-square") >= 0)
             {
                 this.toggleDetails(record.get("id"), item, true);
