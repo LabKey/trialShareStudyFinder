@@ -768,7 +768,13 @@ public class TrialShareController extends SpringActionController
             QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
             QuerySchema listSchema = coreSchema.getSchema("lists");
             StudyPublicationBean publication = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE))).getObject(_id, StudyPublicationBean.class);
-            publication.setDataUrl(new ActionURL("project/Studies/" + publication.getStudyId() + "/Study%20Data/begin.view?pageId=study.DATA_ANALYSIS").toString());
+            String containerId = publication.getManuscriptContainer();
+            if (containerId != null)
+            {
+                Container container = ContainerManager.getForId(containerId);
+                if (container != null && container.hasPermission(getUser(), ReadPermission.class))
+                    publication.setDataUrl(new ActionURL("project" + PageFlowUtil.encodeURI(container.getPath() + "/begin.view?pageId=study.DATA_ANALYSIS")).toString());
+            }
             publication.setThumbnails(getUser(), getViewContext().getActionURL());
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("key"), _id);
