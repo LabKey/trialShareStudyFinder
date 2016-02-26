@@ -451,8 +451,8 @@ public class DataFinderPage extends LabKeyPage
 
         public void toggleFacet(Dimension dimension, String name)
         {
-            Locator.XPathLocator rowLocator = locators.facetMember(dimension, name);
-            _test.scrollIntoView(rowLocator);
+            Locator.XPathLocator rowLocator = locators.facetMemberName(dimension, name);
+            scrollIntoView(rowLocator);
             WebElement row = rowLocator.findElement(_test.getDriver());
 
             _test.doAndWaitForPageSignal(() -> row.click(), COUNT_SIGNAL);
@@ -512,9 +512,9 @@ public class DataFinderPage extends LabKeyPage
                 return Locator.tagWithAttribute("tr", "data-recordid", "[" + dimension.getHierarchyName() + "].[" + name + "]");
             }
 
-            public Locator.XPathLocator facetMember(Dimension dimension, String name)
+            public Locator.XPathLocator facetMemberName(Dimension dimension, String name)
             {
-                return facetMemberRow(dimension, name).append("//span[contains(@class, 'labkey-facet-member')]");
+                return facetMemberRow(dimension, name).append("//span[contains(@class, 'labkey-facet-member-name')]");
             }
 
             public Locator.XPathLocator facetGroup(Dimension dimension)
@@ -638,7 +638,7 @@ public class DataFinderPage extends LabKeyPage
 
         public PublicationPanel viewDetail()
         {
-            locators.pubMoreDetails.findElement(card).click();
+            _test.doAndWaitForPageSignal(() -> locators.pubMoreDetails.findElement(card).click(), PUBLICATION_DETAILS_SIGNAL);
             return new PublicationPanel(_test);
         }
 

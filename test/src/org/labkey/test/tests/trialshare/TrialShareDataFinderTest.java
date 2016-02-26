@@ -92,7 +92,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         operationalSet.add("RESTARRT"); operationalSet.add("EXIIST"); operationalSet.add("RETAIN"); operationalSet.add("GRASS");
         operationalSet.add("T1DAL"); operationalSet.add("TAKE"); operationalSet.add("LEAP-ON"); operationalSet.add("IMPACT");
         operationalSet.add("AVATARS"); operationalSet.add("ACCEPTOR"); operationalSet.add("CATNIP"); operationalSet.add("PAUSE");
-        operationalSet.add("FACTOR"); operationalSet.add("ARTIST"); operationalSet.add("iWITH");
+        operationalSet.add("FACTOR"); operationalSet.add("ARTIST"); operationalSet.add("iWITH"); operationalSet.add("DIAMOND");
 
         Set<String> publicSet = new HashSet<>();
         studySubsets.put("Public", publicSet);
@@ -172,7 +172,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         createStudy(PUBLIC_STUDY_NAME);
         createStudy(OPERATIONAL_STUDY_NAME);
         StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainers(loadedStudies, PUBLIC_STUDY_NAME, OPERATIONAL_STUDY_NAME);
+        queryUpdatePage.setStudyContainers(loadedStudies, "/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
         createUsers();
 
         List<ModulePropertyValue> propList = new ArrayList<>();
@@ -298,7 +298,8 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         goToProjectHome();
         impersonate(PUBLIC_READER);
         DataFinderPage finder = new DataFinderPage(this, true);
-        Assert.assertFalse("Public user should not see the subset menu", finder.hasStudySubsetCombo());
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        Assert.assertFalse("Public user should not see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("Number of studies not as expected", studySubsets.get("Public").size(), cards.size());
         stopImpersonating();
@@ -306,7 +307,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         Assert.assertTrue("Admin user should see subset menu again", finder.hasStudySubsetCombo());
 
         impersonate(CASALE_READER);
-        Assert.assertFalse("User with access to only Casale study should not see the subset menu", finder.hasStudySubsetCombo());
+        Assert.assertFalse("User with access to only Casale study should not see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         cards = finder.getDataCards();
         Assert.assertEquals("User with access to only Casale study should see only that study", 1, cards.size());
         stopImpersonating();
@@ -318,8 +319,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         goToProjectHome();
         impersonate(WISPR_READER);
         DataFinderPage finder = new DataFinderPage(this, true);
-        Assert.assertTrue("Operational user should see the subset menu", finder.hasStudySubsetCombo());
-        finder.selectStudySubset("Operational");
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        Assert.assertTrue("Operational user should see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
         List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("User with access to only WISP-R study should see only that study", 1, cards.size());
     }
@@ -341,8 +343,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         goToProjectHome(RELOCATED_DATA_FINDER_PROJECT);
         new PortalHelper(this).addWebPart(WEB_PART_NAME);
         DataFinderPage finder = new DataFinderPage(this, true);
-        Assert.assertTrue("Should see the subset dropdown", finder.hasStudySubsetCombo());
-        finder.selectStudySubset("Public");
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        Assert.assertTrue("Should see the subset dropdown", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
         Assert.assertEquals("Should see all the study cards", 12, finder.getDataCards().size());
         containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, false);
 
@@ -725,6 +728,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
         Assert.assertFalse("Status facet should not be present for someone with only read permission", fg.facetIsPresent(DataFinderPage.Dimension.STATUS));
 
+        // one publication has "show on dash" set to false; one publication is "in progress" and thus not visible to the public
         Assert.assertEquals("Publication count should not count incomplete publications", (Integer) 126, summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS));
         stopImpersonating();
     }
