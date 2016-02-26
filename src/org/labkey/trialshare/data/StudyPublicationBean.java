@@ -23,9 +23,12 @@ import org.labkey.api.reports.ReportService;
 import org.labkey.api.reports.model.ViewCategory;
 import org.labkey.api.reports.report.view.ReportUtil;
 import org.labkey.api.security.User;
+import org.labkey.api.security.permissions.InsertPermission;
+import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.ViewContext;
+import org.labkey.trialshare.query.TrialShareQuerySchema;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -432,5 +435,36 @@ public class StudyPublicationBean
     public void setShow(Boolean show)
     {
         this.show = show;
+    }
+
+    public Boolean inProgress()
+    {
+        return getStatus().equalsIgnoreCase(TrialShareQuerySchema.IN_PROGRESS_STATUS);
+    }
+
+    public String getCubeId()
+    {
+        return "[Publication].[" + getId() + "]";
+    }
+
+    public boolean hasPermission(User user)
+    {
+        Boolean inProgress = inProgress();
+        if (getPermissionsContainer() == null)
+            return !inProgress;
+        else
+        {
+            Container permissionsContainer = ContainerManager.getForId(getPermissionsContainer());
+            if (permissionsContainer == null)
+                return !inProgress;
+            else if (inProgress)
+            {
+                if (permissionsContainer.hasPermission(user, InsertPermission.class))
+                    return true;
+            }
+            else if (permissionsContainer.hasPermission(user, ReadPermission.class))
+                return true;
+        }
+        return false;
     }
 }

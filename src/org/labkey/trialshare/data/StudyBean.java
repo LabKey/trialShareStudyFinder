@@ -15,13 +15,16 @@
  */
 package org.labkey.trialshare.data;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerFilter;
 import org.labkey.api.data.ContainerFilterable;
 import org.labkey.api.data.ContainerManager;
+import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
 import org.labkey.api.query.DefaultSchema;
+import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
 import org.labkey.api.security.permissions.ReadPermission;
@@ -30,6 +33,7 @@ import org.labkey.api.wiki.WikiRendererType;
 import org.labkey.api.wiki.WikiService;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -57,10 +61,10 @@ public class StudyBean
     private String visibility;
     private Boolean isPublic = false;
     private Integer participantCount;
-    private List<StudyContainer> studyContainers;
+    private List<StudyContainer> studyContainers = new ArrayList<>();
 
     private List<StudyPersonnelBean> personnel;
-    private List<StudyPublicationBean> publications;
+    private List<StudyPublicationBean> publications = new ArrayList<>();
     private Integer manuscriptCount;
     private Integer abstractCount;
 
@@ -153,6 +157,26 @@ public class StudyBean
     public void setPublications(List<StudyPublicationBean> publications)
     {
         this.publications = publications;
+    }
+
+    public void setPublications(User user, Container container, @Nullable String publicationType)
+    {
+        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
+        QuerySchema listSchema = coreSchema.getSchema("lists");
+
+        SimpleFilter filter = new SimpleFilter();
+        filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
+        if (publicationType != null)
+        {
+            filter.addCondition(FieldKey.fromParts("PublicationType"), publicationType);
+        }
+        List<StudyPublicationBean> allPublications = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class);
+        this.publications.clear();
+        for (StudyPublicationBean publication : allPublications)
+        {
+            if (publication.getShow() && publication.hasPermission(user))
+                this.publications.add(publication);
+        }
     }
 
     public String getStudyIdPrefix()
@@ -349,6 +373,27 @@ public class StudyBean
     public void setStudyContainers(List<StudyContainer> studyContainers)
     {
         this.studyContainers = studyContainers;
+    }
+
+    public void setStudyContainers(User user, Container currentContainer)
+    {
+        QuerySchema coreSchema = DefaultSchema.get(user, currentContainer).getSchema("core");
+        QuerySchema listSchema = coreSchema.getSchema("lists");
+
+        SimpleFilter filter = new SimpleFilter();
+        filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
+
+        TableInfo studyContainersTable = listSchema.getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
+        List<StudyContainer> studyContainers = (new TableSelector(studyContainersTable, filter, null)).getArrayList(StudyContainer.class);
+        this.studyContainers.clear();
+        for (StudyContainer studyContainer : studyContainers)
+        {
+            Container container = ContainerManager.getForId(studyContainer.getStudyContainer());
+            if (container != null && container.hasPermission(user, ReadPermission.class))
+            {
+                this.studyContainers.add(studyContainer);
+            }
+        }
     }
 }
 

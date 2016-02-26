@@ -423,15 +423,17 @@ public class TrialShareController extends SpringActionController
 
                     for (StudyPublicationBean pub : publications)
                     {
-                        if (pubCounts.get(pub.getStudyId()) == null)
-                            pubCounts.put(pub.getStudyId(), new Pair<>(0, 0));
-                        Pair<Integer, Integer> countPair = pubCounts.get(pub.getStudyId());
-                        if (pub.getPublicationType() != null)
-                            if (pub.getPublicationType().equalsIgnoreCase("Manuscript"))
-                                countPair.first += 1;
-                            else
-                                countPair.second += 1;
-
+                        if (pub.getShow() && pub.hasPermission(getUser()))
+                        {
+                            if (pubCounts.get(pub.getStudyId()) == null)
+                                pubCounts.put(pub.getStudyId(), new Pair<>(0, 0));
+                            Pair<Integer, Integer> countPair = pubCounts.get(pub.getStudyId());
+                            if (pub.getPublicationType() != null)
+                                if (pub.getPublicationType().equalsIgnoreCase("Manuscript"))
+                                    countPair.first += 1;
+                                else
+                                    countPair.second += 1;
+                        }
                     }
                 }
                 TableInfo studyContainersTable = listsSchema.getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
@@ -674,27 +676,9 @@ public class TrialShareController extends SpringActionController
             {
                 StudyBean study = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.STUDY_TABLE))).getObject(_studyId, StudyBean.class);
 
-                SimpleFilter filter = new SimpleFilter();
-                filter.addCondition(FieldKey.fromParts("studyId"), _studyId);
-                TableInfo studyContainersTable = listSchema.getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
-                List<StudyContainer> studyContainers = (new TableSelector(studyContainersTable, filter, null)).getArrayList(StudyContainer.class);
-                List<StudyContainer> permittedContainers = new ArrayList<>();
-                for (StudyContainer studyContainer : studyContainers)
-                {
-                    Container container = ContainerManager.getForId(studyContainer.getStudyContainer());
-                    if (container != null && container.hasPermission(getUser(), ReadPermission.class))
-                    {
-                        permittedContainers.add(studyContainer);
-                    }
-                }
-                study.setStudyContainers(permittedContainers);
+                study.setStudyContainers(getUser(), getContainer());
                 study.setUrl(getUser());
-                if (form.getDetailType().getDbFieldValue() != null)
-                {
-                    filter.addCondition(FieldKey.fromParts("PublicationType"), form.getDetailType().getDbFieldValue());
-                }
-                study.setPublications((new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class));
-
+                study.setPublications(getUser(), getContainer(), form.getDetailType().getDbFieldValue());
 
                 VBox v = new VBox();
                 if (null != form.getReturnActionURL())

@@ -2,6 +2,8 @@ package org.labkey.trialshare.data;
 
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
+import org.labkey.api.security.User;
+import org.labkey.api.security.permissions.ReadPermission;
 
 /**
  * Created by susanh on 2/23/16.
@@ -76,5 +78,21 @@ public class StudyContainer
         if (container != null)
             return container.getPath();
         return null;
+    }
+
+    public boolean hasPermission(User user)
+    {
+        if (getStudyContainer() != null)
+        {
+            Container studyContainer = ContainerManager.getForId(getStudyContainer());
+            if (studyContainer != null && studyContainer.hasPermission(user, ReadPermission.class))
+                return true;
+        }
+        return false;
+    }
+
+    public String getCubeIdentifier()
+    {
+        return "[Study].[" + getStudyId() + "]";
     }
 }
