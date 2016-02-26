@@ -344,7 +344,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         new PortalHelper(this).addWebPart(WEB_PART_NAME);
         DataFinderPage finder = new DataFinderPage(this, true);
         DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        Assert.assertTrue("Should see the subset dropdown", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        Assert.assertTrue("Should see the visibility dropdown", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
         Assert.assertEquals("Should see all the study cards", 12, finder.getDataCards().size());
         containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, false);
