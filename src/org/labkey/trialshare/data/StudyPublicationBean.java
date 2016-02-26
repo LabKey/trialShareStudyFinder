@@ -36,6 +36,8 @@ import java.util.List;
 
 public class StudyPublicationBean
 {
+    public static final String FIGURES_CATEGORY_TEXT = "Manuscript Figures";
+
     private static final int AUTHORS_PER_ABBREV = 3;
 
     // common fields
@@ -389,21 +391,52 @@ public class StudyPublicationBean
         context.setContainer(container);
         context.setUser(user);
         context.setActionURL(actionURL);
+
+        List<ViewCategory> figureCategories = getFigureReportCategories(user, container);
+
         for (Report report : ReportService.get().getReports(user, container))
         {
             ViewCategory category = report.getDescriptor().getCategory();
 
-            if (category != null && category.getLabel().contains("Manuscript Figures"))
+            if (figureCategories.contains(category))
             {
                 URLHelper urlHelper = ReportUtil.getThumbnailUrl(container, report);
+
                 if (urlHelper != null)
                 {
                     URLData urlData = new URLData();
                     urlData.setLinkText(urlHelper.toString());
                     urlData.setLink(report.getRunReportURL(context).toString());
+                    urlData.setTitle(report.getDescriptor().getReportName());
                     thumbnails.add(urlData);
                 }
             }
+        }
+    }
+
+    public List<ViewCategory> getFigureReportCategories(User user, Container container)
+    {
+        List<ViewCategory> categories = new ArrayList<>();
+
+        for (Report report : ReportService.get().getReports(user, container))
+        {
+            ViewCategory category = report.getDescriptor().getCategory();
+
+            if (category != null && category.getLabel().contains(FIGURES_CATEGORY_TEXT))
+            {
+                addCategories(category, categories);
+                break;
+            }
+        }
+        return categories;
+    }
+
+    public void addCategories(ViewCategory category, List<ViewCategory> categories)
+    {
+        categories.add(category);
+        for (ViewCategory subcategory : category.getSubcategories())
+        {
+            addCategories(subcategory, categories);
         }
     }
 

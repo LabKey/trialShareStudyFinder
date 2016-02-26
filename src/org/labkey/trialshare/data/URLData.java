@@ -8,6 +8,7 @@ public class URLData
     Integer _index;
     String _link;
     String _linkText;
+    String _title;
 
     public Integer getIndex()
     {
@@ -37,5 +38,15 @@ public class URLData
     public void setLinkText(String linkText)
     {
         _linkText = linkText;
+    }
+
+    public String getTitle()
+    {
+        return _title;
+    }
+
+    public void setTitle(String title)
+    {
+        _title = title;
     }
 }

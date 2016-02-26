@@ -54,7 +54,7 @@ Ext4.define("LABKEY.study.panel.PublicationDetails", {
         '   <tpl if="thumbnails">',
         '   <ul class="labkey-figures-list">',
         '   <tpl for="thumbnails">',
-        '       <li class="labkey-figure"><a href="{link}" target="_blank"><img src="{linkText}"></a></li>',
+        '       <li class="labkey-figure"><a href="{link}" title="{title}" target="_blank"><img src="{linkText}"></a></li>',
         '   </tpl>',
         '   </ul>',
         '   </tpl>',
