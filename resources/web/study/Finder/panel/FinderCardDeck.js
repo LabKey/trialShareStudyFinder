@@ -14,6 +14,8 @@ Ext4.define('LABKEY.study.panel.FinderCardDeck', {
 
     border: false,
 
+    bubbleEvents: ['detailsChange'],
+
     initComponent : function() {
 
         this.items = [];

@@ -53,6 +53,7 @@ public class StudyPublicationBean
     private String title;
     private String year;
     private String abstractText;
+    private String citation;
     private String status;
     private String dataUrl;
     private List<StudyBean> studies;
@@ -63,10 +64,8 @@ public class StudyPublicationBean
     private String manuscriptContainer;
     private String keywords;
     private Boolean show;
-
     private List<URLData> urls = new ArrayList<>();
 
-    private String citation;
 
     public Integer getId()
     {

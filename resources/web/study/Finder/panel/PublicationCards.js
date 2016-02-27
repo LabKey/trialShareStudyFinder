@@ -19,6 +19,8 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
 
     autoScroll: true,
 
+    bubbleEvents: ["detailsChange"],
+
     store : Ext4.create('LABKEY.study.store.Publications', {
         dataModuleName: this.dataModuleName
     }),
@@ -27,15 +29,15 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             '<div id="publicationpanel">',
             '   <tpl for=".">',
             '   <tpl if="isHighlighted">',
-            '   <div class="labkey-publication-card labkey-publication-highlight collapsed">',
+            '   <div class="labkey-publication-card labkey-publication-highlight {viewState}">',
             '   <tpl else>',
-            '   <div class="labkey-publication-card collapsed">',
+            '   <div class="labkey-publication-card {viewState}">',
             '   </tpl>',
             '       <div class="labkey-publication">',
-            '       <span>',
-            '           <span id="morePublicationDetails"><i class="fa fa-plus-square"></i></span>',
-            '           <span id="lessPublicationDetails"><i class="fa fa-minus-square"></i></span>',
-            '       </span>',
+            '           <span>',
+            '               <span id="morePublicationDetails"><i class="fa fa-plus-square"></i></span>',
+            '               <span id="lessPublicationDetails"><i class="fa fa-minus-square"></i></span>',
+            '           </span>',
             '       <div>',
             '           <div class="labkey-publication-title">{title:htmlEncode}</div>',
             '           <div id="abbreviatedAuthorList" class="labkey-publication-author">{authorAbbrev:htmlEncode}</div>',
@@ -45,13 +47,70 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             '           <tpl if="url">',
             '               <a class="labkey-text-link labkey-publication-goto" target="_blank" href="{url}">view document</a>',
             '           </tpl>',
-            '           <tpl if="dataUrl">',
-            '               <a class="labkey-text-link labkey-study-card-goto" target="_blank" href="{dataUrl}">view data</a>',
-            '           </tpl>',
             '           </div>',
-            '           <div id="publicationDetails_{id}" class="labkey-publication-detail collapsed"></div>',
+            '           <tpl if="viewState == &quot;expanded&quot;">',
+            '           <div id="publicationDetails_{id}" class="labkey-publication-detail {viewState}">',
+            '               <div id="labkey-publication-details-content">',
+            '               <tpl if="urls"/>',
+            '                   <div class="labkey-publication-links">',
+            '                   <tpl for="urls">',
+            '                       <tpl if="link && linkText">',
+            '                       <div><a class="labkey-text-link" href="{link:htmlEncode}" target="_blank">{linkText:htmlEncode}</a></div>',
+            '                       </tpl>',
+            '                   </tpl>',
+            '                   </div>',
+            '               </tpl>',
+            '                   <div class="labkey-publication-identifiers">',
+            '                   <tpl if="pmid">',
+            '                       <span class="labkey-publication-identifier"><a href="http://www.ncbi.nlm.nih.gov/pubmed/?term={pmid:htmlEncode}" class="labkey-text-link" target="_blank">PMID {pmid:htmlEncode}</a></span>',
+            '                   </tpl>',
+            '                   <tpl if="pmcid">',
+            '                       <span class="labkey-publication-identifier"><a href="http://www.ncbi.nlm.nih.gov/pmc/articles/{pmcid:htmlEncode}" class="labkey-text-link" target="_blank">PMCID {pmcid:htmlEncode}</a></span>',
+            '                   </tpl>',
+            '                   <tpl if="doi">',
+            '                       <span class="labkey-publication-identifier"><a href="http://dx.doi.org/{doi:htmlEncode}" class="labkey-text-link" target="_blank">DOI {doi:htmlEncode}</a></span>',
+            '                   </tpl>',
+            '                   </div>',
+            '                   <tpl if="studies">',
+            '                   <div class="labkey-publication-studies">',
+            '                       <span class="labkey-publication-detail-label">Studies</span>',
+            '                       <tpl for="studies">',
+            '                       <tpl if="url">',
+            '                           <span class="labkey-study-short-name"><a href="{url:htmlEncode}">{shortName:htmlEncode}</a></span>',
+            '                       <tpl else>',
+            '                           <span class="labkey-study-short-name">{shortName:htmlEncode}</span>',
+            '                       </tpl>',
+            '                       </tpl>',
+            '                   </div>',
+            '                   </tpl>',
+            '                   <tpl if="keywords">',
+            '                       <div class="labkey-publication-keywords">',
+            '                           <span class="labkey-publication-detail-label">Keywords</span>',
+            '                           {keywords:htmlEncode}',
+            '                       </div>',
+            '                   </tpl>',
+            '                   <tpl if="abstractText">',
+            '                       <div class="labkey-publication-abstract">',
+            '                           <span class="labkey-publication-detail-label">Abstract</span>',
+            '                           {abstractText:htmlEncode}',
+            '                       </div>',
+            '                   </tpl>',
+            '                   <tpl if="dataUrl">',
+            '                       <a class="labkey-text-link labkey-publication-data-link" href="{dataUrl:htmlEncode}" target="_blank">Clinical and Assay Data</a>',
+            '                   </tpl>',
+            '                   <tpl if="thumbnails">',
+            '                       <ul class="labkey-figures-list">',
+            '                       <tpl for="thumbnails">',
+            '                           <li class="labkey-figure"><a href="{link}" title="{title}" target="_blank"><img src="{linkText}"></a></li>',
+            '                       </tpl>',
+            '                       </ul>',
+            '                   </tpl>',
+            '               </div>',
+            '           </div>',
+            '           </div>',
+            '           </tpl>',
             '       </div>',
-            '       </div>',
+            '   </div>',
             '   </div>',
             '   </tpl>',
             '</div>'
@@ -73,44 +132,36 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
 
     toggleDetails : function(publicationId, item, expand)
     {
+
+        var publication = this.store.getById(publicationId);
+
         if (expand)
         {
-            if (!this.detailsOnPage[publicationId])
-            {
-                var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "publicationDetails.api", null, {
-                    "id": publicationId
-                });
-                Ext4.Ajax.request({
-                    url: url,
-                    success: function (response)
+            var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "publicationDetails.api", null, {
+                "id": publicationId
+            });
+            Ext4.Ajax.request({
+                url: url,
+                success: function (response)
+                {
+                    var o = Ext4.decode(response.responseText);
+                    if (o.success)
                     {
-                        var o = Ext4.decode(response.responseText);
-                        if (o.success)
-                        {
-                            this.detailsOnPage[publicationId] = true;
-                            Ext4.create("LABKEY.study.panel.PublicationDetails", {
-                                data: o.data,
-                                renderTo: "publicationDetails_" + publicationId
-                            });
-                            Ext4.get(Ext4.DomQuery.select('#publicationDetails_' + publicationId)[0]).replaceCls('collapsed', 'expanded');
-                            item.className = item.className.replace("collapsed", "expanded");
-                        }
+                        item.className = item.className.replace("collapsed", "expanded"); // change the +/- icon
+                        console.log(o.data);
+                        publication.set(o.data);
+                        publication.set("viewState", "expanded");
+                    }
 
-                        LABKEY.Utils.signalWebDriverTest('publicationDetailsLoaded');
-                    },
-                    scope: this
-                });
-            }
-            else
-            {
-                Ext4.get(Ext4.DomQuery.select('#publicationDetails_' + publicationId)[0]).replaceCls('collapsed', 'expanded');
-                item.className = item.className.replace("collapsed", "expanded");
-                LABKEY.Utils.signalWebDriverTest('publicationDetailsLoaded');
-            }
+                    this.fireEvent('detailsChange');
+                    LABKEY.Utils.signalWebDriverTest('publicationDetailsLoaded');
+                },
+                scope: this
+            });
         }
         else
         {
-            Ext4.get(Ext4.DomQuery.select('#publicationDetails_' + publicationId)[0]).replaceCls('expanded', 'collapsed');
+            publication.set("viewState", "collapsed");
             item.className = item.className.replace("expanded", "collapsed");
         }
 
@@ -168,11 +219,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         this.callParent();
 
         this.store.addListener('filterChange',this.onFilterSelectionChanged, this);
-    },
-
-    onFilterSelectionChanged: function()
-    {
-        this.detailsOnPage = {};
     },
 
     constructor: function(config)

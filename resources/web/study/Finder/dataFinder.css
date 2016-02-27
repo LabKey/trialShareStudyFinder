@@ -32,6 +32,11 @@ DIV.labkey-data-finder-outer {
     min-width:400px;
 }
 
+.labkey-data-finder-view
+{
+    height: 500px;
+}
+
 DIV.labkey-study-cards {
     background-color: #ffffff
 }
