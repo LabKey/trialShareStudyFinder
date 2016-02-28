@@ -98,6 +98,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             storeId : this.cubeConfig.objectName + "FacetMembers"
         });
 
+        // This makes the objectName available to the header
         this.features = this.getGroupHeaderFeature(this.cubeConfig.objectName);
 
         this.callParent();
@@ -208,13 +209,11 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     onGroupClick : function(view, node, facetName, e, eOpts ) {
         if (e.target.className.indexOf("labkey-clear-filter") >= 0) {
-            console.log("Clearing filter for group " + facetName);
             this.clearFilter(facetName);
             return false;
         }
         if (e.target.className.indexOf("labkey-filter-options") >= 0 || e.target.className.indexOf("labkey-filter-caption") >= 0)
         {
-            console.log("Showing filter options for facet " + facetName);
             this.displayFilterChoice(facetName, e);
             return false;
         }
