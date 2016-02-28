@@ -273,6 +273,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             // query
             onRows: onRows,
             countFilter: filters,
+            includeNullMemberInCount: false,
             countDistinctLevel: this.cubeConfig.countDistinctLevel
         };
         this.mdx.query(config);
@@ -316,36 +317,31 @@ Ext4.define('LABKEY.study.store.Facets', {
         {
             var resultMember = positions[i];
             var hierarchyName = resultMember.level.hierarchy.uniqueName;
-            //if (resultMember.data.level.uniqueName == "[Subject].[Subject]")
-            //{
-            //    this.subjects.push(resultMember.data.name);
-            //}
-            //else
+
+            facet = map[hierarchyName];
+            var count = data[i];
+            member = facetMembersStore.getById(resultMember.uniqueName);
+            if (facet.get("name") == this.cubeConfig.objectName)
             {
-                facet = map[hierarchyName];
-                var count = data[i];
-                member = facetMembersStore.getById(resultMember.uniqueName);
-                if (facet.get("name") == this.cubeConfig.objectName)
-                {
-                    selectedMembers[resultMember.name] = resultMember;
-                    facet.data.selectedMembers.push(resultMember);
-                }
-                else if (!member)
-                {
-                    // might be an all member
-                    //if (facet.data.allMemberName == resultMember.uniqueName)
-                    //    facet.data.allMemberCount = count;
-                    //else
-                    if (-1 == resultMember.uniqueName.indexOf("#") && "(All)" != resultMember.name)
-                        console.log("member not found: " + resultMember.uniqueName);
-                }
-                else if (facet.get("displayFacet"))
-                {
-                    member.set("count", count);
-                    if (count > max)
-                        max = count;
-                }
+                selectedMembers[resultMember.name] = resultMember;
+                facet.data.selectedMembers.push(resultMember);
             }
+            else if (!member)
+            {
+                // might be an all member
+                //if (facet.data.allMemberName == resultMember.uniqueName)
+                //    facet.data.allMemberCount = count;
+                //else
+                if (-1 == resultMember.uniqueName.indexOf("#") && "(All)" != resultMember.name)
+                    console.log("member not found: " + resultMember.uniqueName);
+            }
+            else if (facet.get("displayFacet"))
+            {
+                member.set("count", count);
+                if (count > max)
+                    max = count;
+            }
+
         }
 
         for (f = 0; f < facetStore.count(); f++)
