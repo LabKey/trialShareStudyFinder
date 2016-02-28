@@ -38,11 +38,11 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         '       <hr class="labkey-study-card-divider">',
         '       <div>',
         '           <a class="labkey-text-link labkey-study-card-summary" title="click for more details">view summary</a>',
-        '           <tpl if="studyContainers.length &lt; 2">',
+        '           <tpl if="studyAccessList.length &lt; 2">',
         '               <tpl if="url">',
         '           <a class="labkey-text-link labkey-study-card-goto" href="{url}" target="_blank">go to study</a>',
         '               </tpl>',
-        '           <tpl elseif="studyContainers.length &gt; 1">',
+        '           <tpl elseif="studyAccessList.length &gt; 1">',
         '           <a class="labkey-text-link labkey-study-card-goto labkey-study-card-goto-menu">go to study</a>',
         '           </tpl>',
         '       </div>',
@@ -155,7 +155,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             console.error("could not find study " + studyId);
             return;
         }
-        var studyLinks = study.get("studyContainers");
+        var studyLinks = study.get("studyAccessList");
         if (studyLinks.length < 1)
             return;
 

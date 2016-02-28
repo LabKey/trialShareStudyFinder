@@ -24,6 +24,7 @@ import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.FolderTypeManager;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.module.ModuleProperty;
+import org.labkey.api.settings.AdminConsole;
 import org.labkey.api.view.SimpleWebPartFactory;
 import org.labkey.api.view.WebPartFactory;
 import org.labkey.trialshare.view.DataFinderWebPart;
@@ -32,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 public class TrialShareModule extends DefaultModule
 {
@@ -60,7 +60,7 @@ public class TrialShareModule extends DefaultModule
     public TrialShareModule()
     {
         _cubeContainer = new ModuleProperty(this, "DataFinderCubeContainer");
-        _cubeContainer.setDescription("The container in which the lists containing the study and publication metadata is located.");
+        _cubeContainer.setDescription("The container in which the lists containing the study and publication metadata are located.");
         _cubeContainer.setCanSetPerContainer(true);
         addModuleProperty(_cubeContainer);
     }
@@ -84,9 +84,9 @@ public class TrialShareModule extends DefaultModule
     @Override
     public void doStartup(ModuleContext moduleContext)
     {
-        // add a container listener so we'll know when our container is deleted:
-        ContainerManager.addContainerListener(new TrialShareContainerListener());
         FolderTypeManager.get().registerFolderType(this, new StudyITNFolderType(this));
+
+        AdminConsole.addLink(AdminConsole.SettingsLinkType.Management, "Data Cube", TrialShareController.getCubeAdminURL());
     }
 
     @Override
@@ -94,13 +94,6 @@ public class TrialShareModule extends DefaultModule
     public Collection<String> getSummary(Container c)
     {
         return Collections.emptyList();
-    }
-
-    @Override
-    @NotNull
-    public Set<String> getSchemaNames()
-    {
-        return Collections.singleton(TrialShareSchema.NAME);
     }
 
 
@@ -111,7 +104,7 @@ public class TrialShareModule extends DefaultModule
             return c;
         Container pathContainer = ContainerManager.getForPath(containerPath);
         if (pathContainer == null)
-        LoggerFactory.getLogger(TrialShareModule.class).error(_cubeContainer.getName() + " not configured properly in container " +  c.getName() + ".  Check your module properties.");
+            LoggerFactory.getLogger(TrialShareModule.class).error(_cubeContainer.getName() + " not configured properly in container " +  c.getName() + ".  Check your module properties.");
 
         return pathContainer;
     }

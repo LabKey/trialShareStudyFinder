@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
-Ext4.define('LABKEY.study.data.StudyContainer', {
+Ext4.define('LABKEY.study.data.StudyAccess', {
     extend: 'Ext.data.Model',
 
     idProperty : 'key',

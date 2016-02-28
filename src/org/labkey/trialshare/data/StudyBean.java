@@ -61,7 +61,7 @@ public class StudyBean
     private String visibility;
     private Boolean isPublic = false;
     private Integer participantCount;
-    private List<StudyContainer> studyContainers = new ArrayList<>();
+    private List<StudyAccess> _studyAccessList = new ArrayList<>();
 
     private List<StudyPersonnelBean> personnel;
     private List<StudyPublicationBean> publications = new ArrayList<>();
@@ -282,15 +282,15 @@ public class StudyBean
     public void setUrl(User user)
     {
         this.url = null;
-        if (getStudyContainers() == null)
+        if (getStudyAccessList() == null)
             return;
 
-        for (StudyContainer container: getStudyContainers())
+        for (StudyAccess studyAccess: getStudyAccessList())
         {
-            Container studyContainer = ContainerManager.getForId(container.getStudyContainer());
+            Container studyContainer = ContainerManager.getForId(studyAccess.getStudyContainer());
             if (studyContainer != null && studyContainer.hasPermission(user, ReadPermission.class))
             {
-                if (container.getVisibility().equalsIgnoreCase(TrialShareQuerySchema.OPERATIONAL_VISIBILITY))
+                if (studyAccess.getVisibility().equalsIgnoreCase(TrialShareQuerySchema.OPERATIONAL_VISIBILITY))
                     this.url = studyContainer.getStartURL(user).toString();
                 else if (url == null)
                     this.url = studyContainer.getStartURL(user).toString();
@@ -365,33 +365,32 @@ public class StudyBean
         this.externalUrlDescription = externalUrlDescription;
     }
 
-    public List<StudyContainer> getStudyContainers()
+    public List<StudyAccess> getStudyAccessList()
     {
-        return studyContainers;
+        return _studyAccessList;
     }
 
-    public void setStudyContainers(List<StudyContainer> studyContainers)
+    public void setStudyAccessList(List<StudyAccess> studyAccessList)
     {
-        this.studyContainers = studyContainers;
+        this._studyAccessList = studyAccessList;
     }
 
     public void setStudyContainers(User user, Container currentContainer)
     {
-        QuerySchema coreSchema = DefaultSchema.get(user, currentContainer).getSchema("core");
-        QuerySchema listSchema = coreSchema.getSchema("lists");
+        QuerySchema listSchema = TrialShareQuerySchema.getSchema(user, currentContainer);
 
         SimpleFilter filter = new SimpleFilter();
         filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
 
-        TableInfo studyContainersTable = listSchema.getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
-        List<StudyContainer> studyContainers = (new TableSelector(studyContainersTable, filter, null)).getArrayList(StudyContainer.class);
-        this.studyContainers.clear();
-        for (StudyContainer studyContainer : studyContainers)
+        TableInfo studyContainersTable = listSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+        List<StudyAccess> studyAccessList = (new TableSelector(studyContainersTable, filter, null)).getArrayList(StudyAccess.class);
+        this._studyAccessList.clear();
+        for (StudyAccess studyAccess : studyAccessList)
         {
-            Container container = ContainerManager.getForId(studyContainer.getStudyContainer());
+            Container container = ContainerManager.getForId(studyAccess.getStudyContainer());
             if (container != null && container.hasPermission(user, ReadPermission.class))
             {
-                this.studyContainers.add(studyContainer);
+                this._studyAccessList.add(studyAccess);
             }
         }
     }

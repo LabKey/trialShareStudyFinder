@@ -8,7 +8,7 @@ import org.labkey.api.security.permissions.ReadPermission;
 /**
  * Created by susanh on 2/23/16.
  */
-public class StudyContainer
+public class StudyAccess
 {
     private Integer _key;
     private String _studyId;

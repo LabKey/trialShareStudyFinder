@@ -17,12 +17,14 @@ package org.labkey.trialshare;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.action.ApiAction;
+import org.labkey.api.action.FormViewAction;
 import org.labkey.api.action.Marshal;
 import org.labkey.api.action.Marshaller;
 import org.labkey.api.action.ReturnUrlForm;
 import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
+import org.labkey.api.admin.AdminUrls;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
@@ -34,18 +36,22 @@ import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
+import org.labkey.api.query.QueryService;
 import org.labkey.api.security.RequiresPermission;
+import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.Pair;
+import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
 import org.labkey.api.view.VBox;
+import org.labkey.api.view.WebPartView;
 import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.StudyBean;
-import org.labkey.trialshare.data.StudyContainer;
+import org.labkey.trialshare.data.StudyAccess;
 import org.labkey.trialshare.data.StudyFacetBean;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
@@ -67,7 +73,8 @@ public class TrialShareController extends SpringActionController
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(TrialShareController.class);
     public static final String NAME = "trialshare";
 
-    public enum DetailType {
+    public enum DetailType
+    {
         publications(null, "Manuscripts and Abstracts"),
         study(null, "Manuscripts and Abstracts"),
         abstracts("Abstract", "Abstracts"),
@@ -121,8 +128,103 @@ public class TrialShareController extends SpringActionController
         {
             setTitle("TrialShare Data Finder");
             return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean(getContainer(), getViewContext().getActionURL().getParameter(OBJECT_NAME_PARAM)));
-//            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean(getViewContext().getActionURL().getParameter(OBJECT_NAME_PARAM)));
         }
+    }
+
+    @RequiresPermission(AdminPermission.class)
+    public class CubeAdminAction extends FormViewAction<CubeAdminForm>
+    {
+        @Override
+        public void validateCommand(CubeAdminForm target, Errors errors)
+        {
+            if (target.getPath() == null)
+                errors.reject("Container path is required", "Container path not provided");
+        }
+
+        @Override
+        public ModelAndView getView(CubeAdminForm form, boolean reshow, BindException errors) throws Exception
+        {
+            CubeDefinitionBean bean = new CubeDefinitionBean();
+
+            Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
+            Container cubeContainer = ((TrialShareModule) trialShareModule).getCubeContainer(getContainer());
+            bean.addCubeDefinition(cubeContainer.getPath(), "TrialShare:/StudyCube");
+            bean.addCubeDefinition(cubeContainer.getPath(), "TrialShare:/PublicationCube");
+            JspView view =  new JspView<>("/org/labkey/trialshare/view/cubeAdmin.jsp", bean, errors);
+
+            view.setFrame(WebPartView.FrameType.PORTAL);
+            view.setTitle("Data Cube Definitions");
+            return view;
+        }
+
+        @Override
+        public boolean handlePost(CubeAdminForm form, BindException errors) throws Exception
+        {
+            Container container = ContainerManager.getForPath(form.getPath());
+            QueryService.get().cubeDataChanged(container);
+            return true;
+        }
+
+        @Override
+        public URLHelper getSuccessURL(CubeAdminForm form)
+        {
+            return PageFlowUtil.urlProvider(AdminUrls.class).getAdminConsoleURL();
+        }
+
+        @Override
+        public NavTree appendNavTrail(NavTree root)
+        {
+            return null;
+        }
+    }
+
+    public static class CubeDefinitionBean
+    {
+        private Map<String, List<String>> _cubeDefinitionMap;
+
+        public Map<String, List<String>> getCubeDefinitionMap()
+        {
+            return _cubeDefinitionMap;
+        }
+
+        public void setCubeDefinitionMap(Map<String, List<String>> cubeDefinitionMap)
+        {
+            _cubeDefinitionMap = cubeDefinitionMap;
+        }
+
+        public void addCubeDefinition(String containerPath, String cubeConfigId)
+        {
+            if (_cubeDefinitionMap == null)
+                _cubeDefinitionMap = new HashMap<>();
+
+            List<String> cubeDefs = _cubeDefinitionMap.get(containerPath);
+            if (cubeDefs == null)
+            {
+                cubeDefs = new ArrayList<>();
+                _cubeDefinitionMap.put(containerPath, cubeDefs);
+            }
+            cubeDefs.add(cubeConfigId);
+        }
+    }
+
+    public static class CubeAdminForm
+    {
+        private String _path;
+
+        public String getPath()
+        {
+            return _path;
+        }
+
+        public void setPath(String path)
+        {
+            _path = path;
+        }
+    }
+
+    public static ActionURL getCubeAdminURL()
+    {
+        return new ActionURL(CubeAdminAction.class, ContainerManager.getRoot());
     }
 
     public static FinderBean getFinderBean(Container container, String objectName)
@@ -408,8 +510,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(Object form, BindException errors) throws Exception
         {
-            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
-            QuerySchema listsSchema = coreSchema.getSchema("lists");
+            QuerySchema listsSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
             TableInfo studyProperties = listsSchema.getTable(TrialShareQuerySchema.STUDY_TABLE);
 
             if (studyProperties != null)
@@ -436,28 +537,28 @@ public class TrialShareController extends SpringActionController
                         }
                     }
                 }
-                TableInfo studyContainersTable = listsSchema.getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
-                Map<String, List<StudyContainer>> containerMap = new HashMap<>();
+                TableInfo studyContainersTable = listsSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+                Map<String, List<StudyAccess>> studyAccessMap = new HashMap<>();
                 if (studyContainersTable != null)
                 {
-                    List<StudyContainer> containers = (new TableSelector(studyContainersTable)).getArrayList(StudyContainer.class);
+                    List<StudyAccess> studyAccessList = (new TableSelector(studyContainersTable)).getArrayList(StudyAccess.class);
 
-                    for (StudyContainer studyContainer : containers)
+                    for (StudyAccess studyAccess : studyAccessList)
                     {
-                        Container container = ContainerManager.getForId(studyContainer.getStudyContainer());
+                        Container container = ContainerManager.getForId(studyAccess.getStudyContainer());
                         if (container != null && container.hasPermission(getUser(), ReadPermission.class))
                         {
-                            if (containerMap.get(studyContainer.getStudyId()) == null)
+                            if (studyAccessMap.get(studyAccess.getStudyId()) == null)
                             {
-                                containerMap.put(studyContainer.getStudyId(), new ArrayList<StudyContainer>());
+                                studyAccessMap.put(studyAccess.getStudyId(), new ArrayList<>());
                             }
-                            containerMap.get(studyContainer.getStudyId()).add(studyContainer);
+                            studyAccessMap.get(studyAccess.getStudyId()).add(studyAccess);
                         }
                     }
                 }
                 for (StudyBean study : studies)
                 {
-                    study.setStudyContainers(containerMap.get(study.getStudyId()));
+                    study.setStudyAccessList(studyAccessMap.get(study.getStudyId()));
                     study.setUrl(getUser());
                     if (pubCounts.get(study.getStudyId()) == null)
                     {
@@ -511,8 +612,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(Object o, BindException errors) throws Exception
         {
-            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
-            TableInfo publicationsList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
+            TableInfo publicationsList = TrialShareQuerySchema.getSchema(getUser(), getContainer()).getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
             if (publicationsList != null)
             {
                 List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
@@ -557,7 +657,8 @@ public class TrialShareController extends SpringActionController
             StudyFacetBean facet;
 
             facet = new StudyFacetBean("Visibility", "Visibility", "Study.Visibility", "Visibility", "[Study.Visibility][(All)]", FacetFilter.Type.OR, 1);
-            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            // N.B.  AND doesn't really work on this dimension unless the containers associated with public and operational are the same.
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facet.setDisplayFacet(TrialShareManager.get().canSeeOperationalStudies(getUser(), getContainer()));
             facets.add(facet);
             facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Study.Therapeutic Area", "Therapeutic Area", "[Study.Therapeutic Area][(All)]", FacetFilter.Type.OR, 2);
@@ -668,9 +769,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(StudyIdForm form, BindException errors) throws Exception
         {
-
-            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
-            QuerySchema listSchema = coreSchema.getSchema("lists");
+            QuerySchema listSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
             TableInfo studyPropertiesList = listSchema.getTable(TrialShareQuerySchema.STUDY_TABLE);
             if (studyPropertiesList != null)
             {
@@ -749,8 +848,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(PublicationIdForm form, BindException errors) throws Exception
         {
-            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
-            QuerySchema listSchema = coreSchema.getSchema("lists");
+            QuerySchema listSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
             StudyPublicationBean publication = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE))).getObject(_id, StudyPublicationBean.class);
             String containerId = publication.getManuscriptContainer();
             if (containerId != null)
@@ -784,9 +882,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(PublicationIdForm form, BindException errors) throws Exception
         {
-
-            QuerySchema coreSchema = DefaultSchema.get(getUser(), getContainer()).getSchema("core");
-            QuerySchema listSchema = coreSchema.getSchema("lists");
+            QuerySchema listSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
             TableInfo publicationsList = listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
             if (publicationsList != null)
             {
@@ -802,7 +898,7 @@ public class TrialShareController extends SpringActionController
                 {
                     v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
                 }
-                v.addView(new JspView<StudyPublicationBean>("/org/labkey/trialshare/view/publicationDetail.jsp", publication));
+                v.addView(new JspView<>("/org/labkey/trialshare/view/publicationDetail.jsp", publication));
 
                 return v;
             }
@@ -894,11 +990,10 @@ public class TrialShareController extends SpringActionController
             {
                 levelMembers.put("[Publication].[Publication]", TrialShareManager.get().getVisiblePublications(getUser(), getContainer()));
             }
-            else if (_objectName.equalsIgnoreCase("study"))
-            {
-//                levelMembers.put("[Study].[AssayVisibility]", new ArrayList<>());
-                levelMembers.put("[Study].[Study]", TrialShareManager.get().getVisibleStudies(getUser(), getContainer()));
-            }
+//            else if (_objectName.equalsIgnoreCase("study"))
+//            {
+//                levelMembers.put("[Study.AssayVisibility].[Study]", TrialShareManager.get().getVisibleAssays(getUser(), getContainer()));
+//            }
             return success(levelMembers);
         }
     }

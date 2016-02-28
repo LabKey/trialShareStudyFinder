@@ -18,23 +18,18 @@ package org.labkey.trialshare;
 
 import org.labkey.api.data.CompareType;
 import org.labkey.api.data.Container;
-import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
-import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
-import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
-import org.labkey.api.security.permissions.InsertPermission;
-import org.labkey.api.security.permissions.ReadPermission;
-import org.labkey.trialshare.data.StudyBean;
-import org.labkey.trialshare.data.StudyContainer;
+import org.labkey.trialshare.data.StudyAccess;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class TrialShareManager
@@ -54,14 +49,13 @@ public class TrialShareManager
 
     public boolean canSeeOperationalStudies(User user, Container container)
     {
-        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
         SimpleFilter filter = new SimpleFilter();
         filter.addCondition(FieldKey.fromParts("Visibility"), TrialShareQuerySchema.OPERATIONAL_VISIBILITY);
-        TableInfo visibilityList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
+        TableInfo visibilityList = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
         if (visibilityList != null)
         {
-            List<StudyContainer> containers = (new TableSelector(visibilityList, filter, null)).getArrayList(StudyContainer.class);
-            for (StudyContainer study : containers)
+            List<StudyAccess> containers = (new TableSelector(visibilityList, filter, null)).getArrayList(StudyAccess.class);
+            for (StudyAccess study : containers)
             {
                 if (study.hasPermission(user))
                 {
@@ -75,10 +69,9 @@ public class TrialShareManager
 
     public boolean canSeeIncompleteManuscripts(User user, Container container)
     {
-        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
         SimpleFilter filter = new SimpleFilter();
         filter.addCondition(FieldKey.fromParts("Status"), TrialShareQuerySchema.COMPLETED_STATUS, CompareType.NEQ_OR_NULL);
-        TableInfo publicationsList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
+        TableInfo publicationsList = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
         if (publicationsList != null)
         {
             List<StudyPublicationBean> publications = (new TableSelector(publicationsList, filter, null)).getArrayList(StudyPublicationBean.class);
@@ -97,12 +90,11 @@ public class TrialShareManager
     public Set<Object> getVisibleStudies(User user, Container container)
     {
         Set<Object> studyIdSet = new HashSet<>();
-        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
-        TableInfo containerList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.STUDY_CONTAINER_TABLE);
+        TableInfo containerList = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
         if (containerList != null)
         {
-            List<StudyContainer> containers = (new TableSelector(containerList, null, null)).getArrayList(StudyContainer.class);
-            for (StudyContainer study : containers)
+            List<StudyAccess> studyAccess = (new TableSelector(containerList, null, null)).getArrayList(StudyAccess.class);
+            for (StudyAccess study : studyAccess)
             {
                 if (study.hasPermission(user))
                 {
@@ -113,11 +105,53 @@ public class TrialShareManager
         return studyIdSet;
     }
 
+    public Set<String> getVisibleStudies(User user, Container container, String visibility)
+    {
+        Set<String> studyIdSet = new HashSet<>();
+
+        TableInfo studyAccess = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+        if (studyAccess != null)
+        {
+            SimpleFilter filter = new SimpleFilter();
+            filter.addCondition(FieldKey.fromParts("Visibility"), visibility);
+            List<StudyAccess> studyAccessList = (new TableSelector(studyAccess, filter, null)).getArrayList(StudyAccess.class);
+            for (StudyAccess access : studyAccessList)
+            {
+                if (access.hasPermission(user))
+                {
+                    studyIdSet.add(access.getStudyId());
+                }
+            }
+        }
+        return studyIdSet;
+    }
+
+    public Set<Object> getVisibleAssays(User user, Container container)
+    {
+        Set<Object> idSet = new HashSet<>();
+
+        Set<String> operationalStudyIds = getVisibleStudies(user, container,  TrialShareQuerySchema.OPERATIONAL_VISIBILITY);
+        TableInfo assayAccess = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ASSAY_TABLE);
+        if (assayAccess != null)
+        {
+            Map<String, Object> valueMapArray[] = new TableSelector(assayAccess, null, null).getMapArray();
+            for (Map<String, Object> valueMap : valueMapArray)
+            {
+                String visibility = (String) valueMap.get("Visibility");
+                String cubeId = "[Study.AssayVisibility].[" + valueMap.get("StudyId") + "]";
+                if (visibility == null || (visibility.equalsIgnoreCase(TrialShareQuerySchema.PUBLIC_VISIBILITY)))
+                    idSet.add(cubeId);
+                else if (visibility.equalsIgnoreCase(TrialShareQuerySchema.OPERATIONAL_VISIBILITY) && operationalStudyIds.contains(valueMap.get("StudyId")))
+                    idSet.add(cubeId);
+            }
+        }
+        return idSet;
+    }
+
     public Set<Object> getVisiblePublications(User user, Container container)
     {
         Set<Object> publicationIds  = new HashSet<>();
-        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
-        TableInfo publicationsList = coreSchema.getSchema("lists").getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
+        TableInfo publicationsList = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
         if (publicationsList != null)
         {
             List<StudyPublicationBean> publications = (new TableSelector(publicationsList, null, null)).getArrayList(StudyPublicationBean.class);
