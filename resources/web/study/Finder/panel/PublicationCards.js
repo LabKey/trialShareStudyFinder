@@ -214,11 +214,8 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     {
         this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "publications.api", this.cubeContainerPath);
         this.getStore().load();
-        this.detailsOnPage = {}; // map between publication id and boolean to indicate which publications have had details retrieved
 
         this.callParent();
-
-        this.store.addListener('filterChange',this.onFilterSelectionChanged, this);
     },
 
     constructor: function(config)
