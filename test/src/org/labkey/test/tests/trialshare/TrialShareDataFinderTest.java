@@ -299,14 +299,15 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         impersonate(PUBLIC_READER);
         DataFinderPage finder = new DataFinderPage(this, true);
         DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        Assert.assertFalse("Public user should not see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        Assert.assertFalse("Public user should not see the visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("Number of studies not as expected", studySubsets.get("Public").size(), cards.size());
         stopImpersonating();
-        goToProjectHome();
-        Assert.assertTrue("Admin user should see subset menu again", finder.hasStudySubsetCombo());
+        doAndWaitForPageSignal(() -> goToProjectHome(), DataFinderPage.COUNT_SIGNAL);
 
-        impersonate(CASALE_READER);
+        Assert.assertTrue("Admin user should see visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+
+        doAndWaitForPageSignal(() -> impersonate(CASALE_READER), DataFinderPage.COUNT_SIGNAL);
         Assert.assertFalse("User with access to only Casale study should not see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         cards = finder.getDataCards();
         Assert.assertEquals("User with access to only Casale study should see only that study", 1, cards.size());
@@ -320,7 +321,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         impersonate(WISPR_READER);
         DataFinderPage finder = new DataFinderPage(this, true);
         DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        Assert.assertTrue("Operational user should see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        Assert.assertTrue("Operational user should visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
         List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("User with access to only WISP-R study should see only that study", 1, cards.size());
@@ -344,7 +345,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         new PortalHelper(this).addWebPart(WEB_PART_NAME);
         DataFinderPage finder = new DataFinderPage(this, true);
         DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        Assert.assertTrue("Should see the visibility dropdown", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        Assert.assertTrue("Should see the visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
         Assert.assertEquals("Should see all the study cards", 12, finder.getDataCards().size());
         containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, false);
@@ -390,7 +391,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
-        facets.toggleFacet(DataFinderPage.Dimension.ASSAY, "ELISA");
+        facets.toggleFacet(DataFinderPage.Dimension.ASSAY, "Elispot");
 
 
         List<DataFinderPage.DataCard> filteredStudyCards = finder.getDataCards();
@@ -745,7 +746,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         finder.navigateToPublications();
         finder.clearAllFilters();
 
-        log("Filter for a publication that has DOI, PMDI and PMCID values.");
+        log("Filter for a publication that has DOI, PMID and PMCID values.");
         fg = finder.getFacetsGrid();
         fg.toggleFacet(DataFinderPage.Dimension.YEAR, "2011");
         fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_JOURNAL, "Arthritis Rheum.");
@@ -755,24 +756,27 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Click the 'More Details' and validate that the detail content is as expected.");
         DataFinderPage.DataCard card = finder.getDataCards().get(0);
-        PublicationPanel detailPanel = card.viewDetail();
+        PublicationPanel publicationPanel = card.viewDetail();
 
-        assertTrue("Author value not as expected on detail page: " + detailPanel.getAuthor(), detailPanel.getAuthor().contains("Monach PA, Tomasson G, Specks U, Stone JH, Cuthbertson D"));
-        assertTrue("Title value not as expected on detail page:" + detailPanel.getTitle(), detailPanel.getTitle().contains("Circulating markers of vascular injury and angiogenesis in Antineutrophil Cytoplasmic Antibody-Associated Vasculitis."));
-        assertTrue("Citation value not as expected on detail page:" + detailPanel.getCitation(), detailPanel.getCitation().contains("Arthritis Rheum 63: 3988-3997, 2011"));
-        assertTrue("PMID value not as expected on detail page:" + detailPanel.getPMID(), detailPanel.getPMID().contains("21953143"));
-        assertTrue("PMCID value not as expected on detail page:" + detailPanel.getPMCID(), detailPanel.getPMCID().contains("PMC3227746"));
-        assertTrue("DOI value not as expected on detail page:" + detailPanel.getDOI(), detailPanel.getDOI().contains("10.1002/ART.30615"));
-        assertTrue("Studies value not as expected on detail page:" + detailPanel.getStudyShortName(), detailPanel.getStudyShortName().contains("RAVE"));
+        assertTrue("Author value not as expected on detail page: " + publicationPanel.getAuthor(), publicationPanel.getAuthor().contains("Monach PA, Tomasson G, Specks U, Stone JH, Cuthbertson D"));
+        assertTrue("Title value not as expected on detail page:" + publicationPanel.getTitle(), publicationPanel.getTitle().contains("Circulating markers of vascular injury and angiogenesis in Antineutrophil Cytoplasmic Antibody-Associated Vasculitis."));
+        assertTrue("Citation value not as expected on detail page:" + publicationPanel.getCitation(), publicationPanel.getCitation().contains("Arthritis Rheum 63: 3988-3997, 2011"));
+        assertTrue("PMID value not as expected on detail page:" + publicationPanel.getPMID(), publicationPanel.getPMID().contains("21953143"));
+        assertTrue("PMCID value not as expected on detail page:" + publicationPanel.getPMCID(), publicationPanel.getPMCID().contains("PMC3227746"));
+        assertTrue("DOI value not as expected on detail page:" + publicationPanel.getDOI(), publicationPanel.getDOI().contains("10.1002/ART.30615"));
+        assertTrue("Studies value not as expected on detail page:" + publicationPanel.getStudyShortName(), publicationPanel.getStudyShortName().contains("RAVE"));
 
+        card = finder.getDataCards().get(0);
         card.hideDetail();
-        Assert.assertFalse("Author value not as expected in collapsed view", detailPanel.getAuthor().contains("Cuthbertson"));
-        Assert.assertFalse("PMID should not be displayed in collapsed view", detailPanel.isPMIDDisplayed());
-        Assert.assertFalse("PMCID should not be displayed in collapsed view", detailPanel.isPMCIDDisplayed());
+        publicationPanel = new PublicationPanel(this);
+        Assert.assertFalse("Author value not as expected in collapsed view", publicationPanel.getAuthor().contains("Cuthbertson"));
+        Assert.assertFalse("PMID should not be displayed in collapsed view", publicationPanel.isPMIDDisplayed());
+        Assert.assertFalse("PMCID should not be displayed in collapsed view", publicationPanel.isPMCIDDisplayed());
 
         // open it up again and make sure we have only one copy of the fields
+        card = finder.getDataCards().get(0);
         card.viewDetail();
-        Assert.assertEquals("Should still have just one PMID", 1, detailPanel.getPMIDCount());
+        Assert.assertEquals("Should still have just one PMID", 1, publicationPanel.getPMIDCount());
 
 
         log("Go to another publication that doesn't have the same type of detail.");
@@ -788,30 +792,20 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Show details, this time validate that the missing values are rendered as expected.");
         card = finder.getDataCards().get(0);
-        detailPanel = card.viewDetail();
+        publicationPanel = card.viewDetail();
 
-        assertTrue("Author value not as expected on detail page:" + detailPanel.getAuthor(), detailPanel.getAuthor().contains("Ytterberg SR, Mueller M, Sejismundo LP, Mieras K, Stone JH."));
-        assertTrue("Title value not as expected on detail page.", detailPanel.getTitle().contains("Efficacy of Remission-Induction Regimens for ANCA-Associated Vasculitis"));
-        assertTrue("Citation value not as expected on detail page.", detailPanel.getCitation().contains("New Eng J Med 2013; 369:417-427"));
-        assertTrue("PMID value not as expected on detail page.", detailPanel.getPMID().contains("23902481"));
-        assertTrue("PMCID value not as expected on detail page.", detailPanel.getPMCID().contains(""));
-        assertTrue("DOI value not as expected on detail page.", detailPanel.getDOI().contains(""));
-        assertTrue("Studies value not as expected on detail page.", detailPanel.getStudyShortName().contains("RAVE"));
+        assertTrue("Author value not as expected on detail page:" + publicationPanel.getAuthor(), publicationPanel.getAuthor().contains("Ytterberg SR, Mueller M, Sejismundo LP, Mieras K, Stone JH."));
+        assertTrue("Title value not as expected on detail page.", publicationPanel.getTitle().contains("Efficacy of Remission-Induction Regimens for ANCA-Associated Vasculitis"));
+        assertTrue("Citation value not as expected on detail page.", publicationPanel.getCitation().contains("New Eng J Med 2013; 369:417-427"));
+        assertTrue("PMID value not as expected on detail page.", publicationPanel.getPMID().contains("23902481"));
+        assertTrue("PMCID value not as expected on detail page.", publicationPanel.getPMCID().contains(""));
+        assertTrue("DOI value not as expected on detail page.", publicationPanel.getDOI().contains(""));
+        assertTrue("Studies value not as expected on detail page.", publicationPanel.getStudyShortName().contains("RAVE"));
 
+        card = finder.getDataCards().get(0);
         card.hideDetail();
     }
 
-    @Ignore("Not yet implemented well")
-    @Test
-    public void testAssayVisibility()
-    {
-        goToProjectHome();
-        impersonate(PUBLIC_READER);
-        DataFinderPage finder = new DataFinderPage(this, true);
-        // TODO
-        stopImpersonating();
-
-    }
 
     @LogMethod(quiet = true)
     private void assertCountsSynced(DataFinderPage finder)

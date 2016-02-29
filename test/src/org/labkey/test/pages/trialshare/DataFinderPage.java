@@ -40,7 +40,7 @@ public class DataFinderPage extends LabKeyPage
 {
     private static final String CONTROLLER = "trialshare";
     private static final String ACTION = "dataFinder";
-    private static final String COUNT_SIGNAL = "dataFinderCountsUpdated";
+    public static final String COUNT_SIGNAL = "dataFinderCountsUpdated";
     private static final String GROUP_UPDATED_SIGNAL = "participantGroupUpdated";
     private static final String PUBLICATION_DETAILS_SIGNAL = "publicationDetailsLoaded";
     private boolean testingStudies = true;
