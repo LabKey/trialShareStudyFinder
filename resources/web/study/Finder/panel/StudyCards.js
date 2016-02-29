@@ -172,8 +172,8 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
 
         for (var i = 0; i < studyLinks.length; i++) {
             studyLinksMenu.add({
-                value: studyLinks[i].displayName ? studyLinks[i].displayName : studyLinks[i].studyContainerPath,
-                text: studyLinks[i].studyContainerPath
+                text: studyLinks[i].displayName ? studyLinks[i].displayName : studyLinks[i].studyContainerPath,
+                value: studyLinks[i].studyContainerPath
             });
         }
         studyLinksMenu.showAt(event.xy);
