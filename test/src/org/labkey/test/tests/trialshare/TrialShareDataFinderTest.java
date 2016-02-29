@@ -508,6 +508,42 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     }
 
     @Test
+    public void testGoToStudyMenu()
+    {
+        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
+        log("Filtering to show DIAMOND card with two study containers");
+        facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
+        doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.CONDITION, "Lupus Nephritis"), DataFinderPage.COUNT_SIGNAL);
+        List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
+        Assert.assertEquals("Should have a single data card at this point", 1, dataCards.size());
+        DataFinderPage.DataCard card = dataCards.get(0);
+        Assert.assertEquals("DIAMOND", card.getStudyShortName());
+        log("Go to operational study");
+        card.clickGoToStudy("/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+
+        log("Impersonating public reader who should see only one go to study link");
+        goToProjectHome();
+        impersonate(PUBLIC_READER);
+    }
+
+    @Test
+    public void testGoToStudyNoMenuForPublicReader()
+    {
+        log("Impersonating public reader who should see only one go to study link");
+        impersonate(PUBLIC_READER);
+        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
+        log("Filtering to show DIAMOND card");
+        doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.CONDITION, "Lupus Nephritis"), DataFinderPage.COUNT_SIGNAL);
+        List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
+        Assert.assertEquals("Should have a single data card at this point", 1, dataCards.size());
+        DataFinderPage.DataCard card = dataCards.get(0);
+        Assert.assertEquals("DIAMOND", card.getStudyShortName());
+        card.clickGoToStudy();
+    }
+
+    @Test
     @Ignore("Session storage not yet in use")
     public void testNavigationDoesNotRemoveFinderFilter()
     {
@@ -710,6 +746,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Validate counts for 'Complete' publications.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.COMPLETE);
+        // one is "in progress" and one is set to not show
         assertEquals("Expected count after filtering for 'Complete' was not as expected.", 126, counts.get("Complete").intValue());
 
         log("Validate that there are no 'In Progress' cards visible.");

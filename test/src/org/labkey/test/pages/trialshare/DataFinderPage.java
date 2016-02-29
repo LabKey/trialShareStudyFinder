@@ -608,6 +608,11 @@ public class DataFinderPage extends LabKeyPage
             return new StudySummaryWindow(_test);
         }
 
+        public void clickGoToStudy(String choice)
+        {
+            _ext4Helper.clickExt4MenuButton(false, locators.goToStudyLink, false, choice);
+        }
+
         public void clickGoToStudy()
         {
             _test.clickAndWait(locators.goToStudyLink.findElement(card));
@@ -656,6 +661,7 @@ public class DataFinderPage extends LabKeyPage
         {
             public Locator viewStudyLink = Locator.linkWithText("view summary");
             public Locator goToStudyLink = Locator.linkWithText("go to study");
+            public Locator.XPathLocator goToStudyMenu = Locator.tagWithClass("div", "labkey-study-goto-menu");
             public Locator studyAccession = Locator.css(".labkey-study-card-accession");
             public Locator studyShortName = Locator.css(".labkey-study-card-short-name");
             public Locator studyPI = Locator.css(".labkey-study-card-pi");

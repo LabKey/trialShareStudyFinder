@@ -160,6 +160,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             return;
 
         var studyLinksMenu = Ext4.create('Ext.menu.Menu', {
+            cls: 'labkey-study-goto-menu',
             showSeparator: false
         });
 
