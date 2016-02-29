@@ -1,9 +1,11 @@
 package org.labkey.trialshare.query;
 
 import org.labkey.api.data.Container;
+import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
+import org.labkey.trialshare.TrialShareModule;
 
 /**
  * Created by susanh on 2/23/16.
@@ -25,7 +27,8 @@ public class TrialShareQuerySchema
 
     public static QuerySchema getSchema(User user, Container container)
     {
-        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
+        Container cubeContainer = ((TrialShareModule) ModuleLoader.getInstance().getModule(TrialShareModule.NAME)).getCubeContainer(container);
+        QuerySchema coreSchema = DefaultSchema.get(user, cubeContainer).getSchema("core");
         return coreSchema.getSchema("lists");
     }
 }
