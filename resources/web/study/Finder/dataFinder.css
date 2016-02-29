@@ -13,10 +13,39 @@
     /*float: right;*/
 /*}*/
 
+.labkey-data-finder-view
+{
+    padding-left: 2px;
+}
+
+.labkey-data-finder-view .x4-tab
+{
+    border-bottom-width: 0;
+}
+
+.labkey-data-finder-view .x4-tab-bar-strip
+{
+    height: 0;
+    border-top-width: 0;
+}
+
+.labkey-data-finder-view .x4-tab-default-top-active
+{
+    background-image: -webkit-linear-gradient(top,rgb(240, 240, 240),rgb(240, 240, 240));
+}
+
+.labkey-data-finder-view .x4-tab-bar-body-default-top {
+    padding-bottom: 0;
+}
+
+.labkey-data-finder-card-deck-view .x4-panel-body-default {
+    border-top-width: 0;
+}
+
 .labkey-studies-panel,
 .labkey-publications-panel
 {
-    padding: 5px 0px 0px 0px;
+    padding: 0;
 }
 
 .labkey-finder-object-selection {
@@ -167,7 +196,7 @@ DIV.labkey-search-message
 
 .labkey-facet-selection-panel
 {
-    padding: 5px 0px 5px 5px;
+    padding: 0 0 5px 0px;
     vertical-align: text-top;
     height:100%;
     background-color: white;
@@ -242,10 +271,16 @@ DIV.labkey-facet-summary
     cursor:pointer;
 }
 
+.labkey-facet-summary-header
+{
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-left-color: rgb(180, 180, 180);
+}
+
 .labkey-facet-header
 {
     padding:4pt;
-    /*max-width: 185pt;*/
     background-color: rgb(240, 240, 240);
 }
 
