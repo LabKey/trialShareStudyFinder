@@ -10,9 +10,8 @@ import org.labkey.api.security.User;
  */
 public class TrialShareQuerySchema
 {
-    public static final String NAME = "lists";
     public static final String STUDY_TABLE = "studyProperties";
-    public static final String STUDY_ACCESS_TABLE = "studyContainer";
+    public static final String STUDY_ACCESS_TABLE = "studyAccess";
     public static final String PUBLICATION_TABLE = "manuscriptsAndAbstracts";
     public static final String STUDY_ASSAY_TABLE = "studyAssay";
 

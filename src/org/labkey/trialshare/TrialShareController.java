@@ -33,7 +33,6 @@ import org.labkey.api.data.TableSelector;
 import org.labkey.api.gwt.client.util.StringUtils;
 import org.labkey.api.module.Module;
 import org.labkey.api.module.ModuleLoader;
-import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
@@ -537,11 +536,11 @@ public class TrialShareController extends SpringActionController
                         }
                     }
                 }
-                TableInfo studyContainersTable = listsSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+                TableInfo studyAccessTable = listsSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
                 Map<String, List<StudyAccess>> studyAccessMap = new HashMap<>();
-                if (studyContainersTable != null)
+                if (studyAccessTable != null)
                 {
-                    List<StudyAccess> studyAccessList = (new TableSelector(studyContainersTable)).getArrayList(StudyAccess.class);
+                    List<StudyAccess> studyAccessList = (new TableSelector(studyAccessTable)).getArrayList(StudyAccess.class);
 
                     for (StudyAccess studyAccess : studyAccessList)
                     {
@@ -775,7 +774,7 @@ public class TrialShareController extends SpringActionController
             {
                 StudyBean study = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.STUDY_TABLE))).getObject(_studyId, StudyBean.class);
 
-                study.setStudyContainers(getUser(), getContainer());
+                study.setStudyAccessList(getUser(), getContainer());
                 study.setUrl(getUser());
                 study.setPublications(getUser(), getContainer(), form.getDetailType().getDbFieldValue());
 

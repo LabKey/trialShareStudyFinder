@@ -7,11 +7,11 @@
            <Annotation name="AllowMDX">FALSE</Annotation>
        </Annotations>
 
-        <Table schema="lists" name="StudyContainer" >
+        <Table schema="lists" name="StudyAccess" >
         </Table>
 
         <Dimension name="Study" visible="true" highCardinality="false" foreignKey="StudyId">
-            <Hierarchy hasAll="true" primaryKeyTable="studyContainer" primaryKey="StudyId">
+            <Hierarchy hasAll="true" primaryKeyTable="studyAccess" primaryKey="StudyId">
                 <Level name="Container" visible="true" column="studyContainer" type="String" uniqueMembers="true" levelType="Regular"/>
                 <Level name="Study" visible="true" column="studyId" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>

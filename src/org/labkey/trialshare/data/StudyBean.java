@@ -375,15 +375,15 @@ public class StudyBean
         this._studyAccessList = studyAccessList;
     }
 
-    public void setStudyContainers(User user, Container currentContainer)
+    public void setStudyAccessList(User user, Container currentContainer)
     {
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(user, currentContainer);
 
         SimpleFilter filter = new SimpleFilter();
         filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
 
-        TableInfo studyContainersTable = listSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
-        List<StudyAccess> studyAccessList = (new TableSelector(studyContainersTable, filter, null)).getArrayList(StudyAccess.class);
+        TableInfo studyAccessTable = listSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+        List<StudyAccess> studyAccessList = (new TableSelector(studyAccessTable, filter, null)).getArrayList(StudyAccess.class);
         this._studyAccessList.clear();
         for (StudyAccess studyAccess : studyAccessList)
         {
