@@ -73,7 +73,7 @@ public class DataFinderPage extends LabKeyPage
 
     public static DataFinderPage goDirectlyToPage(BaseWebDriverTest test, String containerPath, boolean testingStudies)
     {
-        test.beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION));
+        test.doAndWaitForPageSignal(() -> test.beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
         return new DataFinderPage(test, testingStudies);
     }
 
@@ -151,22 +151,7 @@ public class DataFinderPage extends LabKeyPage
 
     public void selectDataFinderObject(String text)
     {
-        _ext4Helper.openComboList(DataFinderPage.Locators.finderObjectCombo);
-        if (!_test.isElementPresent(Ext4Helper.Locators.comboListItemSelected().withText(text)))
-        {
-             _ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT);
-//            _test.doAndWaitForElementToRefresh(() -> _ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT), Locators.cardDeck, shortWait());
-//            _test.doAndWaitForPageSignal(() ->_ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT), COUNT_SIGNAL);
-
-        }
-        else // FIXME you should be able to just close the combo box at this point, but the close method assumes you've chosen something from the list
-        {
-            _ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT);
-        }
-    }
-    public void navigate(String buttonText)
-    {
-        clickButton(buttonText, 0);
+        Locators.finderObjectTab(text).findElement(getDriver()).click();
     }
 
     public Map<Dimension, Integer> getSummaryCounts()
@@ -294,6 +279,11 @@ public class DataFinderPage extends LabKeyPage
         public static Locator.CssLocator getActiveClearAll(Locator.CssLocator locator)
         {
             return locator.append(".active");
+        }
+
+        public static Locator.XPathLocator finderObjectTab(String objectName)
+        {
+            return Locator.tagWithText("span", objectName);
         }
 
     }
@@ -615,7 +605,7 @@ public class DataFinderPage extends LabKeyPage
 
         public void clickGoToStudy()
         {
-            _test.clickAndWait(locators.goToStudyLink.findElement(card));
+            locators.goToStudyLink.findElement(card).click();
         }
 
         public String getStudyAccession()
