@@ -28,10 +28,14 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
             {
                 formatNumber :  Ext4.util.Format.numberRenderer('0,000'),
 
-                getPublicationCount : function(defaultValue) {
+                getPublicationCount : function(defaultValue)
+                {
                     var store = Ext4.getStore("Publication");
                     if (!store)
+                    {
+                        console.log("Publication store not available.  Using " + defaultValue);
                         return this.formatNumber(defaultValue);
+                    }
                     return this.formatNumber(store.count());
                 },
 
@@ -39,7 +43,10 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
                 {
                     var store = Ext4.getStore("PublicationFacetMembers");
                     if (!store)
+                    {
+                        console.log("PublicationFacetMembers store not available. Using " + defaultValue);
                         return this.formatNumber(defaultValue);
+                    }
                     var count = 0;
                     for (var i = 0; i < store.count(); i++)
                     {
@@ -47,7 +54,7 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
                         if (member.data.facet.data.name == "Study" && member.data.count > 0)
                             count++;
                     }
-                    return count;
+                    return this.formatNumber(count);
                 }
             }
     ),
