@@ -22,7 +22,7 @@ public class StudyPropertiesQueryUpdatePage extends LabKeyPage
         _test.log("Setting up study container links");
         _test.goToProjectHome();
         String projectName = _test.getCurrentProject();
-        clickAndWait(Locator.linkWithText("StudyContainer"));
+        clickAndWait(Locator.linkWithText("StudyAccess"));
         DataRegionTable table = new DataRegionTable("query", _test);
         for (int i = 0; i < table.getDataRowCount(); i++)
         {
