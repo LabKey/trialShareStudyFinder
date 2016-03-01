@@ -65,8 +65,8 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
     },
 
     initComponent: function() {
-        this.callParent();
         Ext4.getStore(this.objectName).addListener('filterChange',this.onFilterSelectionChanged, this);
+        this.callParent();
     },
 
     onFilterSelectionChanged : function() {

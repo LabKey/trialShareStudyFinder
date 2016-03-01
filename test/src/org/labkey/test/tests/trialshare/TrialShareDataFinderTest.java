@@ -324,6 +324,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
         List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("User with access to only WISP-R study should see only that study", 1, cards.size());
+        stopImpersonating();
     }
 
 
@@ -533,6 +534,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage.DataCard card = dataCards.get(0);
         Assert.assertEquals("DIAMOND", card.getStudyShortName());
         card.clickGoToStudy();
+        stopImpersonating();
     }
 
     @Test
@@ -777,7 +779,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         log("Filter for a publication that has DOI, PMID and PMCID values.");
         fg = finder.getFacetsGrid();
         fg.toggleFacet(DataFinderPage.Dimension.YEAR, "2011");
-        fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_JOURNAL, "Arthritis Rheum.");
+        doAndWaitForPageSignal(() -> fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_JOURNAL, "Arthritis Rheum."), DataFinderPage.COUNT_SIGNAL);
 
         summaryCount = finder.getSummaryCounts();
         assertTrue("Number of publication cards returned does not match dimension count. Number of cards: " + finder.getDataCards().size() + " Count in dimension: " + summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS), summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS) == finder.getDataCards().size());
