@@ -46,11 +46,6 @@
                 <Table name="studyAssay" schema="lists"/>
                 <Level name="Assay" visible="true" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
-            <!--<Hierarchy name="AssayVisibility" hasAll="true" primaryKey="StudyId">-->
-                <!--<Table name="studyAssay" schema="lists"/>-->
-                <!--<Level name="Study" visible="true" type="String" column="StudyId" uniqueMembers="true" levelyType="Regular"/>-->
-                <!--<Level name="Visibility" visible="true"  type="String" column="Visibility" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>-->
-            <!--</Hierarchy>-->
         </Dimension>
 
 

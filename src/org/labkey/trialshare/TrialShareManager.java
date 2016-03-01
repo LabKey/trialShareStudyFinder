@@ -160,7 +160,7 @@ public class TrialShareManager
                 {
                     publicationIds.add(publication.getCubeId());
                 }
-            };
+            }
         }
         return publicationIds;
     }

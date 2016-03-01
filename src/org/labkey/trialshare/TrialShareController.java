@@ -989,10 +989,6 @@ public class TrialShareController extends SpringActionController
             {
                 levelMembers.put("[Publication].[Publication]", TrialShareManager.get().getVisiblePublications(getUser(), getContainer()));
             }
-//            else if (_objectName.equalsIgnoreCase("study"))
-//            {
-//                levelMembers.put("[Study.AssayVisibility].[Study]", TrialShareManager.get().getVisibleAssays(getUser(), getContainer()));
-//            }
             return success(levelMembers);
         }
     }
