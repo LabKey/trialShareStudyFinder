@@ -481,10 +481,11 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         {
             DataFinderPage finder = new DataFinderPage(this, true);
             DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
+            finder.clearAllFilters();
             if (name.contains("Operational"))
-                facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
+                doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational"), DataFinderPage.COUNT_SIGNAL);
             else
-                facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
+                doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public"), DataFinderPage.COUNT_SIGNAL);
             for (DataFinderPage.DataCard studyCard : finder.getDataCards())
             {
                 if (name.contains(studyCard.getStudyShortName()))
@@ -493,6 +494,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
                     String shortName = studyCard.getStudyShortName();
                     foundNames.add(name);
                     studyCard.clickGoToStudy();
+                    log("Switching to window " + foundNames.size());
                     switchToWindow(foundNames.size());
                     WebElement title = Locator.css(".labkey-folder-title > a").waitForElement(shortWait());
                     Assert.assertTrue("Study card " + name + " linked to wrong study", title.getText().contains(shortName));
@@ -778,8 +780,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Filter for a publication that has DOI, PMID and PMCID values.");
         fg = finder.getFacetsGrid();
+        sleep(1000); // HACK to see if TeamCity will be happier
         fg.toggleFacet(DataFinderPage.Dimension.YEAR, "2011");
         doAndWaitForPageSignal(() -> fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_JOURNAL, "Arthritis Rheum."), DataFinderPage.COUNT_SIGNAL);
+
 
         summaryCount = finder.getSummaryCounts();
         assertTrue("Number of publication cards returned does not match dimension count. Number of cards: " + finder.getDataCards().size() + " Count in dimension: " + summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS), summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS) == finder.getDataCards().size());
