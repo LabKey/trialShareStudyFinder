@@ -94,9 +94,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             storeId: this.cubeConfig.objectName + "Facets"
         });
 
-        this.store = Ext4.create('LABKEY.study.store.FacetMembers', {
-            storeId : this.cubeConfig.objectName + "FacetMembers"
-        });
+        this.store = Ext4.getStore(this.cubeConfig.objectName + "FacetMembers");
 
         // This makes the objectName available to the header
         this.features = this.getGroupHeaderFeature(this.cubeConfig.objectName);

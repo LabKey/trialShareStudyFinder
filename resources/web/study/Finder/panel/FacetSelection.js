@@ -21,6 +21,10 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     autoScroll: false,
 
     initComponent : function() {
+        Ext4.create('LABKEY.study.store.FacetMembers', {
+            storeId : this.cubeConfig.objectName + "FacetMembers"
+        });
+
         this.items = [
             this.getFacetPanelHeader(),
             this.getFacetSelectionSummary(),
