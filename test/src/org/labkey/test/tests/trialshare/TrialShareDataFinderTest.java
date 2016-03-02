@@ -125,7 +125,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Override
     protected BrowserType bestBrowser()
     {
-        return BrowserType.CHROME;
+        return BrowserType.FIREFOX;
     }
 
     @Override
@@ -780,9 +780,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Filter for a publication that has DOI, PMID and PMCID values.");
         fg = finder.getFacetsGrid();
-        sleep(1000); // HACK to see if TeamCity will be happier
-        fg.toggleFacet(DataFinderPage.Dimension.YEAR, "2011");
-        doAndWaitForPageSignal(() -> fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_JOURNAL, "Arthritis Rheum."), DataFinderPage.COUNT_SIGNAL);
+        doAndWaitForPageSignal(() -> fg.toggleFacet(DataFinderPage.Dimension.STATUS, "In Progress"), DataFinderPage.COUNT_SIGNAL);
 
 
         summaryCount = finder.getSummaryCounts();
