@@ -17,9 +17,8 @@ public class PublicationsQueryUpdatePage extends LabKeyPage
 
     public void setPermissionsContainer(String publicStudyName, String operationalStudyName)
     {
-        _test.log("Setting up permissions container");
-        _test.goToProjectHome();
-        String projectName = _test.getCurrentProject();
+        log("Setting up permissions container");
+        String projectName = getCurrentProject();
         clickAndWait(Locator.linkWithText("ManuscriptsAndAbstracts"));
         DataRegionTable table = new DataRegionTable("query", _test);
         int rowIndex = table.getRow("Status", "In Progress");

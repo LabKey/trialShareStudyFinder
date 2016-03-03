@@ -19,7 +19,6 @@ import com.google.common.base.Predicate;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.trialshare.PublicationPanel;
 import org.labkey.test.components.trialshare.StudySummaryWindow;
@@ -63,32 +62,38 @@ public class DataFinderPage extends LabKeyPage
     @Override
     protected void waitForPage()
     {
-        _test.waitForElement(LabKeyPage.Locators.pageSignal(COUNT_SIGNAL));
+        waitForElement(LabKeyPage.Locators.pageSignal(COUNT_SIGNAL));
     }
 
     protected void waitForGroupUpdate()
     {
-        _test.waitForElement(LabKeyPage.Locators.pageSignal(GROUP_UPDATED_SIGNAL));
+        waitForElement(LabKeyPage.Locators.pageSignal(GROUP_UPDATED_SIGNAL));
     }
 
-    public static DataFinderPage goDirectlyToPage(BaseWebDriverTest test, String containerPath, boolean testingStudies)
-    {
-        test.doAndWaitForPageSignal(() -> test.beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
-        return new DataFinderPage(test, testingStudies);
-    }
+//    public static DataFinderPage goDirectlyToPage(BaseWebDriverTest test, String containerPath, boolean testingStudies)
+//    {
+//        test.doAndWaitForPageSignal(() -> test.beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
+//        return new DataFinderPage(test, testingStudies);
+//    }
+//
+//    public static DataFinderPage goDirectlyToPage(WebDriver test, String containerPath, boolean testingStudies)
+//    {
+//        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
+//        return new DataFinderPage(test, testingStudies);
+//    }
 
     public boolean hasStudySubsetCombo()
     {
-        return _test.isElementPresent(Locators.studySubsetCombo);
+        return isElementPresent(Locators.studySubsetCombo);
     }
 
     public void selectStudySubset(String text)
     {
         // FIXME isn't there a general method for asking "is this combo list item already selected"?
         _ext4Helper.openComboList(DataFinderPage.Locators.studySubsetCombo);
-        if (!_test.isElementPresent(Ext4Helper.Locators.comboListItemSelected().withText(text)))
+        if (!isElementPresent(Ext4Helper.Locators.comboListItemSelected().withText(text)))
         {
-            _test.doAndWaitForPageSignal(() ->_ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT), COUNT_SIGNAL);
+            doAndWaitForPageSignal(() ->_ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT), COUNT_SIGNAL);
 
         }
         else // FIXME you should be able to just close the combo box at this point, but the close method assumes you've chosen something from teh lis
@@ -100,41 +105,41 @@ public class DataFinderPage extends LabKeyPage
     @LogMethod
     public void studySearch(@LoggedParam final String search)
     {
-        _test.doAndWaitForPageSignal(() -> _test.setFormElement(DataFinderPage.Locators.studySearchInput, search), COUNT_SIGNAL);
+        doAndWaitForPageSignal(() -> setFormElement(DataFinderPage.Locators.studySearchInput, search), COUNT_SIGNAL);
     }
 
     @LogMethod(quiet = true)
     public void clearSearch()
     {
-        if (_test.isElementPresent(DataFinderPage.Locators.studySearchInput) && !_test.getFormElement(DataFinderPage.Locators.studySearchInput).isEmpty())
+        if (isElementPresent(DataFinderPage.Locators.studySearchInput) && !getFormElement(DataFinderPage.Locators.studySearchInput).isEmpty())
             studySearch(" ");
     }
 
     public void saveGroup(String name)
     {
-        _test.setFormElement(DataFinderPage.Locators.groupLabelInput, name);
-        _test.clickButtonContainingText("Save", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        setFormElement(DataFinderPage.Locators.groupLabelInput, name);
+        clickButtonContainingText("Save", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         waitForGroupUpdate();
     }
 
     public String getGroupLabel()
     {
-        return DataFinderPage.Locators.groupLabel.findElement(_test.getDriver()).getText().trim();
+        return DataFinderPage.Locators.groupLabel.findElement(getDriver()).getText().trim();
     }
 
     public GroupMenu getMenu(Locator locator)
     {
-        return new GroupMenu(locator.findElement(_test.getDriver()));
+        return new GroupMenu(locator.findElement(getDriver()));
     }
 
     public boolean menuIsDisabled(Locator.CssLocator locator)
     {
-        return _test.isElementPresent(locator.append(" .labkey-disabled-text-link"));
+        return isElementPresent(locator.append(" .labkey-disabled-text-link"));
     }
 
     public void openMenu(Locator locator)
     {
-        locator.findElement(_test.getDriver()).click();
+        locator.findElement(getDriver()).click();
     }
 
     public void navigateToStudies()
@@ -158,9 +163,9 @@ public class DataFinderPage extends LabKeyPage
     {
         WebElement summaryElement;
         if (testingStudies)
-            summaryElement = DataFinderPage.Locators.studySummaryArea.findElement(_test.getDriver());
+            summaryElement = DataFinderPage.Locators.studySummaryArea.findElement(getDriver());
         else
-            summaryElement = DataFinderPage.Locators.pubSummaryArea.findElement(_test.getDriver());
+            summaryElement = DataFinderPage.Locators.pubSummaryArea.findElement(getDriver());
 
         SummaryPanel summary = new SummaryPanel(summaryElement);
 
@@ -182,10 +187,10 @@ public class DataFinderPage extends LabKeyPage
 
         Locator locator = testingStudies? Locators.studyCard : Locators.pubCard;
 
-        if (_test.isElementPresent(locator))
+        if (isElementPresent(locator))
         {
-            _test.scrollIntoView(locator);
-            cardEls = locator.findElements(_test.getDriver());
+            scrollIntoView(locator);
+            cardEls = locator.findElements(getDriver());
             for (WebElement el : cardEls)
             {
                 cards.add(new DataCard(el));
@@ -198,37 +203,37 @@ public class DataFinderPage extends LabKeyPage
     public FacetGrid getFacetsGrid()
     {
         if(testingStudies)
-            return new FacetGrid(DataFinderPage.Locators.studyFacetPanel.findElement(_test.getDriver()));
+            return new FacetGrid(DataFinderPage.Locators.studyFacetPanel.findElement(getDriver()));
         else
-            return new FacetGrid(DataFinderPage.Locators.pubFacetPanel.findElement(_test.getDriver()));
+            return new FacetGrid(DataFinderPage.Locators.pubFacetPanel.findElement(getDriver()));
     }
 
 
     public void clearAllFilters()
     {
         Locator.CssLocator clearAllLocator = DataFinderPage.Locators.getClearAll(finderLocator);
-        _test.scrollIntoView(clearAllLocator);
+        scrollIntoView(clearAllLocator);
         Locator activeClearAllLocator = DataFinderPage.Locators.getActiveClearAll(clearAllLocator);
-        if (_test.isElementPresent(activeClearAllLocator))
+        if (isElementPresent(activeClearAllLocator))
         {
-            final WebElement clearAll = activeClearAllLocator.findElement(_test.getDriver());
+            final WebElement clearAll = activeClearAllLocator.findElement(getDriver());
             if (clearAll.isDisplayed())
             {
-                _test.doAndWaitForPageSignal(clearAll::click, COUNT_SIGNAL);
+                doAndWaitForPageSignal(clearAll::click, COUNT_SIGNAL);
             }
         }
     }
 
     public void dismissTour()
     {
-        _test.shortWait().until(new Predicate<WebDriver>()
+        shortWait().until(new Predicate<WebDriver>()
         {
             @Override
             public boolean apply(WebDriver webDriver)
             {
                 try
                 {
-                    return (Boolean) _test.executeScript("" +
+                    return (Boolean) executeScript("" +
                             "if (window.hopscotch)" +
                             "  return !hopscotch.endTour().isActive;" +
                             "else" +
@@ -384,7 +389,7 @@ public class DataFinderPage extends LabKeyPage
 
         public void chooseOption(String optionText, boolean waitForUpdate)
         {
-            _test.log("Choosing menu option " + optionText);
+            log("Choosing menu option " + optionText);
             List<WebElement> activeOptions = findElements(elements.activeOption);
             for (WebElement option : activeOptions)
             {
@@ -436,24 +441,24 @@ public class DataFinderPage extends LabKeyPage
 
         public boolean facetIsPresent(Dimension dimension)
         {
-            return _test.isElementPresent(locators.facetGroup(dimension));
+            return isElementPresent(locators.facetGroup(dimension));
         }
 
         public void toggleFacet(Dimension dimension, String name)
         {
             Locator.XPathLocator rowLocator = locators.facetMemberName(dimension, name);
             scrollIntoView(rowLocator);
-            WebElement row = rowLocator.findElement(_test.getDriver());
+            WebElement row = rowLocator.findElement(getDriver());
 
-            _test.doAndWaitForPageSignal(() -> row.click(), COUNT_SIGNAL);
+            doAndWaitForPageSignal(() -> row.click(), COUNT_SIGNAL);
         }
 
         public void clearFilter(Dimension dimension)
         {
-            WebElement clearEl = locators.facetClear(dimension).findElement(_test.getDriver());
+            WebElement clearEl = locators.facetClear(dimension).findElement(getDriver());
             scrollIntoView(clearEl);
             Assert.assertFalse("Attempting to clear filter that is not active", clearEl.getAttribute("class").contains("inactive"));
-            _test.clickAt(locators.facetClear(dimension), 3, 3, 0);
+            clickAt(locators.facetClear(dimension), 3, 3, 0);
             waitForElement(Locator.xpath("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]//span[contains(@class,'labkey-clear-filter')][contains(@class, 'inactive')]"));
         }
 
@@ -472,7 +477,7 @@ public class DataFinderPage extends LabKeyPage
 
         public List<String> getSelectedMembers(Dimension dimension)
         {
-            List<WebElement> selectedElements =  locators.facetMemberSelected(dimension).findElements(_test.getDriver());
+            List<WebElement> selectedElements =  locators.facetMemberSelected(dimension).findElements(getDriver());
             List<String> selectedNames = new ArrayList<>();
             for (WebElement element: selectedElements)
             {
@@ -483,7 +488,7 @@ public class DataFinderPage extends LabKeyPage
 
         public Map<String, Integer> getMemberCounts(Dimension dimension)
         {
-            List<WebElement> memberElements = locators.facetMembers(dimension).findElements(_test.getDriver());
+            List<WebElement> memberElements = locators.facetMembers(dimension).findElements(getDriver());
             Map<String, Integer> countMap = new HashMap<>();
             for (WebElement member : memberElements)
             {
@@ -564,7 +569,7 @@ public class DataFinderPage extends LabKeyPage
 
         public List<String> getValues()
         {
-            return _test.getTexts(findElements(elements.member));
+            return getTexts(findElements(elements.member));
         }
 
         private class Elements
@@ -633,7 +638,7 @@ public class DataFinderPage extends LabKeyPage
 
         public PublicationPanel viewDetail()
         {
-            _test.doAndWaitForPageSignal(() -> locators.pubMoreDetails.findElement(card).click(), PUBLICATION_DETAILS_SIGNAL);
+            doAndWaitForPageSignal(() -> locators.pubMoreDetails.findElement(card).click(), PUBLICATION_DETAILS_SIGNAL);
             return new PublicationPanel(_test);
         }
 

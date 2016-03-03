@@ -19,9 +19,8 @@ public class StudyPropertiesQueryUpdatePage extends LabKeyPage
 
     public void setStudyContainers(Set<String> loadedStudies, String publicStudyName, String operationalStudyName)
     {
-        _test.log("Setting up study container links");
-        _test.goToProjectHome();
-        String projectName = _test.getCurrentProject();
+        log("Setting up study container links");
+        String projectName = getCurrentProject();
         clickAndWait(Locator.linkWithText("StudyAccess"));
         DataRegionTable table = new DataRegionTable("query", _test);
         for (int i = 0; i < table.getDataRowCount(); i++)
@@ -43,7 +42,6 @@ public class StudyPropertiesQueryUpdatePage extends LabKeyPage
 
     private void unlinkStudy(String studyShortName)
     {
-        _test.goToProjectHome();
         clickAndWait(Locator.linkWithText("StudyProperties"));
         DataRegionTable table = new DataRegionTable("query", _test);
         int row = table.getRow("Short Name", studyShortName);

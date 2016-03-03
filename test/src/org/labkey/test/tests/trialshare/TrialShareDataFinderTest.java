@@ -45,6 +45,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ReadOnlyTest;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -77,6 +78,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     private static final String CASALE_READER = CASALE_READER_DISPLAY_NAME + EMAIL_EXTENSION;
     private static final String WISPR_READER_DISPLAY_NAME = "wispr_reader";
     private static final String WISPR_READER = WISPR_READER_DISPLAY_NAME + EMAIL_EXTENSION;
+    private static final String CONTROLLER = "trialshare";
+    private static final String ACTION = "dataFinder";
+    public static final String COUNT_SIGNAL = "dataFinderCountsUpdated";
     private static File listArchive = TestFileUtils.getSampleData("DataFinder.lists.zip");
 
     private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
@@ -171,8 +175,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         }
         createStudy(PUBLIC_STUDY_NAME);
         createStudy(OPERATIONAL_STUDY_NAME);
+        goToProjectHome();
         StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
         queryUpdatePage.setStudyContainers(loadedStudies, "/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+        goToProjectHome();
         PublicationsQueryUpdatePage pubUpdatePage = new PublicationsQueryUpdatePage(this);
         pubUpdatePage.setPermissionsContainer("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
 
@@ -265,7 +271,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Test
     public void testStudyCards()
     {
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
 
         List<DataFinderPage.DataCard> studyCards = finder.getDataCards();
 
@@ -275,7 +281,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Test
     public void testStudySubset()
     {
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
 
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         Set<String> linkedStudyNames = new HashSet<>();
@@ -337,7 +343,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     {
         log("Test that we can put the data finder in a project other than the one with the cube definition and lists");
         AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-
+        containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, false);
         containerHelper.createProject(RELOCATED_DATA_FINDER_PROJECT, "Custom");
         containerHelper.addCreatedProject(RELOCATED_DATA_FINDER_PROJECT);
         containerHelper.enableModule(MODULE_NAME);
@@ -391,7 +397,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         expectedCounts.put(DataFinderPage.Dimension.STUDIES, 0);
         expectedCounts.put(DataFinderPage.Dimension.SUBJECTS, 0);
 
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
         facets.toggleFacet(DataFinderPage.Dimension.ASSAY, "Elispot");
@@ -420,7 +426,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Ignore("Search not implemented")
     public void testSearch()
     {
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
 
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
@@ -441,7 +447,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Test
     public void testStudySummaryWindow()
     {
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
 
         DataFinderPage.DataCard studyCard = finder.getDataCards().get(0);
 
@@ -596,7 +602,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         facetGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
 
         Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
         assertEquals("WebPart study finder filter didn't get applied", selections, finder.getFacetsGrid().getSelectedMembers());
     }
 
@@ -717,7 +723,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         String cardText;
         Map<String, Integer> counts;
 
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), false);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), false);
 
         log("Go to publications and clear any filters that may have been set.");
         finder.navigateToPublications();
@@ -760,7 +766,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     public void testPublicationStatusForReader()
     {
         impersonate(PUBLIC_READER);
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), false);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), false);
         log("Go to publications and clear any filters that may have been set.");
         finder.navigateToPublications();
         finder.clearAllFilters();
@@ -779,7 +785,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage.FacetGrid fg;
         Map<DataFinderPage.Dimension, Integer> summaryCount;
 
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), false);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), false);
 
         log("Go to publications and clear any filters that may have been set.");
         finder.navigateToPublications();
@@ -855,4 +861,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertEquals("Study count mismatch", studyCards.size(), studyCounts.get(DataFinderPage.Dimension.STUDIES).intValue());
     }
 
+
+    private DataFinderPage goDirectlyToDataFinderPage(WebDriver test, String containerPath, boolean testingStudies)
+    {
+        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
+        return new DataFinderPage(this, testingStudies);
+    }
 }
