@@ -8,7 +8,7 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
 
     layout:  'vbox',
 
-    cls: 'labkey-facet-header',
+    cls: 'labkey-facet-summary-header labkey-facet-header',
 
     bubbleEvents: ["clearAllFilters", "finderObjectChanged"],
 
@@ -46,7 +46,6 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
                 width: "100%",
                 items: [
                     this.getSummaryLabel(),
-                    this.getCubeConfigMenu(),
                     {
                         // spacer
                         xtype: 'box',
@@ -76,43 +75,10 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
         {
             this.summaryLabel = Ext4.create("Ext4.Component", {
                 html: "Summary",
-                hidden: this.cubeConfigs.count() > 1
+                cls: 'labkey-facet-panel-summary',
             });
         }
         return this.summaryLabel;
-    },
-
-
-    getCubeConfigMenu: function() {
-        if (!this.cubeConfigsMenu) {
-            this.cubeConfigsMenu = Ext4.create('Ext.form.ComboBox', {
-                store: this.cubeConfigs,
-                queryMode: 'local',
-                name: 'configSelect',
-                valueField: 'objectName',
-                displayField: 'objectNamePlural',
-                hidden: this.cubeConfigs.count() < 2,
-                fieldLabel: "View",
-                labelWidth: 30,
-                padding: '0 0 0 3',
-                labelSeparator: "",
-                labelPadding: 1,
-                value: this.objectName,
-                multiSelect: false,
-                listeners: {
-                    scope: this,
-                    'select': function(field, newValue, oldValue, eOpts) {
-                        this.cubeConfigs.selectedValue = newValue[0].data.objectName;
-                        this.onCubeConfigChanged(newValue[0].data.objectName)
-                    },
-                    'render': function(eOpts) {
-                        if (this.cubeConfigs.selectedValue)
-                            this.onCubeConfigChanged(this.cubeConfigs.selectedValue)
-                    }
-                }
-            })
-        }
-        return this.cubeConfigsMenu;
     },
 
     onFilterSelectionChange: function(hasFilters) {

@@ -29,6 +29,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.labkey.trialshare.data.URLData" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%!
     public LinkedHashSet<ClientDependency> getClientDependencies()
@@ -52,7 +53,7 @@
     if (StringUtils.isEmpty(descriptionHTML))
         descriptionHTML = h(study.getBriefDescription());
 
-    String studyUrl = study.getUrl(c, context.getUser());
+    String studyUrl = study.getUrl(context.getUser());
 
     Map<String, String> linkProps = new HashMap<>();
     linkProps.put("target", "_blank");
@@ -110,7 +111,7 @@
                     {
                         %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPmid(), null, null, linkProps)%><%
                     }
-                    for (StudyPublicationBean.URLData urlData : pub.getUrls())
+                    for (URLData urlData : pub.getUrls())
                     {
                         if (urlData != null && !StringUtils.isEmpty(urlData.getLink()))
                         {

@@ -26,6 +26,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.labkey.trialshare.data.URLData" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%!
     public LinkedHashSet<ClientDependency> getClientDependencies()
@@ -88,7 +89,7 @@
         </div>
         <%
 
-            for (StudyPublicationBean.URLData urlData : publication.getUrls())
+            for (URLData urlData : publication.getUrls())
             {
                 if (urlData != null && !StringUtils.isEmpty(urlData.getLinkText()))
                 {
@@ -105,7 +106,7 @@
         <%
                 for (StudyBean study : publication.getStudies())
                 {
-                    if (study.getUrl(getContainer(), getUser()) != null)
+                    if (study.getUrl(getUser()) != null)
                     {
         %><span class="labkey-study-short-name"><a href="<%=h(study.getUrl())%>"%><%=h(study.getShortName())%></a></span>
         <%
