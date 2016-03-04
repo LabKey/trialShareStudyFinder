@@ -23,7 +23,7 @@ import org.labkey.api.action.Marshaller;
  */
 public class FacetFilter
 {
-    public enum Type { OR, AND };
+    public enum Type { OR, AND }
 
     private Type _type;
     private String _caption;

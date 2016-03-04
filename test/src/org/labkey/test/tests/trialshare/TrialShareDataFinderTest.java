@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -32,8 +33,11 @@ import org.labkey.test.categories.Git;
 import org.labkey.test.components.study.StudyOverviewWebPart;
 import org.labkey.test.components.trialshare.PublicationPanel;
 import org.labkey.test.components.trialshare.StudySummaryWindow;
+import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.study.ManageParticipantGroupsPage;
 import org.labkey.test.pages.trialshare.DataFinderPage;
+import org.labkey.test.pages.trialshare.PublicationsQueryUpdatePage;
+import org.labkey.test.pages.trialshare.StudyPropertiesQueryUpdatePage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -41,11 +45,13 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ReadOnlyTest;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,7 +69,21 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 {
     private static final String MODULE_NAME = "TrialShare";
     private static final String WEB_PART_NAME = "TrialShare Data Finder";
+    private static final String OPERATIONAL_STUDY_NAME = "DataFinderTestOperationalStudy";
+    private static final String PUBLIC_STUDY_NAME = "DataFinderTestPublicStudy";
+    private static final String EMAIL_EXTENSION = "@datafinder.test";
+    private static final String PUBLIC_READER_DISPLAY_NAME = "public_reader";
+    private static final String PUBLIC_READER = PUBLIC_READER_DISPLAY_NAME + EMAIL_EXTENSION;
+    private static final String CASALE_READER_DISPLAY_NAME = "casale_reader";
+    private static final String CASALE_READER = CASALE_READER_DISPLAY_NAME + EMAIL_EXTENSION;
+    private static final String WISPR_READER_DISPLAY_NAME = "wispr_reader";
+    private static final String WISPR_READER = WISPR_READER_DISPLAY_NAME + EMAIL_EXTENSION;
+    private static final String CONTROLLER = "trialshare";
+    private static final String ACTION = "dataFinder";
+    public static final String COUNT_SIGNAL = "dataFinderCountsUpdated";
     private static File listArchive = TestFileUtils.getSampleData("DataFinder.lists.zip");
+
+    private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
 
     private static final Map<String, Set<String>> studySubsets = new HashMap<>();
     static {
@@ -76,7 +96,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         operationalSet.add("RESTARRT"); operationalSet.add("EXIIST"); operationalSet.add("RETAIN"); operationalSet.add("GRASS");
         operationalSet.add("T1DAL"); operationalSet.add("TAKE"); operationalSet.add("LEAP-ON"); operationalSet.add("IMPACT");
         operationalSet.add("AVATARS"); operationalSet.add("ACCEPTOR"); operationalSet.add("CATNIP"); operationalSet.add("PAUSE");
-        operationalSet.add("FACTOR"); operationalSet.add("ARTIST"); operationalSet.add("iWITH");
+        operationalSet.add("FACTOR"); operationalSet.add("ARTIST"); operationalSet.add("iWITH"); operationalSet.add("DIAMOND");
 
         Set<String> publicSet = new HashSet<>();
         studySubsets.put("Public", publicSet);
@@ -87,14 +107,15 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
     private static Set<String> loadedStudies = new HashSet<>();
     static {
-        loadedStudies.add("Casale");
-        loadedStudies.add("WISP-R");
+        loadedStudies.add("DataFinderTestPublicCasale");
+        loadedStudies.add("DataFinderTestOperationalWISP-R");
     }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, afterTest);
     }
 
     @BeforeClass
@@ -109,7 +130,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Override
     protected BrowserType bestBrowser()
     {
-        return BrowserType.CHROME;
+        return BrowserType.FIREFOX;
     }
 
     @Override
@@ -127,6 +148,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Override
     public boolean needsSetup()
     {
+
         try
         {
             return HttpStatus.SC_NOT_FOUND == WebTestHelper.getHttpGetResponse(WebTestHelper.buildURL("project", getProjectName(), "begin"));
@@ -143,17 +165,78 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         containerHelper.createProject(getProjectName(), "Custom");
         containerHelper.enableModule(MODULE_NAME);
+        goToProjectHome();
         ListHelper listHelper = new ListHelper(this);
         listHelper.importListArchive(listArchive);
-        goToProjectHome();
-        new PortalHelper(this).addWebPart(WEB_PART_NAME);
 
         for (String studyAccession : loadedStudies)
         {
-            File studyArchive = TestFileUtils.getSampleData(studyAccession + ".folder.zip");
-            containerHelper.createSubfolder(getProjectName(), studyAccession, "Study");
-            importStudyFromZip(studyArchive, true, true);
+            createStudy(studyAccession);
         }
+        createStudy(PUBLIC_STUDY_NAME);
+        createStudy(OPERATIONAL_STUDY_NAME);
+        goToProjectHome();
+        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
+        queryUpdatePage.setStudyContainers(loadedStudies, "/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+        goToProjectHome();
+        PublicationsQueryUpdatePage pubUpdatePage = new PublicationsQueryUpdatePage(this);
+        pubUpdatePage.setPermissionsContainer("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+
+        createUsers();
+
+        List<ModulePropertyValue> propList = new ArrayList<>();
+        propList.add(new ModulePropertyValue("TrialShare", "/" + getProjectName(), "DataFinderCubeContainer", getProjectName()));
+        setModuleProperties(propList);
+
+        goToProjectHome();
+        new PortalHelper(this).addWebPart(WEB_PART_NAME);
+    }
+
+    private void createStudy(String name)
+    {
+        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
+
+        File studyArchive = TestFileUtils.getSampleData(name + ".folder.zip");
+        containerHelper.createSubfolder(getProjectName(), name, "Study");
+        importStudyFromZip(studyArchive, true, true);
+    }
+
+    private void createUsers()
+    {
+        log("Creating users and setting permisisons");
+        goToProjectHome();
+
+        _userHelper.createUser(PUBLIC_READER);
+        _userHelper.createUser(CASALE_READER);
+        _userHelper.createUser(WISPR_READER);
+
+        PermissionsEditor permissionsEditor = new PermissionsEditor(this);
+
+        goToProjectHome();
+        clickAdminMenuItem("Folder", "Permissions");
+        permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
+
+        goToProjectHome();
+        openFolderMenu();
+        clickFolder("DataFinderTestPublicCasale");
+        clickAdminMenuItem("Folder", "Permissions");
+        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+        permissionsEditor.setUserPermissions(CASALE_READER, "Reader");
+        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+
+        goToProjectHome();
+        openFolderMenu();
+        clickFolder(PUBLIC_STUDY_NAME);
+        clickAdminMenuItem("Folder", "Permissions");
+        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+
+        goToProjectHome();
+        openFolderMenu();
+        clickFolder("DataFinderTestOperationalWISP-R");
+        clickAdminMenuItem("Folder", "Permissions");
+        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+
     }
 
     @Before
@@ -188,7 +271,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Test
     public void testStudyCards()
     {
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
 
         List<DataFinderPage.DataCard> studyCards = finder.getDataCards();
 
@@ -198,7 +281,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Test
     public void testStudySubset()
     {
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
 
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         Set<String> linkedStudyNames = new HashSet<>();
@@ -216,8 +299,66 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
             linkedStudyNames.addAll(getTexts(Locator.tagWithClass("div", "labkey-study-card").withPredicate(Locator.linkWithText("go to study"))
                     .append(Locator.tagWithClass("span", "labkey-study-card-short-name")).findElements(getDriver())));
         }
+    }
 
-        assertEquals("Wrong studies have LabKey study links", loadedStudies, linkedStudyNames);
+    @Test
+    public void testPublicAccess()
+    {
+        goToProjectHome();
+        impersonate(PUBLIC_READER);
+        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        Assert.assertFalse("Public user should not see the visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        List<DataFinderPage.DataCard> cards = finder.getDataCards();
+        Assert.assertEquals("Number of studies not as expected", studySubsets.get("Public").size(), cards.size());
+        stopImpersonating();
+        doAndWaitForPageSignal(() -> goToProjectHome(), DataFinderPage.COUNT_SIGNAL);
+
+        Assert.assertTrue("Admin user should see visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+
+        doAndWaitForPageSignal(() -> impersonate(CASALE_READER), DataFinderPage.COUNT_SIGNAL);
+        Assert.assertFalse("User with access to only Casale study should not see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        cards = finder.getDataCards();
+        Assert.assertEquals("User with access to only Casale study should see only that study", 1, cards.size());
+        stopImpersonating();
+    }
+
+    @Test
+    public void testOperationalAccess()
+    {
+        goToProjectHome();
+        impersonate(WISPR_READER);
+        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        Assert.assertTrue("Operational user should visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
+        List<DataFinderPage.DataCard> cards = finder.getDataCards();
+        Assert.assertEquals("User with access to only WISP-R study should see only that study", 1, cards.size());
+        stopImpersonating();
+    }
+
+
+    @Test
+    public void testDataFinderRelocation()
+    {
+        log("Test that we can put the data finder in a project other than the one with the cube definition and lists");
+        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
+        containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, false);
+        containerHelper.createProject(RELOCATED_DATA_FINDER_PROJECT, "Custom");
+        containerHelper.addCreatedProject(RELOCATED_DATA_FINDER_PROJECT);
+        containerHelper.enableModule(MODULE_NAME);
+        List<ModulePropertyValue> propList = new ArrayList<>();
+        propList.add(new ModulePropertyValue("TrialShare", "/" + RELOCATED_DATA_FINDER_PROJECT, "DataFinderCubeContainer", getProjectName()));
+        setModuleProperties(propList);
+
+        goToProjectHome(RELOCATED_DATA_FINDER_PROJECT);
+        new PortalHelper(this).addWebPart(WEB_PART_NAME);
+        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
+        Assert.assertTrue("Should see the visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
+        Assert.assertEquals("Should see all the study cards", 12, finder.getDataCards().size());
+        goToProjectHome();
     }
 
     @Test
@@ -256,12 +397,12 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         expectedCounts.put(DataFinderPage.Dimension.STUDIES, 0);
         expectedCounts.put(DataFinderPage.Dimension.SUBJECTS, 0);
 
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
-        facets.toggleFacet(DataFinderPage.Dimension.ASSAY, "ELISA");
+        facets.toggleFacet(DataFinderPage.Dimension.ASSAY, "Elispot");
 
-
+        facets = finder.getFacetsGrid();
         List<DataFinderPage.DataCard> filteredStudyCards = finder.getDataCards();
         assertEquals("Study cards visible after selection", 0, filteredStudyCards.size());
 
@@ -285,7 +426,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Ignore("Search not implemented")
     public void testSearch()
     {
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
 
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
@@ -306,7 +447,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Test
     public void testStudySummaryWindow()
     {
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
 
         DataFinderPage.DataCard studyCard = finder.getDataCards().get(0);
 
@@ -315,9 +456,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertEquals("Study card does not match summary (Accession)", studyCard.getStudyAccession().toLowerCase(), summaryWindow.getAccession().toLowerCase());
         assertEquals("Study card does not match summary (Short Name)", studyCard.getStudyShortName().toLowerCase(), summaryWindow.getShortName().toLowerCase());
         assertEquals("Study card does not match summary (Title)", studyCard.getTitle().toUpperCase(), summaryWindow.getTitle().toUpperCase());
-//        String cardPI = studyCard.getStudyPI();
-//        String summaryPI = summaryWindow.getStudyPI();
-//        assertTrue("Study card does not match summary (studyPI)", summaryPI.contains(cardPI));
 
         summaryWindow.closeWindow();
     }
@@ -346,32 +484,72 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertEquals("Participant counts in study finder don't match LabKey studies", finderParticipantCounts, studyParticipantCounts);
     }
 
+    @Ignore("Flaky test")
     @Test
     public void testStudyCardStudyLinks()
     {
+        goToProjectHome();
         Set<String> foundNames = new HashSet<>();
         for (String name :  loadedStudies)
         {
             DataFinderPage finder = new DataFinderPage(this, true);
             DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
-            if (studySubsets.get("Operational").contains(name))
-                facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
+            finder.clearAllFilters();
+            if (name.contains("Operational"))
+                doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational"), DataFinderPage.COUNT_SIGNAL);
             else
-                facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
+                doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public"), DataFinderPage.COUNT_SIGNAL);
             for (DataFinderPage.DataCard studyCard : finder.getDataCards())
             {
-                if (studyCard.getStudyShortName().equals(name))
+                if (name.contains(studyCard.getStudyShortName()))
                 {
+                    log("Going to study " + name);
+                    String shortName = studyCard.getStudyShortName();
                     foundNames.add(name);
                     studyCard.clickGoToStudy();
+                    log("Switching to window " + foundNames.size());
+                    switchToWindow(foundNames.size());
                     WebElement title = Locator.css(".labkey-folder-title > a").waitForElement(shortWait());
-                    Assert.assertTrue("Study card " + name + " linked to wrong study", title.getText().contains(name));
-                    goBack();
+                    Assert.assertTrue("Study card " + name + " linked to wrong study", title.getText().contains(shortName));
+                    switchToMainWindow();
                     break; // we've found it so we don't need to look further
                 }
             }
         }
         assertEquals("Didn't find all studies", loadedStudies, foundNames);
+    }
+
+    @Test
+    public void testGoToStudyMenu()
+    {
+        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
+        log("Filtering to show DIAMOND card with two study containers");
+        facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
+        doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.CONDITION, "Lupus Nephritis"), DataFinderPage.COUNT_SIGNAL);
+        List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
+        Assert.assertEquals("Should have a single data card at this point", 1, dataCards.size());
+        DataFinderPage.DataCard card = dataCards.get(0);
+        Assert.assertEquals("DIAMOND", card.getStudyShortName());
+        log("Go to operational study");
+        card.clickGoToStudy("/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+    }
+
+    @Test
+    public void testGoToStudyNoMenuForPublicReader()
+    {
+        log("Impersonating public reader who should see only one go to study link");
+        impersonate(PUBLIC_READER);
+        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
+        log("Filtering to show DIAMOND card");
+        doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.CONDITION, "Lupus Nephritis"), DataFinderPage.COUNT_SIGNAL);
+        List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
+        Assert.assertEquals("Should have a single data card at this point", 1, dataCards.size());
+        DataFinderPage.DataCard card = dataCards.get(0);
+        Assert.assertEquals("DIAMOND", card.getStudyShortName());
+        card.clickGoToStudy();
+        stopImpersonating();
     }
 
     @Test
@@ -381,7 +559,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage finder = new DataFinderPage(this, true);
         DataFinderPage.FacetGrid facetsGrid = finder.getFacetsGrid();
         facetsGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
 
         Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
         clickTab("Manage");
@@ -425,7 +602,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         facetGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
 
         Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        DataFinderPage.goDirectlyToPage(this, getProjectName(), true);
+        goDirectlyToDataFinderPage(getDriver(), getProjectName(), true);
         assertEquals("WebPart study finder filter didn't get applied", selections, finder.getFacetsGrid().getSelectedMembers());
     }
 
@@ -530,11 +707,11 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     {
         DataFinderPage finder = new DataFinderPage(this, true);
         log("Start at home.");
-        goToProjectHome();
-        assertElementVisible(DataFinderPage.Locators.studyFinder);
-        log("Click the 'Publications' button.");
+        doAndWaitForPageSignal(() -> goToProjectHome(), DataFinderPage.COUNT_SIGNAL);
+        waitForElement(DataFinderPage.Locators.studyFinder);
+        log("Click the 'Publications' tab");
         finder.navigateToPublications();
-        log("Go back by clicking the 'Studies' button");
+        log("Go back by clicking the 'Studies' tab");
         finder.navigateToStudies();
     }
 
@@ -546,7 +723,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         String cardText;
         Map<String, Integer> counts;
 
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), false);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), false);
 
         log("Go to publications and clear any filters that may have been set.");
         finder.navigateToPublications();
@@ -554,7 +731,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Filter for 'In Progress' only publications.");
         DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
-        fg.toggleFacet(DataFinderPage.Dimension.STATUS, "In Progress");
+        doAndWaitForPageSignal(() -> fg.toggleFacet(DataFinderPage.Dimension.STATUS, "In Progress"), DataFinderPage.COUNT_SIGNAL);
 
         log("Validate that the number, content and style of the cards is as expected.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.IN_PROGRESS);
@@ -577,11 +754,29 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Validate counts for 'Complete' publications.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.COMPLETE);
-        assertEquals("Expected count after filtering for 'Complete' was not as expected.", 127, counts.get("Complete").intValue());
+        // one is "in progress" and one is set to not show
+        assertEquals("Expected count after filtering for 'Complete' was not as expected.", 126, counts.get("Complete").intValue());
 
         log("Validate that there are no 'In Progress' cards visible.");
         assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardHighlight);
 
+    }
+
+    @Test
+    public void testPublicationStatusForReader()
+    {
+        impersonate(PUBLIC_READER);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), false);
+        log("Go to publications and clear any filters that may have been set.");
+        finder.navigateToPublications();
+        finder.clearAllFilters();
+        Map<DataFinderPage.Dimension, Integer> summaryCount = finder.getSummaryCounts();
+        DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
+        Assert.assertFalse("Status facet should not be present for someone with only read permission", fg.facetIsPresent(DataFinderPage.Dimension.STATUS));
+
+        // one publication has "show on dash" set to false; one publication is "in progress" and thus not visible to the public
+        Assert.assertEquals("Publication count should not count incomplete publications", (Integer) 126, summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS));
+        stopImpersonating();
     }
 
     @Test
@@ -590,40 +785,43 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage.FacetGrid fg;
         Map<DataFinderPage.Dimension, Integer> summaryCount;
 
-        DataFinderPage finder = DataFinderPage.goDirectlyToPage(this, getProjectName(), false);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getDriver(), getProjectName(), false);
 
         log("Go to publications and clear any filters that may have been set.");
         finder.navigateToPublications();
         finder.clearAllFilters();
 
-        log("Filter for a publication that has DOI, PMDI and PMCID values.");
+        log("Filter for a publication that has DOI, PMID and PMCID values.");
         fg = finder.getFacetsGrid();
-        fg.toggleFacet(DataFinderPage.Dimension.YEAR, "2011");
-        fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_JOURNAL, "Arthritis Rheum.");
+        doAndWaitForPageSignal(() -> fg.toggleFacet(DataFinderPage.Dimension.STATUS, "In Progress"), DataFinderPage.COUNT_SIGNAL);
+
 
         summaryCount = finder.getSummaryCounts();
         assertTrue("Number of publication cards returned does not match dimension count. Number of cards: " + finder.getDataCards().size() + " Count in dimension: " + summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS), summaryCount.get(DataFinderPage.Dimension.PUBLICATIONS) == finder.getDataCards().size());
 
         log("Click the 'More Details' and validate that the detail content is as expected.");
         DataFinderPage.DataCard card = finder.getDataCards().get(0);
-        PublicationPanel detailPanel = card.viewDetail();
+        PublicationPanel publicationPanel = card.viewDetail();
 
-        assertTrue("Author value not as expected on detail page: " + detailPanel.getAuthor(), detailPanel.getAuthor().contains("Monach PA, Tomasson G, Specks U, Stone JH, Cuthbertson D"));
-        assertTrue("Title value not as expected on detail page:" + detailPanel.getTitle(), detailPanel.getTitle().contains("Circulating markers of vascular injury and angiogenesis in Antineutrophil Cytoplasmic Antibody-Associated Vasculitis."));
-        assertTrue("Citation value not as expected on detail page:" + detailPanel.getCitation(), detailPanel.getCitation().contains("Arthritis Rheum 63: 3988-3997, 2011"));
-        assertTrue("PMID value not as expected on detail page:" + detailPanel.getPMID(), detailPanel.getPMID().contains("21953143"));
-        assertTrue("PMCID value not as expected on detail page:" + detailPanel.getPMCID(), detailPanel.getPMCID().contains("PMC3227746"));
-        assertTrue("DOI value not as expected on detail page:" + detailPanel.getDOI(), detailPanel.getDOI().contains("10.1002/ART.30615"));
-        assertTrue("Studies value not as expected on detail page:" + detailPanel.getStudyShortName(), detailPanel.getStudyShortName().contains("RAVE"));
+        assertTrue("Author value not as expected on detail page: " + publicationPanel.getAuthor(), publicationPanel.getAuthor().contains("Monach PA, Tomasson G, Specks U, Stone JH, Cuthbertson D"));
+        assertTrue("Title value not as expected on detail page:" + publicationPanel.getTitle(), publicationPanel.getTitle().contains("Circulating markers of vascular injury and angiogenesis in Antineutrophil Cytoplasmic Antibody-Associated Vasculitis."));
+        assertTrue("Citation value not as expected on detail page:" + publicationPanel.getCitation(), publicationPanel.getCitation().contains("Arthritis Rheum 63: 3988-3997, 2011"));
+        assertTrue("PMID value not as expected on detail page:" + publicationPanel.getPMID(), publicationPanel.getPMID().contains("21953143"));
+        assertTrue("PMCID value not as expected on detail page:" + publicationPanel.getPMCID(), publicationPanel.getPMCID().contains("PMC3227746"));
+        assertTrue("DOI value not as expected on detail page:" + publicationPanel.getDOI(), publicationPanel.getDOI().contains("10.1002/ART.30615"));
+        assertTrue("Studies value not as expected on detail page:" + publicationPanel.getStudyShortName(), publicationPanel.getStudyShortName().contains("RAVE"));
 
+        card = finder.getDataCards().get(0);
         card.hideDetail();
-        Assert.assertFalse("Author value not as expected in collapsed view", detailPanel.getAuthor().contains("Cuthbertson"));
-        Assert.assertFalse("PMID should not be displayed in collapsed view", detailPanel.isPMIDDisplayed());
-        Assert.assertFalse("PMCID should not be displayed in collapsed view", detailPanel.isPMCIDDisplayed());
+        publicationPanel = new PublicationPanel(this);
+        Assert.assertFalse("Author value not as expected in collapsed view", publicationPanel.getAuthor().contains("Cuthbertson"));
+        Assert.assertFalse("PMID should not be displayed in collapsed view", publicationPanel.isPMIDDisplayed());
+        Assert.assertFalse("PMCID should not be displayed in collapsed view", publicationPanel.isPMCIDDisplayed());
 
         // open it up again and make sure we have only one copy of the fields
+        card = finder.getDataCards().get(0);
         card.viewDetail();
-        Assert.assertEquals("Should still have just one PMID", 1, detailPanel.getPMIDCount());
+        Assert.assertEquals("Should still have just one PMID", 1, publicationPanel.getPMIDCount());
 
 
         log("Go to another publication that doesn't have the same type of detail.");
@@ -639,19 +837,20 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Show details, this time validate that the missing values are rendered as expected.");
         card = finder.getDataCards().get(0);
-        detailPanel = card.viewDetail();
+        publicationPanel = card.viewDetail();
 
-        assertTrue("Author value not as expected on detail page:" + detailPanel.getAuthor(), detailPanel.getAuthor().contains("Ytterberg SR, Mueller M, Sejismundo LP, Mieras K, Stone JH."));
-        assertTrue("Title value not as expected on detail page.", detailPanel.getTitle().contains("Efficacy of Remission-Induction Regimens for ANCA-Associated Vasculitis"));
-        assertTrue("Citation value not as expected on detail page.", detailPanel.getCitation().contains("New Eng J Med 2013; 369:417-427"));
-        assertTrue("PMID value not as expected on detail page.", detailPanel.getPMID().contains("23902481"));
-        assertTrue("PMCID value not as expected on detail page.", detailPanel.getPMCID().contains(""));
-        assertTrue("DOI value not as expected on detail page.", detailPanel.getDOI().contains(""));
-        assertTrue("Studies value not as expected on detail page.", detailPanel.getStudyShortName().contains("RAVE"));
+        assertTrue("Author value not as expected on detail page:" + publicationPanel.getAuthor(), publicationPanel.getAuthor().contains("Ytterberg SR, Mueller M, Sejismundo LP, Mieras K, Stone JH."));
+        assertTrue("Title value not as expected on detail page.", publicationPanel.getTitle().contains("Efficacy of Remission-Induction Regimens for ANCA-Associated Vasculitis"));
+        assertTrue("Citation value not as expected on detail page.", publicationPanel.getCitation().contains("New Eng J Med 2013; 369:417-427"));
+        assertTrue("PMID value not as expected on detail page.", publicationPanel.getPMID().contains("23902481"));
+        assertTrue("PMCID value not as expected on detail page.", publicationPanel.getPMCID().contains(""));
+        assertTrue("DOI value not as expected on detail page.", publicationPanel.getDOI().contains(""));
+        assertTrue("Studies value not as expected on detail page.", publicationPanel.getStudyShortName().contains("RAVE"));
 
+        card = finder.getDataCards().get(0);
         card.hideDetail();
-
     }
+
 
     @LogMethod(quiet = true)
     private void assertCountsSynced(DataFinderPage finder)
@@ -662,4 +861,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertEquals("Study count mismatch", studyCards.size(), studyCounts.get(DataFinderPage.Dimension.STUDIES).intValue());
     }
 
+
+    private DataFinderPage goDirectlyToDataFinderPage(WebDriver test, String containerPath, boolean testingStudies)
+    {
+        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
+        return new DataFinderPage(this, testingStudies);
+    }
 }

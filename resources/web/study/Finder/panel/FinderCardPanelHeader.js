@@ -27,6 +27,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
 
         this.subsets = Ext4.create('LABKEY.study.store.Subsets', {
             dataModuleName : this.dataModuleName,
+            cubeContainerPath: this.cubeContainerPath,
             objectName: this.objectName
         });
         this.items = [];

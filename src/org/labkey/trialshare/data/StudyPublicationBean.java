@@ -23,9 +23,12 @@ import org.labkey.api.reports.ReportService;
 import org.labkey.api.reports.model.ViewCategory;
 import org.labkey.api.reports.report.view.ReportUtil;
 import org.labkey.api.security.User;
+import org.labkey.api.security.permissions.InsertPermission;
+import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.ViewContext;
+import org.labkey.trialshare.query.TrialShareQuerySchema;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +36,8 @@ import java.util.List;
 
 public class StudyPublicationBean
 {
+    public static final String FIGURES_CATEGORY_TEXT = "Manuscript Figures";
+
     private static final int AUTHORS_PER_ABBREV = 3;
 
     // common fields
@@ -48,55 +53,19 @@ public class StudyPublicationBean
     private String title;
     private String year;
     private String abstractText;
+    private String citation;
     private String status;
     private String dataUrl;
     private List<StudyBean> studies;
     private Boolean isHighlighted = false;
     private String publicationType;
+    private String permissionsContainer;
     private List<URLData> thumbnails;
     private String manuscriptContainer;
     private String keywords;
-
-    public static class URLData
-    {
-        Integer _index;
-        String _link;
-        String _linkText;
-
-        public Integer getIndex()
-        {
-            return _index;
-        }
-
-        public void setIndex(Integer index)
-        {
-            _index = index;
-        }
-
-        public String getLink()
-        {
-            return _link;
-        }
-
-        public void setLink(String link)
-        {
-            _link = link;
-        }
-
-        public String getLinkText()
-        {
-            return _linkText;
-        }
-
-        public void setLinkText(String linkText)
-        {
-            _linkText = linkText;
-        }
-    }
-
+    private Boolean show;
     private List<URLData> urls = new ArrayList<>();
 
-    private String citation;
 
     public Integer getId()
     {
@@ -113,10 +82,7 @@ public class StudyPublicationBean
         this.id = id;
     }
 
-    public void set_Key(Integer id)
-    {
-        this.id = id;
-    }
+    public void set_Key(Integer id) { this.id = id; } // this is required because for SQLServer we alias "Key" as "_Key" in our query
 
     public String getStudyId()
     {
@@ -424,21 +390,52 @@ public class StudyPublicationBean
         context.setContainer(container);
         context.setUser(user);
         context.setActionURL(actionURL);
+
+        List<ViewCategory> figureCategories = getFigureReportCategories(user, container);
+
         for (Report report : ReportService.get().getReports(user, container))
         {
             ViewCategory category = report.getDescriptor().getCategory();
 
-            if (category != null && category.getLabel().contains("Manuscript Figures"))
+            if (figureCategories.contains(category))
             {
                 URLHelper urlHelper = ReportUtil.getThumbnailUrl(container, report);
+
                 if (urlHelper != null)
                 {
                     URLData urlData = new URLData();
                     urlData.setLinkText(urlHelper.toString());
                     urlData.setLink(report.getRunReportURL(context).toString());
+                    urlData.setTitle(report.getDescriptor().getReportName());
                     thumbnails.add(urlData);
                 }
             }
+        }
+    }
+
+    public List<ViewCategory> getFigureReportCategories(User user, Container container)
+    {
+        List<ViewCategory> categories = new ArrayList<>();
+
+        for (Report report : ReportService.get().getReports(user, container))
+        {
+            ViewCategory category = report.getDescriptor().getCategory();
+
+            if (category != null && category.getLabel().contains(FIGURES_CATEGORY_TEXT))
+            {
+                addCategories(category, categories);
+                break;
+            }
+        }
+        return categories;
+    }
+
+    public void addCategories(ViewCategory category, List<ViewCategory> categories)
+    {
+        categories.add(category);
+        for (ViewCategory subcategory : category.getSubcategories())
+        {
+            addCategories(subcategory, categories);
         }
     }
 
@@ -450,5 +447,56 @@ public class StudyPublicationBean
     public void setKeywords(String keywords)
     {
         this.keywords = keywords;
+    }
+
+    public String getPermissionsContainer()
+    {
+        return permissionsContainer;
+    }
+
+    public void setPermissionsContainer(String permissionsContainer)
+    {
+        this.permissionsContainer = permissionsContainer;
+    }
+
+    public Boolean getShow()
+    {
+        return show;
+    }
+
+    public void setShow(Boolean show)
+    {
+        this.show = show;
+    }
+
+    public Boolean inProgress()
+    {
+        return getStatus().equalsIgnoreCase(TrialShareQuerySchema.IN_PROGRESS_STATUS);
+    }
+
+    public String getCubeId()
+    {
+        return "[Publication].[" + getId() + "]";
+    }
+
+    public boolean hasPermission(User user)
+    {
+        Boolean inProgress = inProgress();
+        if (getPermissionsContainer() == null)
+            return !inProgress;
+        else
+        {
+            Container permissionsContainer = ContainerManager.getForId(getPermissionsContainer());
+            if (permissionsContainer == null)
+                return !inProgress;
+            else if (inProgress)
+            {
+                if (permissionsContainer.hasPermission(user, InsertPermission.class))
+                    return true;
+            }
+            else if (permissionsContainer.hasPermission(user, ReadPermission.class))
+                return true;
+        }
+        return false;
     }
 }

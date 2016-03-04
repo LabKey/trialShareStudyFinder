@@ -33,7 +33,7 @@ Ext4.define('LABKEY.study.store.Subsets', {
     },
 
     constructor: function(config) {
-        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "subsets.api", LABKEY.containerPath, {objectName: config.objectName});
+        this.proxy.url = LABKEY.ActionURL.buildURL(config.dataModuleName, "subsets.api", config.cubeContainerPath, {objectName: config.objectName});
         this.callParent(config);
     }
 });

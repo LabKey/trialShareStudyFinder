@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
 Ext4.define('LABKEY.study.panel.FinderCardDeck', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.tab.Panel',
 
     alias: 'widget.labkey-data-finder-card-deck',
 
@@ -14,14 +14,16 @@ Ext4.define('LABKEY.study.panel.FinderCardDeck', {
 
     border: false,
 
+    bubbleEvents: ['detailsChange'],
+
     initComponent : function() {
 
-        this.width = Ext4.getBody().getWidth() - 70;
         this.items = [];
         var activeIndex = 0;
         for (var i = 0; i < this.cubeConfigs.length; i++)
         {
             this.items.push(Ext4.create('LABKEY.study.panel.FinderCard', {
+                title: Ext4.htmlEncode(this.cubeConfigs[i].objectNamePlural),
                 dataModuleName: this.dataModuleName,
                 cubeConfig: this.cubeConfigs[i],
                 itemId: this.cubeConfigs[i].objectName + '-finder-card'
@@ -32,7 +34,7 @@ Ext4.define('LABKEY.study.panel.FinderCardDeck', {
 
         this.callParent();
 
-        this.getLayout().setActiveItem(activeIndex);
+        this.setActiveTab(activeIndex);
 
     }
 });

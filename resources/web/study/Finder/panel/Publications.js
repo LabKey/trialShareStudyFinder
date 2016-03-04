@@ -26,18 +26,12 @@ Ext4.define("LABKEY.study.panel.Publications", {
         ];
         this.callParent();
 
-        //this.getCards().store.addListener('filterChange',this.onFilterSelectionChanged, this);
         this.on(
                 {'subsetChanged': this.onSubsetChanged,
                  'searchTermsChanged': this.onSearchTermsChanged
-                 //'filterSelectionChanged': this.onFilterSelectionChanged
                 }
         );
     },
-
-    //onFilterSelectionChanged: function() {
-    //    console.log('filterChange happened!')
-    //},
 
     onSubsetChanged : function(selectedSubset) {
         if (!selectedSubset)
@@ -54,6 +48,7 @@ Ext4.define("LABKEY.study.panel.Publications", {
         if (!this.cardPanelHeader) {
             this.cardPanelHeader = Ext4.create("LABKEY.study.panel.FinderCardPanelHeader", {
                 dataModuleName: this.dataModuleName,
+                cubeContainerPath: this.cubeContainerPath,
                 showSearch : this.showSearch,
                 objectName: this.objectName
             });
@@ -84,7 +79,8 @@ Ext4.define("LABKEY.study.panel.Publications", {
     getCards : function() {
         if (!this.cards) {
             this.cards = Ext4.create("LABKEY.study.panel.PublicationCards", {
-                dataModuleName: this.dataModuleName
+                dataModuleName: this.dataModuleName,
+                cubeContainerPath : this.cubeContainerPath
             });
         }
         return this.cards;

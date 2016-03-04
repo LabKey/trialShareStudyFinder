@@ -22,6 +22,8 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     searchTerms : '',
 
+    bubbleEvents : ['detailsChange'],
+
     initComponent : function() {
 
         this.cls += ' labkey-' +  this.cubeConfig.objectName.toLowerCase() + '-finder-card';
@@ -33,8 +35,6 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
         this.callParent();
 
         this.getCubeDefinition();
-
-        this._initResize();
 
         this.on({
             subsetChanged: this.onSubsetChanged,
@@ -48,6 +48,8 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             configId: this.cubeConfig.configId,
             schemaName: this.cubeConfig.schemaName,
             name: this.cubeConfig.cubeName,
+            container: this.cubeConfig.cubeContainerId,
+            containerPath: this.cubeConfig.cubeContainerPath,
             deferLoad: false
         });
         this.cube.onReady(function (m)
@@ -124,21 +126,6 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
         });
     },
 
-    _initResize : function() {
-        var resize = function(w, h) {
-            LABKEY.ext4.Util.resizeToViewport(this, w, h, 46, 32);
-        };
-
-        Ext4.EventManager.onWindowResize(resize, this);
-
-        this.on('afterrender', function() {
-            Ext4.defer(function() {
-                var size = Ext4.getBody().getBox();
-                resize.call(this, size.width, size.height);
-            }, 300, this);
-        });
-    },
-
     getFacetsPanel: function() {
         if (!this.facetsPanel) {
 
@@ -167,6 +154,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             this.studiesPanel = Ext4.create("LABKEY.study.panel.Studies", {
                 showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
+                cubeContainerPath: this.cubeConfig.cubeContainerPath,
                 region: 'center',
                 flex:4
             });
@@ -179,6 +167,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             this.publicationsPanel = Ext4.create("LABKEY.study.panel.Publications", {
                 showSearch : this.cubeConfig.showSearch,
                 dataModuleName: this.dataModuleName,
+                cubeContainerPath: this.cubeConfig.cubeContainerPath,
                 region: 'center',
                 flex:4
             });
