@@ -54,7 +54,7 @@ public class TrialShareModule extends DefaultModule
     @Override
     public boolean hasScripts()
     {
-        return true;
+        return false;
     }
 
     public TrialShareModule()
