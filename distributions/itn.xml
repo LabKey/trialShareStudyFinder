@@ -13,10 +13,10 @@
     </target>
 
     <target name="gather_modules">
-        <ant antfile="${basedir}/distributions/legacy.xml" target="gather_modules" />
+        <!-- Note: No premium modules! ITN contract requires ONLY open source, community modules. -->
+        <ant antfile="${basedir}/distributions/community.xml" target="gather_modules" />
         <copy todir="${dist.modules.dir}">
             <filelist dir="${staging.modules.dir}">
-                <file name="cloud.module" />
                 <file name="timeline.module" />
                 <file name="trialShare.module" />
             </filelist>
