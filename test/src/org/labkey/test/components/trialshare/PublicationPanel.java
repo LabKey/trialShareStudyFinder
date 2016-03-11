@@ -40,7 +40,12 @@ public class PublicationPanel extends Component
 
     public String getAuthor()
     {
-        return getTextOfElement(Locators.allAuthors);
+        for (WebElement element : Locators.authors.findElements(_test.getDriver()) )
+        {
+            if (element.isDisplayed())
+                return element.getText();
+        }
+        return null;
     }
 
     public String getTitle()
@@ -55,7 +60,7 @@ public class PublicationPanel extends Component
 
     public boolean isPMIDDisplayed()
     {
-        return _test.isElementVisible(Locators.PMID);
+        return _test.isElementPresent(Locators.PMID);
     }
 
     public int getPMIDCount()
@@ -71,7 +76,7 @@ public class PublicationPanel extends Component
 
     public boolean isPMCIDDisplayed()
     {
-        return _test.isElementVisible(Locators.PMCID);
+        return _test.isElementPresent(Locators.PMCID);
     }
     public String getPMCID()
     {
@@ -108,14 +113,13 @@ public class PublicationPanel extends Component
     private static class Locators
     {
         private static Locator.CssLocator publicationCard = Locator.css(".labkey-publication-card");
-        private static Locator.CssLocator allAuthors = publicationCard.append(Locator.css("#fullAuthorList"));
+        private static Locator.CssLocator authors = publicationCard.append(Locator.css(".labkey-publication-author"));
         private static Locator.CssLocator title = publicationCard.append(Locator.css(".labkey-publication-title"));
         private static Locator.CssLocator citation = publicationCard.append(Locator.css(".labkey-publication-citation"));
         private static Locator.XPathLocator PMID = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')]//a[contains(text(), 'PMID')]");
         private static Locator.XPathLocator PMCID = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')]//a[contains(text(), 'PMCID')]");
         private static Locator.XPathLocator DOI = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')]//a[contains(text(), 'DOI')]");
         private static Locator.CssLocator studyShortName = Locator.css(".labkey-study-short-name");
-        private static Locator.CssLocator closeButton = Locator.css(".x4-tool-close");
     }
 
 }

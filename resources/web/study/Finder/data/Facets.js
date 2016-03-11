@@ -82,6 +82,13 @@ Ext4.define('LABKEY.study.store.Facets', {
                     facet.data.selectedMembers = facet.data.members;
                 }
             }
+            facetMembersStore.filter(
+                [
+                    {filterFn: function(item) {
+                        return item.get("facet").get("displayFacet");
+                    }}
+                ]
+            );
             facetMembersStore.sort();
             this.updateCountsAsync(false);
         }
@@ -105,6 +112,33 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     },
 
+    getCountDistinctFilters: function(filters) {
+        var newFilters = this.getStudySubsetFilter();
+        if (newFilters != null)
+            filters.push(newFilters);
+        newFilters = this.getCustomFilters();
+        if (newFilters != null)
+            filters.push(newFilters);
+        return filters;
+    },
+
+    getCustomFilters: function()
+    {
+        return null;
+    },
+
+    getValidFacetMemberSubset : function(possibleMembers)
+    {
+        var validMembers = [];
+        var facetMemberStore = Ext4.getStore(this.cubeConfig.objectName + "FacetMembers");
+        for (var i = 0; i < possibleMembers.length; i++)
+        {
+            if (facetMemberStore.getById(possibleMembers[i]))
+                validMembers.push(possibleMembers[i]);
+        }
+        return validMembers;
+    },
+
     updateCountsAsync: function (isSavedGroup)
     {
         if (!this.isLoaded || !this.mdx)
@@ -113,16 +147,42 @@ Ext4.define('LABKEY.study.store.Facets', {
             return;
         }
 
-        var facetStore = this;
-        var intersectFilters = [];
-        var i, f, facet;
+        var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "accessibleMembers.api", null, {
+            "objectName": this.cubeConfig.objectName
+        });
+        Ext4.Ajax.request({
+            url: url,
+            success: function (response)
+            {
+                var o = Ext4.decode(response.responseText);
+                if (o.success)
+                {
+                    var filters = [];
+                    for (var level in o.data)
+                    {
+                        if (o.data[level].length)
+                        {
+                            filters.push({
+                                level: level,
+                                members: o.data[level]
+                            })
+                        }
+                    }
+                    this.makeCountDistinctQuery(filters);
+                }
 
-        var filter = this.getStudySubsetFilter();
-        if (filter)
-            intersectFilters.push(filter);
-        for (f = 0; f < facetStore.count(); f++)
+            },
+            scope: this
+        });
+    },
+
+    makeCountDistinctQuery: function(intersectFilters)
+    {
+        this.getCountDistinctFilters(intersectFilters);
+        var i, f, facet;
+        for (f = 0; f < this.count(); f++)
         {
-            facet = facetStore.getAt(f);
+            facet = this.getAt(f);
             var selectedMembers = facet.get("selectedMembers");
             if (facet.get("name") == this.cubeConfig.objectName)
             {
@@ -181,9 +241,9 @@ Ext4.define('LABKEY.study.store.Facets', {
 
         var onRows = { operator: "UNION", arguments: [] };
         onRows.arguments.push({level: this.cubeConfig.filterByLevel});
-        for (f = 0; f < facetStore.count(); f++)
+        for (f = 0; f < this.count(); f++)
         {
-            facet = facetStore.getAt(f);
+            facet = this.getAt(f);
             if (facet.get("name") == "Subject")
                 onRows.arguments.push({level: facet.data.hierarchy.levels[0].uniqueName});
             else if (facet.get("name") == this.cubeConfig.objectName )
@@ -200,10 +260,12 @@ Ext4.define('LABKEY.study.store.Facets', {
             "sql": true,
             configId: this.cubeConfig.configId,
             schemaName: this.cubeConfig.schemaName,
+            container: this.cubeConfig.cubeContainerId,
+            containerPath : this.cubeConfig.cubeContainerPath,
             name: this.cubeConfig.name,
             success: function (cellSet, mdx, config)
             {
-                this.updateCountsUnion(cellSet, isSavedGroup);
+                this.updateCountsUnion(cellSet);
                 //this.fireEvent("cubeReady");
             },
             scope: this,
@@ -211,6 +273,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             // query
             onRows: onRows,
             countFilter: filters,
+            includeNullMemberInCount: false,
             countDistinctLevel: this.cubeConfig.countDistinctLevel
         };
         this.mdx.query(config);
@@ -227,7 +290,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     },
 
     /* handle query response to update all the member counts with all filters applied */
-    updateCountsUnion : function (cellSet, isSavedGroup)
+    updateCountsUnion : function (cellSet)
     {
         var facet, member, f, m;
         // map from hierarchyName to facet
@@ -254,36 +317,31 @@ Ext4.define('LABKEY.study.store.Facets', {
         {
             var resultMember = positions[i];
             var hierarchyName = resultMember.level.hierarchy.uniqueName;
-            //if (resultMember.data.level.uniqueName == "[Subject].[Subject]")
-            //{
-            //    this.subjects.push(resultMember.data.name);
-            //}
-            //else
+
+            facet = map[hierarchyName];
+            var count = data[i];
+            member = facetMembersStore.getById(resultMember.uniqueName);
+            if (facet.get("name") == this.cubeConfig.objectName)
             {
-                facet = map[hierarchyName];
-                var count = data[i];
-                member = facetMembersStore.getById(resultMember.uniqueName);
-                if (facet.get("name") == this.cubeConfig.objectName)
-                {
-                    selectedMembers[resultMember.name] = resultMember;
-                    facet.data.selectedMembers.push(resultMember);
-                }
-                else if (!member)
-                {
-                    // might be an all member
-                    //if (facet.data.allMemberName == resultMember.uniqueName)
-                    //    facet.data.allMemberCount = count;
-                    //else
-                    if (-1 == resultMember.uniqueName.indexOf("#") && "(All)" != resultMember.name)
-                        console.log("member not found: " + resultMember.uniqueName);
-                }
-                else
-                {
-                    member.set("count", count);
-                    if (count > max)
-                        max = count;
-                }
+                selectedMembers[resultMember.name] = resultMember;
+                facet.data.selectedMembers.push(resultMember);
             }
+            else if (!member)
+            {
+                // might be an all member
+                //if (facet.data.allMemberName == resultMember.uniqueName)
+                //    facet.data.allMemberCount = count;
+                //else
+                if (-1 == resultMember.uniqueName.indexOf("#") && "(All)" != resultMember.name)
+                    console.log("member not found: " + resultMember.uniqueName);
+            }
+            else if (facet.get("displayFacet"))
+            {
+                member.set("count", count);
+                if (count > max)
+                    max = count;
+            }
+
         }
 
         for (f = 0; f < facetStore.count(); f++)

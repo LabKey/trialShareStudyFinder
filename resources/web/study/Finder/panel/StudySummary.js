@@ -14,31 +14,17 @@ Ext4.define("LABKEY.study.panel.StudySummary", {
             '           <ul>',
             '               <li class="labkey-facet-member">',
             '                   <span class="labkey-facet-member-name">Studies</span>',
-            '                   <span id="memberCount" class="labkey-facet-member-count">{studyCount:this.getStudyCount}</span>',
+            '                   <span id="memberCount" class="labkey-facet-member-count">{studyCount:this.formatNumber}</span>',
             '               </li>',
             '               <li class="labkey-facet-member">',
             '                   <span class="labkey-facet-member-name">Subjects</span>',
-            '                   <span id="participantCount" class="labkey-facet-member-count">{participantCount:this.getParticipantCount}</span>',
+            '                   <span id="participantCount" class="labkey-facet-member-count">{participantCount:this.formatNumber}</span>',
             '               </li>',
             '           </ul>',
             '       </div>',
             '</div>',
             {
                 formatNumber :  Ext4.util.Format.numberRenderer('0,000'),
-
-                getStudyCount : function(defaultValue) {
-                    var studyStore = Ext4.getStore("Study");
-                    if (!studyStore)
-                        return this.formatNumber(defaultValue);
-                    return this.formatNumber(studyStore.count());
-                },
-
-                getParticipantCount: function(defaultValue) {
-                    var studyStore = Ext4.getStore("Study");
-                    if (!studyStore)
-                        return this.formatNumber(defaultValue);
-                    return this.formatNumber(studyStore.sum("participantCount"));
-                }
             }
     ),
 
@@ -49,10 +35,14 @@ Ext4.define("LABKEY.study.panel.StudySummary", {
 
     initComponent: function() {
         Ext4.getStore(this.objectName).addListener('filterChange',this.onFilterSelectionChanged, this);
+        Ext4.getStore(this.objectName).addListener('load', this.onFilterSelectionChanged, this);
         this.callParent();
     },
 
     onFilterSelectionChanged : function() {
-        this.update();
+        this.update( {
+            studyCount : Ext4.getStore("Study").count(),
+            participantCount :  Ext4.getStore("Study").sum("participantCount")
+        });
     }
 });

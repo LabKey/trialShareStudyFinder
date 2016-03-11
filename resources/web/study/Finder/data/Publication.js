@@ -11,9 +11,9 @@ Ext4.define('LABKEY.study.data.Publication', {
     fields : [
         {name: 'id', type:'int'},
         {name: 'studyId'},
-        {name: 'pmid'}, // PubMed Id
+        {name: 'pmid'},     // PubMed Id
         {name: 'pmcid'},    // PubMed Central reference number
-        {name: 'doi'},
+        {name: 'doi'},      // Digital Object Identifier
         {name: 'author'},
         {name: 'authorAbbrev'},
         {name: 'issue'},
@@ -25,11 +25,16 @@ Ext4.define('LABKEY.study.data.Publication', {
         {name: 'status'},
         {name: 'url'},
         {name: 'dataUrl'},
+        {name: 'studies'},
         {name: 'publicationType'},
         {name: 'isSelected', type: 'boolean', defaultValue: true},
         {name: 'isHighlighted', type: 'boolean', defaultValue: false},
         {name: 'abstractText'},
-        {name: 'keywords'}
+        {name: 'keywords'},
+        {name: 'viewState', type: 'string', defaultValue: 'collapsed'},
+        {name: 'thumbnails'},
+        {name: 'keywords'},
+        {name: 'urls'}
     ]
 
 });

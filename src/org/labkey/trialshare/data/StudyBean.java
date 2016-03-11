@@ -15,24 +15,27 @@
  */
 package org.labkey.trialshare.data;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerFilter;
 import org.labkey.api.data.ContainerFilterable;
 import org.labkey.api.data.ContainerManager;
+import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
 import org.labkey.api.query.DefaultSchema;
+import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
+import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.wiki.WikiRendererType;
 import org.labkey.api.wiki.WikiService;
+import org.labkey.trialshare.query.TrialShareQuerySchema;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,13 +61,12 @@ public class StudyBean
     private String visibility;
     private Boolean isPublic = false;
     private Integer participantCount;
+    private List<StudyAccess> _studyAccessList = new ArrayList<>();
 
     private List<StudyPersonnelBean> personnel;
-    private List<StudyPublicationBean> publications;
+    private List<StudyPublicationBean> publications = new ArrayList<>();
     private Integer manuscriptCount;
     private Integer abstractCount;
-
-    public final static String studyIdField = "StudyId";
 
 
     public String getStudyId()
@@ -157,6 +159,26 @@ public class StudyBean
         this.publications = publications;
     }
 
+    public void setPublications(User user, Container container, @Nullable String publicationType)
+    {
+        QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
+        QuerySchema listSchema = coreSchema.getSchema("lists");
+
+        SimpleFilter filter = new SimpleFilter();
+        filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
+        if (publicationType != null)
+        {
+            filter.addCondition(FieldKey.fromParts("PublicationType"), publicationType);
+        }
+        List<StudyPublicationBean> allPublications = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class);
+        this.publications.clear();
+        for (StudyPublicationBean publication : allPublications)
+        {
+            if (publication.getShow() && publication.hasPermission(user))
+                this.publications.add(publication);
+        }
+    }
+
     public String getStudyIdPrefix()
     {
         return studyIdPrefix;
@@ -239,7 +261,7 @@ public class StudyBean
 
     public void setIsPublic(Boolean aPublic)
     {
-        isPublic = aPublic;
+        isPublic = aPublic == null ? false : aPublic;
     }
 
     public Integer getParticipantCount()
@@ -257,29 +279,35 @@ public class StudyBean
         this.url = url;
     }
 
+    public void setUrl(User user)
+    {
+        this.url = null;
+        if (getStudyAccessList() == null)
+            return;
+
+        for (StudyAccess studyAccess: getStudyAccessList())
+        {
+            Container studyContainer = ContainerManager.getForId(studyAccess.getStudyContainer());
+            if (studyContainer != null && studyContainer.hasPermission(user, ReadPermission.class))
+            {
+                if (studyAccess.getVisibility().equalsIgnoreCase(TrialShareQuerySchema.OPERATIONAL_VISIBILITY))
+                    this.url = studyContainer.getStartURL(user).toString();
+                else if (url == null)
+                    this.url = studyContainer.getStartURL(user).toString();
+            }
+        }
+    }
+
     public String getUrl()
     {
         return this.url;
     }
 
-    public String getUrl(Container c, User user)
+    public String getUrl(User user)
     {
         if (url == null)
         {
-            Collection<Map<String, Object>> maps = getStudyProperties(c, user);
-            for (Map<String, Object> map : maps)
-            {
-                Container studyContainer = ContainerManager.getForId((String) map.get("container"));
-                String studyId = (String) map.get(studyIdField);
-                String name = (String) map.get("Label");
-                if (null == studyId && getStudyIdPrefix() != null && name.startsWith(getStudyIdPrefix()))
-                    studyId = name;
-                if (null != studyContainer && StringUtils.equalsIgnoreCase(getStudyId(), studyId))
-                {
-                    url = studyContainer.getStartURL(user).toString();
-                    break;
-                }
-            }
+           setUrl(user);
         }
         return url;
     }
@@ -302,45 +330,8 @@ public class StudyBean
         return Collections.emptyList();
     }
 
-
-    public static Map<String, String> getStudyUrls(Container c, User user, String idField)
-    {
-        Map<String, String> studyUrls = new HashMap<>();
-        Collection<Map<String, Object>> maps = getStudyProperties(c, user);
-        for (Map<String, Object> map : maps)
-        {
-            Container studyContainer = ContainerManager.getForId((String) map.get("container"));
-            String studyId = (String) map.get(idField);
-
-            if (null != studyContainer && studyId != null)
-            {
-                studyUrls.put(studyId, studyContainer.getStartURL(user).toString());
-            }
-        }
-        return studyUrls;
-    }
-
     public String getDescription(Container c, User user)
     {
-        if (description == null)
-        {
-            Collection<Map<String, Object>> maps = getStudyProperties(c, user);
-            for (Map<String, Object> map : maps)
-            {
-                Container studyContainer = ContainerManager.getForId((String) map.get("container"));
-                String studyAccession = (String)map.get(studyIdField);
-                if (null != studyContainer && StringUtils.equalsIgnoreCase(getStudyId(), studyAccession))
-                {
-                    description = (String) map.get("description");
-                    if (description != null) {
-                        String rendererType = (String) map.get("descriptionRendererType");
-                        description = getFormattedHtml(rendererType == null ? null : WikiRendererType.valueOf(rendererType), description);
-                    }
-                    break;
-                }
-            }
-
-        }
         return description;
     }
 
@@ -372,6 +363,36 @@ public class StudyBean
     public void setExternalUrlDescription(String externalUrlDescription)
     {
         this.externalUrlDescription = externalUrlDescription;
+    }
+
+    public List<StudyAccess> getStudyAccessList()
+    {
+        return _studyAccessList;
+    }
+
+    public void setStudyAccessList(List<StudyAccess> studyAccessList)
+    {
+        this._studyAccessList = studyAccessList;
+    }
+
+    public void setStudyAccessList(User user, Container currentContainer)
+    {
+        QuerySchema listSchema = TrialShareQuerySchema.getSchema(user, currentContainer);
+
+        SimpleFilter filter = new SimpleFilter();
+        filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
+
+        TableInfo studyAccessTable = listSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+        List<StudyAccess> studyAccessList = (new TableSelector(studyAccessTable, filter, null)).getArrayList(StudyAccess.class);
+        this._studyAccessList.clear();
+        for (StudyAccess studyAccess : studyAccessList)
+        {
+            Container container = ContainerManager.getForId(studyAccess.getStudyContainer());
+            if (container != null && container.hasPermission(user, ReadPermission.class))
+            {
+                this._studyAccessList.add(studyAccess);
+            }
+        }
     }
 }
 
