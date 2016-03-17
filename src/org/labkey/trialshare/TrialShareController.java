@@ -15,6 +15,7 @@
  */
 package org.labkey.trialshare;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.FormViewAction;
@@ -30,7 +31,6 @@ import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
-import org.labkey.api.gwt.client.util.StringUtils;
 import org.labkey.api.module.Module;
 import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.FieldKey;
@@ -486,6 +486,18 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+    @RequiresPermission(AdminPermission.class)
+    public class ReindexAction extends ApiAction
+    {
+        @Override
+        public Object execute(Object o, BindException errors) throws Exception
+        {
+            TrialShareStudyDocumentProvider.reindex();
+            TrialSharePublicationDocumentProvider.reindex();
+            return success();
+        }
+    }
+
     @RequiresPermission(ReadPermission.class)
     public class DataFinderAction extends SimpleViewAction
     {
@@ -509,6 +521,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(Object form, BindException errors) throws Exception
         {
+            // TODO update to not use static methods
             QuerySchema listsSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
             TableInfo studyProperties = listsSchema.getTable(TrialShareQuerySchema.STUDY_TABLE);
 
@@ -611,7 +624,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(Object o, BindException errors) throws Exception
         {
-            TableInfo publicationsList = TrialShareQuerySchema.getSchema(getUser(), getContainer()).getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
+            TableInfo publicationsList = TrialShareQuerySchema.getPublicationsTableInfo(getUser(), getContainer());
             if (publicationsList != null)
             {
                 List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
@@ -885,7 +898,7 @@ public class TrialShareController extends SpringActionController
             TableInfo publicationsList = listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
             if (publicationsList != null)
             {
-                StudyPublicationBean publication = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE))).getObject(_id, StudyPublicationBean.class);
+                StudyPublicationBean publication = (new TableSelector(publicationsList)).getObject(_id, StudyPublicationBean.class);
 
                 SimpleFilter filter = new SimpleFilter();
                 filter.addCondition(FieldKey.fromParts("key"), _id);

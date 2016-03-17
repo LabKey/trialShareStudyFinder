@@ -31,7 +31,8 @@
 <labkey:errors/>
 <p>
 Data cube definitions and contents are cached on the server for efficiency.  When data are updated, you will need to
-clear the cache in order for the new data to be presented to users.
+clear the cache in order for the new data to be presented to users.  Also, the search index for the data cube data is refreshed
+    periodically, but you may want to manually reindex if you are making changes to the cube data.
 </p>
 <p>
 Cube definitions are managed per container.  The following listing shows the definitions currently registered.
@@ -53,7 +54,7 @@ Cube definitions are managed per container.  The following listing shows the def
             <th>Cube Definitions</th>
         </tr>
         <tr>
-            <td><%= button("Clear Cache").onClick("confirmClear(" + qh(path) + ")") %></td>
+            <td><%= button("Clear Cache").onClick("confirmClear(" + qh(path) + ")") %>&nbsp;<%= button("Reindex").onClick("confirmReindex(" + qh(path) + ")")%></td>
             <td><%=textLink(path, ContainerManager.getForPath(path).getStartURL(getUser()))%></td>
             <td><%= h(StringUtils.join(definitionIds, ", ")) %></td>
         </tr>
@@ -81,5 +82,49 @@ Cube definitions are managed per container.  The following listing shows the def
                 }
             }
         });
+    }
+
+    function confirmReindex(path)
+    {
+        Ext4.Msg.show({
+            title: 'Confirm',
+            buttons: Ext4.MessageBox.OKCANCEL,
+            msg: 'Reindex the data in the cube ' + path + '?',
+            fn: function (btn)
+            {
+                if (btn == 'ok')
+                {
+                    reindexCubeData(path);
+                }
+            }
+        });
+    }
+
+    function reindexCubeData(path)
+    {
+        Ext4.Ajax.request({
+            url: LABKEY.ActionURL.buildURL("trialShare", "reindex.api", path),
+            success: function (response)
+            {
+                var o = Ext4.decode(response.responseText);
+                if (!o.success)
+                {
+                    Ext4.Msg.show({
+                        title: 'Reindex',
+                        buttons: Ext4.MessageBox.OK,
+                        msg: 'Reindex of data failed.  Please check the logs.'
+                    })
+                }
+            },
+            failure: function ()
+            {
+                Ext4.Msg.show({
+                    title: 'Reindex',
+                    buttons: Ext4.MessageBox.OK,
+                    msg: 'Reindex of data failed.  Please check the logs.'
+                })
+            }
+        })
+
     }
 </script>
