@@ -98,7 +98,6 @@ public class TrialShareModule extends DefaultModule
         {
             ss.addDocumentProvider(new TrialShareStudyDocumentProvider());
             ss.addDocumentProvider(new TrialSharePublicationDocumentProvider());
-//            ss.addResourceResolver("trialshare", new TrialShareDocumentResolver());
             ss.addSearchCategory(searchCategoryStudy);
             ss.addSearchCategory(searchCategoryPublication);
         }
