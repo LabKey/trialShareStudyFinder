@@ -74,6 +74,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     onSearchTermsChanged: function(searchTerms) {
 
+        console.log("Search terms changed to " + searchTerms);
         if (!searchTerms)
         {
             this.searchMessage = "";
@@ -81,8 +82,8 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
             return;
         }
 
-        var url = LABKEY.ActionURL.buildURL("search", "json", "/home/", {
-            "category": "List",
+        var url = LABKEY.ActionURL.buildURL("search", "json", this.dataModuleName, {
+            "category": this.cubeConfig.searchCategory,
             "q": searchTerms
         });
         Ext4.Ajax.request({

@@ -243,7 +243,7 @@ public class TrialShareController extends SpringActionController
         CubeConfigBean bean = new CubeConfigBean();
         bean.setSchemaName("lists");
         bean.setDataModuleName(TrialShareModule.NAME);
-        bean.setShowSearch(false);
+        bean.setShowSearch(true);
         bean.setShowParticipantFilters(false);
         Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
         bean.setCubeContainer(((TrialShareModule) trialShareModule).getCubeContainer(container));
@@ -259,6 +259,7 @@ public class TrialShareController extends SpringActionController
             bean.setFilterByFacetUniqueName("[Study]");
             bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Study.Public].[Public]");
+            bean.setSearchCategory(TrialShareModule.searchCategoryStudy.getName());
         }
         else if (objectName.equalsIgnoreCase("publications"))
         {
@@ -271,6 +272,7 @@ public class TrialShareController extends SpringActionController
             bean.setFilterByFacetUniqueName("[Publication]");
             bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Publication.Status].[Status]");
+            bean.setSearchCategory(TrialShareModule.searchCategoryPublication.getName());
         }
 
         return bean;
@@ -324,6 +326,7 @@ public class TrialShareController extends SpringActionController
         private String _subsetLevelName;
         private String _cubeContainerPath;
         private String _cubeContainerId;
+        private String _searchCategory;
 
         public String getObjectName()
         {
@@ -483,6 +486,16 @@ public class TrialShareController extends SpringActionController
         public void setCubeContainerPath(String cubeContainerPath)
         {
             _cubeContainerPath = cubeContainerPath;
+        }
+
+        public String getSearchCategory()
+        {
+            return _searchCategory;
+        }
+
+        public void setSearchCategory(String searchCategory)
+        {
+            _searchCategory = searchCategory;
         }
     }
 

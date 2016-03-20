@@ -17,6 +17,7 @@ Ext4.define("LABKEY.study.panel.Studies", {
     cls: 'labkey-studies-panel',
 
     objectName: 'Study',
+    objectPluralName: 'Studies',
 
     showSearch : true,
 
@@ -58,7 +59,8 @@ Ext4.define("LABKEY.study.panel.Studies", {
                 dataModuleName: this.dataModuleName,
                 cubeContainerPath: this.cubeContainerPath,
                 showSearch : this.showSearch,
-                objectName: this.objectName
+                objectName: this.objectName,
+                objectPluralName: this.objectPluralName
             });
         }
         return this.cardPanelHeader;
