@@ -21,11 +21,20 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
 
     bubbleEvents: ["detailsChange"],
 
-    store : Ext4.create('LABKEY.study.store.Publications', {
-        dataModuleName: this.dataModuleName
-    }),
+    store : Ext4.create('LABKEY.study.store.Publications'),
+    // TODO Why doesn't this work???
+    // store:  Ext4.create('LABKEY.study.store.CubeObjects', {
+    //         storeId: 'Publication',
+    //         model: 'LABKEY.study.data.Publication',
+    //         autoLoad: false,
+    //         sorters: [{
+    //             property: 'title',
+    //             direction: 'ASC'
+    //         }]
+    //     }),
 
-    tpl: new Ext4.XTemplate(
+
+        tpl: new Ext4.XTemplate(
             '<div id="publicationpanel">',
             '   <tpl for=".">',
             '   <tpl if="isHighlighted">',
@@ -213,6 +222,9 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     initComponent: function(config)
     {
         this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "publications.api", this.cubeContainerPath);
+        this.getStore().facetSelectedMembers = {}; // initially we indicate that none of the members are selected by facets
+        this.getStore().searchSelectedMembers = null; // initially we have no search terms so everything is selected
+        this.getStore().selectedSubset = null;
         this.getStore().load();
 
         this.callParent();

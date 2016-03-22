@@ -5,6 +5,7 @@
         <script path="study/Finder/dataFinder.css"/>
         <script path="study/Finder/trialShare.css"/>
         <script path="study/Finder/data/CubeConfig.js"/>
+        <script path="study/Finder/data/CubeObjects.js"/>
         <script path="study/Finder/data/Facet.js"/>
         <script path="study/Finder/data/FacetFilter.js"/>
         <script path="study/Finder/data/FacetMember.js"/>
@@ -23,8 +24,7 @@
         <script path="study/Finder/panel/PublicationSummary.js"/>
         <script path="study/Finder/panel/FacetSelection.js"/>
 
-        <script path="study/Finder/panel/Studies.js"/>
-        <script path="study/Finder/panel/Publications.js"/>
+        <script path="study/Finder/panel/CubeObjects.js"/>
         <script path="study/Finder/panel/FinderCardPanelHeader.js"/>
         <script path="study/Finder/panel/StudyCards.js"/>
         <script path="study/Finder/panel/PublicationCards.js"/>

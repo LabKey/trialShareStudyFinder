@@ -66,7 +66,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
     getSearchBox : function() {
         if (!this.searchBox && this.showSearch) {
             this.searchBox = Ext4.create('Ext.form.field.Text', {
-                emptyText: this.objectPluralName,
+                emptyText: this.objectNamePlural,
                 cls: 'labkey-search-box',
                 fieldLabel: '<i class="fa fa-search"></i>',
                 labelWidth: "10px",

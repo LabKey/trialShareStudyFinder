@@ -57,7 +57,6 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
             Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('active', 'inactive');
     },
 
-
     getFacetPanelHeader : function() {
         if (!this.facetPanelHeader) {
             this.facetPanelHeader = Ext4.create("LABKEY.study.panel.FacetPanelHeader", {

@@ -27,14 +27,15 @@ Ext4.define('LABKEY.study.data.Publication', {
         {name: 'dataUrl'},
         {name: 'studies'},
         {name: 'publicationType'},
-        {name: 'isSelected', type: 'boolean', defaultValue: true},
-        {name: 'isHighlighted', type: 'boolean', defaultValue: false},
         {name: 'abstractText'},
         {name: 'keywords'},
-        {name: 'viewState', type: 'string', defaultValue: 'collapsed'},
         {name: 'thumbnails'},
         {name: 'keywords'},
-        {name: 'urls'}
+        {name: 'urls'},
+        {name: 'isSelected', type: 'boolean', defaultValue: true},
+        {name: 'isSelectedBySearch', type: 'boolean', defaultValue: false},
+        {name: 'isHighlighted', type: 'boolean', defaultValue: false},
+        {name: 'viewState', type: 'string', defaultValue: 'collapsed'}
     ]
 
 });

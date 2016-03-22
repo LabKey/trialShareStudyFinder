@@ -260,6 +260,7 @@ public class TrialShareController extends SpringActionController
             bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Study.Public].[Public]");
             bean.setSearchCategory(TrialShareModule.searchCategoryStudy.getName());
+            bean.setHasContainerFilter(true);
         }
         else if (objectName.equalsIgnoreCase("publications"))
         {
@@ -273,6 +274,7 @@ public class TrialShareController extends SpringActionController
             bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Publication.Status].[Status]");
             bean.setSearchCategory(TrialShareModule.searchCategoryPublication.getName());
+            bean.setHasContainerFilter(false);
         }
 
         return bean;
@@ -327,6 +329,7 @@ public class TrialShareController extends SpringActionController
         private String _cubeContainerPath;
         private String _cubeContainerId;
         private String _searchCategory;
+        private Boolean _hasContainerFilter;
 
         public String getObjectName()
         {
@@ -496,6 +499,16 @@ public class TrialShareController extends SpringActionController
         public void setSearchCategory(String searchCategory)
         {
             _searchCategory = searchCategory;
+        }
+
+        public Boolean getHasContainerFilter()
+        {
+            return _hasContainerFilter;
+        }
+
+        public void setHasContainerFilter(Boolean hasContainerFilter)
+        {
+            _hasContainerFilter = hasContainerFilter;
         }
     }
 

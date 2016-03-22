@@ -17,6 +17,7 @@ Ext4.define('LABKEY.study.data.CubeConfig', {
         {name: 'showParticipantFilters'},
         {name: 'isDefault'},
         {name: 'subsetLevelName'},
-        {name: 'searchCategory'}
+        {name: 'searchCategory'},
+        {name: 'hasContainerFilter', type: 'boolean', defaultValue: false}
     ]
 });

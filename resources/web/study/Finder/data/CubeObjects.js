@@ -1,13 +1,12 @@
 /*
- * Copyright (c) 2016 LabKey Corporation
+ * Copyright (c) 2015-2016 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
-Ext4.define('LABKEY.study.store.Publications', {
+Ext4.define('LABKEY.study.store.CubeObjects', {
     extend: 'Ext.data.Store',
-    storeId: 'Publication',
-    model: 'LABKEY.study.data.Publication',
     autoLoad: false,
+    
     proxy : {
         type: "ajax",
         //url: set before calling "load".
@@ -16,25 +15,23 @@ Ext4.define('LABKEY.study.store.Publications', {
             root: 'data'
         }
     },
-    sorters: [{
-        property: 'title',
-        direction: 'ASC'
-    }],
+
+    listeners: {
+        'load' : {
+            fn : function(store, records, options) {
+                store.updateFacetFilters(this.selectedSubset ? null : {}); // initial load should have no studies selected
+            },
+            scope: this
+        }
+    },
+
 
     updateSearchFilters: function(searchSelectedMembers) {
         this.updateFilters(this.facetSelectedMembers, searchSelectedMembers, this.selectedSubset);
     },
 
-    clearSearchFilters: function() {
-        this.searchSelectedMembers = null;
-    },
-
     updateFacetFilters: function(selectedMembers, selectedSubset) {
         this.updateFilters(selectedMembers, this.searchSelectedMembers, selectedSubset)
-    },
-
-    clearFacetFilters: function() {
-        this.facetSelectedMembers = null;
     },
 
     updateFilters: function(facetSelectedMembers, searchSelectedMembers, selectedSubset)
@@ -45,18 +42,16 @@ Ext4.define('LABKEY.study.store.Publications', {
             this.searchSelectedMembers = searchSelectedMembers;
         if (selectedSubset)
             this.selectedSubset = selectedSubset;
-        
+
         var object;
 
-        // this.suspendEvents(false);
         this.clearFilter();
         for (var i = 0; i < this.count(); i++) {
             object = this.getAt(i);
-            object.set("isSelected", this.facetSelectedMembers[object.get("id")] !== undefined);
-            object.set("isSelectedBySearch", this.searchSelectedMembers == null || this.searchSelectedMembers[object.get("id")] !== undefined);
+            object.set("isSelected", this.facetSelectedMembers[object.get(object.idProperty)] !== undefined);
+            object.set("isSelectedBySearch", this.searchSelectedMembers == null || this.searchSelectedMembers[object.get(object.idProperty)] !== undefined);
         }
 
-        // this.resumeEvents();
         this.filter([
             {property: 'isSelected', value: true},
             {property: 'isSelectedBySearch', value: true}
@@ -65,8 +60,9 @@ Ext4.define('LABKEY.study.store.Publications', {
 
     selectAll : function() {
         for (var i = 0; i < this.count(); i++) {
-            var object = this.getAt(i);
-            object.set("isSelected", true);
+            var cubeObj = this.getAt(i);
+            cubeObj.set("isSelected", true);
+            cubeObj.set("isSelectedBySearch", true);
         }
     }
 });

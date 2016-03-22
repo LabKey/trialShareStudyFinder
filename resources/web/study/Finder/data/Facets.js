@@ -113,13 +113,31 @@ Ext4.define('LABKEY.study.store.Facets', {
     },
 
     getCountDistinctFilters: function(filters) {
+        // TODO I think we need to check for an existing filter for the filterByLevel
         var newFilters = this.getStudySubsetFilter();
+        if (newFilters != null)
+            filters.push(newFilters);
+        newFilters = this.getSearchFilter();
         if (newFilters != null)
             filters.push(newFilters);
         newFilters = this.getCustomFilters();
         if (newFilters != null)
             filters.push(newFilters);
         return filters;
+    },
+
+    getSearchFilter : function()
+    {
+        var store = Ext4.getStore(this.cubeConfig.objectName);
+        if (store.searchSelectedMembers != null)
+        {
+            var selection = [];
+            for (var key in store.searchSelectedMembers)
+            {
+                selection.push(store.searchSelectedMembers[key])
+            }
+            return {level: this.cubeConfig.filterByLevel, members: selection};
+        }
     },
 
     getCustomFilters: function()
@@ -236,9 +254,6 @@ Ext4.define('LABKEY.study.store.Facets', {
 
         var filters = intersectFilters;
 
-        // CONSIDER: Don't fetch subject IDs every time a filter is changed.
-        var includeSubjectIds = false;
-
         var onRows = { operator: "UNION", arguments: [] };
         onRows.arguments.push({level: this.cubeConfig.filterByLevel});
         for (f = 0; f < this.count(); f++)
@@ -252,8 +267,6 @@ Ext4.define('LABKEY.study.store.Facets', {
                 onRows.arguments.push({level: facet.data.level.uniqueName});
         }
 
-        if (includeSubjectIds)
-            onRows.arguments.push({level: "[Subject].[Subject]", members: "members"});
 
         var config =
         {
@@ -373,8 +386,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     updateMemberFilter : function(selectedMembers) {
         var store = Ext4.getStore(this.cubeConfig.objectName);
-        store.selectedStudies = selectedMembers;
-        store.updateFilters(selectedMembers);
+        store.updateFacetFilters(selectedMembers);
     },
 
     getRowPositions : function(cellSet)
