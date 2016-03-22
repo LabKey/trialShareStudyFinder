@@ -6,25 +6,14 @@
 Ext4.define('LABKEY.study.store.CubeObjects', {
     extend: 'Ext.data.Store',
     autoLoad: false,
-    
-    proxy : {
-        type: "ajax",
-        //url: set before calling "load".
-        reader: {
-            type: 'json',
-            root: 'data'
-        }
-    },
 
     listeners: {
         'load' : {
             fn : function(store, records, options) {
-                store.updateFacetFilters(this.selectedSubset ? null : {}); // initial load should have no studies selected
-            },
-            scope: this
+                store.updateFacetFilters(store.selectedSubset ? null : {}); // initial load should have no objects selected
+            }
         }
     },
-
 
     updateSearchFilters: function(searchSelectedMembers) {
         this.updateFilters(this.facetSelectedMembers, searchSelectedMembers, this.selectedSubset);
@@ -45,12 +34,16 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
 
         var object;
 
+        this.suspendEvents(false);
         this.clearFilter();
         for (var i = 0; i < this.count(); i++) {
             object = this.getAt(i);
-            object.set("isSelected", this.facetSelectedMembers[object.get(object.idProperty)] !== undefined);
-            object.set("isSelectedBySearch", this.searchSelectedMembers == null || this.searchSelectedMembers[object.get(object.idProperty)] !== undefined);
+            object.set({
+                "isSelected":this.facetSelectedMembers[object.get(object.idProperty)] !== undefined,
+                "isSelectedBySearch": this.searchSelectedMembers == null || this.searchSelectedMembers[object.get(object.idProperty)] !== undefined
+            });
         }
+        this.resumeEvents();
 
         this.filter([
             {property: 'isSelected', value: true},
@@ -61,8 +54,10 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
     selectAll : function() {
         for (var i = 0; i < this.count(); i++) {
             var cubeObj = this.getAt(i);
-            cubeObj.set("isSelected", true);
-            cubeObj.set("isSelectedBySearch", true);
+            cubeObj.set({
+                "isSelected":  true,
+                "isSelectedBySearch": true
+            });
         }
     }
 });

@@ -10,13 +10,11 @@
         <script path="study/Finder/data/FacetFilter.js"/>
         <script path="study/Finder/data/FacetMember.js"/>
         <script path="study/Finder/data/Study.js"/>
-        <script path="study/Finder/data/Studies.js"/>
         <script path="study/Finder/data/Subset.js"/>
         <script path="study/Finder/data/Subsets.js"/>
         <script path="study/Finder/data/Facets.js"/>
         <script path="study/Finder/data/FacetMembers.js"/>
         <script path="study/Finder/data/Publication.js"/>
-        <script path="study/Finder/data/Publications.js"/>
 
         <script path="study/Finder/panel/FacetPanelHeader.js"/>
         <script path="study/Finder/panel/FacetsGrid.js"/>

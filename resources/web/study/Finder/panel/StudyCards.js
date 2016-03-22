@@ -25,6 +25,9 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         storeId: 'Study',
         model: 'LABKEY.study.data.Study',
         autoLoad: false,
+        facetSelectedMembers : {}, // initially we indicate that none of the members are selected by facets
+        searchSelectedMembers : null, // initially we have no search terms so everything is selected
+        selectedSubset : null,
         sorters: [{
             property: 'shortName',
             direction: 'ASC'
@@ -231,17 +234,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     initComponent: function(config)
     {
         this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "studies.api", this.cubeContainerPath);
-        this.getStore().facetSelectedMembers = {}; // initially we indicate that none of the members are selected by facets
-        this.getStore().searchSelectedMembers = null; // initially we have no search terms so everything is selected
-        this.getStore().selectedSubset = null;
         this.getStore().load();
         this.callParent();
-    },
-
-    constructor: function(config)
-    {
-        this.dataModuleName = config.dataModuleName;
-        this.cubeContainerPath = config.cubeContainerPath;
-        this.callParent(config);
     }
 });

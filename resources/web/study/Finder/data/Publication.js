@@ -8,6 +8,16 @@ Ext4.define('LABKEY.study.data.Publication', {
 
     idProperty: 'id',
 
+
+    proxy : {   
+        type: "ajax",
+        //url: set before calling "load".
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    },
+
     fields : [
         {name: 'id', type:'int'},
         {name: 'studyId'},
