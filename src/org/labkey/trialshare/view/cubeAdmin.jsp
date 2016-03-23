@@ -95,6 +95,7 @@ Cube definitions are managed per container.  The following listing shows the def
                 if (btn == 'ok')
                 {
                     reindexCubeData(path);
+                    window.location = LABKEY.ActionURL.buildURL("admin", "showAdmin.view", "/")
                 }
             }
         });
