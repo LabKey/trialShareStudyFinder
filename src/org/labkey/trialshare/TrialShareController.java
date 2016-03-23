@@ -518,8 +518,8 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(Object o, BindException errors) throws Exception
         {
-            TrialShareStudyDocumentProvider.reindex();
-            TrialSharePublicationDocumentProvider.reindex();
+            StudyDocumentProvider.reindex();
+            PublicationDocumentProvider.reindex();
             return success();
         }
     }

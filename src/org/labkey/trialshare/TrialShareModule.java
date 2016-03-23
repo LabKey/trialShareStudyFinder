@@ -96,8 +96,8 @@ public class TrialShareModule extends DefaultModule
         SearchService ss = ServiceRegistry.get().getService(SearchService.class);
         if (null != ss)
         {
-            ss.addDocumentProvider(new TrialShareStudyDocumentProvider());
-            ss.addDocumentProvider(new TrialSharePublicationDocumentProvider());
+            ss.addDocumentProvider(new StudyDocumentProvider());
+            ss.addDocumentProvider(new PublicationDocumentProvider());
             ss.addSearchCategory(searchCategoryStudy);
             ss.addSearchCategory(searchCategoryPublication);
         }

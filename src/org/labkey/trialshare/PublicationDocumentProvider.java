@@ -17,6 +17,7 @@ package org.labkey.trialshare;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
+import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SqlExecutor;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.module.Module;
@@ -40,9 +41,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TrialShareStudyDocumentProvider implements SearchService.DocumentProvider
+public class PublicationDocumentProvider implements SearchService.DocumentProvider
 {
-    private static final Logger _logger = LoggerFactory.getLogger(TrialShareStudyDocumentProvider.class);
+    private static final Logger _logger = LoggerFactory.getLogger(PublicationDocumentProvider.class);
+
     public static Container getDocumentContainer()
     {
         Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
@@ -51,7 +53,7 @@ public class TrialShareStudyDocumentProvider implements SearchService.DocumentPr
 
     public static void reindex()
     {
-        TrialShareStudyDocumentProvider dp = new TrialShareStudyDocumentProvider();
+        PublicationDocumentProvider dp = new PublicationDocumentProvider();
         SearchService ss = ServiceRegistry.get(SearchService.class);
         dp.enumerateDocuments(ss.defaultTask(), getDocumentContainer(), null);
     }
@@ -64,25 +66,33 @@ public class TrialShareStudyDocumentProvider implements SearchService.DocumentPr
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(User.getSearchUser(), c);
 
         String sql =
-            "SELECT sa.StudyId," +
-                "sa.StudyContainer, " +
-                "sag.AgeGroup, " +
-                "sas.Assay, " +
-                "sc.Condition, " +
-                "sph.Phase, " +
-                "sta.TherapeuticArea, " +
-                "sp.shortName, " +
-                "sp.Title, " +
-                "sp.StudyType, " +
-                "sp.Description, " +
-                "sp.Investigator " +
+            "SELECT pub.Key as PublicationId," +
+                "pub.Title, " +
+                "pub.Author, " +
+                "pub.DOI, " +
+                "pub.PMID, " +
+                "pub.PMCID, " +
+                "pub.PublicationType, " +
+                "pub.Year, " +
+                "pub.Journal, " +
+                "pub.Status, " +
+                "pub.Study as PrimaryStudy, " +
+                "pub.StudyId as PrimaryStudyId, " +
+                "pub.AbstractText, " +
+                "pub.Keywords, " +
+                "pub.PermissionsContainer, " +
+                "pub.ManuscriptContainer, " +
+                "pa.Assay, " +
+                "pc.Condition, " +
+                "ps.ShortName as StudyShortName, " +
+                "ps.StudyId, " +
+                "pta.TherapeuticArea " +
             "FROM " +
-                "StudyAccess sa LEFT JOIN StudyProperties sp ON sa.StudyId = sp.StudyId " +
-                "LEFT JOIN StudyAgeGroup sag on sa.StudyId = sag.StudyId " +
-                "LEFT JOIN StudyAssay sas on sa.StudyId = sas.StudyId " +
-                "LEFT JOIN StudyCondition sc on sa.StudyId = sc.StudyId " +
-                "LEFT JOIN StudyPhase sph on sa.StudyId = sph.StudyId " +
-                "LEFT JOIN StudyTherapeuticArea sta on sa.StudyId = sta.StudyId";
+                "ManuscriptsAndAbstracts pub LEFT JOIN PublicationAssay pa ON pub.Key = pa.PublicationId " +
+                "LEFT JOIN PublicationCondition pc on pa.Key = pc.PublicationId " +
+                "LEFT JOIN PublicationStudy ps on pa.Key = ps.PublicationId " +
+                "LEFT JOIN PublicationTherapeuticArea pta on pa.Key = pta.PublicationId " +
+            "WHERE pub.Show = true";
 
         try (ResultSet results = QueryService.get().select(listSchema,sql))
         {
@@ -91,34 +101,33 @@ public class TrialShareStudyDocumentProvider implements SearchService.DocumentPr
 
                 StringBuilder body = new StringBuilder();
 
-                for (String field : new String[]{"Description", "AgeGroup", "Assay", "Condition", "Phase", "TherapeuticArea", "StudyType"})
+                for (String field : new String[]{"AbstractText", "DOI", "PMID", "PMCID", "PublicationType", "Journal", "Year", "Status", "PrimaryStudy", "PrimaryStudyId", "Keywords", "Assay", "Condition", "StudyId", "StudyShortName", "TherapeuticArea"})
                 {
                     if (results.getString(field) != null)
                         body.append(results.getString(field)).append("\n");
                 }
-
                 Map<String, Object> properties = new HashMap<>();
 
-                StringBuilder identifiers = new StringBuilder();
-                for (String field : new String[]{"shortName", "StudyId", "Investigator"})
-                {
-                    if (results.getString(field) != null)
-                        identifiers.append(results.getString(field)).append(" ");
-                }
-
-                properties.put(SearchService.PROPERTY.identifiersMed.toString(), identifiers.toString());
+                body.append("\n" + results.getString("Author"));
+                properties.put(SearchService.PROPERTY.identifiersMed.toString(), results.getString("Author"));
                 properties.put(SearchService.PROPERTY.keywordsMed.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.title.toString(), results.getString("Title"));
-                properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryStudy.getName());
+                properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryPublication.getName());
 
-                String containerId = results.getString("StudyContainer") == null ? c.getId() : results.getString("StudyContainer");
+                String containerId;
+                if (results.getString("PermissionsContainer") != null)
+                    containerId = results.getString("PermissionsContainer");
+                else if (results.getString("ManuscriptContainer") != null)
+                    containerId = results.getString("ManuscriptContainer");
+                else
+                    containerId = ContainerManager.getHomeContainer().getId();
 
-                ActionURL url = new ActionURL(TrialShareController.StudyDetailAction.class, c).addParameter("studyId", (String) results.getString("StudyId")).addParameter("detailType", "study");
+                ActionURL url = new ActionURL(TrialShareController.PublicationDetailViewAction.class, c).addParameter("id", results.getString("PublicationId"));
                 url.setExtraPath(containerId);
 
                 SimpleDocumentResource resource = new SimpleDocumentResource (
-                                Path.parse("/" + results.getString("StudyId")),
-                                "trialShare:study:" + results.getString("StudyId"),
+                                Path.parse("/" + results.getString("PublicationId")),
+                                "trialShare:publication:" + results.getString("PublicationId"),
                                 containerId,
                                 "text/html",
                                 body.toString().getBytes(StringUtilsLabKey.DEFAULT_CHARSET),
@@ -140,7 +149,7 @@ public class TrialShareStudyDocumentProvider implements SearchService.DocumentPr
         TrialShareQuerySchema querySchema = new TrialShareQuerySchema(User.getSearchUser(), null);
         SqlExecutor executor = new SqlExecutor(querySchema.getSchema().getDbSchema());
 
-        for (TableInfo ti : querySchema.getStudyTables())
+        for (TableInfo ti : querySchema.getPublicationTables())
         {
             executor.execute("UPDATE " + ti.getFromSQL(ti.getName()) + " SET LastIndexed = NULL");
         }
