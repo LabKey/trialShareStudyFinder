@@ -129,6 +129,10 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         return this.helpLinks;
     },
 
+    onClearAllFilters: function() {
+        this.getSearchBox().setValue("");
+    },
+
     onSearchTermsChanged: function(value) {
         this.fireEvent("searchTermsChanged", value);
     },

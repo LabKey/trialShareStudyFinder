@@ -37,7 +37,9 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
         this.getCubeDefinition();
 
         this.on({
-            subsetChanged: this.onSubsetChanged
+            subsetChanged: this.onSubsetChanged,
+            clearAllFilters: this.onClearAllFilters,
+            searchTermsChanged: this.onSearchTermsChanged
         });
     },
 
@@ -68,7 +70,11 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
     },
 
     onClearAllFilters: function() {
-        this.getFacetsPanel().onClearAllFilters();
+        this.getCubeMemberPanel().onClearAllFilters();
+    },
+
+    onSearchTermsChanged: function(terms) {
+        this.getFacetsPanel().onSearchTermsChanged(terms);
     },
 
     getFacetsPanel: function() {

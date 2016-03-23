@@ -202,27 +202,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         {
             facet = this.getAt(f);
             var selectedMembers = facet.get("selectedMembers");
-            if (facet.get("name") == this.cubeConfig.objectName)
-            {
-                //if (!selectedMembers || selectedMembers.length == facet.data.members.length)
-                //    continue;
-                //if (selectedMembers.length == 0)
-                //{
-                //    // in the case of study filter, this means no matches, rather than no filter!
-                //    this.updateCountsZero();
-                //    return;
-                //}
-                // TODO seems unnecessary if we always pass in all of the names.
-                //var uniqueNames = facet.data.members.map(function(m){return m.uniqueName;});
-                //if (this.filterByLevel != "[Study].[Study]")
-                //    intersectFilters.push({
-                //        level: this.filterByLevel,
-                //        membersQuery: {level: "[Study].[Study]", members: uniqueNames}
-                //    });
-                //else
-                //    intersectFilters.push({level: "[Study].[Study]", members: uniqueNames});
-            }
-            else
+            if (facet.get("name") != this.cubeConfig.objectName)
             {
                 if (!selectedMembers || selectedMembers.length == 0)
                     continue;

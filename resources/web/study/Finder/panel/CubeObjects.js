@@ -22,10 +22,18 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
         ];
         this.callParent();
 
+        var searchTermsChangeTask = new Ext4.util.DelayedTask();
+
         this.on({
             'subsetChanged': this.onSubsetChanged,
-            'searchTermsChanged': this.onSearchTermsChanged
+            'searchTermsChanged': function(searchTerms){
+                searchTermsChangeTask.delay(750, this.onSearchTermsChanged, this, [searchTerms]);
+            }
         });
+    },
+
+    onClearAllFilters : function() {
+        this.getCardPanelHeader().onClearAllFilters();
     },
 
     onSubsetChanged : function(selectedSubset) {
@@ -42,7 +50,6 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
             return "";
     },
 
-    // TODO make this a delayed action?
     onSearchTermsChanged : function(searchTerms) {
         this.searchTerms = searchTerms;
         if (!searchTerms)
@@ -77,7 +84,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
                 }
                 console.log("found " + Object.keys(searchHits).length + " objects matching terms " + searchTerms, searchHits);
                 this.updateSearchFilters(searchHits);
-                // this.up('labkey-data-finder-panel').onSearchTermsChanged();
+                // this.getCardPanelHeader().onSearchTermsChanged(this.getSearchMessage());
             }
         });
         
@@ -85,7 +92,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
 
     updateSearchFilters: function(searchHits)
     {
-        this.getCards().store.updateSearchFilters(searchHits);
+        this.getCards().store.setSearchFilters(searchHits);
         var facetStore = Ext4.getStore(this.cubeConfig.objectName + "Facets");
         if (facetStore)
             facetStore.updateCountsAsync();

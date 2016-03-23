@@ -14,6 +14,10 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
             }
         }
     },
+    
+    setSearchFilters: function(searchSelectedMembers) {
+        this.searchSelectedMembers = searchSelectedMembers;
+    },
 
     updateSearchFilters: function(searchSelectedMembers) {
         this.updateFilters(this.facetSelectedMembers, searchSelectedMembers, this.selectedSubset);
