@@ -127,7 +127,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
                 SimpleDocumentResource resource = new SimpleDocumentResource (
                                 Path.parse("/" + results.getString("PublicationId")),
-                                "trialShare:publication:" + results.getString("PublicationId"),
+                                "trialShare:publication:" + containerId + ":" + results.getString("PublicationId"),
                                 containerId,
                                 "text/html",
                                 body.toString().getBytes(StringUtilsLabKey.DEFAULT_CHARSET),

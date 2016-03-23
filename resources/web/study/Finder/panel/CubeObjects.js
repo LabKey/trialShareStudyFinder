@@ -27,7 +27,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
         this.on({
             'subsetChanged': this.onSubsetChanged,
             'searchTermsChanged': function(searchTerms){
-                searchTermsChangeTask.delay(750, this.onSearchTermsChanged, this, [searchTerms]);
+                searchTermsChangeTask.delay(500, this.onSearchTermsChanged, this, [searchTerms]);
             }
         });
     },
@@ -58,9 +58,10 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
             return;
         }
 
-        var url = LABKEY.ActionURL.buildURL("search", "json", this.dataModuleName, {
+        var url = LABKEY.ActionURL.buildURL("search", "json", this.cubeConfig.cubeContainerPath, {
             "category": this.cubeConfig.searchCategory,
-            "q": searchTerms
+            "q": searchTerms,
+            "scope" : "Project"
         });
         Ext4.Ajax.request({
             url: url,

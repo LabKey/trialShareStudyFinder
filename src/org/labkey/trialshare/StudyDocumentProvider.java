@@ -105,10 +105,10 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                     if (results.getString(field) != null)
                         identifiers.append(results.getString(field)).append(" ");
                 }
-                body.append(" " + identifiers);
+//                body.append(" " + identifiers);
 
-                properties.put(SearchService.PROPERTY.identifiersMed.toString(), identifiers.toString());
-                properties.put(SearchService.PROPERTY.keywordsMed.toString(), results.getString("Title"));
+                properties.put(SearchService.PROPERTY.identifiersHi.toString(), identifiers.toString());
+                properties.put(SearchService.PROPERTY.keywordsHi.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.title.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryStudy.getName());
 
@@ -119,7 +119,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
 
                 SimpleDocumentResource resource = new SimpleDocumentResource (
                                 Path.parse("/" + results.getString("StudyId")),
-                                "trialShare:study:" + results.getString("StudyId"),
+                                "trialShare:study:" + containerId + ":" + results.getString("StudyId"),
                                 containerId,
                                 "text/html",
                                 body.toString().getBytes(StringUtilsLabKey.DEFAULT_CHARSET),
