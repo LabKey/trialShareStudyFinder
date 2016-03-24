@@ -15,6 +15,7 @@
  */
 package org.labkey.trialshare;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
@@ -88,10 +89,11 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 "ps.StudyId, " +
                 "pta.TherapeuticArea " +
             "FROM " +
-                "ManuscriptsAndAbstracts pub LEFT JOIN PublicationAssay pa ON pub.Key = pa.PublicationId " +
-                "LEFT JOIN PublicationCondition pc on pa.Key = pc.PublicationId " +
-                "LEFT JOIN PublicationStudy ps on pa.Key = ps.PublicationId " +
-                "LEFT JOIN PublicationTherapeuticArea pta on pa.Key = pta.PublicationId " +
+                "ManuscriptsAndAbstracts pub " +
+                "LEFT JOIN (SELECT PublicationId, group_concat(Assay) AS Assay FROM PublicationAssay GROUP BY PublicationId) pa ON pub.Key = pa.PublicationId " +
+                "LEFT JOIN (SELECT PublicationId, group_concat(Condition) AS Condition FROM PublicationCondition GROUP BY PublicationId) pc on pa.Key = pc.PublicationId " +
+                "LEFT JOIN (SELECT PublicationId, group_concat(StudyId) AS StudyId FROM PublicationStudy GROUP BY PublicationId) ps on pa.Key = ps.PublicationId " +
+                "LEFT JOIN (SELECT PublicationId, group_concat(TherapeuticArea) AS TherapeuticArea FROM PublicationTherapeuticArea GROUP BY PublicationId) pta on pa.Key = pta.PublicationId " +
             "WHERE pub.Show = true";
 
         try (ResultSet results = QueryService.get().select(listSchema,sql))
@@ -101,13 +103,14 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
                 StringBuilder body = new StringBuilder();
 
-                for (String field : new String[]{"AbstractText", "DOI", "PMID", "PMCID", "PublicationType", "Journal", "Year", "Status", "PrimaryStudy", "PrimaryStudyId", "Keywords", "Assay", "Condition", "StudyId", "StudyShortName", "TherapeuticArea"})
+                for (String field : new String[]{"AbstractText", "DOI", "PMID", "PMCID", "PublicationType", "Journal", "Citation", "Year", "Status", "PrimaryStudy", "PrimaryStudyId", "Keywords", "Assay", "Condition", "StudyId", "StudyShortName", "TherapeuticArea"})
                 {
                     if (results.getString(field) != null)
-                        body.append(results.getString(field)).append("\n");
+                        body.append(StringUtils.join(results.getString(field).split(",")," ")).append(" ");
                 }
                 Map<String, Object> properties = new HashMap<>();
 
+                // FIXME It seems to be required to add the author to the body in order for it to be in the index, even though supplied as an identifier
                 body.append("\n" + results.getString("Author"));
                 properties.put(SearchService.PROPERTY.identifiersMed.toString(), results.getString("Author"));
                 properties.put(SearchService.PROPERTY.keywordsMed.toString(), results.getString("Title"));

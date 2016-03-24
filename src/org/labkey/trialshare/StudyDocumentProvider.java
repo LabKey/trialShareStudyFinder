@@ -15,6 +15,7 @@
  */
 package org.labkey.trialshare;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.SqlExecutor;
@@ -64,25 +65,26 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(User.getSearchUser(), c);
 
         String sql =
-            "SELECT sa.StudyId," +
-                "sa.StudyContainer, " +
-                "sag.AgeGroup, " +
-                "sas.Assay, " +
-                "sc.Condition, " +
-                "sph.Phase, " +
-                "sta.TherapeuticArea, " +
-                "sp.shortName, " +
-                "sp.Title, " +
-                "sp.StudyType, " +
-                "sp.Description, " +
-                "sp.Investigator " +
-            "FROM " +
-                "StudyAccess sa LEFT JOIN StudyProperties sp ON sa.StudyId = sp.StudyId " +
-                "LEFT JOIN StudyAgeGroup sag on sa.StudyId = sag.StudyId " +
-                "LEFT JOIN StudyAssay sas on sa.StudyId = sas.StudyId " +
-                "LEFT JOIN StudyCondition sc on sa.StudyId = sc.StudyId " +
-                "LEFT JOIN StudyPhase sph on sa.StudyId = sph.StudyId " +
-                "LEFT JOIN StudyTherapeuticArea sta on sa.StudyId = sta.StudyId";
+                "SELECT  "+
+                        "sa.StudyId, "+
+                        "sa.StudyContainer, "+
+                        "sc.condition, "+
+                        "sas.Assay, "+
+                        "sph.Phase,  "+
+                        "sag.AgeGroup, "+
+                        "sta.TherapeuticArea, "+
+                        "sp.shortName, "+
+                        "sp.Title, "+
+                        "sp.StudyType, "+
+                        "sp.Description, "+
+                        "sp.Investigator "+
+                "FROM StudyAccess sa  "+
+                        "   LEFT JOIN StudyProperties sp ON sa.StudyId = sp.StudyId "+
+                        "   LEFT JOIN (SELECT StudyId, group_concat(Assay) AS Assay FROM StudyAssay GROUP BY StudyId) sas on sa.StudyId = sas.StudyId  "+
+                        "   LEFT JOIN (SELECT StudyId, group_concat(Condition) As Condition FROM StudyCondition GROUP BY StudyId) sc on sa.StudyId = sc.StudyId "+
+                        "   LEFT JOIN (SELECT StudyId, group_concat(AgeGroup) AS AgeGroup FROM StudyAgeGroup GROUP BY StudyId) sag on sa.StudyId = sag.StudyId "+
+                        "   LEFT JOIN (SELECT StudyId, group_concat(Phase) AS Phase FROM StudyPhase GROUP BY StudyId) sph on sa.StudyId = sph.StudyId "+
+                        "   LEFT JOIN (SELECT StudyId, group_concat(TherapeuticArea) AS TherapeuticArea FROM StudyTherapeuticArea GROUP BY StudyId) sta on sa.StudyId = sta.StudyId ";
 
         try (ResultSet results = QueryService.get().select(listSchema,sql))
         {
@@ -94,7 +96,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                 for (String field : new String[]{"Description", "AgeGroup", "Assay", "Condition", "Phase", "TherapeuticArea", "StudyType"})
                 {
                     if (results.getString(field) != null)
-                        body.append(results.getString(field)).append("\n");
+                        body.append(StringUtils.join(results.getString(field).split(",")," ")).append(" ");
                 }
 
                 Map<String, Object> properties = new HashMap<>();
@@ -105,7 +107,8 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                     if (results.getString(field) != null)
                         identifiers.append(results.getString(field)).append(" ");
                 }
-//                body.append(" " + identifiers);
+                // FIXME it seems to be required to add the identifiers to the body for them to show up in the index even though also supplied as an identifier property
+                body.append(" " + identifiers);
 
                 properties.put(SearchService.PROPERTY.identifiersHi.toString(), identifiers.toString());
                 properties.put(SearchService.PROPERTY.keywordsHi.toString(), results.getString("Title"));
