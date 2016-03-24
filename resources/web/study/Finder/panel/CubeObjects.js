@@ -27,7 +27,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
         this.on({
             'subsetChanged': this.onSubsetChanged,
             'searchTermsChanged': function(searchTerms){
-                searchTermsChangeTask.delay(500, this.onSearchTermsChanged, this, [searchTerms]);
+                searchTermsChangeTask.delay(350, this.onSearchTermsChanged, this, [searchTerms]);
             }
         });
     },
