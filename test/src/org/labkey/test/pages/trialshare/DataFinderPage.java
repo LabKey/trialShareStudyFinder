@@ -103,16 +103,16 @@ public class DataFinderPage extends LabKeyPage
     }
 
     @LogMethod
-    public void studySearch(@LoggedParam final String search)
+    public void search(@LoggedParam final String search)
     {
-        doAndWaitForPageSignal(() -> setFormElement(DataFinderPage.Locators.studySearchInput, search), COUNT_SIGNAL);
+        doAndWaitForPageSignal(() -> setFormElement(Locators.getSearchInput(finderLocator), search), COUNT_SIGNAL);
     }
 
     @LogMethod(quiet = true)
     public void clearSearch()
     {
-        if (isElementPresent(DataFinderPage.Locators.studySearchInput) && !getFormElement(DataFinderPage.Locators.studySearchInput).isEmpty())
-            studySearch(" ");
+        if (isElementPresent(Locators.getSearchInput(finderLocator)) && !getFormElement(Locators.getSearchInput(finderLocator)).isEmpty())
+            search("");
     }
 
     public void saveGroup(String name)
@@ -208,6 +208,13 @@ public class DataFinderPage extends LabKeyPage
             return new FacetGrid(DataFinderPage.Locators.pubFacetPanel.findElement(getDriver()));
     }
 
+    public boolean clearAllActive()
+    {
+        Locator.CssLocator clearAllLocator = DataFinderPage.Locators.getClearAll(finderLocator);
+        scrollIntoView(clearAllLocator);
+        Locator activeClearAllLocator = DataFinderPage.Locators.getActiveClearAll(clearAllLocator);
+        return isElementPresent(activeClearAllLocator);
+    }
 
     public void clearAllFilters()
     {
@@ -255,9 +262,10 @@ public class DataFinderPage extends LabKeyPage
     
     public static class Locators
     {
+
         public static final Locator.CssLocator cardDeck = Locator.css(".labkey-data-finder-card-deck-view");
         public static final Locator.CssLocator studyFinder = Locator.css(".labkey-study-finder-card");
-        public static final Locator.CssLocator studySearchInput = studyFinder.append(Locator.css("#searchTerms"));
+
         public static final Locator.XPathLocator finderObjectCombo = Ext4Helper.Locators.formItemWithInputNamed("configSelect");
         public static final Locator.XPathLocator studySubsetCombo = Ext4Helper.Locators.formItemWithInputNamed("subsetSelect");
         public static final Locator.CssLocator studyCard = studyFinder.append(Locator.css(".labkey-study-card"));
@@ -275,6 +283,11 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.CssLocator saveMenu = Locator.css("#saveMenu");
         public static final Locator.CssLocator loadMenu = Locator.css("#loadMenu");
         public static final Locator.IdLocator manageMenu = Locator.id("manageMenu");
+
+        public static final Locator.CssLocator getSearchInput(Locator.CssLocator locator)
+        {
+            return locator.append(" input.labkey-search-box");
+        }
 
         public static Locator.CssLocator getClearAll(Locator.CssLocator locator)
         {
