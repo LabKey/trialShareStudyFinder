@@ -112,18 +112,29 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     },
 
-    getCountDistinctFilters: function(filters) {
-        // TODO I think we need to check for an existing filter for the filterByLevel
-        var newFilters = this.getStudySubsetFilter();
-        if (newFilters != null)
-            filters.push(newFilters);
-        newFilters = this.getSearchFilter();
-        if (newFilters != null)
-            filters.push(newFilters);
-        newFilters = this.getCustomFilters();
-        if (newFilters != null)
-            filters.push(newFilters);
+    getCountDistinctFilters: function(filtersMap) {
+        this.addFilterMapData(filtersMap, this.getStudySubsetFilter());
+        this.addFilterMapData(filtersMap, this.getSearchFilter());
+        this.addFilterMapData(filtersMap, this.getCustomFilters());
+        var filters = [];
+        for (var level in filtersMap) {
+            if (!filtersMap.hasOwnProperty(level))
+                    continue;
+            filters.push({level: level, members: filtersMap[level]});
+        }
         return filters;
+    },
+
+    addFilterMapData : function(filtersMap, newFilters)
+    {
+        if (newFilters != null)
+        {
+            if (filtersMap[newFilters.level])
+                filtersMap[newFilters.level].concat(newFilters.members);
+            else
+                filtersMap[newFilters.level] = newFilters.members;
+        }
+        return filtersMap;
     },
 
     getSearchFilter : function()
@@ -138,6 +149,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             }
             return {level: this.cubeConfig.filterByLevel, members: selection};
         }
+        return null;
     },
 
     getCustomFilters: function()
@@ -165,6 +177,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             return;
         }
 
+         // console.log("updateCountsAsync called");
         var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "accessibleMembers.api", null, {
             "objectName": this.cubeConfig.objectName
         });
@@ -175,18 +188,22 @@ Ext4.define('LABKEY.study.store.Facets', {
                 var o = Ext4.decode(response.responseText);
                 if (o.success)
                 {
-                    var filters = [];
+                    var filters = {};
                     for (var level in o.data)
                     {
                         if (o.data[level].length)
                         {
-                            filters.push({
-                                level: level,
-                                members: o.data[level]
-                            })
+                            if (!filters[level])
+                                filters[level] = o.data[level];
+                            else
+                                filters[level] = filters[level].concat(o.data[level]);
                         }
                     }
                     this.makeCountDistinctQuery(filters);
+                }
+                else
+                {
+                    console.log("Problem making request for accessible members", o);
                 }
 
             },
@@ -194,9 +211,9 @@ Ext4.define('LABKEY.study.store.Facets', {
         });
     },
 
-    makeCountDistinctQuery: function(intersectFilters)
+    makeCountDistinctQuery: function(filtersMap)
     {
-        this.getCountDistinctFilters(intersectFilters);
+        var filters = this.getCountDistinctFilters(filtersMap);
         var i, f, facet;
         for (f = 0; f < this.count(); f++)
         {
@@ -213,7 +230,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                     {
                         names.push(m.data.uniqueName)
                     });
-                    intersectFilters.push({
+                    filters.push({
                         level: this.cubeConfig.filterByLevel,
                         membersQuery: {level: selectedMembers[0].data.level, members: names}
                     });
@@ -223,7 +240,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                     for (i = 0; i < selectedMembers.length; i++)
                     {
                         var filterMember = selectedMembers[i];
-                        intersectFilters.push({
+                        filters.push({
                             level: this.cubeConfig.filterByLevel,
                             membersQuery: {level: filterMember.data.level, members: [filterMember.data.uniqueName]}
                         });
@@ -231,8 +248,6 @@ Ext4.define('LABKEY.study.store.Facets', {
                 }
             }
         }
-
-        var filters = intersectFilters;
 
         var onRows = { operator: "UNION", arguments: [] };
         onRows.arguments.push({level: this.cubeConfig.filterByLevel});
@@ -246,7 +261,6 @@ Ext4.define('LABKEY.study.store.Facets', {
             else
                 onRows.arguments.push({level: facet.data.level.uniqueName});
         }
-
 
         var config =
         {
@@ -269,6 +283,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             includeNullMemberInCount: false,
             countDistinctLevel: this.cubeConfig.countDistinctLevel
         };
+        // console.log("Making count distinct query with config", config);
         this.mdx.query(config);
     },
 

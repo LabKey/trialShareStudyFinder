@@ -51,6 +51,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
     },
 
     onSearchTermsChanged : function(searchTerms) {
+        // console.log("search terms changed to " + searchTerms);
         this.searchTerms = searchTerms;
         if (!searchTerms)
         {
@@ -61,7 +62,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
         var url = LABKEY.ActionURL.buildURL("search", "json", this.cubeConfig.cubeContainerPath, {
             "category": this.cubeConfig.searchCategory,
             "q": searchTerms,
-            "scope" : "Project"
+            "scope" : this.cubeConfig.searchScope
         });
         Ext4.Ajax.request({
             url: url,

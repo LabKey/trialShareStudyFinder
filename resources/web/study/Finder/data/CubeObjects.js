@@ -24,6 +24,7 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
     },
 
     updateFacetFilters: function(selectedMembers, selectedSubset) {
+        // console.log("update facet filters with searchSelectedMembers ", this.searchSelectedMembers);
         this.updateFilters(selectedMembers, this.searchSelectedMembers, selectedSubset)
     },
 
