@@ -67,34 +67,35 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(User.getSearchUser(), c);
 
         String sql =
-            "SELECT pub.Key as PublicationId," +
-                "pub.Title, " +
-                "pub.Author, " +
-                "pub.DOI, " +
-                "pub.PMID, " +
-                "pub.PMCID, " +
-                "pub.PublicationType, " +
-                "pub.Year, " +
-                "pub.Journal, " +
-                "pub.Status, " +
-                "pub.Study as PrimaryStudy, " +
-                "pub.StudyId as PrimaryStudyId, " +
-                "pub.AbstractText, " +
-                "pub.Keywords, " +
-                "pub.PermissionsContainer, " +
-                "pub.ManuscriptContainer, " +
-                "pa.Assay, " +
-                "pc.Condition, " +
-                "ps.ShortName as StudyShortName, " +
-                "ps.StudyId, " +
-                "pta.TherapeuticArea " +
-            "FROM " +
-                "ManuscriptsAndAbstracts pub " +
-                "LEFT JOIN (SELECT PublicationId, group_concat(Assay) AS Assay FROM PublicationAssay GROUP BY PublicationId) pa ON pub.Key = pa.PublicationId " +
-                "LEFT JOIN (SELECT PublicationId, group_concat(Condition) AS Condition FROM PublicationCondition GROUP BY PublicationId) pc on pa.Key = pc.PublicationId " +
-                "LEFT JOIN (SELECT PublicationId, group_concat(StudyId) AS StudyId FROM PublicationStudy GROUP BY PublicationId) ps on pa.Key = ps.PublicationId " +
-                "LEFT JOIN (SELECT PublicationId, group_concat(TherapeuticArea) AS TherapeuticArea FROM PublicationTherapeuticArea GROUP BY PublicationId) pta on pa.Key = pta.PublicationId " +
-            "WHERE pub.Show = true";
+                "SELECT  " +
+                    "pub.Key as PublicationId, " +
+                    "pub.Title,  " +
+                    "pub.Author,  " +
+                    "pub.Citation, " +
+                    "pub.DOI,  " +
+                    "pub.PMID,  " +
+                    "pub.PMCID,  " +
+                    "pub.PublicationType,  " +
+                    "pub.Year,  " +
+                    "pub.Journal,  " +
+                    "pub.Status,  " +
+                    "pub.Study as PrimaryStudy,  " +
+                    "pub.StudyId as PrimaryStudyId,  " +
+                    "pub.AbstractText,  " +
+                    "pub.Keywords,  " +
+                    "pub.PermissionsContainer,  " +
+                    "pub.ManuscriptContainer,  " +
+                    "pa.Assay,  " +
+                    "pc.Condition,  " +
+                    "ps.ShortName as StudyShortName,  " +
+                    "ps.StudyId,  " +
+                    "pta.TherapeuticArea  " +
+                "FROM ManuscriptsAndAbstracts pub  " +
+                    "   LEFT JOIN (SELECT PublicationId, group_concat(Assay) AS Assay FROM PublicationAssay GROUP BY PublicationId) pa ON pub.Key = pa.PublicationId  " +
+                    "   LEFT JOIN (SELECT PublicationId, group_concat(Condition) AS Condition FROM PublicationCondition GROUP BY PublicationId) pc on pub.Key = pc.PublicationId  " +
+                    "   LEFT JOIN (SELECT PublicationId, ShortName, group_concat(StudyId) AS StudyId FROM PublicationStudy GROUP BY ShortName, PublicationId) ps on pub.Key = ps.PublicationId  " +
+                    "   LEFT JOIN (SELECT PublicationId, group_concat(TherapeuticArea) AS TherapeuticArea FROM PublicationTherapeuticArea GROUP BY PublicationId) pta on pub.Key = pta.PublicationId  " +
+                "WHERE pub.Show = true ";
 
         try (ResultSet results = QueryService.get().select(listSchema,sql))
         {
