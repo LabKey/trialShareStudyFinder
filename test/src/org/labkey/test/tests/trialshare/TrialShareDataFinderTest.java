@@ -901,7 +901,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
     private DataFinderPage goDirectlyToDataFinderPage(String containerPath, boolean testingStudies)
     {
-        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
+        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL, longWait());
         DataFinderPage page = new DataFinderPage(this, testingStudies);
         if (!testingStudies)
             page.navigateToPublications();
