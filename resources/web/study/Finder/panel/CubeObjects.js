@@ -41,14 +41,6 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
             selectedSubset = this.getCardPanelHeader().getSubsetMenu().getValue();
         this.getCards().store.updateFacetFilters(null, selectedSubset);
     },
-    
-    // TODO should this be displayed?
-    getSearchMessage : function() {
-        if (this.getCards().store.count() == 0 && this.searchTerms != "")
-            return "No " + this.cubeConfig.objectNamePlural.toLowerCase() + " match your search criteria";
-        else
-            return "";
-    },
 
     onSearchTermsChanged : function(searchTerms) {
         // console.log("search terms changed to " + searchTerms);
@@ -70,6 +62,11 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
             success: function (response)
             {
                 var data = Ext4.decode(response.responseText);
+                if (data.q != this.searchTerms) // search terms changed since query was made
+                {
+                    // console.log("Ignoring results.  Search terms have since changed to " + this.searchTerms, data);
+                    return;
+                }
                 var hits = data.hits;
                 var searchHits = {};
                 var count = 0;
@@ -84,7 +81,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
                     else
                         searchHits[accession] = "[" + this.cubeConfig.objectName + "].[" + accession + "]";
                 }
-                console.log("found " + Object.keys(searchHits).length + " objects matching terms " + searchTerms, searchHits);
+                // console.log("found " + Object.keys(searchHits).length + " objects matching terms " + searchTerms, searchHits);
                 this.updateSearchFilters(searchHits);
                 // this.getCardPanelHeader().onSearchTermsChanged(this.getSearchMessage());
             }
