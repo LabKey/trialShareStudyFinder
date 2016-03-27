@@ -107,7 +107,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 for (String field : new String[]{"AbstractText", "DOI", "PMID", "PMCID", "PublicationType", "Journal", "Citation", "Year", "Status", "PrimaryStudy", "PrimaryStudyId", "Keywords", "Assay", "Condition", "StudyId", "StudyShortName", "TherapeuticArea"})
                 {
                     if (results.getString(field) != null)
-                        body.append(StringUtils.join(results.getString(field).split(",")," ")).append(" ");
+                        body.append(results.getString(field).replaceAll(",", " ")).append(" ");
                 }
                 Map<String, Object> properties = new HashMap<>();
 

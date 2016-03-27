@@ -96,7 +96,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                 for (String field : new String[]{"Description", "AgeGroup", "Assay", "Condition", "Phase", "TherapeuticArea", "StudyType"})
                 {
                     if (results.getString(field) != null)
-                        body.append(StringUtils.join(results.getString(field).split(",")," ")).append(" ");
+                        body.append(results.getString(field).replaceAll(",", " ")).append(" " );
                 }
 
                 Map<String, Object> properties = new HashMap<>();
