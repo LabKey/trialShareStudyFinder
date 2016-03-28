@@ -8,9 +8,6 @@ import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
 import org.labkey.trialshare.TrialShareModule;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Created by susanh on 2/23/16.
  */
@@ -103,21 +100,50 @@ public class TrialShareQuerySchema
         return _listsSchema.getTable(TrialShareQuerySchema.STUDY_THERAPEUTIC_AREA_TABLE);
     }
 
+    public TableInfo getPublicationsTableInfo()
+    {
+        return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
+    }
+
+    public TableInfo getPublicationAssayTableInfo()
+    {
+        return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_ASSAY_TABLE);
+    }
+
+    public TableInfo getPublicationConditionTableInfo()
+    {
+        return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_CONDITION_TABLE);
+    }
+
+    public TableInfo getPublicationStudyTableInfo()
+    {
+        return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_STUDY_TABLE);
+    }
+
+    public TableInfo getPublicationTherapeuticAreaTableInfo()
+    {
+        return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_THERAPEUTIC_AREA_TABLE);
+    }
+
     public TableInfo[] getStudyTables() {
         return new TableInfo[] {
-//                getStudyPropertiesTableInfo(),
-//                getStudyAccessTableInfo(),
-//                getStudyAgeGroupTableInfo(),
-//                getStudyAssayTableInfo(),
-//                getStudyConditionTableInfo(),
-//                getStudyPhaseTableInfo(),
-//                getStudyTherapeuticAreaTableInfo()
+                getStudyPropertiesTableInfo(),
+                getStudyAccessTableInfo(),
+                getStudyAgeGroupTableInfo(),
+                getStudyAssayTableInfo(),
+                getStudyConditionTableInfo(),
+                getStudyPhaseTableInfo(),
+                getStudyTherapeuticAreaTableInfo()
         };
     }
 
     public TableInfo[] getPublicationTables() {
         return new TableInfo[] {
-// TODO
+                getPublicationsTableInfo(),
+                getPublicationAssayTableInfo(),
+                getPublicationConditionTableInfo(),
+                getPublicationStudyTableInfo(),
+                getPublicationTherapeuticAreaTableInfo()
         };
     }
 }
