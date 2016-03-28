@@ -83,7 +83,15 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
                 }
                 // console.log("found " + Object.keys(searchHits).length + " objects matching terms " + searchTerms, searchHits);
                 this.updateSearchFilters(searchHits);
-                // this.getCardPanelHeader().onSearchTermsChanged(this.getSearchMessage());
+            },
+            failure: function(response)
+            {
+                var data = Ext4.decode(response.responseText);
+                Ext4.Msg.show({
+                    title: 'Error',
+                    buttons: Ext4.MessageBox.OK,
+                    msg: data.exception
+                });
             }
         });
         
