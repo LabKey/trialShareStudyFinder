@@ -39,7 +39,8 @@ public class DataFinderPage extends LabKeyPage
 {
     private static final String CONTROLLER = "trialshare";
     private static final String ACTION = "dataFinder";
-    public static final String COUNT_SIGNAL = "dataFinderCountsUpdated";
+    public static final String STUDY_COUNT_SIGNAL = "dataFinderStudyCountsUpdated";
+    public static final String PUBLICATION_COUNT_SIGNAL = "dataFinderPublicationCountsUpdated";
     private static final String GROUP_UPDATED_SIGNAL = "participantGroupUpdated";
     private static final String PUBLICATION_DETAILS_SIGNAL = "publicationDetailsLoaded";
     private boolean testingStudies = true;
@@ -59,10 +60,14 @@ public class DataFinderPage extends LabKeyPage
         }
     }
 
+    public String getCountSignal()
+    {
+        return (this.testingStudies ? STUDY_COUNT_SIGNAL : PUBLICATION_COUNT_SIGNAL);
+    }
     @Override
     protected void waitForPage()
     {
-        waitForElement(LabKeyPage.Locators.pageSignal(COUNT_SIGNAL));
+        waitForElement(LabKeyPage.Locators.pageSignal(getCountSignal()));
     }
 
     protected void waitForGroupUpdate()
@@ -70,17 +75,6 @@ public class DataFinderPage extends LabKeyPage
         waitForElement(LabKeyPage.Locators.pageSignal(GROUP_UPDATED_SIGNAL));
     }
 
-//    public static DataFinderPage goDirectlyToPage(BaseWebDriverTest test, String containerPath, boolean testingStudies)
-//    {
-//        test.doAndWaitForPageSignal(() -> test.beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
-//        return new DataFinderPage(test, testingStudies);
-//    }
-//
-//    public static DataFinderPage goDirectlyToPage(WebDriver test, String containerPath, boolean testingStudies)
-//    {
-//        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
-//        return new DataFinderPage(test, testingStudies);
-//    }
 
     public boolean hasStudySubsetCombo()
     {
@@ -93,7 +87,7 @@ public class DataFinderPage extends LabKeyPage
         _ext4Helper.openComboList(DataFinderPage.Locators.studySubsetCombo);
         if (!isElementPresent(Ext4Helper.Locators.comboListItemSelected().withText(text)))
         {
-            doAndWaitForPageSignal(() ->_ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT), COUNT_SIGNAL);
+            doAndWaitForPageSignal(() ->_ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT), getCountSignal());
 
         }
         else // FIXME you should be able to just close the combo box at this point, but the close method assumes you've chosen something from teh lis
@@ -105,7 +99,7 @@ public class DataFinderPage extends LabKeyPage
     @LogMethod
     public void search(@LoggedParam final String search)
     {
-        doAndWaitForPageSignal(() -> setFormElement(Locators.getSearchInput(finderLocator), search), COUNT_SIGNAL);
+        doAndWaitForPageSignal(() -> setFormElement(Locators.getSearchInput(finderLocator), search), getCountSignal());
     }
 
     @LogMethod(quiet = true)
@@ -226,7 +220,7 @@ public class DataFinderPage extends LabKeyPage
             final WebElement clearAll = activeClearAllLocator.findElement(getDriver());
             if (clearAll.isDisplayed())
             {
-                doAndWaitForPageSignal(clearAll::click, COUNT_SIGNAL);
+                doAndWaitForPageSignal(clearAll::click, getCountSignal());
             }
         }
     }
@@ -463,7 +457,7 @@ public class DataFinderPage extends LabKeyPage
             scrollIntoView(rowLocator);
             WebElement row = rowLocator.findElement(getDriver());
 
-            doAndWaitForPageSignal(() -> row.click(), COUNT_SIGNAL);
+            doAndWaitForPageSignal(() -> row.click(), getCountSignal());
         }
 
         public void clearFilter(Dimension dimension)

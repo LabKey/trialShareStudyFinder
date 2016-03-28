@@ -376,7 +376,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         //    this.changeSubjectGroup();
 
 
-        LABKEY.Utils.signalWebDriverTest('dataFinderCountsUpdated');
+        LABKEY.Utils.signalWebDriverTest('dataFinder' + this.cubeConfig.objectName + 'CountsUpdated');
     },
 
     updateMemberFilter : function(selectedMembers) {
