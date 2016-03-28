@@ -111,10 +111,13 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 }
                 Map<String, Object> properties = new HashMap<>();
 
-                // FIXME It seems to be required to add the author to the body in order for it to be in the index, even though supplied as an identifier
-                body.append("\n" + results.getString("Author"));
-                properties.put(SearchService.PROPERTY.identifiersMed.toString(), results.getString("Author"));
-                properties.put(SearchService.PROPERTY.keywordsMed.toString(), results.getString("Title"));
+                StringBuilder keywords = new StringBuilder();
+                for (String field : new String[]{"Author",  "Title"})
+                {
+                    if (results.getString(field) != null)
+                        keywords.append(results.getString(field)).append(" ");
+                }
+                properties.put(SearchService.PROPERTY.keywordsMed.toString(), keywords);
                 properties.put(SearchService.PROPERTY.title.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryPublication.getName());
 

@@ -101,17 +101,14 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
 
                 Map<String, Object> properties = new HashMap<>();
 
-                StringBuilder identifiers = new StringBuilder();
-                for (String field : new String[]{"shortName", "StudyId", "Investigator"})
+                StringBuilder keywords = new StringBuilder();
+                for (String field : new String[]{"shortName", "StudyId", "Investigator", "Title"})
                 {
                     if (results.getString(field) != null)
-                        identifiers.append(results.getString(field)).append(" ");
+                        keywords.append(results.getString(field)).append(" ");
                 }
-                // FIXME it seems to be required to add the identifiers to the body for them to show up in the index even though also supplied as an identifier property
-                body.append(" " + identifiers);
 
-                properties.put(SearchService.PROPERTY.identifiersHi.toString(), identifiers.toString());
-                properties.put(SearchService.PROPERTY.keywordsHi.toString(), results.getString("Title"));
+                properties.put(SearchService.PROPERTY.keywordsMed.toString(), keywords.toString());
                 properties.put(SearchService.PROPERTY.title.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryStudy.getName());
 
