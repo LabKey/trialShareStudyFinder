@@ -104,7 +104,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
                 StringBuilder body = new StringBuilder();
 
-                for (String field : new String[]{"AbstractText", "DOI", "PMID", "PMCID", "PublicationType", "Journal", "Citation", "Year", "Status", "PrimaryStudy", "PrimaryStudyId", "Keywords", "Assay", "Condition", "StudyId", "StudyShortName", "TherapeuticArea"})
+                for (String field : new String[]{"AbstractText", "Citation", "Keywords"})
                 {
                     if (results.getString(field) != null)
                         body.append(results.getString(field).replaceAll(",", " ")).append(" ");
@@ -112,12 +112,20 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 Map<String, Object> properties = new HashMap<>();
 
                 StringBuilder keywords = new StringBuilder();
-                for (String field : new String[]{"Author",  "Title"})
+                // See #26028: identifiers that have punctuation in them (e.g., DOI) are not indexed well as identifiers, so we use keywords instead
+                for (String field : new String[]{"Author", "Year", "Status", "PrimaryStudy", "Title", "PublicationType", "Journal", "TherapeuticArea", "StudyShortName", "Assay", "Condition", "DOI"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");
                 }
-                properties.put(SearchService.PROPERTY.keywordsMed.toString(), keywords);
+                StringBuilder identifiers = new StringBuilder();
+                for (String field : new String[]{"PMID", "PMCID", "StudyId", "PrimaryStudyId"})
+                {
+                    if (results.getString(field) != null)
+                        identifiers.append(results.getString(field)).append(" " );
+                }
+                properties.put(SearchService.PROPERTY.identifiersMed.toString(), identifiers.toString());
+                properties.put(SearchService.PROPERTY.keywordsMed.toString(), keywords.toString());
                 properties.put(SearchService.PROPERTY.title.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryPublication.getName());
 
@@ -153,12 +161,5 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
     @Override
     public void indexDeleted() throws SQLException
     {
-        TrialShareQuerySchema querySchema = new TrialShareQuerySchema(User.getSearchUser(), null);
-        SqlExecutor executor = new SqlExecutor(querySchema.getSchema().getDbSchema());
-
-        for (TableInfo ti : querySchema.getPublicationTables())
-        {
-            executor.execute("UPDATE " + ti.getFromSQL(ti.getName()) + " SET LastIndexed = NULL");
-        }
     }
 }
