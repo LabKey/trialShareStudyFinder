@@ -159,8 +159,16 @@ public class TrialShareController extends SpringActionController
         @Override
         public boolean handlePost(CubeAdminForm form, BindException errors) throws Exception
         {
-            Container container = ContainerManager.getForPath(form.getPath());
-            QueryService.get().cubeDataChanged(container);
+            if ("reindex".equalsIgnoreCase(form.getMethod()))
+            {
+                StudyDocumentProvider.reindex();
+                PublicationDocumentProvider.reindex();
+            }
+            else
+            {
+                Container container = ContainerManager.getForPath(form.getPath());
+                QueryService.get().cubeDataChanged(container);
+            }
             return true;
         }
 
@@ -209,6 +217,7 @@ public class TrialShareController extends SpringActionController
     public static class CubeAdminForm
     {
         private String _path;
+        private String _method;
 
         public String getPath()
         {
@@ -218,6 +227,16 @@ public class TrialShareController extends SpringActionController
         public void setPath(String path)
         {
             _path = path;
+        }
+
+        public String getMethod()
+        {
+            return _method;
+        }
+
+        public void setMethod(String method)
+        {
+            _method = method;
         }
     }
 

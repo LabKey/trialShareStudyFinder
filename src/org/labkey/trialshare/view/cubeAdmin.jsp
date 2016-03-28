@@ -39,6 +39,7 @@ Cube definitions are managed per container.  The following listing shows the def
 </p>
 <labkey:form method="post" id="cubeAdminForm">
     <input type="hidden" id="containerPath" name="path"/>
+    <input type="hidden" id="adminMethod" name="method"/>
     <table>
 <%
     for (String path : cubeDefinitions.keySet())
@@ -78,6 +79,7 @@ Cube definitions are managed per container.  The following listing shows the def
                 if (btn == 'ok')
                 {
                     document.getElementById("containerPath").setAttribute("value", path);
+                    document.getElementById("adminMethod").setAttribute("value", "clearCache");
                     document.getElementById("cubeAdminForm").submit();
                 }
             }
@@ -94,38 +96,12 @@ Cube definitions are managed per container.  The following listing shows the def
             {
                 if (btn == 'ok')
                 {
-                    reindexCubeData(path);
-                    window.location = LABKEY.ActionURL.buildURL("admin", "showAdmin.view", "/")
+                    document.getElementById("containerPath").setAttribute("value", path);
+                    document.getElementById("adminMethod").setAttribute("value", "reindex");
+                    document.getElementById("cubeAdminForm").submit();
                 }
             }
         });
     }
 
-    function reindexCubeData(path)
-    {
-        Ext4.Ajax.request({
-            url: LABKEY.ActionURL.buildURL("trialShare", "reindex.api", path),
-            success: function (response)
-            {
-                var o = Ext4.decode(response.responseText);
-                if (!o.success)
-                {
-                    Ext4.Msg.show({
-                        title: 'Reindex',
-                        buttons: Ext4.MessageBox.OK,
-                        msg: 'Reindex of data failed.  Please check the logs.'
-                    })
-                }
-            },
-            failure: function ()
-            {
-                Ext4.Msg.show({
-                    title: 'Reindex',
-                    buttons: Ext4.MessageBox.OK,
-                    msg: 'Reindex of data failed.  Please check the logs.'
-                })
-            }
-        })
-
-    }
 </script>
