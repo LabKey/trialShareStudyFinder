@@ -112,7 +112,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     },
 
-    getCountDistinctFilters: function(filtersMap) {
+    getFiltersForCountDistinct: function(filtersMap) {
         this.addFilterMapData(filtersMap, this.getStudySubsetFilter());
         this.addFilterMapData(filtersMap, this.getSearchFilter());
         this.addFilterMapData(filtersMap, this.getCustomFilters());
@@ -213,7 +213,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     makeCountDistinctQuery: function(filtersMap)
     {
-        var filters = this.getCountDistinctFilters(filtersMap);
+        var filters = this.getFiltersForCountDistinct(filtersMap);
         var i, f, facet;
         for (f = 0; f < this.count(); f++)
         {

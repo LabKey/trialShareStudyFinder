@@ -20,23 +20,22 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
     },
 
     updateSearchFilters: function(searchSelectedMembers) {
-        this.updateFilters(this.facetSelectedMembers, searchSelectedMembers, this.selectedSubset);
-    },
-
-    updateFacetFilters: function(selectedMembers, selectedSubset) {
-        // console.log("update facet filters with searchSelectedMembers ", this.searchSelectedMembers);
-        this.updateFilters(selectedMembers, this.searchSelectedMembers, selectedSubset)
-    },
-
-    updateFilters: function(facetSelectedMembers, searchSelectedMembers, selectedSubset)
-    {
-        if (facetSelectedMembers != undefined)
-            this.facetSelectedMembers = facetSelectedMembers;
         if (searchSelectedMembers == null || searchSelectedMembers) // null is a value we want to retain but undefined is not
             this.searchSelectedMembers = searchSelectedMembers;
+        this.updateFilters();
+    },
+
+    updateFacetFilters: function(facetSelectedMembers, selectedSubset) {
+        if (facetSelectedMembers != undefined)
+            this.facetSelectedMembers = facetSelectedMembers;
         if (selectedSubset)
             this.selectedSubset = selectedSubset;
+        // console.log("update facet filters with searchSelectedMembers ", this.searchSelectedMembers);
+        this.updateFilters()
+    },
 
+    updateFilters: function()
+    {
         var object;
 
         this.suspendEvents(false);
