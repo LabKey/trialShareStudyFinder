@@ -8,6 +8,9 @@ import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
 import org.labkey.trialshare.TrialShareModule;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by susanh on 2/23/16.
  */
@@ -125,25 +128,25 @@ public class TrialShareQuerySchema
         return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_THERAPEUTIC_AREA_TABLE);
     }
 
-    public TableInfo[] getStudyTables() {
-        return new TableInfo[] {
-                getStudyPropertiesTableInfo(),
-                getStudyAccessTableInfo(),
-                getStudyAgeGroupTableInfo(),
-                getStudyAssayTableInfo(),
-                getStudyConditionTableInfo(),
-                getStudyPhaseTableInfo(),
-                getStudyTherapeuticAreaTableInfo()
-        };
+    public List<TableInfo> getStudyTables() {
+        List<TableInfo> list = new ArrayList<>();
+        list.add(getStudyPropertiesTableInfo());
+        list.add(getStudyAccessTableInfo());
+        list.add(getStudyAgeGroupTableInfo());
+        list.add(getStudyAssayTableInfo());
+        list.add(getStudyConditionTableInfo());
+        list.add(getStudyPhaseTableInfo());
+        list.add(getStudyTherapeuticAreaTableInfo());
+        return list;
     }
 
-    public TableInfo[] getPublicationTables() {
-        return new TableInfo[] {
-                getPublicationsTableInfo(),
-                getPublicationAssayTableInfo(),
-                getPublicationConditionTableInfo(),
-                getPublicationStudyTableInfo(),
-                getPublicationTherapeuticAreaTableInfo()
-        };
+    public List<TableInfo> getPublicationTables() {
+        List<TableInfo> list = new ArrayList<>();
+        list.add(getPublicationsTableInfo());
+        list.add(getPublicationAssayTableInfo());
+        list.add(getPublicationConditionTableInfo());
+        list.add(getPublicationStudyTableInfo());
+        list.add(getPublicationTherapeuticAreaTableInfo());
+        return list;
     }
 }
