@@ -38,6 +38,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
         this.on({
             subsetChanged: this.onSubsetChanged,
+            clearAllFilters: this.onClearAllFilters,
             searchTermsChanged: this.onSearchTermsChanged
         });
     },
@@ -69,61 +70,11 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
     },
 
     onClearAllFilters: function() {
-        this.getFacetsPanel().onClearAllFilters();
+        this.getCubeMemberPanel().onClearAllFilters();
     },
 
-    onSearchTermsChanged: function(searchTerms) {
-
-        if (!searchTerms)
-        {
-            this.searchMessage = "";
-            this.clearStudyFilter();
-            return;
-        }
-
-        var url = LABKEY.ActionURL.buildURL("search", "json", "/home/", {
-            "category": "List",
-            "q": searchTerms
-        });
-        Ext4.Ajax.request({
-            url: url,
-            success: function (response)
-            {
-                //// NOOP if we're not current (poor man's cancel)
-                //if (promise != $scope.doSearchTermsChanged_promise)
-                //    return;
-                //$scope.doSearchTermsChanged_promise = null;
-                var data = Ext4.decode(response.responseText);
-                var hits = data.hits;
-                var searchStudies = [];
-                var found = {};
-                for (var h = 0; h < hits.length; h++)
-                {
-                    var id = hits[h].id;
-                    var accession = id.substring(id.lastIndexOf(':') + 1);
-                    if (found[accession])
-                        continue;
-                    found[accession] = true;
-                    searchStudies.push("[Study].[" + accession + "]");
-                }
-                if (!searchStudies.length)
-                {
-                    console.log("No studies match your search criteria");
-                    //$scope.setStudyFilter(searchStudies);
-                    //$scope.searchMessage = 'No studies match your search criteria';
-                }
-                else
-                {
-                    console.log("found " + searchStudies.length + " studies matching terms " + searchTerms);
-                    //$scope.searchMessage = '';
-                    //// intersect with study subset list
-                    //var result = $scope.intersect(searchStudies, $scope.getStudySubsetList());
-                    //if (!result.length)
-                    //    $scope.searchMessage = 'No studies match your search criteria';
-                    //$scope.setStudyFilter(result);
-                }
-            }
-        });
+    onSearchTermsChanged: function(terms) {
+        this.getFacetsPanel().onSearchTermsChanged(terms);
     },
 
     getFacetsPanel: function() {
@@ -151,10 +102,11 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     getStudiesPanel: function() {
         if (!this.studiesPanel) {
-            this.studiesPanel = Ext4.create("LABKEY.study.panel.Studies", {
-                showSearch : this.cubeConfig.showSearch,
+            this.studiesPanel = Ext4.create("LABKEY.study.panel.CubeObjects", {
+                alias : 'widget.labkey-studies-panel',
+                cls: 'labkey-studies-panel',
+                cubeConfig: this.cubeConfig,
                 dataModuleName: this.dataModuleName,
-                cubeContainerPath: this.cubeConfig.cubeContainerPath,
                 region: 'center',
                 flex:4
             });
@@ -164,10 +116,11 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     getPublicationsPanel: function() {
         if (!this.publicationsPanel) {
-            this.publicationsPanel = Ext4.create("LABKEY.study.panel.Publications", {
-                showSearch : this.cubeConfig.showSearch,
+            this.publicationsPanel = Ext4.create("LABKEY.study.panel.CubeObjects", {
+                alias : 'widget.labkey-publications-panel',
+                cls: 'labkey-publications-panel',
+                cubeConfig: this.cubeConfig,
                 dataModuleName: this.dataModuleName,
-                cubeContainerPath: this.cubeConfig.cubeContainerPath,
                 region: 'center',
                 flex:4
             });

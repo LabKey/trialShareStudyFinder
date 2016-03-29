@@ -15,6 +15,7 @@
  */
 package org.labkey.trialshare;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.FormViewAction;
@@ -30,7 +31,6 @@ import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
-import org.labkey.api.gwt.client.util.StringUtils;
 import org.labkey.api.module.Module;
 import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.FieldKey;
@@ -159,8 +159,16 @@ public class TrialShareController extends SpringActionController
         @Override
         public boolean handlePost(CubeAdminForm form, BindException errors) throws Exception
         {
-            Container container = ContainerManager.getForPath(form.getPath());
-            QueryService.get().cubeDataChanged(container);
+            if ("reindex".equalsIgnoreCase(form.getMethod()))
+            {
+                StudyDocumentProvider.reindex();
+                PublicationDocumentProvider.reindex();
+            }
+            else
+            {
+                Container container = ContainerManager.getForPath(form.getPath());
+                QueryService.get().cubeDataChanged(container);
+            }
             return true;
         }
 
@@ -209,6 +217,7 @@ public class TrialShareController extends SpringActionController
     public static class CubeAdminForm
     {
         private String _path;
+        private String _method;
 
         public String getPath()
         {
@@ -218,6 +227,16 @@ public class TrialShareController extends SpringActionController
         public void setPath(String path)
         {
             _path = path;
+        }
+
+        public String getMethod()
+        {
+            return _method;
+        }
+
+        public void setMethod(String method)
+        {
+            _method = method;
         }
     }
 
@@ -243,7 +262,7 @@ public class TrialShareController extends SpringActionController
         CubeConfigBean bean = new CubeConfigBean();
         bean.setSchemaName("lists");
         bean.setDataModuleName(TrialShareModule.NAME);
-        bean.setShowSearch(false);
+        bean.setShowSearch(true);
         bean.setShowParticipantFilters(false);
         Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
         bean.setCubeContainer(((TrialShareModule) trialShareModule).getCubeContainer(container));
@@ -259,6 +278,9 @@ public class TrialShareController extends SpringActionController
             bean.setFilterByFacetUniqueName("[Study]");
             bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Study.Public].[Public]");
+            bean.setSearchCategory(TrialShareModule.searchCategoryStudy.getName());
+            bean.setSearchScope("Project");
+            bean.setHasContainerFilter(true);
         }
         else if (objectName.equalsIgnoreCase("publications"))
         {
@@ -271,6 +293,9 @@ public class TrialShareController extends SpringActionController
             bean.setFilterByFacetUniqueName("[Publication]");
             bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Publication.Status].[Status]");
+            bean.setSearchCategory(TrialShareModule.searchCategoryPublication.getName());
+            bean.setSearchScope("All");
+            bean.setHasContainerFilter(false);
         }
 
         return bean;
@@ -324,6 +349,9 @@ public class TrialShareController extends SpringActionController
         private String _subsetLevelName;
         private String _cubeContainerPath;
         private String _cubeContainerId;
+        private String _searchCategory;
+        private String _searchScope;
+        private Boolean _hasContainerFilter;
 
         public String getObjectName()
         {
@@ -484,6 +512,48 @@ public class TrialShareController extends SpringActionController
         {
             _cubeContainerPath = cubeContainerPath;
         }
+
+        public String getSearchCategory()
+        {
+            return _searchCategory;
+        }
+
+        public void setSearchCategory(String searchCategory)
+        {
+            _searchCategory = searchCategory;
+        }
+
+        public String getSearchScope()
+        {
+            return _searchScope;
+        }
+
+        public void setSearchScope(String searchScope)
+        {
+            _searchScope = searchScope;
+        }
+
+        public Boolean getHasContainerFilter()
+        {
+            return _hasContainerFilter;
+        }
+
+        public void setHasContainerFilter(Boolean hasContainerFilter)
+        {
+            _hasContainerFilter = hasContainerFilter;
+        }
+    }
+
+    @RequiresPermission(AdminPermission.class)
+    public class ReindexAction extends ApiAction
+    {
+        @Override
+        public Object execute(Object o, BindException errors) throws Exception
+        {
+            StudyDocumentProvider.reindex();
+            PublicationDocumentProvider.reindex();
+            return success();
+        }
     }
 
     @RequiresPermission(ReadPermission.class)
@@ -509,6 +579,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(Object form, BindException errors) throws Exception
         {
+            // TODO update to not use static methods
             QuerySchema listsSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
             TableInfo studyProperties = listsSchema.getTable(TrialShareQuerySchema.STUDY_TABLE);
 
@@ -611,7 +682,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(Object o, BindException errors) throws Exception
         {
-            TableInfo publicationsList = TrialShareQuerySchema.getSchema(getUser(), getContainer()).getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
+            TableInfo publicationsList = TrialShareQuerySchema.getPublicationsTableInfo(getUser(), getContainer());
             if (publicationsList != null)
             {
                 List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
@@ -885,7 +956,7 @@ public class TrialShareController extends SpringActionController
             TableInfo publicationsList = listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
             if (publicationsList != null)
             {
-                StudyPublicationBean publication = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE))).getObject(_id, StudyPublicationBean.class);
+                StudyPublicationBean publication = (new TableSelector(publicationsList)).getObject(_id, StudyPublicationBean.class);
 
                 SimpleFilter filter = new SimpleFilter();
                 filter.addCondition(FieldKey.fromParts("key"), _id);

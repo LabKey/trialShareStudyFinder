@@ -8,6 +8,15 @@ Ext4.define('LABKEY.study.data.Study', {
 
     idProperty : 'studyId',
 
+    proxy : {
+        type: "ajax",
+        //url: set before calling "load".
+        reader: {
+            type: 'json',
+            root: 'data'
+        }
+    },
+
     fields: [
         {name: 'studyId'},
         {name: 'title'},
@@ -22,7 +31,8 @@ Ext4.define('LABKEY.study.data.Study', {
         {name: 'abstractCount', type: 'int'},
         {name: 'manuscriptCount', type: 'int'},
         {name: 'participantCount', type: 'int'},
-        {name: 'isSelected', type: 'boolean'},
+        {name: 'isSelected', type: 'boolean', defaultValue: true},
+        {name: 'isSelectedBySearch', type: 'boolean', defaultValue: false},
         {name: 'isHighlighted', type: 'boolean', defaultValue: false},
         {name: 'isBorderHighlighted', type: 'boolean', defaultValue: false},
         {name: 'studyAccessList'}

@@ -112,14 +112,44 @@ Ext4.define('LABKEY.study.store.Facets', {
 
     },
 
-    getCountDistinctFilters: function(filters) {
-        var newFilters = this.getStudySubsetFilter();
-        if (newFilters != null)
-            filters.push(newFilters);
-        newFilters = this.getCustomFilters();
-        if (newFilters != null)
-            filters.push(newFilters);
+    getFiltersForCountDistinct: function(filtersMap) {
+        this.addFilterMapData(filtersMap, this.getStudySubsetFilter());
+        this.addFilterMapData(filtersMap, this.getSearchFilter());
+        this.addFilterMapData(filtersMap, this.getCustomFilters());
+        var filters = [];
+        for (var level in filtersMap) {
+            if (!filtersMap.hasOwnProperty(level))
+                    continue;
+            filters.push({level: level, members: filtersMap[level]});
+        }
         return filters;
+    },
+
+    addFilterMapData : function(filtersMap, newFilters)
+    {
+        if (newFilters != null)
+        {
+            if (filtersMap[newFilters.level])
+                filtersMap[newFilters.level].concat(newFilters.members);
+            else
+                filtersMap[newFilters.level] = newFilters.members;
+        }
+        return filtersMap;
+    },
+
+    getSearchFilter : function()
+    {
+        var store = Ext4.getStore(this.cubeConfig.objectName);
+        if (store.searchSelectedMembers != null)
+        {
+            var selection = [];
+            for (var key in store.searchSelectedMembers)
+            {
+                selection.push(store.searchSelectedMembers[key])
+            }
+            return {level: this.cubeConfig.filterByLevel, members: selection};
+        }
+        return null;
     },
 
     getCustomFilters: function()
@@ -147,6 +177,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             return;
         }
 
+         // console.log("updateCountsAsync called");
         var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "accessibleMembers.api", null, {
             "objectName": this.cubeConfig.objectName
         });
@@ -157,18 +188,22 @@ Ext4.define('LABKEY.study.store.Facets', {
                 var o = Ext4.decode(response.responseText);
                 if (o.success)
                 {
-                    var filters = [];
+                    var filters = {};
                     for (var level in o.data)
                     {
                         if (o.data[level].length)
                         {
-                            filters.push({
-                                level: level,
-                                members: o.data[level]
-                            })
+                            if (!filters[level])
+                                filters[level] = o.data[level];
+                            else
+                                filters[level] = filters[level].concat(o.data[level]);
                         }
                     }
                     this.makeCountDistinctQuery(filters);
+                }
+                else
+                {
+                    console.log("Problem making request for accessible members", o);
                 }
 
             },
@@ -176,35 +211,15 @@ Ext4.define('LABKEY.study.store.Facets', {
         });
     },
 
-    makeCountDistinctQuery: function(intersectFilters)
+    makeCountDistinctQuery: function(filtersMap)
     {
-        this.getCountDistinctFilters(intersectFilters);
+        var filters = this.getFiltersForCountDistinct(filtersMap);
         var i, f, facet;
         for (f = 0; f < this.count(); f++)
         {
             facet = this.getAt(f);
             var selectedMembers = facet.get("selectedMembers");
-            if (facet.get("name") == this.cubeConfig.objectName)
-            {
-                //if (!selectedMembers || selectedMembers.length == facet.data.members.length)
-                //    continue;
-                //if (selectedMembers.length == 0)
-                //{
-                //    // in the case of study filter, this means no matches, rather than no filter!
-                //    this.updateCountsZero();
-                //    return;
-                //}
-                // TODO seems unnecessary if we always pass in all of the names.
-                //var uniqueNames = facet.data.members.map(function(m){return m.uniqueName;});
-                //if (this.filterByLevel != "[Study].[Study]")
-                //    intersectFilters.push({
-                //        level: this.filterByLevel,
-                //        membersQuery: {level: "[Study].[Study]", members: uniqueNames}
-                //    });
-                //else
-                //    intersectFilters.push({level: "[Study].[Study]", members: uniqueNames});
-            }
-            else
+            if (facet.get("name") != this.cubeConfig.objectName)
             {
                 if (!selectedMembers || selectedMembers.length == 0)
                     continue;
@@ -215,7 +230,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                     {
                         names.push(m.data.uniqueName)
                     });
-                    intersectFilters.push({
+                    filters.push({
                         level: this.cubeConfig.filterByLevel,
                         membersQuery: {level: selectedMembers[0].data.level, members: names}
                     });
@@ -225,7 +240,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                     for (i = 0; i < selectedMembers.length; i++)
                     {
                         var filterMember = selectedMembers[i];
-                        intersectFilters.push({
+                        filters.push({
                             level: this.cubeConfig.filterByLevel,
                             membersQuery: {level: filterMember.data.level, members: [filterMember.data.uniqueName]}
                         });
@@ -233,11 +248,6 @@ Ext4.define('LABKEY.study.store.Facets', {
                 }
             }
         }
-
-        var filters = intersectFilters;
-
-        // CONSIDER: Don't fetch subject IDs every time a filter is changed.
-        var includeSubjectIds = false;
 
         var onRows = { operator: "UNION", arguments: [] };
         onRows.arguments.push({level: this.cubeConfig.filterByLevel});
@@ -251,9 +261,6 @@ Ext4.define('LABKEY.study.store.Facets', {
             else
                 onRows.arguments.push({level: facet.data.level.uniqueName});
         }
-
-        if (includeSubjectIds)
-            onRows.arguments.push({level: "[Subject].[Subject]", members: "members"});
 
         var config =
         {
@@ -276,6 +283,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             includeNullMemberInCount: false,
             countDistinctLevel: this.cubeConfig.countDistinctLevel
         };
+        // console.log("Making count distinct query with config", config);
         this.mdx.query(config);
     },
 
@@ -368,13 +376,12 @@ Ext4.define('LABKEY.study.store.Facets', {
         //    this.changeSubjectGroup();
 
 
-        LABKEY.Utils.signalWebDriverTest('dataFinderCountsUpdated');
+        LABKEY.Utils.signalWebDriverTest('dataFinder' + this.cubeConfig.objectName + 'CountsUpdated');
     },
 
     updateMemberFilter : function(selectedMembers) {
         var store = Ext4.getStore(this.cubeConfig.objectName);
-        store.selectedStudies = selectedMembers;
-        store.updateFilters(selectedMembers);
+        store.updateFacetFilters(selectedMembers);
     },
 
     getRowPositions : function(cellSet)

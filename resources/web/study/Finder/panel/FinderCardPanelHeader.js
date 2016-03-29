@@ -66,7 +66,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
     getSearchBox : function() {
         if (!this.searchBox && this.showSearch) {
             this.searchBox = Ext4.create('Ext.form.field.Text', {
-                emptyText:'Studies',
+                emptyText: this.objectNamePlural,
                 cls: 'labkey-search-box',
                 fieldLabel: '<i class="fa fa-search"></i>',
                 labelWidth: "10px",
@@ -74,7 +74,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
                 disabled: !this.showSearch,
                 hidden: !this.showSearch,
                 fieldCls: 'labkey-search-box',
-                id: 'searchTerms',
+                name: this.objectName + 'searchTerms',
                 listeners: {
                     scope: this,
                     'change': function(field,newValue,oldValue,eOpts) {
@@ -129,8 +129,11 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         return this.helpLinks;
     },
 
+    onClearAllFilters: function() {
+        this.getSearchBox().setValue("");
+    },
+
     onSearchTermsChanged: function(value) {
-        console.log("Search terms changed to ", value);
         this.fireEvent("searchTermsChanged", value);
     },
 
