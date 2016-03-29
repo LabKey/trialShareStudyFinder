@@ -182,7 +182,8 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         createUsers();
 
         List<ModulePropertyValue> propList = new ArrayList<>();
-        propList.add(new ModulePropertyValue("TrialShare", "/" + getProjectName(), "DataFinderCubeContainer", getProjectName()));
+        // set the site-default value for this so it will work as expected from the Admin Console.
+        propList.add(new ModulePropertyValue("TrialShare", "/", "DataFinderCubeContainer", getProjectName()));
         setModuleProperties(propList);
 
         reindexForSearch();
