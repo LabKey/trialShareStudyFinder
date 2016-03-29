@@ -15,7 +15,6 @@
  */
 package org.labkey.trialshare;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
@@ -161,5 +160,6 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
     @Override
     public void indexDeleted() throws SQLException
     {
+        // we currently do not support the LastIndexed setting
     }
 }

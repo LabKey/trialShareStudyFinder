@@ -15,11 +15,8 @@
  */
 package org.labkey.trialshare;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
-import org.labkey.api.data.SqlExecutor;
-import org.labkey.api.data.TableInfo;
 import org.labkey.api.module.Module;
 import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.QuerySchema;
@@ -116,7 +113,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
 
                 String containerId = results.getString("StudyContainer") == null ? c.getId() : results.getString("StudyContainer");
 
-                ActionURL url = new ActionURL(TrialShareController.StudyDetailAction.class, c).addParameter("studyId", (String) results.getString("StudyId")).addParameter("detailType", "study");
+                ActionURL url = new ActionURL(TrialShareController.StudyDetailAction.class, c).addParameter("studyId", results.getString("StudyId")).addParameter("detailType", "study");
                 url.setExtraPath(containerId);
 
                 SimpleDocumentResource resource = new SimpleDocumentResource (
@@ -140,12 +137,6 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
     @Override
     public void indexDeleted() throws SQLException
     {
-        TrialShareQuerySchema querySchema = new TrialShareQuerySchema(User.getSearchUser(), null);
-        SqlExecutor executor = new SqlExecutor(querySchema.getSchema().getDbSchema());
-
-        for (TableInfo ti : querySchema.getStudyTables())
-        {
-            executor.execute("UPDATE " + ti.getFromSQL(ti.getName()) + " SET LastIndexed = NULL");
-        }
+        // we currently do not support the LastIndexed setting
     }
 }
