@@ -294,7 +294,7 @@ public class TrialShareController extends SpringActionController
             bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Publication.Status].[Status]");
             bean.setSearchCategory(TrialShareModule.searchCategoryPublication.getName());
-            bean.setSearchScope("Project");
+            bean.setSearchScope("All");
             bean.setHasContainerFilter(false);
         }
 
