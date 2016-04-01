@@ -249,15 +249,15 @@ public class TrialShareController extends SpringActionController
     {
         FinderBean bean = new FinderBean();
         bean.setDataModuleName(TrialShareModule.NAME);
-        bean.addCubeConfig(getCubeConfigBean("studies", container, "studies".equalsIgnoreCase(objectName)));
-        bean.addCubeConfig(getCubeConfigBean("publications", container, "publications".equalsIgnoreCase(objectName)));
+        bean.addCubeConfig(getCubeConfigBean("study", container, "study".equalsIgnoreCase(objectName)));
+        bean.addCubeConfig(getCubeConfigBean("publication", container, "publication".equalsIgnoreCase(objectName)));
         return bean;
     }
 
     public static CubeConfigBean getCubeConfigBean(String objectName, Container container, Boolean isDefault)
     {
         if (objectName == null)
-            objectName = "studies";
+            objectName = "study";
 
         CubeConfigBean bean = new CubeConfigBean();
         bean.setSchemaName("lists");
@@ -267,7 +267,7 @@ public class TrialShareController extends SpringActionController
         Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
         bean.setCubeContainer(((TrialShareModule) trialShareModule).getCubeContainer(container));
 
-        if (objectName.equalsIgnoreCase("studies"))
+        if (objectName.equalsIgnoreCase("study"))
         {
             bean.setObjectName("Study");
             bean.setObjectNamePlural("Studies");
@@ -282,7 +282,7 @@ public class TrialShareController extends SpringActionController
             bean.setSearchScope("Project");
             bean.setHasContainerFilter(true);
         }
-        else if (objectName.equalsIgnoreCase("publications"))
+        else if (objectName.equalsIgnoreCase("publication"))
         {
             bean.setObjectName("Publication");
             bean.setObjectNamePlural("Publications");
