@@ -29,10 +29,13 @@ Ext4.define('LABKEY.study.panel.Finder', {
         this.callParent();
 
         this._initResize();
-
+        
         this.on({
-            finderObjectChanged: this.updateFinderObject
+            finderObjectChanged: this.updateFinderObject,
+            render : this.mask,
         });
+
+        this.on("countsUpdated", this.unmask, this, {single: true});
     },
 
     createCubeConfigStore : function(cubeConfigs) {
@@ -85,6 +88,17 @@ Ext4.define('LABKEY.study.panel.Finder', {
     updateFinderObject : function(objectName)
     {
         this.getFinderCardDeck().getLayout().setActiveItem(objectName + '-finder-card');
+    },
+
+    mask : function() {
+        this.getEl().mask("Loading study and publication data ...");
+    },
+
+    unmask : function() {
+        if (this.getEl().isMasked())
+        {
+            this.getEl().unmask()
+        }
     }
 
 });

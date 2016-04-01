@@ -273,7 +273,6 @@ Ext4.define('LABKEY.study.store.Facets', {
             success: function (cellSet, mdx, config)
             {
                 this.updateCountsUnion(cellSet);
-                //this.fireEvent("cubeReady");
             },
             scope: this,
 
@@ -374,8 +373,8 @@ Ext4.define('LABKEY.study.store.Facets', {
         //this.updateContainerFilter();
         //if (!isSavedGroup)
         //    this.changeSubjectGroup();
-
-
+        
+        this.fireEvent("countsUpdated");
         LABKEY.Utils.signalWebDriverTest('dataFinder' + this.cubeConfig.objectName + 'CountsUpdated');
     },
 

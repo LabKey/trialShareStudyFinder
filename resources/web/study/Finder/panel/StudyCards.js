@@ -18,6 +18,8 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     itemSelector: 'div.labkey-study-card',
 
     autoScroll: true,
+    
+    loadMask: false,
 
     dataModuleName: 'study',
 

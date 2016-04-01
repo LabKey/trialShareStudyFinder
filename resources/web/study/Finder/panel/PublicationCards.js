@@ -19,6 +19,8 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
 
     autoScroll: true,
 
+    loadMask: false,
+
     bubbleEvents: ["detailsChange"],
 
     store:  Ext4.create('LABKEY.study.store.CubeObjects', {

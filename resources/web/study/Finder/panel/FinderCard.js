@@ -22,7 +22,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     searchTerms : '',
 
-    bubbleEvents : ['detailsChange'],
+    bubbleEvents : ['detailsChange','countsUpdated'],
 
     initComponent : function() {
 

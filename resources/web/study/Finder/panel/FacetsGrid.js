@@ -17,7 +17,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     autoScroll: false,
 
-    bubbleEvents : ["filterSelectionChanged"],
+    bubbleEvents : ["filterSelectionChanged", "countsUpdated"],
 
     viewConfig : { stripeRows : false },
 
@@ -121,8 +121,15 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                 this.facetStore.selectMembers(records);
             facetChangeTask.delay(500);
         }, this);
+
+        this.facetStore.on(
+            'countsUpdated' , this.onCountsUpdated, this
+        )
     },
 
+    onCountsUpdated : function() {
+        this.fireEvent("countsUpdated");
+    },
 
     getGroupHeaderFeature: function(objectName) {
         return Ext4.create('Ext.grid.feature.Grouping',
