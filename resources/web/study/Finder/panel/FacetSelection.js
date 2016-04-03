@@ -18,6 +18,10 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     cls: 'labkey-facet-selection-panel',
 
+    bubbleEvents: [
+        "clearAllFilters"
+    ],
+
     autoScroll: false,
 
     initComponent : function() {
@@ -34,6 +38,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
         this.on({
             filterSelectionChanged: this.onFilterSelectionChange,
+            searchTermsChanged: this.onFilterSelectionChange,
             clearAllFilters: this.onClearAllFilters
         });
     },
@@ -49,14 +54,24 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     onSubsetChanged: function() {
         this.getFacets().onSubsetChanged();
     },
-
-    onFilterSelectionChange: function(hasFilters) {
-        if (hasFilters)
+    
+    onSearchTermsChanged: function(terms)
+    {
+        if (this.hasFilters)
+            return;
+        else if (terms)
             Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('inactive', 'active');
         else
             Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('active', 'inactive');
     },
 
+    onFilterSelectionChange: function(hasFilters) {
+        this.hasFilters = hasFilters;
+        if (hasFilters)
+            Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('inactive', 'active');
+        else
+            Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('active', 'inactive');
+    },
 
     getFacetPanelHeader : function() {
         if (!this.facetPanelHeader) {

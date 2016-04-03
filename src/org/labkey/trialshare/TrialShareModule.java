@@ -25,6 +25,8 @@ import org.labkey.api.module.FolderTypeManager;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.module.ModuleProperty;
 import org.labkey.api.settings.AdminConsole;
+import org.labkey.api.search.SearchService;
+import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.view.SimpleWebPartFactory;
 import org.labkey.api.view.WebPartFactory;
 import org.labkey.trialshare.view.DataFinderWebPart;
@@ -38,6 +40,10 @@ public class TrialShareModule extends DefaultModule
 {
     public static final String NAME = "TrialShare";
     private final ModuleProperty _cubeContainer;
+
+    public static final SearchService.SearchCategory searchCategoryStudy = new SearchService.SearchCategory("trialshare_study", "TrialShare Study", false);
+    public static final SearchService.SearchCategory searchCategoryPublication = new SearchService.SearchCategory("trialshare_publication", "TrialShare Publication", false);
+
 
     @Override
     public String getName()
@@ -54,7 +60,7 @@ public class TrialShareModule extends DefaultModule
     @Override
     public boolean hasScripts()
     {
-        return true;
+        return false;
     }
 
     public TrialShareModule()
@@ -87,6 +93,14 @@ public class TrialShareModule extends DefaultModule
         FolderTypeManager.get().registerFolderType(this, new StudyITNFolderType(this));
 
         AdminConsole.addLink(AdminConsole.SettingsLinkType.Management, "Data Cube", TrialShareController.getCubeAdminURL());
+        SearchService ss = ServiceRegistry.get().getService(SearchService.class);
+        if (null != ss)
+        {
+            ss.addDocumentProvider(new StudyDocumentProvider());
+            ss.addDocumentProvider(new PublicationDocumentProvider());
+            ss.addSearchCategory(searchCategoryStudy);
+            ss.addSearchCategory(searchCategoryPublication);
+        }
     }
 
     @Override

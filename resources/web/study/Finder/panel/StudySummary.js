@@ -24,7 +24,7 @@ Ext4.define("LABKEY.study.panel.StudySummary", {
             '       </div>',
             '</div>',
             {
-                formatNumber :  Ext4.util.Format.numberRenderer('0,000'),
+                formatNumber :  Ext4.util.Format.numberRenderer('0,000')
             }
     ),
 

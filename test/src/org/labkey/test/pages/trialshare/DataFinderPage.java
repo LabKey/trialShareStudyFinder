@@ -39,7 +39,8 @@ public class DataFinderPage extends LabKeyPage
 {
     private static final String CONTROLLER = "trialshare";
     private static final String ACTION = "dataFinder";
-    public static final String COUNT_SIGNAL = "dataFinderCountsUpdated";
+    public static final String STUDY_COUNT_SIGNAL = "dataFinderStudyCountsUpdated";
+    public static final String PUBLICATION_COUNT_SIGNAL = "dataFinderPublicationCountsUpdated";
     private static final String GROUP_UPDATED_SIGNAL = "participantGroupUpdated";
     private static final String PUBLICATION_DETAILS_SIGNAL = "publicationDetailsLoaded";
     private boolean testingStudies = true;
@@ -59,10 +60,14 @@ public class DataFinderPage extends LabKeyPage
         }
     }
 
+    public String getCountSignal()
+    {
+        return (this.testingStudies ? STUDY_COUNT_SIGNAL : PUBLICATION_COUNT_SIGNAL);
+    }
     @Override
     protected void waitForPage()
     {
-        waitForElement(LabKeyPage.Locators.pageSignal(COUNT_SIGNAL));
+        waitForElement(LabKeyPage.Locators.pageSignal(getCountSignal()));
     }
 
     protected void waitForGroupUpdate()
@@ -70,17 +75,6 @@ public class DataFinderPage extends LabKeyPage
         waitForElement(LabKeyPage.Locators.pageSignal(GROUP_UPDATED_SIGNAL));
     }
 
-//    public static DataFinderPage goDirectlyToPage(BaseWebDriverTest test, String containerPath, boolean testingStudies)
-//    {
-//        test.doAndWaitForPageSignal(() -> test.beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
-//        return new DataFinderPage(test, testingStudies);
-//    }
-//
-//    public static DataFinderPage goDirectlyToPage(WebDriver test, String containerPath, boolean testingStudies)
-//    {
-//        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), COUNT_SIGNAL);
-//        return new DataFinderPage(test, testingStudies);
-//    }
 
     public boolean hasStudySubsetCombo()
     {
@@ -93,7 +87,7 @@ public class DataFinderPage extends LabKeyPage
         _ext4Helper.openComboList(DataFinderPage.Locators.studySubsetCombo);
         if (!isElementPresent(Ext4Helper.Locators.comboListItemSelected().withText(text)))
         {
-            doAndWaitForPageSignal(() ->_ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT), COUNT_SIGNAL);
+            doAndWaitForPageSignal(() ->_ext4Helper.selectItemFromOpenComboList(text, Ext4Helper.TextMatchTechnique.EXACT), getCountSignal());
 
         }
         else // FIXME you should be able to just close the combo box at this point, but the close method assumes you've chosen something from teh lis
@@ -103,16 +97,16 @@ public class DataFinderPage extends LabKeyPage
     }
 
     @LogMethod
-    public void studySearch(@LoggedParam final String search)
+    public void search(@LoggedParam final String search)
     {
-        doAndWaitForPageSignal(() -> setFormElement(DataFinderPage.Locators.studySearchInput, search), COUNT_SIGNAL);
+        doAndWaitForPageSignal(() -> setFormElement(Locators.getSearchInput(finderLocator), search), getCountSignal());
     }
 
     @LogMethod(quiet = true)
     public void clearSearch()
     {
-        if (isElementPresent(DataFinderPage.Locators.studySearchInput) && !getFormElement(DataFinderPage.Locators.studySearchInput).isEmpty())
-            studySearch(" ");
+        if (isElementPresent(Locators.getSearchInput(finderLocator)) && !getFormElement(Locators.getSearchInput(finderLocator)).isEmpty())
+            search("");
     }
 
     public void saveGroup(String name)
@@ -208,6 +202,13 @@ public class DataFinderPage extends LabKeyPage
             return new FacetGrid(DataFinderPage.Locators.pubFacetPanel.findElement(getDriver()));
     }
 
+    public boolean clearAllActive()
+    {
+        Locator.CssLocator clearAllLocator = DataFinderPage.Locators.getClearAll(finderLocator);
+        scrollIntoView(clearAllLocator);
+        Locator activeClearAllLocator = DataFinderPage.Locators.getActiveClearAll(clearAllLocator);
+        return isElementPresent(activeClearAllLocator);
+    }
 
     public void clearAllFilters()
     {
@@ -219,7 +220,7 @@ public class DataFinderPage extends LabKeyPage
             final WebElement clearAll = activeClearAllLocator.findElement(getDriver());
             if (clearAll.isDisplayed())
             {
-                doAndWaitForPageSignal(clearAll::click, COUNT_SIGNAL);
+                doAndWaitForPageSignal(clearAll::click, getCountSignal());
             }
         }
     }
@@ -255,9 +256,10 @@ public class DataFinderPage extends LabKeyPage
     
     public static class Locators
     {
+
         public static final Locator.CssLocator cardDeck = Locator.css(".labkey-data-finder-card-deck-view");
         public static final Locator.CssLocator studyFinder = Locator.css(".labkey-study-finder-card");
-        public static final Locator.CssLocator studySearchInput = studyFinder.append(Locator.css("#searchTerms"));
+
         public static final Locator.XPathLocator finderObjectCombo = Ext4Helper.Locators.formItemWithInputNamed("configSelect");
         public static final Locator.XPathLocator studySubsetCombo = Ext4Helper.Locators.formItemWithInputNamed("subsetSelect");
         public static final Locator.CssLocator studyCard = studyFinder.append(Locator.css(".labkey-study-card"));
@@ -275,6 +277,11 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.CssLocator saveMenu = Locator.css("#saveMenu");
         public static final Locator.CssLocator loadMenu = Locator.css("#loadMenu");
         public static final Locator.IdLocator manageMenu = Locator.id("manageMenu");
+
+        public static final Locator.CssLocator getSearchInput(Locator.CssLocator locator)
+        {
+            return locator.append(" input.labkey-search-box");
+        }
 
         public static Locator.CssLocator getClearAll(Locator.CssLocator locator)
         {
@@ -450,7 +457,7 @@ public class DataFinderPage extends LabKeyPage
             scrollIntoView(rowLocator);
             WebElement row = rowLocator.findElement(getDriver());
 
-            doAndWaitForPageSignal(() -> row.click(), COUNT_SIGNAL);
+            doAndWaitForPageSignal(() -> row.click(), getCountSignal());
         }
 
         public void clearFilter(Dimension dimension)

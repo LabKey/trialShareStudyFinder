@@ -75,22 +75,10 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
         {
             this.summaryLabel = Ext4.create("Ext4.Component", {
                 html: "Summary",
-                cls: 'labkey-facet-panel-summary',
+                cls: 'labkey-facet-panel-summary'
             });
         }
         return this.summaryLabel;
-    },
-
-    onFilterSelectionChange: function(hasFilters) {
-        if (hasFilters)
-            Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('inactive', 'active');
-        else
-            Ext4.get(Ext4.DomQuery.select('.labkey-clear-all', this.id)[0]).replaceCls('active', 'inactive');
-    },
-
-    onCubeConfigChanged: function(value) {
-        this.fireEvent("finderObjectChanged", value);
-        this.getCubeConfigMenu().setValue(this.objectName);
     },
 
     getParticipantGroupMenus: function()
