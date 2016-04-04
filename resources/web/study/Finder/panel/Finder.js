@@ -16,8 +16,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     border: false,
 
-    autoScroll : true,
-
     searchTerms : '',
 
     initComponent : function()

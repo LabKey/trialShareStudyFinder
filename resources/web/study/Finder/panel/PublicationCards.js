@@ -159,7 +159,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
                     if (o.success)
                     {
                         item.className = item.className.replace("collapsed", "expanded"); // change the +/- icon
-                        console.log(o.data);
                         publication.set(o.data);
                         publication.set("viewState", "expanded");
                     }

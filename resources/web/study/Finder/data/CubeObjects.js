@@ -40,6 +40,7 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
 
         this.suspendEvents(false);
         this.clearFilter();
+        this.unfilteredCount = this.count();
         for (var i = 0; i < this.count(); i++) {
             object = this.getAt(i);
             object.set({

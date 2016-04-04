@@ -16,11 +16,11 @@ Ext4.define('LABKEY.study.data.Facet', {
         {name: 'filterOptions'},
         {name: 'currentFilterType'},
         {name: 'currentFilterCaption'},
-        {name: 'allMemberCount', type:'int', defaultValue: 0}, // set but not currently used
+        {name: 'allMemberCount', type:'int'}, // not currently used
         {name: 'hierarchy'},
         {name: 'hierarchyName'},
         {name: 'levelName'},
-        {name: 'allMemberName'},
+        {name: 'allMemberName'}, // not currently used
         {name: 'ordinal'},
         {name: 'isExpanded', type:'boolean', defaultValue: true},
         {name: 'displayFacet', type:'boolean', defaultValue: true}

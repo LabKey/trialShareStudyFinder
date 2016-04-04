@@ -493,14 +493,14 @@ public class DataFinderPage extends LabKeyPage
             return selectedNames;
         }
 
-        public Map<String, Integer> getMemberCounts(Dimension dimension)
+        public Map<String, String> getMemberCounts(Dimension dimension)
         {
             List<WebElement> memberElements = locators.facetMembers(dimension).findElements(getDriver());
-            Map<String, Integer> countMap = new HashMap<>();
+            Map<String, String> countMap = new HashMap<>();
             for (WebElement member : memberElements)
             {
                 String name = locators.memberName.findElement(member).getText();
-                Integer count = Integer.valueOf(locators.memberCount.findElement(member).getText());
+                String count = locators.memberCount.findElement(member).getText();
                 countMap.put(name, count);
             }
             return countMap;
