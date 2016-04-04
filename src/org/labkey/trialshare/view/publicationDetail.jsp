@@ -20,18 +20,21 @@
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.ViewContext" %>
-<%@ page import="org.labkey.api.view.template.ClientDependencies" %>
 <%@ page import="org.labkey.trialshare.data.StudyBean" %>
 <%@ page import="org.labkey.trialshare.data.StudyPublicationBean" %>
 <%@ page import="org.labkey.trialshare.data.URLData" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.labkey.api.view.template.ClientDependency" %>
+<%@ page import="java.util.LinkedHashSet" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%!
-    public void addClientDependencies(ClientDependencies dependencies)
+    public LinkedHashSet<ClientDependency> getClientDependencies()
     {
-        dependencies.add("study/Finder/dataFinder.css");
-        dependencies.add("study/Finder/trialShare.css");
+        LinkedHashSet<ClientDependency> resources = new LinkedHashSet<>();
+        resources.add(ClientDependency.fromPath("study/Finder/dataFinder.css"));
+        resources.add(ClientDependency.fromPath("study/Finder/trialShare.css"));
+        return resources;
     }
 %>
 <%
