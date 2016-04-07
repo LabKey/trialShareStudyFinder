@@ -102,7 +102,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         return optionsStore.getAt(0);
     },
 
-    getStudySubsetFilter: function() {
+    getObjectSubsetFilter: function() {
         var store = Ext4.getStore(this.cubeConfig.objectName);
 
         if (!store || !store.selectedSubset)
@@ -113,7 +113,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     },
 
     getFiltersForCountDistinct: function(filtersMap) {
-        this.addFilterMapData(filtersMap, this.getStudySubsetFilter());
+        this.addFilterMapData(filtersMap, this.getObjectSubsetFilter());
         this.addFilterMapData(filtersMap, this.getSearchFilter());
         this.addFilterMapData(filtersMap, this.getCustomFilters());
         var filters = [];
@@ -177,38 +177,44 @@ Ext4.define('LABKEY.study.store.Facets', {
             return;
         }
 
-         // console.log("updateCountsAsync called");
-        var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "accessibleMembers.api", null, {
-            "objectName": this.cubeConfig.objectName
-        });
-        Ext4.Ajax.request({
-            url: url,
-            success: function (response)
-            {
-                var o = Ext4.decode(response.responseText);
-                if (o.success)
+        var store = Ext4.getStore(this.cubeConfig.objectName);
+        if (store.searchSelectedMembers != null)
+            this.makeCountDistinctQuery({});
+        else
+        {
+            // console.log("updateCountsAsync called");
+            var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "accessibleMembers.api", null, {
+                "objectName": this.cubeConfig.objectName
+            });
+            Ext4.Ajax.request({
+                url: url,
+                success: function (response)
                 {
-                    var filters = {};
-                    for (var level in o.data)
+                    var o = Ext4.decode(response.responseText);
+                    if (o.success)
                     {
-                        if (o.data[level].length)
+                        var filters = {};
+                        for (var level in o.data)
                         {
-                            if (!filters[level])
-                                filters[level] = o.data[level];
-                            else
-                                filters[level] = filters[level].concat(o.data[level]);
+                            if (o.data[level].length)
+                            {
+                                if (!filters[level])
+                                    filters[level] = o.data[level];
+                                else
+                                    filters[level] = filters[level].concat(o.data[level]);
+                            }
                         }
+                        this.makeCountDistinctQuery(filters);
                     }
-                    this.makeCountDistinctQuery(filters);
-                }
-                else
-                {
-                    console.log("Problem making request for accessible members", o);
-                }
+                    else
+                    {
+                        console.log("Problem making request for accessible members", o);
+                    }
 
-            },
-            scope: this
-        });
+                },
+                scope: this
+            });
+        }
     },
 
     makeCountDistinctQuery: function(filtersMap)
