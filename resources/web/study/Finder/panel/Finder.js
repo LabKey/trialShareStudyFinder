@@ -30,7 +30,7 @@ Ext4.define('LABKEY.study.panel.Finder', {
         
         this.on({
             finderObjectChanged: this.updateFinderObject,
-            render : this.mask,
+            render : this.mask
         });
 
         this.on("countsUpdated", this.unmask, this, {single: true});
@@ -74,13 +74,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 resize.call(this, size.width, size.height);
             }, 300, this);
         });
-
-        this.on('detailsChange', function() {
-            Ext4.defer(function() {
-                var size = Ext4.getBody().getBox();
-                resize.call(this, size.width, size.height);
-            }, 300, this);
-        })
     },
 
     updateFinderObject : function(objectName)

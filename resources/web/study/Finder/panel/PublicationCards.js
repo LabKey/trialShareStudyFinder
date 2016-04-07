@@ -17,8 +17,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
 
     itemSelector: 'div.labkey-publication-card',
 
-    autoScroll: true,
-
     loadMask: false,
 
     bubbleEvents: ["detailsChange"],
@@ -145,7 +143,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     {
 
         var publication = this.store.getById(publicationId);
-
+        
         if (expand)
         {
             var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "publicationDetails.api", null, {

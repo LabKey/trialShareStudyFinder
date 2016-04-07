@@ -16,8 +16,6 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
     width: "100%",
 
     itemSelector: 'div.labkey-study-card',
-
-    autoScroll: true,
     
     loadMask: false,
 
@@ -35,7 +33,6 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             direction: 'ASC'
         }]
     }),
-
 
     tpl: new Ext4.XTemplate(
         '<div id="studypanel">',
