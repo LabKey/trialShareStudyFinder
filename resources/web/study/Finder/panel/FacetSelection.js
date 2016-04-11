@@ -19,7 +19,8 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     cls: 'labkey-facet-selection-panel',
 
     bubbleEvents: [
-        "clearAllFilters"
+        "clearAllFilters",
+        "countsUpdated"
     ],
 
     autoScroll: false,
@@ -41,6 +42,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
             searchTermsChanged: this.onFilterSelectionChange,
             clearAllFilters: this.onClearAllFilters
         });
+        this.on("countsUpdated", this.onCountsUpdated, this, {single: true});
     },
 
     onCubeReady: function(mdx) {
@@ -53,6 +55,11 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
 
     onSubsetChanged: function() {
         this.getFacets().onSubsetChanged();
+    },
+    
+    onCountsUpdated: function() {
+        this.getFacetSelectionSummary().show();
+        this.getFacetsContainer().show();
     },
     
     onSearchTermsChanged: function(terms)
@@ -90,14 +97,16 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
             {
                 this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.StudySummary", {
                     dataModuleName: this.dataModuleName,
-                    objectName: this.cubeConfig.objectName
+                    objectName: this.cubeConfig.objectName,
+                    hidden: true
                 });
             }
             else
             {
                 this.facetSelectionSummary = Ext4.create("LABKEY.study.panel.PublicationSummary", {
                     dataModuleName: this.dataModuleName,
-                    objectName: this.cubeConfig.objectName
+                    objectName: this.cubeConfig.objectName,
+                    hidden: true
                 });
             }
         }
@@ -121,6 +130,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
                 itemId: 'facetsContainer',
                 flex: 10,
                 autoScroll: true,
+                hidden: true,
                 layout: {
                     type: 'vbox',
                     align: 'stretch',

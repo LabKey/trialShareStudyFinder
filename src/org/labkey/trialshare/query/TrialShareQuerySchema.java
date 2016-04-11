@@ -58,6 +58,8 @@ public class TrialShareQuerySchema
     public static QuerySchema getSchema(User user, Container container)
     {
         Container cubeContainer = ((TrialShareModule) ModuleLoader.getInstance().getModule(TrialShareModule.NAME)).getCubeContainer(container);
+        if (cubeContainer == null)
+            cubeContainer = container;
         QuerySchema coreSchema = DefaultSchema.get(user, cubeContainer).getSchema("core");
         return coreSchema.getSchema("lists");
     }

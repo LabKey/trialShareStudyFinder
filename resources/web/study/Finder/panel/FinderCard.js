@@ -18,11 +18,9 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     dataModuleName: null,  // the module responsible for serving up the cube data
 
-    autoScroll : true,
-
     searchTerms : '',
 
-    bubbleEvents : ['detailsChange'],
+    bubbleEvents : ['detailsChange','countsUpdated'],
 
     initComponent : function() {
 

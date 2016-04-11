@@ -327,6 +327,7 @@ DIV.labkey-facet-summary
     background-image: none;
 }
 
+.labkey-finder-facets .x4-grid-row-selected .labkey-facet-unfilteredPercent-bar,
 .labkey-finder-facets .x4-grid-row-selected .labkey-facet-percent-bar {
     background-color: rgba(81, 158, 218, 0.2);
 }
@@ -386,6 +387,7 @@ DIV.labkey-facet-summary LI.labkey-facet-member
     padding-left: 8px;
 }
 
+SPAN.labkey-facet-member:hover SPAN.labkey-facet-unfilteredPercent-bar,
 SPAN.labkey-facet-member:hover SPAN.labkey-facet-percent-bar
 {
     background-color:rgba(81, 158, 218, 0.2);
@@ -428,9 +430,8 @@ LI.labkey-facet-member .labkey-facet-member-count
     padding-right: 8px;
 }
 
-.x4-grid-row-selected SPAN.labkey-facet-percent-bar,
-SPAN.labkey-facet-member  SPAN.bar-selected,
-LI.labkey-facet-member SPAN.bar-selected
+.x4-grid-row-selected SPAN.labkey-facet-unfilteredPercent-bar,
+.x4-grid-row-selected SPAN.labkey-facet-percent-bar
 {
     background-color:rgba(81, 158, 218, 0.2);
 }
@@ -452,13 +453,22 @@ LI.labkey-facet-member SPAN.bar-selected
 
 
 .x4-grid-row SPAN.labkey-facet-percent-bar,
-LI.labkey-facet-member .bar
+.x4-grid-row SPAN.labkey-facet-unfilteredPercent-bar
 {
     height:14pt;
-    background-color:rgba(222,222,222,0.3);
     position:absolute; right:0;
     z-index:0;
     padding-right: 8px;
+}
+
+.x4-grid-row SPAN.labkey-facet-percent-bar
+{
+    background-color:rgba(200,200,200,0.3);
+}
+
+.x4-grid-row SPAN.labkey-facet-unfilteredPercent-bar
+{
+    background-color:rgba(222,222,222,0.3);
 }
 
 /* filter type popup */

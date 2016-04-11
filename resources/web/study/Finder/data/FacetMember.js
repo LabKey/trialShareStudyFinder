@@ -13,9 +13,11 @@ Ext4.define('LABKEY.study.data.FacetMember', {
         {name: 'uniqueName'},
         {name: 'count'},
         {name: 'percent'},
+        {name: 'unfilteredPercent'},
         {name: 'facet'},
         {name: 'facetName'},
-        {name: 'level'}
+        {name: 'level'},
+        {name: 'unfilteredCount', type: 'int', defaultValue: 0}
     ]
 
 });

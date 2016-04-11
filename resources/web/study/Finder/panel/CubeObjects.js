@@ -13,8 +13,6 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
 
     border: false,
 
-    autoScroll: true,
-    
     initComponent : function() {
         this.items = [
             this.getCardPanelHeader(),
@@ -25,6 +23,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
         var searchTermsChangeTask = new Ext4.util.DelayedTask();
 
         this.on({
+            'resize' : this.updateCardContainerHeight,
             'subsetChanged': this.onSubsetChanged,
             'searchTermsChanged': function(searchTerms){
                 searchTermsChangeTask.delay(350, this.onSearchTermsChanged, this, [searchTerms]);
@@ -44,16 +43,17 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
 
     onSearchTermsChanged : function(searchTerms) {
         // console.log("search terms changed to " + searchTerms);
-        this.searchTerms = searchTerms;
         if (!searchTerms)
         {
+            this.searchTerms = null;
             this.updateSearchFilters(null);
             return;
         }
+        this.searchTerms = searchTerms.trim();
 
         var url = LABKEY.ActionURL.buildURL("search", "json", this.cubeConfig.cubeContainerPath, {
             "category": this.cubeConfig.searchCategory,
-            "q": searchTerms,
+            "q": this.searchTerms,
             "scope" : this.cubeConfig.searchScope
         });
         Ext4.Ajax.request({
@@ -118,22 +118,22 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
         return this.cardPanelHeader;
     },
 
+    updateCardContainerHeight: function() {
+        this.getCardsContainer().setHeight(this.getHeight() - this.getCardPanelHeader().getHeight());
+    },
+
     getCardsContainer : function() {
         if (!this.facetsContainer) {
-            this.facetsContainer = {
-                xtype: 'container',
+            this.facetsContainer = Ext4.create('Ext.panel.Panel', {
                 itemId: this.cubeConfig.objectName.toLowerCase() + 'CardsContainer',
-                flex: 10,
                 autoScroll: true,
-                layout: {
-                    type: 'vbox',
-                    align: 'stretch',
-                    pack: 'start'
-                },
+                border: false,
                 items: [
                     this.getCards()
                 ]
-            };
+            });
+            this.facetsContainer.on("afterlayout", this.updateCardContainerHeight, this, {single: true});
+
         }
         return this.facetsContainer;
     },

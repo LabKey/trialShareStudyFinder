@@ -423,10 +423,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         {
             if (dimension.getHierarchyName() != null)
             {
-                Map<String, Integer> memberCounts = facets.getMemberCounts(dimension);
-                for (Map.Entry<String, Integer> memberCount : memberCounts.entrySet())
+                Map<String, String> memberCounts = facets.getMemberCounts(dimension);
+                for (Map.Entry<String,String> memberCount : memberCounts.entrySet())
                 {
-                    assertEquals("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure", 0, memberCount.getValue().intValue());
+                    assertTrue("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure: " + memberCount.getValue(), memberCount.getValue().matches("0 of \\d+"));
                 }
             }
         }
@@ -764,7 +764,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         String cardTitle = "Circulating markers of vascular injury";
         String cardAuthors = "Monach PA, Tomasson G, Specks U, et al.";
         String cardText;
-        Map<String, Integer> counts;
+        Map<String, String> counts;
 
         log("Go to publications and clear any filters that may have been set.");
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
@@ -776,7 +776,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Validate that the number, content and style of the cards is as expected.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.IN_PROGRESS);
-        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", 1, counts.get("In Progress").intValue());
+        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", "1 of 1", counts.get("In Progress"));
 
         // I have no idea why assertTextPresent returned false for these strings. The below tests appear to be more reliable.
         scrollIntoView(DataFinderPage.Locators.pubCardHighlight);
@@ -796,7 +796,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         log("Validate counts for 'Complete' publications.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.COMPLETE);
         // one is "in progress" and one is set to not show
-        assertEquals("Expected count after filtering for 'Complete' was not as expected.", 15, counts.get("Complete").intValue());
+        assertEquals("Expected count after filtering for 'Complete' was not as expected.", "15 of 15", counts.get("Complete"));
 
         log("Validate that there are no 'In Progress' cards visible.");
         assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardHighlight);
