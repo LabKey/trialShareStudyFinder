@@ -40,8 +40,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         this.on({
             filterSelectionChanged: this.onFilterSelectionChange,
             searchTermsChanged: this.onFilterSelectionChange,
-            clearAllFilters: this.onClearAllFilters,
-            // countsUpdated: this.onCountsUpdated
+            clearAllFilters: this.onClearAllFilters
         });
         this.on("countsUpdated", this.onCountsUpdated, this, {single: true});
     },

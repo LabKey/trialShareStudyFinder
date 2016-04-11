@@ -68,6 +68,8 @@ import java.util.Map;
 public class TrialShareController extends SpringActionController
 {
     public static final String OBJECT_NAME_PARAM = "object";
+    public static final String STUDY_OBJECT = "Study";
+    public static final String PUBLICATION_OBJECT = "Publication";
 
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(TrialShareController.class);
     public static final String NAME = "trialshare";
@@ -249,15 +251,15 @@ public class TrialShareController extends SpringActionController
     {
         FinderBean bean = new FinderBean();
         bean.setDataModuleName(TrialShareModule.NAME);
-        bean.addCubeConfig(getCubeConfigBean("study", container, "study".equalsIgnoreCase(objectName)));
-        bean.addCubeConfig(getCubeConfigBean("publication", container, "publication".equalsIgnoreCase(objectName)));
+        bean.addCubeConfig(getCubeConfigBean(STUDY_OBJECT, container, STUDY_OBJECT.equalsIgnoreCase(objectName)));
+        bean.addCubeConfig(getCubeConfigBean(PUBLICATION_OBJECT, container, PUBLICATION_OBJECT.equalsIgnoreCase(objectName)));
         return bean;
     }
 
     public static CubeConfigBean getCubeConfigBean(String objectName, Container container, Boolean isDefault)
     {
         if (objectName == null)
-            objectName = "study";
+            objectName = STUDY_OBJECT;
 
         CubeConfigBean bean = new CubeConfigBean();
         bean.setSchemaName("lists");
@@ -267,9 +269,9 @@ public class TrialShareController extends SpringActionController
         Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
         bean.setCubeContainer(((TrialShareModule) trialShareModule).getCubeContainer(container));
 
-        if (objectName.equalsIgnoreCase("study"))
+        if (objectName.equalsIgnoreCase(STUDY_OBJECT))
         {
-            bean.setObjectName("Study");
+            bean.setObjectName(STUDY_OBJECT);
             bean.setObjectNamePlural("Studies");
             bean.setCubeName("StudyCube");
             bean.setConfigId("TrialShare:/StudyCube");
@@ -282,9 +284,9 @@ public class TrialShareController extends SpringActionController
             bean.setSearchScope("Project");
             bean.setHasContainerFilter(true);
         }
-        else if (objectName.equalsIgnoreCase("publication"))
+        else if (objectName.equalsIgnoreCase(PUBLICATION_OBJECT))
         {
-            bean.setObjectName("Publication");
+            bean.setObjectName(PUBLICATION_OBJECT);
             bean.setObjectNamePlural("Publications");
             bean.setCubeName("PublicationCube");
             bean.setConfigId("TrialShare:/PublicationCube");
@@ -715,7 +717,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
         {
-            if (form.getObjectName().equalsIgnoreCase("publication"))
+            if (form.getObjectName().equalsIgnoreCase(PUBLICATION_OBJECT))
                 return success(getPublicationFacets());
             else
                 return success(getStudyFacets());
@@ -769,7 +771,7 @@ public class TrialShareController extends SpringActionController
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
             facet = new StudyFacetBean("Featured", "Featured", "Publication.Featured", "Featured", "[Publication.Featured][(All)]", FacetFilter.Type.OR, 3);
-            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
             facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Publication.Therapeutic Area", "Therapeutic Area", "[Publication.Therapeutic Area][(All)]", FacetFilter.Type.OR, 4);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
@@ -1056,7 +1058,7 @@ public class TrialShareController extends SpringActionController
         {
             Map<String, Object> levelMembers = new HashMap<>();
 
-            if (_objectName.equalsIgnoreCase("publication") )
+            if (_objectName.equalsIgnoreCase(PUBLICATION_OBJECT) )
             {
                 levelMembers.put("[Publication].[Publication]", TrialShareManager.get().getVisiblePublications(getUser(), getContainer()));
             }
