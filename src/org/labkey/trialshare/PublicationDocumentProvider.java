@@ -123,7 +123,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                     if (results.getString(field) != null)
                         identifiers.append(results.getString(field)).append(" " );
                 }
-                properties.put(SearchService.PROPERTY.identifiersMed.toString(), identifiers.toString());
+                properties.put(SearchService.PROPERTY.indentifiersMed.toString(), identifiers.toString());
                 properties.put(SearchService.PROPERTY.keywordsMed.toString(), keywords.toString());
                 properties.put(SearchService.PROPERTY.title.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryPublication.getName());

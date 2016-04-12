@@ -17,7 +17,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
 
     itemSelector: 'div.labkey-publication-card',
 
-    autoScroll: true,
+    loadMask: false,
 
     bubbleEvents: ["detailsChange"],
 
@@ -143,7 +143,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     {
 
         var publication = this.store.getById(publicationId);
-
+        
         if (expand)
         {
             var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "publicationDetails.api", null, {
@@ -157,7 +157,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
                     if (o.success)
                     {
                         item.className = item.className.replace("collapsed", "expanded"); // change the +/- icon
-                        console.log(o.data);
                         publication.set(o.data);
                         publication.set("viewState", "expanded");
                     }

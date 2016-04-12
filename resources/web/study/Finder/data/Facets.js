@@ -102,7 +102,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         return optionsStore.getAt(0);
     },
 
-    getStudySubsetFilter: function() {
+    getObjectSubsetFilter: function() {
         var store = Ext4.getStore(this.cubeConfig.objectName);
 
         if (!store || !store.selectedSubset)
@@ -113,7 +113,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     },
 
     getFiltersForCountDistinct: function(filtersMap) {
-        this.addFilterMapData(filtersMap, this.getStudySubsetFilter());
+        this.addFilterMapData(filtersMap, this.getObjectSubsetFilter());
         this.addFilterMapData(filtersMap, this.getSearchFilter());
         this.addFilterMapData(filtersMap, this.getCustomFilters());
         var filters = [];
@@ -177,38 +177,44 @@ Ext4.define('LABKEY.study.store.Facets', {
             return;
         }
 
-         // console.log("updateCountsAsync called");
-        var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "accessibleMembers.api", null, {
-            "objectName": this.cubeConfig.objectName
-        });
-        Ext4.Ajax.request({
-            url: url,
-            success: function (response)
-            {
-                var o = Ext4.decode(response.responseText);
-                if (o.success)
+        var store = Ext4.getStore(this.cubeConfig.objectName);
+        if (store.searchSelectedMembers != null)
+            this.makeCountDistinctQuery({});
+        else
+        {
+            // console.log("updateCountsAsync called");
+            var url = LABKEY.ActionURL.buildURL(this.dataModuleName, "accessibleMembers.api", null, {
+                "objectName": this.cubeConfig.objectName
+            });
+            Ext4.Ajax.request({
+                url: url,
+                success: function (response)
                 {
-                    var filters = {};
-                    for (var level in o.data)
+                    var o = Ext4.decode(response.responseText);
+                    if (o.success)
                     {
-                        if (o.data[level].length)
+                        var filters = {};
+                        for (var level in o.data)
                         {
-                            if (!filters[level])
-                                filters[level] = o.data[level];
-                            else
-                                filters[level] = filters[level].concat(o.data[level]);
+                            if (o.data[level].length)
+                            {
+                                if (!filters[level])
+                                    filters[level] = o.data[level];
+                                else
+                                    filters[level] = filters[level].concat(o.data[level]);
+                            }
                         }
+                        this.makeCountDistinctQuery(filters);
                     }
-                    this.makeCountDistinctQuery(filters);
-                }
-                else
-                {
-                    console.log("Problem making request for accessible members", o);
-                }
+                    else
+                    {
+                        console.log("Problem making request for accessible members", o);
+                    }
 
-            },
-            scope: this
-        });
+                },
+                scope: this
+            });
+        }
     },
 
     makeCountDistinctQuery: function(filtersMap)
@@ -273,7 +279,6 @@ Ext4.define('LABKEY.study.store.Facets', {
             success: function (cellSet, mdx, config)
             {
                 this.updateCountsUnion(cellSet);
-                //this.fireEvent("cubeReady");
             },
             scope: this,
 
@@ -305,6 +310,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         var map = {};
         var facetStore = this;
         var facetMembersStore = Ext4.getStore(this.cubeConfig.objectName + "FacetMembers");
+        var objectStore = Ext4.getStore(this.cubeConfig.objectName);
         facetMembersStore.suspendEvents(false);
 
         for (f = 0; f < facetStore.count(); f++)
@@ -336,10 +342,6 @@ Ext4.define('LABKEY.study.store.Facets', {
             }
             else if (!member)
             {
-                // might be an all member
-                //if (facet.data.allMemberName == resultMember.uniqueName)
-                //    facet.data.allMemberCount = count;
-                //else
                 if (-1 == resultMember.uniqueName.indexOf("#") && "(All)" != resultMember.name)
                     console.log("member not found: " + resultMember.uniqueName);
             }
@@ -348,8 +350,9 @@ Ext4.define('LABKEY.study.store.Facets', {
                 member.set("count", count);
                 if (count > max)
                     max = count;
+                if (!member.data.unfilteredCount)
+                    member.set("unfilteredCount", count);
             }
-
         }
 
         for (f = 0; f < facetStore.count(); f++)
@@ -357,12 +360,27 @@ Ext4.define('LABKEY.study.store.Facets', {
             facet = facetStore.getAt(f);
             if (facet.data.hierarchy.uniqueName !== this.cubeConfig.filterByFacetUniqueName)
             {
+                var facetTotal = 0;
                 for (m = 0; m < facet.data.members.length; m++)
                 {
                     member = facetMembersStore.getById(facet.data.members[m].uniqueName);
-                    member.set("percent", max == 0 ? 0 : (100.0 * member.data.count) / max);
+                    if (facet.get("displayFacet"))
+                    {
+                        if (objectStore)
+                        {
+                            member.set("unfilteredPercent", objectStore.unfilteredCount == 0 ? 0 : 100 * member.data.unfilteredCount / objectStore.unfilteredCount);
+                            member.set("percent", objectStore.unfilteredCount == 0 ? 0 : (100.0 * member.data.count) / objectStore.unfilteredCount);
+                        }
+                        else // not sure this is necessary
+                        {
+                            member.set("unfilteredPercent", 100 * member.data.unfilteredCount / max);
+                            member.set("percent", max == 0 ? 0 : (100.0 * member.data.count) / max);
+                        }
+                    }
                 }
             }
+            if (!facet.data.allMemberCount)
+                facet.set("allMemberCount", facetTotal);
         }
 
         facetMembersStore.resumeEvents();
@@ -375,7 +393,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         //if (!isSavedGroup)
         //    this.changeSubjectGroup();
 
-
+        this.fireEvent("countsUpdated");
         LABKEY.Utils.signalWebDriverTest('dataFinder' + this.cubeConfig.objectName + 'CountsUpdated');
     },
 

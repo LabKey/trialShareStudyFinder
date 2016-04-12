@@ -9,7 +9,7 @@ Ext4.define("LABKEY.study.panel.PublicationSummary", {
     alias : 'widget.facet-publication-summary',
 
     objectName: null,
-
+    
     tpl: new Ext4.XTemplate(
             '<div id="publicationSelectionPanel">',
             '       <div id="summaryArea" class="labkey-facet-summary" >',

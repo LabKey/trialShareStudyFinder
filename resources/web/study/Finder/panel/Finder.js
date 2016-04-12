@@ -3,6 +3,28 @@
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
+/**
+ * @Override
+ * Sencha Issue: https://www.sencha.com/forum/showthread.php?265078-Broken-contracts-of-getAt-indexOf-methods-of-the-Ext.grid.feature.Grouping Version: 4.2.1
+ */
+Ext4.override(Ext4.view.Table, 
+{
+    getRecord: function (node) {
+        node = this.getNode(node);
+        if (node) {
+            return this.dataSource.data.get(node.getAttribute('data-recordId'));
+        }
+    },
+    
+    indexInStore: function (node) {
+        node = this.getNode(node, true);
+        if (!node && node !== 0) {
+            return -1;
+        }
+        return this.dataSource.indexOf(this.getRecord(node));
+    }
+});
+
 Ext4.define('LABKEY.study.panel.Finder', {
     extend: 'Ext.panel.Panel',
 
@@ -16,8 +38,6 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     border: false,
 
-    autoScroll : true,
-
     searchTerms : '',
 
     initComponent : function()
@@ -29,10 +49,13 @@ Ext4.define('LABKEY.study.panel.Finder', {
         this.callParent();
 
         this._initResize();
-
+        
         this.on({
-            finderObjectChanged: this.updateFinderObject
+            finderObjectChanged: this.updateFinderObject,
+            render : this.mask
         });
+
+        this.on("countsUpdated", this.unmask, this, {single: true});
     },
 
     createCubeConfigStore : function(cubeConfigs) {
@@ -73,20 +96,25 @@ Ext4.define('LABKEY.study.panel.Finder', {
                 resize.call(this, size.width, size.height);
             }, 300, this);
         });
-
-        this.on('detailsChange', function() {
-            Ext4.defer(function() {
-                var size = Ext4.getBody().getBox();
-                resize.call(this, size.width, size.height);
-            }, 300, this);
-        })
     },
 
     updateFinderObject : function(objectName)
     {
         this.getFinderCardDeck().getLayout().setActiveItem(objectName + '-finder-card');
+    },
+
+    mask : function() {
+        this.getEl().mask("Loading study and publication data ...");
+    },
+
+    unmask : function() {
+        if (this.getEl().isMasked())
+        {
+            this.getEl().unmask()
+        }
     }
 
 });
+
 
 

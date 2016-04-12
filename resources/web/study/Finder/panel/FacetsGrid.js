@@ -17,7 +17,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
     autoScroll: false,
 
-    bubbleEvents : ["filterSelectionChanged"],
+    bubbleEvents : ["filterSelectionChanged", "countsUpdated"],
 
     viewConfig : { stripeRows : false },
 
@@ -49,7 +49,10 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                     '       <span class="labkey-facet-member">',
                     '   </tpl>',
                     '       <span class="labkey-facet-member-name" title="{name}">{name}</span>',
-                    '       <span class="labkey-facet-member-count">{count:this.formatNumber}</span>',
+                    '       <span class="labkey-facet-member-count">{count:this.formatNumber} of {unfilteredCount:this.formatNumber}</span>',
+                    '   <tpl if="unfilteredCount">',
+                    '       <span class="labkey-facet-unfilteredPercent-bar" style="width:{unfilteredPercent}%;"></span>',
+                    '   </tpl>',
                     '   <tpl if="count">',
                     '       <span class="labkey-facet-percent-bar" style="width:{percent}%;"></span>',
                     '   </tpl>',
@@ -121,8 +124,15 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                 this.facetStore.selectMembers(records);
             facetChangeTask.delay(500);
         }, this);
+
+        this.facetStore.on(
+            'countsUpdated' , this.onCountsUpdated, this
+        )
     },
 
+    onCountsUpdated : function() {
+        this.fireEvent("countsUpdated");
+    },
 
     getGroupHeaderFeature: function(objectName) {
         return Ext4.create('Ext.grid.feature.Grouping',
