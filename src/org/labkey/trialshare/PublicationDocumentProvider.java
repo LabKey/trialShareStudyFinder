@@ -111,14 +111,13 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 Map<String, Object> properties = new HashMap<>();
 
                 StringBuilder keywords = new StringBuilder();
-                // See #26028: identifiers that have punctuation in them (e.g., DOI) are not indexed well as identifiers, so we use keywords instead
-                for (String field : new String[]{"Year", "Status", "PrimaryStudy", "Title", "PublicationType", "Journal", "TherapeuticArea", "StudyShortName", "Assay", "Condition"})
+                for (String field : new String[]{"Year", "Status", "Title", "PublicationType", "Journal", "TherapeuticArea" , "Assay", "Condition"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");
                 }
                 StringBuilder identifiers = new StringBuilder();
-                for (String field : new String[]{"PMID", "PMCID", "StudyId", "PrimaryStudyId", "DOI", "Author"})
+                for (String field : new String[]{"PMID", "PMCID", "StudyId", "PrimaryStudy", "StudyShortName", "PrimaryStudyId", "DOI", "Author"})
                 {
                     if (results.getString(field) != null)
                         identifiers.append(results.getString(field).replaceAll(",", " ")).append(" " );
