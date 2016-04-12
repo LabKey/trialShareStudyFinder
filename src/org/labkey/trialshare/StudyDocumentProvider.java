@@ -100,13 +100,20 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
 
                 StringBuilder keywords = new StringBuilder();
                 // See #26028: we want to avoid stemming of the following fields, so we use keywords instead
-                for (String field : new String[]{"shortName", "StudyId", "Investigator", "AgeGroup", "Assay", "Condition", "Phase", "TherapeuticArea", "StudyType"})
+                for (String field : new String[]{"AgeGroup", "Assay", "Condition", "Phase", "TherapeuticArea", "StudyType"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");
                 }
 
-                properties.put(SearchService.PROPERTY.indentifiersMed.toString(), results.getString("StudyId"));
+                StringBuilder identifiers = new StringBuilder();
+                for (String field : new String[]{"shortName", "StudyId", "Investigator"})
+                {
+                    if (results.getString(field) != null)
+                        identifiers.append(results.getString(field)).append(" ");
+                }
+
+                properties.put(SearchService.PROPERTY.identifiersMed.toString(), identifiers.toString());
                 properties.put(SearchService.PROPERTY.keywordsMed.toString(), keywords.toString());
                 properties.put(SearchService.PROPERTY.title.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryStudy.getName());
