@@ -37,11 +37,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
     tpl: new Ext4.XTemplate(
         '<div id="publicationpanel">',
         '   <tpl for=".">',
-        '   <tpl if="isHighlighted">',
-        '   <div class="labkey-publication-card labkey-publication-highlight {viewState}">',
-        '   <tpl else>',
-        '   <div class="labkey-publication-card {viewState}">',
-        '   </tpl>',
+        '   {[this.startCardDiv(values)]}',
         '       <div class="labkey-publication">',
         '           <span>',
         '               <span id="morePublicationDetails"><i class="fa fa-plus-square"></i></span>',
@@ -55,6 +51,9 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '           <div>',
         '           <tpl if="url">',
         '               <a class="labkey-text-link labkey-publication-goto" target="_blank" href="{url}">view document</a>',
+        '           </tpl>',
+        '           <tpl if="dataUrl">',
+        '                <a class="labkey-text-link labkey-publication-data-link" href="{dataUrl:htmlEncode}" target="_blank">Clinical and Assay Data</a>',
         '           </tpl>',
         '           </div>',
         '           <tpl if="viewState == &quot;expanded&quot;">',
@@ -104,9 +103,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '                           {abstractText:htmlEncode}',
         '                       </div>',
         '                   </tpl>',
-        '                   <tpl if="dataUrl">',
-        '                       <a class="labkey-text-link labkey-publication-data-link" href="{dataUrl:htmlEncode}" target="_blank">Clinical and Assay Data</a>',
-        '                   </tpl>',
         '                   <tpl if="thumbnails">',
         '                       <ul class="labkey-figures-list">',
         '                       <tpl for="thumbnails">',
@@ -122,7 +118,20 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '   </div>',
         '   </div>',
         '   </tpl>',
-        '</div>'
+        '</div>',
+            {
+                startCardDiv: function(values)
+                {
+                    var html = '<div class="labkey-publication-card ';
+                    html += values.viewState;
+                    if (values.status)
+                        html += " labkey-publication-" + values.status.toLowerCase().replace(' ', '-') + "-highlight";
+                    if (values.publicationType)
+                        html += " labkey-publication-" + values.publicationType.toLowerCase().replace(' ', '-') + "-highlight";
+                    html += '">';
+                    return html;
+                }
+            }
     ),
 
     listeners: {

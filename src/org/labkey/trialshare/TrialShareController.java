@@ -689,6 +689,17 @@ public class TrialShareController extends SpringActionController
             {
                 List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
 
+                for (StudyPublicationBean publication : publications)
+                {
+                    String containerId = publication.getManuscriptContainer();
+                    if (containerId != null)
+                    {
+                        Container container = ContainerManager.getForId(containerId);
+                        if (container != null && container.hasPermission(getUser(), ReadPermission.class))
+                            publication.setDataUrl(new ActionURL("project" + PageFlowUtil.encodeURI(container.getPath() + "/begin.view?pageId=study.DATA_ANALYSIS")).toString());
+                    }
+                    publication.setThumbnails(getUser(), getViewContext().getActionURL());
+                }
                 return success(publications);
             }
             else
@@ -936,55 +947,6 @@ public class TrialShareController extends SpringActionController
             }
 
             return success(publication);
-        }
-    }
-
-    @RequiresPermission(ReadPermission.class)
-    public class PublicationDetailViewAction extends SimpleViewAction<PublicationIdForm>
-    {
-        Integer _id;
-
-        @Override
-        public void validate(PublicationIdForm form, BindException errors)
-        {
-            _id = (null==form) ? null : form.getId();
-            if (_id == null)
-                errors.reject(ERROR_MSG, "Publication not specified");
-        }
-
-        @Override
-        public ModelAndView getView(PublicationIdForm form, BindException errors) throws Exception
-        {
-            QuerySchema listSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
-            TableInfo publicationsList = listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
-            if (publicationsList != null)
-            {
-                StudyPublicationBean publication = (new TableSelector(publicationsList)).getObject(_id, StudyPublicationBean.class);
-
-                SimpleFilter filter = new SimpleFilter();
-                filter.addCondition(FieldKey.fromParts("key"), _id);
-                publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
-
-
-                VBox v = new VBox();
-                if (null != form.getReturnActionURL())
-                {
-                    v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
-                }
-                v.addView(new JspView<>("/org/labkey/trialshare/view/publicationDetail.jsp", publication));
-
-                return v;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        @Override
-        public NavTree appendNavTrail(NavTree root)
-        {
-            return root;
         }
     }
 
