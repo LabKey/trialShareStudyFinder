@@ -513,6 +513,10 @@ DIV.labkey-filter-popup
     padding: 0;
 }
 
+.labkey-study-details .labkey-study-links {
+    padding: 5px 0 5px 10px;
+}
+
 div.labkey-study-details {
     background-color: white;
     padding: 10px 20px 20px 20px;
