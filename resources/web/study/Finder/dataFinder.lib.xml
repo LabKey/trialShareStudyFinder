@@ -16,6 +16,8 @@
         <script path="study/Finder/data/FacetMembers.js"/>
         <script path="study/Finder/data/Publication.js"/>
 
+        <script path="study/Finder/view/GridTable.js"/>
+
         <script path="study/Finder/panel/FacetPanelHeader.js"/>
         <script path="study/Finder/panel/FacetsGrid.js"/>
         <script path="study/Finder/panel/StudySummary.js"/>
