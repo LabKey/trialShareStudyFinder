@@ -49,8 +49,8 @@ import org.labkey.api.view.NavTree;
 import org.labkey.api.view.VBox;
 import org.labkey.api.view.WebPartView;
 import org.labkey.trialshare.data.FacetFilter;
-import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyAccess;
+import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
@@ -631,7 +631,7 @@ public class TrialShareController extends SpringActionController
                 for (StudyBean study : studies)
                 {
                     study.setStudyAccessList(studyAccessMap.get(study.getStudyId()));
-                    study.setUrl(getUser());
+                    study.setUrl(getUser(), true);
                     if (pubCounts.get(study.getStudyId()) == null)
                     {
                         study.setManuscriptCount(0);
@@ -688,10 +688,6 @@ public class TrialShareController extends SpringActionController
             if (publicationsList != null)
             {
                 List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
-                for (StudyPublicationBean publication : publications)
-                {
-                    publication.setIsHighlighted(publication.getStatus().equalsIgnoreCase("in progress"));
-                }
 
                 return success(publications);
             }
@@ -848,7 +844,7 @@ public class TrialShareController extends SpringActionController
                 StudyBean study = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.STUDY_TABLE))).getObject(_studyId, StudyBean.class);
 
                 study.setStudyAccessList(getUser(), getContainer());
-                study.setUrl(getUser());
+                study.setUrl(getUser(), true);
                 study.setPublications(getUser(), getContainer(), form.getDetailType().getDbFieldValue());
 
                 VBox v = new VBox();
@@ -933,6 +929,11 @@ public class TrialShareController extends SpringActionController
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("key"), _id);
             publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
+            for (StudyBean study : publication.getStudies())
+            {
+                study.setStudyAccessList(getUser(), getContainer());
+                study.setUrl(getUser(), false);
+            }
 
             return success(publication);
         }
