@@ -163,6 +163,10 @@ DIV.labkey-study-card
     overflow-y:hidden;
 }
 
+.labkey-study-card.labkey-publication-highlight
+{
+    background-color:rgba(81, 158, 218, 0.2);
+}
 
 .labkey-publication-highlight1
 {
