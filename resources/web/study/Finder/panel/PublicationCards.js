@@ -125,9 +125,15 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
                     var html = '<div class="labkey-publication-card ';
                     html += values.viewState;
                     if (values.status)
-                        html += " labkey-publication-" + values.status.toLowerCase().replace(' ', '-') + "-highlight";
+                            if (values.status.toLowerCase() == "in progress")
+                                html += " labkey-publication-highlight1";
+                            else
+                                html += " labkey-publication-highlight2";
                     if (values.publicationType)
-                        html += " labkey-publication-" + values.publicationType.toLowerCase().replace(' ', '-') + "-highlight";
+                        if (values.publicationType.toLowerCase() == "manuscript")
+                            html += " labkey-publication-highlight3";
+                        else
+                            html += " labkey-publication-highlight4";
                     html += '">';
                     return html;
                 }

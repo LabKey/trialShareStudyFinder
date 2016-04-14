@@ -163,14 +163,15 @@ DIV.labkey-study-card
     overflow-y:hidden;
 }
 
-.labkey-publication-manuscript-highlight
-{
-    background-color:rgba(81, 158, 218, 0.1);
-}
 
-.labkey-publication-in-progress-highlight
+.labkey-publication-highlight1
 {
     border: 1pt solid #AAAAAA;
+}
+
+.labkey-publication-highlight3
+{
+    background-color:rgba(81, 158, 218, 0.1);
 }
 
 TABLE.labkey-study-search
