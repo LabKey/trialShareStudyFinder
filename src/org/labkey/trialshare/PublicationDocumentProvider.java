@@ -136,7 +136,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 else
                     containerId = ContainerManager.getHomeContainer().getId();
 
-                ActionURL url = new ActionURL(TrialShareController.PublicationDetailViewAction.class, c).addParameter("id", results.getString("PublicationId"));
+                ActionURL url = new ActionURL(TrialShareController.PublicationDetailsAction.class, c).addParameter("id", results.getString("PublicationId"));
                 url.setExtraPath(containerId);
 
                 SimpleDocumentResource resource = new SimpleDocumentResource (
