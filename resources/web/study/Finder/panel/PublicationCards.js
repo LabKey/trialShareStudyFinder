@@ -25,7 +25,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             storeId: 'Publication',
             model: 'LABKEY.study.data.Publication',
             autoLoad: false,
-            facetSelectedMembers : {}, // initially we indicate that none of the members are selected by facets
+            facetSelectedMembers : {}, // initially we indicate that none of the members is selected by facets
             searchSelectedMembers : null, // initially we have no search terms so everything is selected
             selectedSubset : null,
             sorters: [{

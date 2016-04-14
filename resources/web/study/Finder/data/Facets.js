@@ -145,7 +145,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             var selection = [];
             for (var key in store.searchSelectedMembers)
             {
-                selection.push(store.searchSelectedMembers[key])
+                selection = selection.concat(store.searchSelectedMembers[key]);
             }
             return {level: this.cubeConfig.filterByLevel, members: selection};
         }
@@ -268,6 +268,8 @@ Ext4.define('LABKEY.study.store.Facets', {
                 onRows.arguments.push({level: facet.data.level.uniqueName});
         }
 
+        var multiColumnCount = this.cubeConfig.countField && this.cubeConfig.countField != this.cubeConfig.objectName;
+
         var config =
         {
             "sql": true,
@@ -278,7 +280,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             name: this.cubeConfig.name,
             success: function (cellSet, mdx, config)
             {
-                this.updateCountsUnion(cellSet);
+                this.updateCountsUnion(cellSet, multiColumnCount);
             },
             scope: this,
 
@@ -288,6 +290,10 @@ Ext4.define('LABKEY.study.store.Facets', {
             includeNullMemberInCount: false,
             countDistinctLevel: this.cubeConfig.countDistinctLevel
         };
+        if (multiColumnCount)
+        {
+            config.onCols = { operator: "UNION", arguments: [{level: this.cubeConfig.filterByLevel}] };
+        }
         // console.log("Making count distinct query with config", config);
         this.mdx.query(config);
     },
@@ -303,7 +309,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     },
 
     /* handle query response to update all the member counts with all filters applied */
-    updateCountsUnion : function (cellSet)
+    updateCountsUnion : function (cellSet, multiColumnCount)
     {
         var facet, member, f, m;
         // map from hierarchyName to facet
@@ -323,8 +329,17 @@ Ext4.define('LABKEY.study.store.Facets', {
         }
 
         this.updateCountsZero();
-        var positions = this.getRowPositionsOneLevel(cellSet);
-        var data = this.getDataOneColumn(cellSet, 0);
+        var positions = this.getAxisPositions(cellSet, 1);
+        var data;
+        if (multiColumnCount)
+        {
+            data = this.getMultiColumnData(cellSet);
+            if (!objectStore.unfilteredCount)
+                objectStore.setUnfilteredCount(data)
+        }
+        else
+            data = this.getDataOneColumn(cellSet, 0);
+
         var max = 0;
         var selectedMembers = {};
         for (var i = 0; i < positions.length; i++)
@@ -337,8 +352,11 @@ Ext4.define('LABKEY.study.store.Facets', {
             member = facetMembersStore.getById(resultMember.uniqueName);
             if (facet.get("name") == this.cubeConfig.objectName)
             {
-                selectedMembers[resultMember.name] = resultMember;
-                facet.data.selectedMembers.push(resultMember);
+                if (count > 0)
+                {
+                    selectedMembers[resultMember.name] = resultMember;
+                    facet.data.selectedMembers.push(resultMember);
+                }
             }
             else if (!member)
             {
@@ -402,17 +420,12 @@ Ext4.define('LABKEY.study.store.Facets', {
         store.updateFacetFilters(selectedMembers);
     },
 
-    getRowPositions : function(cellSet)
+    getAxisPositions : function(cellSet, axisIndex)
     {
-        return cellSet.axes[1].positions;
-    },
-
-    getRowPositionsOneLevel : function(cellSet)
-    {
-        var positions = cellSet.axes[1].positions;
+        var positions = cellSet.axes[axisIndex].positions;
         if (positions.length > 0 && positions[0].length > 1)
         {
-            console.log("warning: rows have nested members");
+            console.log("warning: axis has nested members");
             throw "illegal state";
         }
         return positions.map(function(inner){return inner[0]});
@@ -425,6 +438,25 @@ Ext4.define('LABKEY.study.store.Facets', {
         {
             return row.map(function(col){return col.value ? col.value : defaultValue;});
         });
+    },
+
+    getMultiColumnData : function(cellSet)
+    {
+        var columnPositions = this.getAxisPositions(cellSet, 0);
+        var cells = cellSet.cells;
+        var objectStore = Ext4.getStore(this.cubeConfig.objectName);
+        var unfilteredCount = 0;
+        return cells.map(function(row)
+        {
+            var sum = 0;
+            for (var i = 0; i < row.length; i++)
+            {
+                var object = objectStore.getById(columnPositions[i].name);
+                if (object && object.get(this.cubeConfig.countField))
+                    sum += row[i].value * object.get(this.cubeConfig.countField)
+            }
+            return sum;
+        }, this);
     },
 
     getDataOneColumn : function(cellSet,defaultValue)

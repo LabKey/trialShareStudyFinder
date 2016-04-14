@@ -283,6 +283,7 @@ public class TrialShareController extends SpringActionController
             bean.setSearchCategory(TrialShareModule.searchCategoryStudy.getName());
             bean.setSearchScope("Project");
             bean.setHasContainerFilter(true);
+            bean.setCountField("participantCount");
         }
         else if (objectName.equalsIgnoreCase(PUBLICATION_OBJECT))
         {
@@ -298,6 +299,7 @@ public class TrialShareController extends SpringActionController
             bean.setSearchCategory(TrialShareModule.searchCategoryPublication.getName());
             bean.setSearchScope("All");
             bean.setHasContainerFilter(false);
+            bean.setCountField(PUBLICATION_OBJECT);
         }
 
         return bean;
@@ -354,6 +356,7 @@ public class TrialShareController extends SpringActionController
         private String _searchCategory;
         private String _searchScope;
         private Boolean _hasContainerFilter;
+        private String _countField;
 
         public String getObjectName()
         {
@@ -543,6 +546,16 @@ public class TrialShareController extends SpringActionController
         public void setHasContainerFilter(Boolean hasContainerFilter)
         {
             _hasContainerFilter = hasContainerFilter;
+        }
+
+        public String getCountField()
+        {
+            return _countField;
+        }
+
+        public void setCountField(String countField)
+        {
+            _countField = countField;
         }
     }
 

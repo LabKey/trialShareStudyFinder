@@ -297,6 +297,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         Set<String> linkedStudyNames = new HashSet<>();
         for (String subset : studySubsets.keySet())
         {
+            log("Toggle facet: " + subset);
             facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, subset);
             List<DataFinderPage.DataCard> studyCards = finder.getDataCards();
             Set<String> studies = new HashSet<>();
@@ -779,15 +780,17 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertEquals("Expected count after filtering for 'In Progress' was not as expected.", "1 of 1", counts.get("In Progress"));
 
         // I have no idea why assertTextPresent returned false for these strings. The below tests appear to be more reliable.
-        scrollIntoView(DataFinderPage.Locators.pubCardHighlight);
-        cardText = getText(DataFinderPage.Locators.pubCardHighlight);
+        scrollIntoView(DataFinderPage.Locators.pubCardBorderHighlight);
+        cardText = getText(DataFinderPage.Locators.pubCardBorderHighlight);
         assertTrue("Could not find '" + cardTitle + "' on card.", cardText.contains(cardTitle));
         assertTrue("Could not find '" + cardAuthors + "' on card.", cardText.contains(cardAuthors));
 
         log("Validate that there is only one publication card present and has the correct style.");
         assertElementPresent(DataFinderPage.Locators.pubCard, 1);
-        assertElementVisible(DataFinderPage.Locators.pubCardHighlight);
-        assertElementPresent(DataFinderPage.Locators.pubCardHighlight, 1);
+        assertElementVisible(DataFinderPage.Locators.pubCardBorderHighlight);
+        assertElementVisible(DataFinderPage.Locators.pubCardBackgroundHighlight);
+        assertElementPresent(DataFinderPage.Locators.pubCardBorderHighlight, 1);
+        assertElementPresent(DataFinderPage.Locators.pubCardBackgroundHighlight, 1);
 
         log("Remove the 'In Progress' filter, and apply the 'Complete' filter.");
         fg.toggleFacet(DataFinderPage.Dimension.STATUS, "In Progress");
@@ -799,7 +802,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         assertEquals("Expected count after filtering for 'Complete' was not as expected.", "15 of 15", counts.get("Complete"));
 
         log("Validate that there are no 'In Progress' cards visible.");
-        assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardHighlight);
+        assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardBorderHighlight);
 
     }
 

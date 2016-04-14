@@ -271,7 +271,8 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.CssLocator pubFacetPanel = pubSelectionPanel.append(Locator.css(" .labkey-publication-facets"));
         public static final Locator.CssLocator pubSummaryArea = pubSelectionPanel.append(Locator.css("#summaryArea"));
         public static final Locator.CssLocator pubCard = pubFinder.append(Locator.css(".labkey-publication-card"));
-        public static final Locator.CssLocator pubCardHighlight = pubFinder.append(Locator.css(".labkey-publication-highlight"));
+        public static final Locator.CssLocator pubCardBorderHighlight = pubFinder.append(Locator.css(".labkey-publication-highlight1"));
+        public static final Locator.CssLocator pubCardBackgroundHighlight = pubFinder.append(Locator.css(".labkey-publication-highlight3"));
         public static final Locator.CssLocator groupLabel = Locator.css(".labkey-group-label");
         public static final Locator.NameLocator groupLabelInput = Locator.name("groupLabel");
         public static final Locator.CssLocator saveMenu = Locator.css("#saveMenu");
