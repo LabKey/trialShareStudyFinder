@@ -49,7 +49,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                     '       <span class="labkey-facet-member">',
                     '   </tpl>',
                     '       <span class="labkey-facet-member-name" title="{name}">{name}</span>',
-                    '       <span class="labkey-facet-member-count">{count:this.formatNumber} of {unfilteredCount:this.formatNumber}</span>',
+                    '       <span class="labkey-facet-member-count">{count:this.formatNumber} / {unfilteredCount:this.formatNumber}</span>',
                     '   <tpl if="unfilteredCount">',
                     '       <span class="labkey-facet-unfilteredPercent-bar" style="width:{unfilteredPercent}%;"></span>',
                     '   </tpl>',
