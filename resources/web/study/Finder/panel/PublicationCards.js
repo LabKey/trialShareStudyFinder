@@ -28,10 +28,16 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             facetSelectedMembers : {}, // initially we indicate that none of the members is selected by facets
             searchSelectedMembers : null, // initially we have no search terms so everything is selected
             selectedSubset : null,
-            sorters: [{
-                property: 'title',
-                direction: 'ASC'
-            }]
+            sorters: [
+                {
+                    property: 'year',
+                    direction: 'DESC'
+                },
+                {
+                    property: 'title',
+                    direction: 'ASC'
+                }
+            ]
         }),
 
     tpl: new Ext4.XTemplate(
