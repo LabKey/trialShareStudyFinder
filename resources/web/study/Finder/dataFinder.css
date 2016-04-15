@@ -1,17 +1,3 @@
-/*.labkey-publications-panel .x4-box-item*/
-/*{*/
-    /*width: 100%*/
-/*}*/
-
-/*.labkey-publications-panel .x4-box-inner*/
-/*{*/
-    /*float: right;*/
-/*}*/
-
-/*.labkey-finder-help {*/
-    /*width: 100%;*/
-    /*float: right;*/
-/*}*/
 
 .labkey-data-finder-view
 {
@@ -73,22 +59,6 @@ DIV.labkey-study-cards {
 DIV.labkey-finder-facets {
     background-color: #ffffff
 }
-
-/*.labkey-finder-facets .x4-grid-group-hd-collapsible .x4-grid-group-title*/
-/*{*/
-    /*background-image: none;*/
-    /*!*position: relative;*!*/
-/*}*/
-
-/*.labkey-finder-facets .x4-grid-group-hd-collapsible .x4-grid-group-title:before*/
-/*{*/
-    /*position: absolute;*/
-    /*font-family: 'FontAwesome';*/
-    /*top: 6px;*/
-    /*left: 6px;*/
-    /*content: "\f0fe";*/
-
-/*}*/
 
 .labkey-data-finder-inner
 {
@@ -180,7 +150,7 @@ DIV.labkey-study-card
 
 TABLE.labkey-study-search
 {
-    margin: 5px 0px 0px 5px;
+    margin: 5px 0 0 5px;
 }
 
 SPAN.labkey-study-search
@@ -206,7 +176,7 @@ DIV.labkey-search-message
 
 .labkey-facet-selection-panel
 {
-    padding: 0 0 5px 0px;
+    padding: 0 0 5px 0;
     vertical-align: text-top;
     height:100%;
     background-color: white;
@@ -215,7 +185,6 @@ DIV.labkey-search-message
 .labkey-facet-selection-panel > DIV
 {
     height:100%;
-    /*max-width:200pt;*/
     overflow-y:auto;
 }
 
@@ -223,7 +192,7 @@ DIV.labkey-facet-summary LI.labkey-facet-member
 {
     clear:both;
     padding:2pt;
-    margin:1px 0px 1px 0px;
+    margin:1px 0 1px 0;
     border:1px solid #ffffff;
     height:14pt;
     position:relative;
@@ -273,7 +242,7 @@ DIV.labkey-facet-summary
     border-bottom : solid 1px rgb(124,124,124);
     border-left: solid 1px rgb(180, 180, 180);
     border-right: solid 1px rgb(180, 180, 180);
-    border-top-width:0px;
+    border-top-width:0;
 }
 
 .active
@@ -354,7 +323,7 @@ DIV.labkey-facet-summary
 }
 
 .labkey-finder-facets .x4-grid-cell-special {
-    border-right-width: 0px;
+    border-right-width: 0;
 }
 
 .labkey-finder-facets .x4-grid-group-hd .x4-grid-group-title {
@@ -385,7 +354,7 @@ DIV.labkey-facet-summary LI.labkey-facet-member
     clear:both;
     cursor:default;
     padding:2pt;
-    margin:1px 0px 1px 0px;
+    margin:1px 0 1px 0;
     border:1px solid #ffffff;
     height:14pt;
     position:relative;
@@ -493,9 +462,9 @@ DIV.labkey-filter-popup
     border-color:#b4b4b4;
     border-width: 1px;
     border-style: solid;
-    box-shadow: rgb(136, 136, 136) 0px 0px 6px;
+    box-shadow: rgb(136, 136, 136) 0 0 6px;
     z-index: 100;
-    -webkit-padding-start: 0px
+    -webkit-padding-start: 0
 }
 
 
@@ -565,7 +534,7 @@ div.labkey-study-details h3 {
     text-transform: uppercase;
     font-size: 14px;
     font-weight: normal;
-    padding: 10px 0px 10px 50px;
+    padding: 10px 0 10px 50px;
     border-bottom: 1px solid darkgray;
 }
 
@@ -725,16 +694,12 @@ div.labkey-study-details h3 {
 
 .labkey-publication-card
 {
-    /*background-color:#F8F8F8;*/
-    /*border:1pt solid #AAAAAA;*/
     border-bottom:1px solid #AAAAAA;
     padding: 5pt;
     margin: 5pt;
     float:left;
     position:relative;
     width:90%;
-    /*width:171pt;*/
-    /*height:140pt;*/
     overflow-y:hidden;
 }
 
@@ -761,4 +726,14 @@ div.labkey-study-details h3 {
 .labkey-finder-label
 {
     font-weight: bold;
+}
+
+.labkey-data-link-icon
+{
+    display: none;
+}
+
+.labkey-goto-link-icon
+{
+    display: none;
 }
