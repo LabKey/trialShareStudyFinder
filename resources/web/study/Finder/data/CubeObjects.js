@@ -36,7 +36,7 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
 
     setUnfilteredCount: function()
     {
-        if (!this.countField)
+        if (!this.countField || this.countField == this.storeId)
             this.unfilteredCount = this.count();
         else
             this.unfilteredCount = this.sum(this.countField);

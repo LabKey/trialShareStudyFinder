@@ -335,7 +335,7 @@ Ext4.define('LABKEY.study.store.Facets', {
         {
             data = this.getMultiColumnData(cellSet);
             if (!objectStore.unfilteredCount)
-                objectStore.setUnfilteredCount(data)
+                objectStore.setUnfilteredCount()
         }
         else
             data = this.getDataOneColumn(cellSet, 0);
