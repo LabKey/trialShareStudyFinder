@@ -348,9 +348,14 @@ Ext4.define('LABKEY.study.store.Facets', {
             var hierarchyName = resultMember.level.hierarchy.uniqueName;
 
             facet = map[hierarchyName];
-            var count = data[i];
+
+            var isCubeObjectCount = facet.get("name") == this.cubeConfig.objectName;
+            // a bit of hackery here because cube objects that are present in the counts should become selected members
+            // even if the countField value is 0.  We return -1 in the data to indicate selected but with a 0 count.
+            // So if this member is a cube object, we make a negative count positive (1) and otherwise we make the count 0.
+            var count = (data[i] >= 0 ? data[i] : isCubeObjectCount ? 1 : 0);
             member = facetMembersStore.getById(resultMember.uniqueName);
-            if (facet.get("name") == this.cubeConfig.objectName)
+            if (isCubeObjectCount)
             {
                 if (count > 0)
                 {
@@ -445,17 +450,27 @@ Ext4.define('LABKEY.study.store.Facets', {
         var columnPositions = this.getAxisPositions(cellSet, 0);
         var cells = cellSet.cells;
         var objectStore = Ext4.getStore(this.cubeConfig.objectName);
-        var unfilteredCount = 0;
         return cells.map(function(row)
         {
+            var isSelected = false;
             var sum = 0;
             for (var i = 0; i < row.length; i++)
             {
                 var object = objectStore.getById(columnPositions[i].name);
-                if (object && object.get(this.cubeConfig.countField))
+                if (object && object.get(this.cubeConfig.countField) !== undefined)
+                {
+                    isSelected = isSelected || row[i].value > 0; // we want members to be selected from the filter even if their countField is 0
                     sum += row[i].value * object.get(this.cubeConfig.countField)
+                }
+                else
+                {
+                    console.log("no object in store with id " + columnPositions[i].name);
+                }
             }
-            return sum;
+            // return -1 to indicate that the member was selected, even though the sum of count
+            // field was 0 (because, for example, there may be operational studies (cube objects) that have 0 
+            // participants (count field) currently)
+            return sum > 0 ? sum : (isSelected ? -1 : 0);
         }, this);
     },
 
