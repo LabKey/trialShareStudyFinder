@@ -831,6 +831,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Go to publications and clear any filters that may have been set.");
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
+
         finder.clearAllFilters();
 
         log("Filter for a publication that has DOI, PMID and PMCID values.");
@@ -868,9 +869,8 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Go to another publication that doesn't have the same type of detail.");
         finder.clearAllFilters();
-        fg.toggleFacet(DataFinderPage.Dimension.PUB_CONDITION, "Microscopic Polyangiitis");
-        fg.toggleFacet(DataFinderPage.Dimension.PUB_ASSAY, "FCM");
         fg.toggleFacet(DataFinderPage.Dimension.PUB_STUDY, "RAVE");
+        fg.toggleFacet(DataFinderPage.Dimension.STATUS, "Complete");
         fg.toggleFacet(DataFinderPage.Dimension.PUB_THERAPEUTIC_AREA, "Autoimmune");
         fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript");
 
@@ -909,7 +909,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage finder = new DataFinderPage(this, testingStudies);
         doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), finder.getCountSignal(), longWait());
         if (!testingStudies)
+        {
+            sleep(1000); // HACK!
             finder.navigateToPublications();
+        }
         return finder;
     }
 }
