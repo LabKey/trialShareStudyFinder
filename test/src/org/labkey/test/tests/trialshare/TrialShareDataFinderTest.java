@@ -427,7 +427,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
                 Map<String, String> memberCounts = facets.getMemberCounts(dimension);
                 for (Map.Entry<String,String> memberCount : memberCounts.entrySet())
                 {
-                    assertTrue("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure: " + memberCount.getValue(), memberCount.getValue().matches("0 of \\d+"));
+                    assertTrue("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure: " + memberCount.getValue(), memberCount.getValue().matches("0 / \\d+"));
                 }
             }
         }
@@ -777,7 +777,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Validate that the number, content and style of the cards is as expected.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.IN_PROGRESS);
-        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", "1 of 1", counts.get("In Progress"));
+        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", "1 / 1", counts.get("In Progress"));
 
         // I have no idea why assertTextPresent returned false for these strings. The below tests appear to be more reliable.
         scrollIntoView(DataFinderPage.Locators.pubCardBorderHighlight);
@@ -799,7 +799,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         log("Validate counts for 'Complete' publications.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.COMPLETE);
         // one is "in progress" and one is set to not show
-        assertEquals("Expected count after filtering for 'Complete' was not as expected.", "15 of 15", counts.get("Complete"));
+        assertEquals("Expected count after filtering for 'Complete' was not as expected.", "15 / 15", counts.get("Complete"));
 
         log("Validate that there are no 'In Progress' cards visible.");
         assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardBorderHighlight);
