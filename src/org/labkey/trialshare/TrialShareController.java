@@ -283,7 +283,7 @@ public class TrialShareController extends SpringActionController
             bean.setSearchCategory(TrialShareModule.searchCategoryStudy.getName());
             bean.setSearchScope("Project");
             bean.setHasContainerFilter(true);
-            bean.setCountField("participantCount");
+            bean.setCountField(STUDY_OBJECT);
         }
         else if (objectName.equalsIgnoreCase(PUBLICATION_OBJECT))
         {
@@ -641,6 +641,11 @@ public class TrialShareController extends SpringActionController
                         }
                     }
                 }
+                studies.removeIf(studyBean ->
+                {
+                        List<StudyAccess> accessList = studyAccessMap.get(studyBean.getStudyId());
+                        return accessList == null || accessList.isEmpty();
+                });
                 for (StudyBean study : studies)
                 {
                     study.setStudyAccessList(studyAccessMap.get(study.getStudyId()));
