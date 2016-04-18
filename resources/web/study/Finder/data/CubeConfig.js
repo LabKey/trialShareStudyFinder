@@ -20,6 +20,7 @@ Ext4.define('LABKEY.study.data.CubeConfig', {
         {name: 'searchCategory'},
         {name: 'searchScope'},
         {name: 'cubeContainerPath'},
-        {name: 'hasContainerFilter', type: 'boolean', defaultValue: false}
+        {name: 'hasContainerFilter', type: 'boolean', defaultValue: false},
+        {name: 'countField'}
     ]
 });

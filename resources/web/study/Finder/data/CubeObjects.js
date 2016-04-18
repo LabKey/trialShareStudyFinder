@@ -34,13 +34,21 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
         this.updateFilters()
     },
 
+    setUnfilteredCount: function()
+    {
+        if (!this.countField || this.countField == this.storeId)
+            this.unfilteredCount = this.count();
+        else
+            this.unfilteredCount = this.sum(this.countField);
+    },
+
     updateFilters: function()
     {
         var object;
 
         this.suspendEvents(false);
         this.clearFilter();
-        this.unfilteredCount = this.count();
+        this.setUnfilteredCount();
         for (var i = 0; i < this.count(); i++) {
             object = this.getAt(i);
             object.set({

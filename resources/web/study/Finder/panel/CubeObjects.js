@@ -74,12 +74,15 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
                 {
                     var id = hits[h].id;
                     var accession = id.substring(id.lastIndexOf(':') + 1);
-                    if (searchHits[accession])
-                        continue;
+                    // NOTE:  If you are counting a differnet field than the accession and
+                    // want to count only one instance of that field for each object with the same
+                    // accession, change this array to have no more than one element.
+                    if (!searchHits[accession])
+                        searchHits[accession] = [];
                     if (this.cubeConfig.hasContainerFilter)
-                        searchHits[accession] = "[" + this.cubeConfig.objectName + "].[" + hits[h].container + "].[" + accession + "]";
+                        searchHits[accession].push("[" + this.cubeConfig.objectName + "].[" + hits[h].container + "].[" + accession + "]");
                     else
-                        searchHits[accession] = "[" + this.cubeConfig.objectName + "].[" + accession + "]";
+                        searchHits[accession].push("[" + this.cubeConfig.objectName + "].[" + accession + "]");
                 }
                 // console.log("found " + Object.keys(searchHits).length + " objects matching terms " + searchTerms, searchHits);
                 this.updateSearchFilters(searchHits);
@@ -142,7 +145,8 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
         if (!this.cards) {
             this.cards = Ext4.create("LABKEY.study.panel." + this.cubeConfig.objectName + "Cards", {
                 dataModuleName: this.dataModuleName,
-                cubeContainerPath : this.cubeConfig.cubeContainerPath
+                cubeContainerPath : this.cubeConfig.cubeContainerPath,
+                countField: this.cubeConfig.countField
             });
         }
         return this.cards;

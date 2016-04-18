@@ -25,23 +25,25 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
             storeId: 'Publication',
             model: 'LABKEY.study.data.Publication',
             autoLoad: false,
-            facetSelectedMembers : {}, // initially we indicate that none of the members are selected by facets
+            facetSelectedMembers : {}, // initially we indicate that none of the members is selected by facets
             searchSelectedMembers : null, // initially we have no search terms so everything is selected
             selectedSubset : null,
-            sorters: [{
-                property: 'title',
-                direction: 'ASC'
-            }]
+            sorters: [
+                {
+                    property: 'year',
+                    direction: 'DESC'
+                },
+                {
+                    property: 'title',
+                    direction: 'ASC'
+                }
+            ]
         }),
 
     tpl: new Ext4.XTemplate(
         '<div id="publicationpanel">',
         '   <tpl for=".">',
-        '   <tpl if="isHighlighted">',
-        '   <div class="labkey-publication-card labkey-publication-highlight {viewState}">',
-        '   <tpl else>',
-        '   <div class="labkey-publication-card {viewState}">',
-        '   </tpl>',
+        '   {[this.startCardDiv(values)]}',
         '       <div class="labkey-publication">',
         '           <span>',
         '               <span id="morePublicationDetails"><i class="fa fa-plus-square"></i></span>',
@@ -54,7 +56,16 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '           <div class="labkey-publication-citation">{citation:htmlEncode}</div>',
         '           <div>',
         '           <tpl if="url">',
-        '               <a class="labkey-text-link labkey-publication-goto" target="_blank" href="{url}">view document</a>',
+        '               <div class="labkey-publication-goto">',
+        '               <a class="labkey-text-link labkey-goto-link-text" target="_blank" href="{url}">view document</a>',
+        '               <a class="labkey-goto-link-icon" target="_blank" href="{url}"><div class="labkey-goto-link-icon"></div></a>',
+        '               </div>',
+        '           </tpl>',
+        '           <tpl if="dataUrl">',
+        '                <div class="labkey-publication-data-link">',
+        '                <a class="labkey-text-link labkey-data-link-text" href="{dataUrl:htmlEncode}" target="_blank"><span class="labkey-data-link-text">Clinical and Assay Data</span></a>',
+        '                <a class="labkey-data-link-icon" href="{dataUrl:htmlEncode}" target="_blank"><div class="labkey-data-link-icon"></div></a>',
+        '                </div>',
         '           </tpl>',
         '           </div>',
         '           <tpl if="viewState == &quot;expanded&quot;">',
@@ -104,9 +115,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '                           {abstractText:htmlEncode}',
         '                       </div>',
         '                   </tpl>',
-        '                   <tpl if="dataUrl">',
-        '                       <a class="labkey-text-link labkey-publication-data-link" href="{dataUrl:htmlEncode}" target="_blank">Clinical and Assay Data</a>',
-        '                   </tpl>',
         '                   <tpl if="thumbnails">',
         '                       <ul class="labkey-figures-list">',
         '                       <tpl for="thumbnails">',
@@ -122,7 +130,26 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '   </div>',
         '   </div>',
         '   </tpl>',
-        '</div>'
+        '</div>',
+            {
+                startCardDiv: function(values)
+                {
+                    var html = '<div class="labkey-publication-card ';
+                    html += values.viewState;
+                    if (values.status)
+                            if (values.status.toLowerCase() == "in progress")
+                                html += " labkey-publication-highlight1";
+                            else
+                                html += " labkey-publication-highlight2";
+                    if (values.publicationType)
+                        if (values.publicationType.toLowerCase() == "manuscript")
+                            html += " labkey-publication-highlight3";
+                        else
+                            html += " labkey-publication-highlight4";
+                    html += '">';
+                    return html;
+                }
+            }
     ),
 
     listeners: {

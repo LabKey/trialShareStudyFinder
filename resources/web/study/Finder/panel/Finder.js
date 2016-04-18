@@ -3,28 +3,6 @@
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
-/**
- * @Override
- * Sencha Issue: https://www.sencha.com/forum/showthread.php?265078-Broken-contracts-of-getAt-indexOf-methods-of-the-Ext.grid.feature.Grouping Version: 4.2.1
- */
-Ext4.override(Ext4.view.Table, 
-{
-    getRecord: function (node) {
-        node = this.getNode(node);
-        if (node) {
-            return this.dataSource.data.get(node.getAttribute('data-recordId'));
-        }
-    },
-    
-    indexInStore: function (node) {
-        node = this.getNode(node, true);
-        if (!node && node !== 0) {
-            return -1;
-        }
-        return this.dataSource.indexOf(this.getRecord(node));
-    }
-});
-
 Ext4.define('LABKEY.study.panel.Finder', {
     extend: 'Ext.panel.Panel',
 
