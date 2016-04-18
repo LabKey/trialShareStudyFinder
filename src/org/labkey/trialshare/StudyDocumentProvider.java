@@ -106,7 +106,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                         keywords.append(results.getString(field)).append(" ");
                 }
 
-                properties.put(SearchService.PROPERTY.indentifiersMed.toString(), results.getString("StudyId"));
+                properties.put(SearchService.PROPERTY.identifiersMed.toString(), results.getString("StudyId"));
                 properties.put(SearchService.PROPERTY.keywordsMed.toString(), keywords.toString());
                 properties.put(SearchService.PROPERTY.title.toString(), results.getString("Title"));
                 properties.put(SearchService.PROPERTY.categories.toString(), TrialShareModule.searchCategoryStudy.getName());
