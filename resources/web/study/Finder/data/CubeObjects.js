@@ -6,14 +6,6 @@
 Ext4.define('LABKEY.study.store.CubeObjects', {
     extend: 'Ext.data.Store',
     autoLoad: false,
-
-    listeners: {
-        'load' : {
-            fn : function(store, records, options) {
-                store.updateFacetFilters(store.selectedSubset ? null : {}); // initial load should have no objects selected
-            }
-        }
-    },
     
     setSearchFilters: function(searchSelectedMembers) {
         this.searchSelectedMembers = searchSelectedMembers;
