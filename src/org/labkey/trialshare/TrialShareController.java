@@ -770,9 +770,9 @@ public class TrialShareController extends SpringActionController
             facet = new StudyFacetBean("Phase", "Phases", "Study.Phase", "Phase", "[Study.Phase][(All)]", FacetFilter.Type.OR, 5);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Assay", "Assays", "Study.Assay", "Assay", "[Study.Assay][(All)]", FacetFilter.Type.OR, 6);
-            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            facets.add(facet);
+//            facet = new StudyFacetBean("Assay", "Assays", "Study.Assay", "Assay", "[Study.Assay][(All)]", FacetFilter.Type.OR, 6);
+//            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+//            facets.add(facet);
             facet = new StudyFacetBean("Condition", "Conditions", "Study.Condition", "Condition", "[Study.Condition][(All)]", FacetFilter.Type.OR, 7);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);

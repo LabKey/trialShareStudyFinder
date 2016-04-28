@@ -42,10 +42,10 @@
             <Hierarchy name="Visibility" hasAll="true" primaryKey="StudyId">
                 <Level name="Visibility" visible="true"  type="String" column="Visibility" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
-            <Hierarchy name="Assay" hasAll="true" primaryKey="StudyId">
-                <Table name="studyAssay" schema="lists"/>
-                <Level name="Assay" visible="true" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-            </Hierarchy>
+            <!--<Hierarchy name="Assay" hasAll="true" primaryKey="StudyId">-->
+                <!--<Table name="studyAssay" schema="lists"/>-->
+                <!--<Level name="Assay" visible="true" type="String"  column="Assay" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>-->
+            <!--</Hierarchy>-->
         </Dimension>
 
 
