@@ -49,7 +49,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                     '       <span class="labkey-facet-member">',
                     '   </tpl>',
                     '       <span class="labkey-facet-member-name" title="{name}">{name}</span>',
-                    '       <span class="labkey-facet-member-count">{count:this.formatNumber} of {unfilteredCount:this.formatNumber}</span>',
+                    '       <span class="labkey-facet-member-count">{count:this.formatNumber} / {unfilteredCount:this.formatNumber}</span>',
                     '   <tpl if="unfilteredCount">',
                     '       <span class="labkey-facet-unfilteredPercent-bar" style="width:{unfilteredPercent}%;"></span>',
                     '   </tpl>',
@@ -89,8 +89,62 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         }
     },
 
+    /**
+     * @Override
+     * Issue 26148: Collapsing a section cause click in sections that follow to be off by 1.
+     * We need to use our own view table to get around the bug in Ext4
+     * Sencha Issue: https://www.sencha.com/forum/showthread.php?265078-Broken-contracts-of-getAt-indexOf-methods-of-the-Ext.grid.feature.Grouping
+     * Version: 4.2.1
+     */
+    getView: function() {
+        var me = this,
+                sm;
+
+        if (!me.view) {
+            sm = me.getSelectionModel();
+
+            // TableView injects the view reference into this grid so that we have a reference as early as possible
+            me.viewConfig = Ext4.apply({
+                // Features need a reference to the grid, so configure a reference into the View
+                grid: me,
+                deferInitialRefresh: me.deferRowRender !== false,
+                trackOver: me.trackMouseOver !== false,
+                scroll: me.scroll,
+                store: me.store,
+                headerCt: me.headerCt,
+                columnLines: me.columnLines,
+                rowLines: me.rowLines,
+                selModel: sm,
+                features: me.features,
+                panel: me,
+                emptyText: me.emptyText || ''
+            }, me.viewConfig);
+            me.view = Ext4.create('LABKEY.study.view.GridTable', me.viewConfig);
+
+            // Normalize the application of the markup wrapping the emptyText config.
+            // `emptyText` can now be defined on the grid as well as on its viewConfig, and this led to the emptyText not
+            // having the wrapping markup when it was defined in the viewConfig. It should be backwards compatible.
+            // Note that in the unlikely event that emptyText is defined on both the grid config and the viewConfig that the viewConfig wins.
+            if (me.view.emptyText) {
+                me.view.emptyText = '<div class="' + me.emptyCls + '">' + me.view.emptyText + '</div>';
+            }
+
+            // TableView's custom component layout, Ext.view.TableLayout requires a reference to the headerCt because it depends on the headerCt doing its work.
+            me.view.getComponentLayout().headerCt = me.headerCt;
+
+            me.mon(me.view, {
+                uievent: me.processEvent,
+                scope: me
+            });
+            sm.view = me.view;
+            me.headerCt.view = me.view;
+        }
+        return me.view;
+    },
+
     initComponent: function() {
         this.cls = 'labkey-finder-facets labkey-' + this.cubeConfig.objectName.toLowerCase() + '-facets';
+
         this.facetStore = Ext4.create("LABKEY.study.store.Facets", {
             dataModuleName: this.dataModuleName,
             cubeConfig: this.cubeConfig,

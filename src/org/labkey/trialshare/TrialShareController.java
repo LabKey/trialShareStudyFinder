@@ -49,8 +49,8 @@ import org.labkey.api.view.NavTree;
 import org.labkey.api.view.VBox;
 import org.labkey.api.view.WebPartView;
 import org.labkey.trialshare.data.FacetFilter;
-import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyAccess;
+import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
@@ -283,6 +283,7 @@ public class TrialShareController extends SpringActionController
             bean.setSearchCategory(TrialShareModule.searchCategoryStudy.getName());
             bean.setSearchScope("Project");
             bean.setHasContainerFilter(true);
+            bean.setCountField(STUDY_OBJECT);
         }
         else if (objectName.equalsIgnoreCase(PUBLICATION_OBJECT))
         {
@@ -298,6 +299,7 @@ public class TrialShareController extends SpringActionController
             bean.setSearchCategory(TrialShareModule.searchCategoryPublication.getName());
             bean.setSearchScope("All");
             bean.setHasContainerFilter(false);
+            bean.setCountField(PUBLICATION_OBJECT);
         }
 
         return bean;
@@ -354,6 +356,7 @@ public class TrialShareController extends SpringActionController
         private String _searchCategory;
         private String _searchScope;
         private Boolean _hasContainerFilter;
+        private String _countField;
 
         public String getObjectName()
         {
@@ -544,6 +547,16 @@ public class TrialShareController extends SpringActionController
         {
             _hasContainerFilter = hasContainerFilter;
         }
+
+        public String getCountField()
+        {
+            return _countField;
+        }
+
+        public void setCountField(String countField)
+        {
+            _countField = countField;
+        }
     }
 
     @RequiresPermission(AdminPermission.class)
@@ -628,10 +641,15 @@ public class TrialShareController extends SpringActionController
                         }
                     }
                 }
+                studies.removeIf(studyBean ->
+                {
+                        List<StudyAccess> accessList = studyAccessMap.get(studyBean.getStudyId());
+                        return accessList == null || accessList.isEmpty();
+                });
                 for (StudyBean study : studies)
                 {
                     study.setStudyAccessList(studyAccessMap.get(study.getStudyId()));
-                    study.setUrl(getUser());
+                    study.setUrl(getUser(), true);
                     if (pubCounts.get(study.getStudyId()) == null)
                     {
                         study.setManuscriptCount(0);
@@ -688,11 +706,18 @@ public class TrialShareController extends SpringActionController
             if (publicationsList != null)
             {
                 List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
+
                 for (StudyPublicationBean publication : publications)
                 {
-                    publication.setIsHighlighted(publication.getStatus().equalsIgnoreCase("in progress"));
+                    String containerId = publication.getManuscriptContainer();
+                    if (containerId != null)
+                    {
+                        Container container = ContainerManager.getForId(containerId);
+                        if (container != null && container.hasPermission(getUser(), ReadPermission.class))
+                            publication.setDataUrl(new ActionURL("project" + PageFlowUtil.encodeURI(container.getPath() + "/begin.view?pageId=study.DATA_ANALYSIS")).toString());
+                    }
+                    publication.setThumbnails(getUser(), getViewContext().getActionURL());
                 }
-
                 return success(publications);
             }
             else
@@ -739,16 +764,16 @@ public class TrialShareController extends SpringActionController
             facet = new StudyFacetBean("Study Type", "Study Types", "Study.Study Type", "StudyType", "[Study.Study Type][(All)]", FacetFilter.Type.OR, 3);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Assay", "Assays", "Study.Assay", "Assay", "[Study.Assay][(All)]", FacetFilter.Type.OR, 4);
+            facet = new StudyFacetBean("Age Group", "Age Groups", "Study.AgeGroup", "AgeGroup", "[Study.AgeGroup][(All)]", FacetFilter.Type.OR, 4);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Phase", "Phases", "Study.Phase", "Phase", "[Study.Phase][(All)]", FacetFilter.Type.OR, 5);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Assay", "Assays", "Study.Assay", "Assay", "[Study.Assay][(All)]", FacetFilter.Type.OR, 6);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
             facet = new StudyFacetBean("Condition", "Conditions", "Study.Condition", "Condition", "[Study.Condition][(All)]", FacetFilter.Type.OR, 7);
-            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            facets.add(facet);
-            facet = new StudyFacetBean("Age Group", "Age Groups", "Study.AgeGroup", "AgeGroup", "[Study.AgeGroup][(All)]", FacetFilter.Type.OR, 5);
-            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            facets.add(facet);
-            facet = new StudyFacetBean("Phase", "Phases", "Study.Phase", "Phase", "[Study.Phase][(All)]", FacetFilter.Type.OR, 6);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
             facet = new StudyFacetBean("Study", "Studies", "Study", "Study", "[Study].[(All)]", FacetFilter.Type.OR, null);
@@ -767,30 +792,32 @@ public class TrialShareController extends SpringActionController
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facet.setDisplayFacet(TrialShareManager.get().canSeeIncompleteManuscripts(getUser(), getContainer()));
             facets.add(facet);
-            facet = new StudyFacetBean("Publication Type", "Publication Types", "Publication.Publication Type", "PublicationType", "[Publication.Publication Type][(All)]", FacetFilter.Type.OR, 2);
+            facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Publication.Therapeutic Area", "Therapeutic Area", "[Publication.Therapeutic Area][(All)]", FacetFilter.Type.OR, 2);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Featured", "Featured", "Publication.Featured", "Featured", "[Publication.Featured][(All)]", FacetFilter.Type.OR, 3);
+            facet = new StudyFacetBean("Publication Type", "Publication Types", "Publication.Publication Type", "PublicationType", "[Publication.Publication Type][(All)]", FacetFilter.Type.OR, 3);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Therapeutic Area", "Therapeutic Areas", "Publication.Therapeutic Area", "Therapeutic Area", "[Publication.Therapeutic Area][(All)]", FacetFilter.Type.OR, 4);
-            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facet = new StudyFacetBean("Study", "Studies", "Publication.Study", "Study", "[Publication.Study].[(All)]", FacetFilter.Type.OR, 4);
+            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
             facet = new StudyFacetBean("Year", "Years", "Publication.Year", "Year", "[Publication.Year][(All)]", FacetFilter.Type.OR, 5);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Journal", "Journals", "Publication.Journal", "Journal", "[Publication.Journal][(All)]", FacetFilter.Type.OR, 6);
-            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            facets.add(facet);
-            facet = new StudyFacetBean("Study", "Studies", "Publication.Study", "Study", "[Publication.Study].[(All)]", FacetFilter.Type.OR, 7);
-            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            facets.add(facet);
-            facet = new StudyFacetBean("Assay", "Assays", "Publication.Assay", "Assay", "[Publication.Assay][(All)]", FacetFilter.Type.OR, 8);
-            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            facets.add(facet);
-            facet = new StudyFacetBean("Condition", "Conditions", "Publication.Condition", "Condition", "[Publication.Condition][(All)]", FacetFilter.Type.OR, 9);
-            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
-            facets.add(facet);
+
+//            facet = new StudyFacetBean("Featured", "Featured", "Publication.Featured", "Featured", "[Publication.Featured][(All)]", FacetFilter.Type.OR, 3);
+//            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+//            facets.add(facet);
+//            facet = new StudyFacetBean("Journal", "Journals", "Publication.Journal", "Journal", "[Publication.Journal][(All)]", FacetFilter.Type.OR, 6);
+//            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+//            facets.add(facet);
+//            facet = new StudyFacetBean("Assay", "Assays", "Publication.Assay", "Assay", "[Publication.Assay][(All)]", FacetFilter.Type.OR, 8);
+//            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+//            facets.add(facet);
+//            facet = new StudyFacetBean("Condition", "Conditions", "Publication.Condition", "Condition", "[Publication.Condition][(All)]", FacetFilter.Type.OR, 9);
+//            facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
+//            facets.add(facet);
+
             facet = new StudyFacetBean("Publication", "Publications", "Publication", "Publication", "[Publication].[(All)]", FacetFilter.Type.OR, null);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
@@ -848,7 +875,7 @@ public class TrialShareController extends SpringActionController
                 StudyBean study = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.STUDY_TABLE))).getObject(_studyId, StudyBean.class);
 
                 study.setStudyAccessList(getUser(), getContainer());
-                study.setUrl(getUser());
+                study.setUrl(getUser(), true);
                 study.setPublications(getUser(), getContainer(), form.getDetailType().getDbFieldValue());
 
                 VBox v = new VBox();
@@ -933,57 +960,13 @@ public class TrialShareController extends SpringActionController
             SimpleFilter filter = new SimpleFilter();
             filter.addCondition(FieldKey.fromParts("key"), _id);
             publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
+            for (StudyBean study : publication.getStudies())
+            {
+                study.setStudyAccessList(getUser(), getContainer());
+                study.setUrl(getUser(), false);
+            }
 
             return success(publication);
-        }
-    }
-
-    @RequiresPermission(ReadPermission.class)
-    public class PublicationDetailViewAction extends SimpleViewAction<PublicationIdForm>
-    {
-        Integer _id;
-
-        @Override
-        public void validate(PublicationIdForm form, BindException errors)
-        {
-            _id = (null==form) ? null : form.getId();
-            if (_id == null)
-                errors.reject(ERROR_MSG, "Publication not specified");
-        }
-
-        @Override
-        public ModelAndView getView(PublicationIdForm form, BindException errors) throws Exception
-        {
-            QuerySchema listSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
-            TableInfo publicationsList = listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
-            if (publicationsList != null)
-            {
-                StudyPublicationBean publication = (new TableSelector(publicationsList)).getObject(_id, StudyPublicationBean.class);
-
-                SimpleFilter filter = new SimpleFilter();
-                filter.addCondition(FieldKey.fromParts("key"), _id);
-                publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
-
-
-                VBox v = new VBox();
-                if (null != form.getReturnActionURL())
-                {
-                    v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
-                }
-                v.addView(new JspView<>("/org/labkey/trialshare/view/publicationDetail.jsp", publication));
-
-                return v;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        @Override
-        public NavTree appendNavTrail(NavTree root)
-        {
-            return root;
         }
     }
 

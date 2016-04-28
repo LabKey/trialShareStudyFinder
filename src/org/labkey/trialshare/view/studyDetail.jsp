@@ -85,7 +85,32 @@
         <%
         }
         %>
-        <div class="labkey-study-papers"><%
+
+        <% if (null != studyUrl || null != study.getExternalUrl())
+            { %>
+        <div class="labkey-study-links">
+        <%      if (null != studyUrl) { %>
+        <%= textLink("View study " + study.getShortName(), studyUrl, null, null, linkProps)%><br>
+        <% } %>
+        <%
+                    if (null != study.getExternalUrl())
+                    {
+                        String text = study.getExternalUrlDescription();
+                        if (StringUtils.isEmpty(text))
+                        {
+                            URL url = new URL(study.getExternalUrl());
+                            text = "View study at " + url.getHost();
+                        }
+        %>
+        <%= textLink(text, study.getExternalUrl(), null, null, linkProps)%><br>
+        <%          } %>
+
+        </div>
+        <%  } %>
+        <div class="labkey-study-papers">
+            <hr>
+        <%
+
         if (null != study.getPublications() && study.getPublications().size() > 0)
         {
             %><span class="labkey-study-publication-header"><%=h(studyDetail.getDetailType().getSectionHeader())%></span><%
@@ -123,21 +148,6 @@
         %></div>
     </div>
 
-    <% if (null != studyUrl) { %>
-        <%= textLink("View study " + study.getShortName(), studyUrl, null, null, linkProps)%><br>
-    <% } %>
-    <%
-        if (null != study.getExternalUrl())
-        {
-            String text = study.getExternalUrlDescription();
-            if (StringUtils.isEmpty(text))
-            {
-                URL url = new URL(study.getExternalUrl());
-                text = "View study at " + url.getHost();
-            }
-    %>
-        <%= textLink(text, study.getExternalUrl(), null, null, linkProps)%><br>
-    <% } %>
 </div>
 </div>
 

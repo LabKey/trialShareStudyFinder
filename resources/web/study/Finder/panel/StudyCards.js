@@ -230,8 +230,9 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         }
     },
 
-    initComponent: function(config)
+    initComponent: function()
     {
+        this.getStore().countField = this.countField;
         this.getStore().proxy.url = LABKEY.ActionURL.buildURL(this.dataModuleName, "studies.api", this.cubeContainerPath);
         this.getStore().load();
         this.callParent();

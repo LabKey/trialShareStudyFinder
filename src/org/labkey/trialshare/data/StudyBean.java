@@ -279,7 +279,7 @@ public class StudyBean
         this.url = url;
     }
 
-    public void setUrl(User user)
+    public void setUrl(User user, Boolean linkPublicStudies)
     {
         this.url = null;
         if (getStudyAccessList() == null)
@@ -292,7 +292,7 @@ public class StudyBean
             {
                 if (studyAccess.getVisibility().equalsIgnoreCase(TrialShareQuerySchema.OPERATIONAL_VISIBILITY))
                     this.url = studyContainer.getStartURL(user).toString();
-                else if (url == null)
+                else if (url == null && linkPublicStudies)
                     this.url = studyContainer.getStartURL(user).toString();
             }
         }
@@ -307,7 +307,7 @@ public class StudyBean
     {
         if (url == null)
         {
-           setUrl(user);
+           setUrl(user, true);
         }
         return url;
     }

@@ -297,6 +297,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         Set<String> linkedStudyNames = new HashSet<>();
         for (String subset : studySubsets.keySet())
         {
+            log("Toggle facet: " + subset);
             facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, subset);
             List<DataFinderPage.DataCard> studyCards = finder.getDataCards();
             Set<String> studies = new HashSet<>();
@@ -426,7 +427,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
                 Map<String, String> memberCounts = facets.getMemberCounts(dimension);
                 for (Map.Entry<String,String> memberCount : memberCounts.entrySet())
                 {
-                    assertTrue("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure: " + memberCount.getValue(), memberCount.getValue().matches("0 of \\d+"));
+                    assertTrue("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure: " + memberCount.getValue(), memberCount.getValue().matches("0 / \\d+"));
                 }
             }
         }
@@ -776,18 +777,20 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Validate that the number, content and style of the cards is as expected.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.IN_PROGRESS);
-        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", "1 of 1", counts.get("In Progress"));
+        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", "1 / 1", counts.get("In Progress"));
 
         // I have no idea why assertTextPresent returned false for these strings. The below tests appear to be more reliable.
-        scrollIntoView(DataFinderPage.Locators.pubCardHighlight);
-        cardText = getText(DataFinderPage.Locators.pubCardHighlight);
+        scrollIntoView(DataFinderPage.Locators.pubCardBorderHighlight);
+        cardText = getText(DataFinderPage.Locators.pubCardBorderHighlight);
         assertTrue("Could not find '" + cardTitle + "' on card.", cardText.contains(cardTitle));
         assertTrue("Could not find '" + cardAuthors + "' on card.", cardText.contains(cardAuthors));
 
         log("Validate that there is only one publication card present and has the correct style.");
         assertElementPresent(DataFinderPage.Locators.pubCard, 1);
-        assertElementVisible(DataFinderPage.Locators.pubCardHighlight);
-        assertElementPresent(DataFinderPage.Locators.pubCardHighlight, 1);
+        assertElementVisible(DataFinderPage.Locators.pubCardBorderHighlight);
+        assertElementVisible(DataFinderPage.Locators.pubCardBackgroundHighlight);
+        assertElementPresent(DataFinderPage.Locators.pubCardBorderHighlight, 1);
+        assertElementPresent(DataFinderPage.Locators.pubCardBackgroundHighlight, 1);
 
         log("Remove the 'In Progress' filter, and apply the 'Complete' filter.");
         fg.toggleFacet(DataFinderPage.Dimension.STATUS, "In Progress");
@@ -796,10 +799,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         log("Validate counts for 'Complete' publications.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.COMPLETE);
         // one is "in progress" and one is set to not show
-        assertEquals("Expected count after filtering for 'Complete' was not as expected.", "15 of 15", counts.get("Complete"));
+        assertEquals("Expected count after filtering for 'Complete' was not as expected.", "15 / 15", counts.get("Complete"));
 
         log("Validate that there are no 'In Progress' cards visible.");
-        assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardHighlight);
+        assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardBorderHighlight);
 
     }
 
@@ -828,6 +831,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Go to publications and clear any filters that may have been set.");
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
+
         finder.clearAllFilters();
 
         log("Filter for a publication that has DOI, PMID and PMCID values.");
@@ -865,9 +869,8 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
 
         log("Go to another publication that doesn't have the same type of detail.");
         finder.clearAllFilters();
-        fg.toggleFacet(DataFinderPage.Dimension.PUB_CONDITION, "Microscopic Polyangiitis");
-        fg.toggleFacet(DataFinderPage.Dimension.PUB_ASSAY, "FCM");
         fg.toggleFacet(DataFinderPage.Dimension.PUB_STUDY, "RAVE");
+        fg.toggleFacet(DataFinderPage.Dimension.STATUS, "Complete");
         fg.toggleFacet(DataFinderPage.Dimension.PUB_THERAPEUTIC_AREA, "Autoimmune");
         fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript");
 
@@ -906,7 +909,10 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage finder = new DataFinderPage(this, testingStudies);
         doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), finder.getCountSignal(), longWait());
         if (!testingStudies)
+        {
+            sleep(1000); // HACK!
             finder.navigateToPublications();
+        }
         return finder;
     }
 }
