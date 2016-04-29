@@ -411,7 +411,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
-        facets.toggleFacet(DataFinderPage.Dimension.ASSAY, "Elispot");
+        facets.toggleFacet(DataFinderPage.Dimension.CONDITION, "Allergy");
 
         facets = finder.getFacetsGrid();
         List<DataFinderPage.DataCard> filteredStudyCards = finder.getDataCards();
@@ -908,9 +908,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     {
         DataFinderPage finder = new DataFinderPage(this, testingStudies);
         doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), finder.getCountSignal(), longWait());
+        sleep(1000);  // HACK!
         if (!testingStudies)
         {
-            sleep(1000); // HACK!
             finder.navigateToPublications();
         }
         return finder;
