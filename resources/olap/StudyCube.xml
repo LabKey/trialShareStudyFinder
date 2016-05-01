@@ -15,6 +15,10 @@
                 <Level name="Container" visible="true" column="studyContainer" type="String" uniqueMembers="true" levelType="Regular"/>
                 <Level name="Study" visible="true" column="studyId" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
+            <Hierarchy name="Study Name" hasAll="true" primaryKeyTable="studyAccess" primaryKey="StudyId">
+                <Level name="Container" visible="true" column="studyContainer" type="String" uniqueMembers="true" levelType="Regular"/>
+                <Level name="Study" visible="true" column="studyId" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+            </Hierarchy>
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="StudyId">
                 <Table name="studyTherapeuticArea" schema="lists"/>
                 <Level name="Therapeutic Area" visible="true" column="therapeuticArea" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
