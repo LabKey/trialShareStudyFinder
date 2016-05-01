@@ -77,7 +77,6 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     getFacetsPanel: function() {
         if (!this.facetsPanel) {
-
             this.facetsPanel = Ext4.create("LABKEY.study.panel.FacetSelection", {
                 region: 'west',
                 flex: 1,

@@ -6,7 +6,7 @@
 Ext4.define('LABKEY.study.store.Facets', {
     extend: 'Ext.data.Store',
     model: 'LABKEY.study.data.Facet',
-    autoLoad: true,
+    autoLoad: false,
 
     mdx: null,
     isLoaded: false,
@@ -120,7 +120,18 @@ Ext4.define('LABKEY.study.store.Facets', {
         for (var level in filtersMap) {
             if (!filtersMap.hasOwnProperty(level))
                     continue;
-            filters.push({level: level, members: filtersMap[level]});
+            if (Ext4.isObject(filtersMap[level]))
+            {
+                for (var level2 in filtersMap[level])
+                {
+                    filters.push({
+                        level: this.cubeConfig.filterByLevel,
+                        membersQuery: {level: level2, members: filtersMap[level][level2]}
+                    });
+                }
+            }
+            else
+                filters.push({level: level, members: filtersMap[level]});
         }
         return filters;
     },
@@ -196,7 +207,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                         var filters = {};
                         for (var level in o.data)
                         {
-                            if (o.data[level].length)
+                            if (Ext4.isObject(o.data[level]) || (Ext4.isArray(o.data[level]) && o.data[level].length))
                             {
                                 if (!filters[level])
                                     filters[level] = o.data[level];
@@ -220,6 +231,7 @@ Ext4.define('LABKEY.study.store.Facets', {
     makeCountDistinctQuery: function(filtersMap)
     {
         var filters = this.getFiltersForCountDistinct(filtersMap);
+
         var i, f, facet;
         for (f = 0; f < this.count(); f++)
         {
@@ -331,12 +343,10 @@ Ext4.define('LABKEY.study.store.Facets', {
         this.updateCountsZero();
         var positions = this.getAxisPositions(cellSet, 1);
         var data;
+        if (!objectStore.unfilteredCount)
+            objectStore.setUnfilteredCount();
         if (multiColumnCount)
-        {
             data = this.getMultiColumnData(cellSet);
-            if (!objectStore.unfilteredCount)
-                objectStore.setUnfilteredCount()
-        }
         else
             data = this.getDataOneColumn(cellSet, 0);
 

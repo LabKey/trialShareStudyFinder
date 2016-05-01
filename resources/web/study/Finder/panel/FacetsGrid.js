@@ -179,9 +179,17 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             facetChangeTask.delay(500);
         }, this);
 
+        Ext4.getStore(this.cubeConfig.objectName).on("load", this.onObjectStoreLoad, this);
         this.facetStore.on(
             'countsUpdated' , this.onCountsUpdated, this
         )
+    },
+
+    onObjectStoreLoad: function() {
+        this.objectStoreLoaded = true;
+        if (!this.facetStore.isLoaded)
+            this.facetStore.load();
+        this.onDataReady();
     },
 
     onCountsUpdated : function() {
@@ -238,9 +246,14 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
         );
     },
 
+    onDataReady : function() {
+        if (this.facetStore.mdx && this.objectStoreLoaded)
+            this.facetStore.loadFromCube();
+    },
+
     onCubeReady : function(mdx) {
         this.facetStore.mdx = mdx;
-        this.facetStore.loadFromCube();
+        this.onDataReady();
     },
 
     onSubsetChanged: function() {
