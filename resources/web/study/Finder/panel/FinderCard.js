@@ -61,6 +61,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     onCubeReady: function() {
         this.getFacetsPanel().onCubeReady(this.mdx);
+        this.getCubeMemberPanel().onCubeReady();
     },
 
     onSubsetChanged : function(value) {
