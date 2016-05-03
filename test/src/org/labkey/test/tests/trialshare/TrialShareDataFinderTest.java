@@ -245,7 +245,8 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
             for (String accession : studySubsets.get(subset))
             {
                 String name = "DataFinderTest" + subset + accession;
-                permissionsEditor.selectFolder(name);
+                doAndWaitForPageToLoad(() -> permissionsEditor.selectFolder(name));
+                sleep(500); // HACK, but waitForPageLoad doesn't do the trick here.  Perhaps waitForElement would work...
                 if (subset.equalsIgnoreCase("public"))
                 {
                     permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
