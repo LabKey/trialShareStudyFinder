@@ -250,22 +250,46 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         openFolderMenu();
         clickFolder("DataFinderTestPublicCasale");
         clickAdminMenuItem("Folder", "Permissions");
-        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
-        permissionsEditor.setUserPermissions(CASALE_READER, "Reader");
-        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-
-        goToProjectHome();
-        openFolderMenu();
-        clickFolder(PUBLIC_STUDY_NAME);
-        clickAdminMenuItem("Folder", "Permissions");
-        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
-        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-
-        goToProjectHome();
-        openFolderMenu();
-        clickFolder("DataFinderTestOperationalWISP-R");
-        clickAdminMenuItem("Folder", "Permissions");
-        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+        for (String subset : studySubsets.keySet())
+        {
+            for (String accession : studySubsets.get(subset))
+            {
+                String name = "DataFinderTest" + subset + accession;
+                goToProjectHome();
+                openFolderMenu();
+                clickFolder(name);
+                if (subset.equalsIgnoreCase("public"))
+                {
+                    permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+                    permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+                }
+                if (accession.equalsIgnoreCase("Casale"))
+                {
+                    permissionsEditor.setUserPermissions(CASALE_READER, "Reader");
+                }
+                else if (accession.equalsIgnoreCase("WISP-R"))
+                {
+                    permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+                }
+            }
+        }
+//
+//        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+//        permissionsEditor.setUserPermissions(CASALE_READER, "Reader");
+//        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+//
+//        goToProjectHome();
+//        openFolderMenu();
+//        clickFolder(PUBLIC_STUDY_NAME);
+//        clickAdminMenuItem("Folder", "Permissions");
+//        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+//        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+//
+//        goToProjectHome();
+//        openFolderMenu();
+//        clickFolder("DataFinderTestOperationalWISP-R");
+//        clickAdminMenuItem("Folder", "Permissions");
+//        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
 
     }
 
@@ -349,7 +373,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         Assert.assertTrue("Admin user should see visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
 
         doAndWaitForPageSignal(() -> impersonate(CASALE_READER), finder.getCountSignal());
-        Assert.assertFalse("User with access to only Casale study should not see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        Assert.assertFalse("User with access to only  Casale study should not see the visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         cards = finder.getDataCards();
         Assert.assertEquals("User with access to only Casale study should see only that study", 1, cards.size());
         stopImpersonating();
