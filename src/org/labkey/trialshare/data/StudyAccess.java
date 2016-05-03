@@ -91,6 +91,11 @@ public class StudyAccess
         return false;
     }
 
+    public String getCubeContainerIdentifier()
+    {
+        return "[Study].[" + getStudyContainer() + "]";
+    }
+
     public String getCubeIdentifier()
     {
         return "[Study].[" + getStudyId() + "]";

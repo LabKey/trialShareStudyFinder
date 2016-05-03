@@ -31,6 +31,10 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
         });
     },
 
+    onCubeReady : function() {
+        this.getCardsContainer().show();
+    },
+
     onClearAllFilters : function() {
         this.getCardPanelHeader().onClearAllFilters();
     },
@@ -131,6 +135,7 @@ Ext4.define("LABKEY.study.panel.CubeObjects", {
                 itemId: this.cubeConfig.objectName.toLowerCase() + 'CardsContainer',
                 autoScroll: true,
                 border: false,
+                hidden: true,
                 items: [
                     this.getCards()
                 ]

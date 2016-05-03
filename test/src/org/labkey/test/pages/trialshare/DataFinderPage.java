@@ -41,6 +41,8 @@ public class DataFinderPage extends LabKeyPage
     private static final String ACTION = "dataFinder";
     public static final String STUDY_COUNT_SIGNAL = "dataFinderStudyCountsUpdated";
     public static final String PUBLICATION_COUNT_SIGNAL = "dataFinderPublicationCountsUpdated";
+    public static final String STUDY_FACET_SIGNAL = "dataFinderStudyFacetsReady";
+    public static final String PUBLICATION_FACET_SIGNAL = "dataFinderPublicationFacetReady";
     private static final String GROUP_UPDATED_SIGNAL = "participantGroupUpdated";
     private static final String PUBLICATION_DETAILS_SIGNAL = "publicationDetailsLoaded";
     private boolean testingStudies = true;
@@ -64,6 +66,12 @@ public class DataFinderPage extends LabKeyPage
     {
         return (this.testingStudies ? STUDY_COUNT_SIGNAL : PUBLICATION_COUNT_SIGNAL);
     }
+
+    public String getFacetReadySignal()
+    {
+        return (this.testingStudies ? STUDY_FACET_SIGNAL : PUBLICATION_FACET_SIGNAL);
+    }
+
     @Override
     protected void waitForPage()
     {

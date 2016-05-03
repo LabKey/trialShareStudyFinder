@@ -45,6 +45,11 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
         this.on("countsUpdated", this.onCountsUpdated, this, {single: true});
     },
 
+    onObjectStoreLoad : function()
+    {
+        this.objectStoreLoaded = true;
+    },
+
     onCubeReady: function(mdx) {
         this.getFacets().onCubeReady(mdx);
     },
@@ -60,6 +65,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     onCountsUpdated: function() {
         this.getFacetSelectionSummary().show();
         this.getFacetsContainer().show();
+        LABKEY.Utils.signalWebDriverTest('dataFinder' + this.cubeConfig.objectName + 'FacetsReady');
     },
     
     onSearchTermsChanged: function(terms)

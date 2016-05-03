@@ -87,6 +87,24 @@ public class TrialShareManager
         return false;
     }
 
+    public Set<Object> getVisibleStudyContainers(User user, Container container)
+    {
+        Set<Object> idSet = new HashSet<>();
+        TableInfo containerList = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+        if (containerList != null)
+        {
+            List<StudyAccess> studyAccess = (new TableSelector(containerList, null, null)).getArrayList(StudyAccess.class);
+            for (StudyAccess study : studyAccess)
+            {
+                if (study.hasPermission(user))
+                {
+                    idSet.add(study.getCubeContainerIdentifier());
+                }
+            }
+        }
+        return idSet;
+    }
+
     public Set<Object> getVisibleStudies(User user, Container container)
     {
         Set<Object> studyIdSet = new HashSet<>();

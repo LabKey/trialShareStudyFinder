@@ -276,12 +276,12 @@ public class TrialShareController extends SpringActionController
             bean.setCubeName("StudyCube");
             bean.setConfigId("TrialShare:/StudyCube");
             bean.setFilterByLevel("[Study].[Study]");
-            bean.setCountDistinctLevel("[Study].[Study]");
+            bean.setCountDistinctLevel("[Study.Study Name].[Study]");
             bean.setFilterByFacetUniqueName("[Study]");
             bean.setIsDefault(isDefault);
             bean.setSubsetLevelName("[Study.Public].[Public]");
             bean.setSearchCategory(TrialShareModule.searchCategoryStudy.getName());
-            bean.setSearchScope("Project");
+            bean.setSearchScope("All");
             bean.setHasContainerFilter(true);
             bean.setCountField(STUDY_OBJECT);
         }
@@ -1041,7 +1041,13 @@ public class TrialShareController extends SpringActionController
         {
             Map<String, Object> levelMembers = new HashMap<>();
 
-            if (_objectName.equalsIgnoreCase(PUBLICATION_OBJECT) )
+            if (_objectName.equalsIgnoreCase(STUDY_OBJECT))
+            {
+                Map<String, Object> members = new HashMap<>();
+                members.put("[Study].[Container]", TrialShareManager.get().getVisibleStudyContainers(getUser(), getContainer()));
+                levelMembers.put("[Study].[Study]", members);
+            }
+            else if (_objectName.equalsIgnoreCase(PUBLICATION_OBJECT) )
             {
                 levelMembers.put("[Publication].[Publication]", TrialShareManager.get().getVisiblePublications(getUser(), getContainer()));
             }
