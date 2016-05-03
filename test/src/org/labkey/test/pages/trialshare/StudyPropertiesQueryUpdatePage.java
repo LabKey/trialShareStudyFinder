@@ -17,7 +17,7 @@ public class StudyPropertiesQueryUpdatePage extends LabKeyPage
         super(test);
     }
 
-    public void setStudyContainers(Set<String> loadedStudies, String publicStudyName, String operationalStudyName)
+    public void setStudyContainers()
     {
         log("Setting up study container links");
         String projectName = getCurrentProject();
@@ -29,15 +29,6 @@ public class StudyPropertiesQueryUpdatePage extends LabKeyPage
             Boolean isPublic = "Public".equalsIgnoreCase(table.getDataAsText(i, "Visibility"));
             clickAndWait(table.updateLink(i));
             selectOptionByText(Locators.studyContainerSelect, "/" + projectName + "/DataFinderTest" + (isPublic ? "Public" : "Operational") + name);
-
-//            if (loadedStudies.contains("DataFinderTestOperational" + name))
-//                selectOptionByText(Locators.studyContainerSelect, "/" + projectName + "/DataFinderTestOperational" + name);
-//            else if (loadedStudies.contains("DataFinderTestPublic" + name))
-//                selectOptionByText(Locators.studyContainerSelect, "/" + projectName + "/DataFinderTestPublic" + name);
-//            else if (isPublic)
-//                selectOptionByText(Locators.studyContainerSelect, publicStudyName);
-//            else
-//                selectOptionByText(Locators.studyContainerSelect, operationalStudyName);
             clickButton("Submit");
         }
     }

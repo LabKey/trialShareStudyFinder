@@ -175,17 +175,11 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
                 createStudy(name, subset.equalsIgnoreCase("operational"));
             }
         }
-        log("Creating a second study container for one of the studies");
-        createStudy("DataFinderTestOperationalDIAMOND", true);
-//        for (String studyAccession : loadedStudies)
-//        {
-//            createStudy(studyAccession);
-//        }
         createStudy(PUBLIC_STUDY_NAME);
         createStudy(OPERATIONAL_STUDY_NAME);
         goToProjectHome();
         StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainers(loadedStudies, "/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+        queryUpdatePage.setStudyContainers();
         goToProjectHome();
         PublicationsQueryUpdatePage pubUpdatePage = new PublicationsQueryUpdatePage(this);
         pubUpdatePage.setPermissionsContainer("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
@@ -246,18 +240,12 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         clickAdminMenuItem("Folder", "Permissions");
         permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
 
-        goToProjectHome();
-        openFolderMenu();
-        clickFolder("DataFinderTestPublicCasale");
-        clickAdminMenuItem("Folder", "Permissions");
         for (String subset : studySubsets.keySet())
         {
             for (String accession : studySubsets.get(subset))
             {
                 String name = "DataFinderTest" + subset + accession;
-                goToProjectHome();
-                openFolderMenu();
-                clickFolder(name);
+                permissionsEditor.selectFolder(name);
                 if (subset.equalsIgnoreCase("public"))
                 {
                     permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
@@ -273,24 +261,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
                 }
             }
         }
-//
-//        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
-//        permissionsEditor.setUserPermissions(CASALE_READER, "Reader");
-//        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-//
-//        goToProjectHome();
-//        openFolderMenu();
-//        clickFolder(PUBLIC_STUDY_NAME);
-//        clickAdminMenuItem("Folder", "Permissions");
-//        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
-//        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-//
-//        goToProjectHome();
-//        openFolderMenu();
-//        clickFolder("DataFinderTestOperationalWISP-R");
-//        clickAdminMenuItem("Folder", "Permissions");
-//        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-
+        permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
+        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
     }
 
     @Before
@@ -621,7 +594,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage.DataCard card = dataCards.get(0);
         Assert.assertEquals("DIAMOND", card.getStudyShortName());
         log("Go to operational study");
-        card.clickGoToStudy("/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+        card.clickGoToStudy("/" + getProjectName() + "/DataFinderTestOperationalDIAMOND");
     }
 
     @Test
