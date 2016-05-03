@@ -166,15 +166,20 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         ListHelper listHelper = new ListHelper(this);
         listHelper.importListArchive(listArchive);
 
-        for (String studyAccession : loadedStudies)
+        log("Creating a study container for each study");
+        for (String subset : studySubsets.keySet())
         {
-            createStudy(studyAccession);
+            for (String accession : studySubsets.get(subset))
+            {
+                String name = "DataFinderTest" + subset + accession;
+                createStudy(name, subset.equalsIgnoreCase("operational"));
+            }
         }
         createStudy(PUBLIC_STUDY_NAME);
         createStudy(OPERATIONAL_STUDY_NAME);
         goToProjectHome();
         StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainers(loadedStudies, "/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+        queryUpdatePage.setStudyContainers();
         goToProjectHome();
         PublicationsQueryUpdatePage pubUpdatePage = new PublicationsQueryUpdatePage(this);
         pubUpdatePage.setPermissionsContainer("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
@@ -202,6 +207,15 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         clickButton("OK");
     }
 
+    private void createStudy(String studyName, Boolean operational)
+    {
+        log("creating study " + studyName);
+        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
+        File studyArchive = operational ? TestFileUtils.getSampleData(OPERATIONAL_STUDY_NAME + ".folder.zip") : TestFileUtils.getSampleData(PUBLIC_STUDY_NAME + ".folder.zip");
+        containerHelper.createSubfolder(getProjectName(), studyName, "Study");
+        importStudyFromZip(studyArchive, true, true);
+    }
+
     private void createStudy(String name)
     {
         AbstractContainerHelper containerHelper = new APIContainerHelper(this);
@@ -226,27 +240,31 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         clickAdminMenuItem("Folder", "Permissions");
         permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
 
-        goToProjectHome();
-        openFolderMenu();
-        clickFolder("DataFinderTestPublicCasale");
-        clickAdminMenuItem("Folder", "Permissions");
+        for (String subset : studySubsets.keySet())
+        {
+            for (String accession : studySubsets.get(subset))
+            {
+                String name = "DataFinderTest" + subset + accession;
+                doAndWaitForPageToLoad(() -> permissionsEditor.selectFolder(name));
+                sleep(500); // HACK, but waitForPageLoad doesn't do the trick here.  Perhaps waitForElement would work...
+                if (subset.equalsIgnoreCase("public"))
+                {
+                    permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+                    permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+                }
+                if (accession.equalsIgnoreCase("Casale"))
+                {
+                    permissionsEditor.setUserPermissions(CASALE_READER, "Reader");
+                }
+                else if (accession.equalsIgnoreCase("WISP-R"))
+                {
+                    permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+                }
+            }
+        }
+        permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
         permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
-        permissionsEditor.setUserPermissions(CASALE_READER, "Reader");
         permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-
-        goToProjectHome();
-        openFolderMenu();
-        clickFolder(PUBLIC_STUDY_NAME);
-        clickAdminMenuItem("Folder", "Permissions");
-        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
-        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-
-        goToProjectHome();
-        openFolderMenu();
-        clickFolder("DataFinderTestOperationalWISP-R");
-        clickAdminMenuItem("Folder", "Permissions");
-        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-
     }
 
     @Before
@@ -325,10 +343,11 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         stopImpersonating();
         doAndWaitForPageSignal(() -> goToProjectHome(), finder.getCountSignal());
 
+        sleep(1000);
         Assert.assertTrue("Admin user should see visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
 
         doAndWaitForPageSignal(() -> impersonate(CASALE_READER), finder.getCountSignal());
-        Assert.assertFalse("User with access to only Casale study should not see the subset menu", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
+        Assert.assertFalse("User with access to only  Casale study should not see the visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
         cards = finder.getDataCards();
         Assert.assertEquals("User with access to only Casale study should see only that study", 1, cards.size());
         stopImpersonating();
@@ -566,7 +585,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Test
     public void testGoToStudyMenu()
     {
-        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         log("Filtering to show DIAMOND card with two study containers");
         facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
@@ -576,7 +595,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         DataFinderPage.DataCard card = dataCards.get(0);
         Assert.assertEquals("DIAMOND", card.getStudyShortName());
         log("Go to operational study");
-        card.clickGoToStudy("/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+        card.clickGoToStudy("/" + getProjectName() + "/DataFinderTestOperationalDIAMOND");
     }
 
     @Test
@@ -584,7 +603,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     {
         log("Impersonating public reader who should see only one go to study link");
         impersonate(PUBLIC_READER);
-        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         log("Filtering to show DIAMOND card");
         doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.CONDITION, "Lupus Nephritis"), finder.getCountSignal());

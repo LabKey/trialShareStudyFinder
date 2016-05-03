@@ -61,6 +61,7 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     onCubeReady: function() {
         this.getFacetsPanel().onCubeReady(this.mdx);
+        this.getCubeMemberPanel().onCubeReady();
     },
 
     onSubsetChanged : function(value) {
@@ -77,7 +78,6 @@ Ext4.define('LABKEY.study.panel.FinderCard', {
 
     getFacetsPanel: function() {
         if (!this.facetsPanel) {
-
             this.facetsPanel = Ext4.create("LABKEY.study.panel.FacetSelection", {
                 region: 'west',
                 flex: 1,

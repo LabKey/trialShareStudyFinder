@@ -6,18 +6,30 @@
 Ext4.define('LABKEY.study.store.CubeObjects', {
     extend: 'Ext.data.Store',
     autoLoad: false,
-    
+
+    listeners: {
+        'load' : {
+            fn : function(store, records, options) {
+                store.isLoaded = true;
+            },
+            scope: this
+        }
+    },
+
     setSearchFilters: function(searchSelectedMembers) {
+        // console.log("setting searchSelectedMembers ", searchSelectedMembers);
         this.searchSelectedMembers = searchSelectedMembers;
     },
 
     updateSearchFilters: function(searchSelectedMembers) {
+        // console.log("searchSelectedMembers: ", searchSelectedMembers);
         if (searchSelectedMembers == null || searchSelectedMembers) // null is a value we want to retain but undefined is not
             this.searchSelectedMembers = searchSelectedMembers;
         this.updateFilters();
     },
 
     updateFacetFilters: function(facetSelectedMembers, selectedSubset) {
+        // console.log("updateFacetFilters: this.facetSelectedMembers ", this.facetSelectedMembers, " facetSelectedMembers ", facetSelectedMembers, " this.selectedSubset ", this.selectedSubset, " selectedSubset ", selectedSubset);
         if (facetSelectedMembers != undefined)
             this.facetSelectedMembers = facetSelectedMembers;
         if (selectedSubset)
@@ -38,6 +50,7 @@ Ext4.define('LABKEY.study.store.CubeObjects', {
     {
         var object;
 
+        // console.log("updateFilters with this.searchSelectedMembers ", this.searchSelectedMembers, " this.facetSelectedMembers ", this.facetSelectedMembers);
         this.suspendEvents(false);
         this.clearFilter();
         this.setUnfilteredCount();
