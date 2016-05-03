@@ -166,10 +166,21 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         ListHelper listHelper = new ListHelper(this);
         listHelper.importListArchive(listArchive);
 
-        for (String studyAccession : loadedStudies)
+        log("Creating a study container for each study");
+        for (String subset : studySubsets.keySet())
         {
-            createStudy(studyAccession);
+            for (String accession : studySubsets.get(subset))
+            {
+                String name = "DataFinderTest" + subset + accession;
+                createStudy(name, subset.equalsIgnoreCase("operational"));
+            }
         }
+        log("Creating a second study container for one of the studies");
+        createStudy("DataFinderTestOperationalDIAMOND", true);
+//        for (String studyAccession : loadedStudies)
+//        {
+//            createStudy(studyAccession);
+//        }
         createStudy(PUBLIC_STUDY_NAME);
         createStudy(OPERATIONAL_STUDY_NAME);
         goToProjectHome();
@@ -200,6 +211,15 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         clickAndWait(Locator.linkWithText("Data Cube"));
         clickButton("Reindex", 0);
         clickButton("OK");
+    }
+
+    private void createStudy(String studyName, Boolean operational)
+    {
+        log("creating study " + studyName);
+        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
+        File studyArchive = operational ? TestFileUtils.getSampleData(OPERATIONAL_STUDY_NAME + ".folder.zip") : TestFileUtils.getSampleData(PUBLIC_STUDY_NAME + ".folder.zip");
+        containerHelper.createSubfolder(getProjectName(), studyName, "Study");
+        importStudyFromZip(studyArchive, true, true);
     }
 
     private void createStudy(String name)
@@ -325,6 +345,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         stopImpersonating();
         doAndWaitForPageSignal(() -> goToProjectHome(), finder.getCountSignal());
 
+        sleep(1000);
         Assert.assertTrue("Admin user should see visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
 
         doAndWaitForPageSignal(() -> impersonate(CASALE_READER), finder.getCountSignal());
@@ -566,7 +587,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     @Test
     public void testGoToStudyMenu()
     {
-        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         log("Filtering to show DIAMOND card with two study containers");
         facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
@@ -584,7 +605,7 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     {
         log("Impersonating public reader who should see only one go to study link");
         impersonate(PUBLIC_READER);
-        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
         DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
         log("Filtering to show DIAMOND card");
         doAndWaitForPageSignal(() -> facets.toggleFacet(DataFinderPage.Dimension.CONDITION, "Lupus Nephritis"), finder.getCountSignal());

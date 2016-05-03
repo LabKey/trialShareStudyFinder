@@ -65,6 +65,7 @@ Ext4.define("LABKEY.study.panel.FacetSelection", {
     onCountsUpdated: function() {
         this.getFacetSelectionSummary().show();
         this.getFacetsContainer().show();
+        LABKEY.Utils.signalWebDriverTest('dataFinder' + this.cubeConfig.objectName + 'FacetsReady');
     },
     
     onSearchTermsChanged: function(terms)

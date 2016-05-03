@@ -190,7 +190,7 @@ Ext4.define('LABKEY.study.store.Facets', {
 
         var store = Ext4.getStore(this.cubeConfig.objectName);
         if (store.searchSelectedMembers != null)
-            this.makeCountDistinctQuery({});
+            this.makeCountDistinctQueries({}); // search has already filtered results to the ones the user has access to
         else
         {
             // console.log("updateCountsAsync called");
@@ -215,7 +215,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                                     filters[level] = filters[level].concat(o.data[level]);
                             }
                         }
-                        this.makeCountDistinctQuery(filters);
+                        this.makeCountDistinctQueries(filters);
                     }
                     else
                     {
@@ -226,6 +226,21 @@ Ext4.define('LABKEY.study.store.Facets', {
                 scope: this
             });
         }
+    },
+
+    makeCountDistinctQueries : function(filtersMap)
+    {
+        this.cellSetPositions = null;
+        this.cellSetCells = null;
+        this.cellSets = {};
+        if (this.cubeConfig.objectName == "Publication")
+            this.makeCountDistinctQuery(filtersMap);
+        else
+        {
+            this.makeVisibilityCountDistinctQuery(filtersMap);
+            this.makeCountDistinctQuery(filtersMap);
+        }
+
     },
 
     makeCountDistinctQuery: function(filtersMap)
@@ -267,6 +282,39 @@ Ext4.define('LABKEY.study.store.Facets', {
             }
         }
 
+        var multiColumnCount = this.cubeConfig.countField && this.cubeConfig.countField != this.cubeConfig.objectName;
+
+        var config =
+        {
+            "sql": true,
+            configId: this.cubeConfig.configId,
+            schemaName: this.cubeConfig.schemaName,
+            container: this.cubeConfig.cubeContainerId,
+            containerPath : this.cubeConfig.cubeContainerPath,
+            name: this.cubeConfig.name,
+            success: function (cellSet, mdx, config)
+            {
+                this.updateCounts(cellSet, "Default", multiColumnCount);
+            },
+            scope: this,
+
+            // query
+            onRows: this.getOnRowsData(),
+            countFilter: filters,
+            includeNullMemberInCount: false,
+            countDistinctLevel: this.cubeConfig.countDistinctLevel
+        };
+        if (multiColumnCount)
+        {
+            config.onCols = { operator: "UNION", arguments: [{level: this.cubeConfig.filterByLevel}] };
+        }
+        // console.log("Making count distinct query with config", config);
+        this.mdx.query(config);
+
+    },
+
+    getOnRowsData: function()
+    {
         var onRows = { operator: "UNION", arguments: [] };
         onRows.arguments.push({level: this.cubeConfig.filterByLevel});
         for (f = 0; f < this.count(); f++)
@@ -274,11 +322,90 @@ Ext4.define('LABKEY.study.store.Facets', {
             facet = this.getAt(f);
             if (facet.get("name") == "Subject")
                 onRows.arguments.push({level: facet.data.hierarchy.levels[0].uniqueName});
-            else if (facet.get("name") == this.cubeConfig.objectName )
+            else if (facet.get("name") == this.cubeConfig.objectName || (this.cubeConfig.objectName == "Study" && facet.get("name") == "Visibility"))
                 continue;
             else
                 onRows.arguments.push({level: facet.data.level.uniqueName});
         }
+        return onRows;
+    },
+
+    mergeCellSets: function(newCellSet)
+    {
+        if (!this.cellSetPositions)
+        {
+            this.cellSetPositions = newCellSet.axes[1].positions;
+            this.cellSetCells = newCellSet.cells;
+        }
+        else
+        {
+            // console.log("before", this.cellSet);
+            this.cellSetPositions = this.cellSetPositions.concat(newCellSet.axes[1].positions);
+            this.cellSetCells = this.cellSetCells.concat(newCellSet.cells);
+            // console.log("after", this.cellSet);
+        }
+    },
+
+    makeVisibilityCountDistinctQuery : function(filtersMap)
+    {
+        var filters = this.getFiltersForCountDistinct(filtersMap);
+
+        var i, f, facet;
+        // facet = this.getById("Visibility");
+        //
+        // var selectedMembers = facet.get("selectedMembers");
+
+        // var names = [];
+        // if (selectedMembers && selectedMembers.length > 0)
+        // {
+        //     selectedMembers.forEach(function (m)
+        //     {
+        //         names.push(m.data.uniqueName)
+        //     });
+        //     filters.push({
+        //         level: this.cubeConfig.filterByLevel,
+        //         membersQuery: {level: selectedMembers[0].data.level, members: names}
+        //     });
+        // }
+
+        for (f = 0; f < this.count(); f++)
+        {
+            facet = this.getAt(f);
+            var selectedMembers = facet.get("selectedMembers");
+            if (facet.get("name") != this.cubeConfig.objectName)
+            {
+                if (!selectedMembers || selectedMembers.length == 0)
+                    continue;
+                if (facet.get("currentFilterType") === "OR")
+                {
+                    var names = [];
+                    selectedMembers.forEach(function (m)
+                    {
+                        names.push(m.data.uniqueName)
+                    });
+                    filters.push({
+                        level: this.cubeConfig.filterByLevel,
+                        membersQuery: {level: selectedMembers[0].data.level, members: names}
+                    });
+                }
+                else
+                {
+                    for (i = 0; i < selectedMembers.length; i++)
+                    {
+                        var filterMember = selectedMembers[i];
+                        filters.push({
+                            level: this.cubeConfig.filterByLevel,
+                            membersQuery: {level: filterMember.data.level, members: [filterMember.data.uniqueName]}
+                        });
+                    }
+                }
+            }
+        }
+
+
+
+        var onRows = { operator: "UNION", arguments: [] };
+        onRows.arguments.push({level: "[Study.Visibility].[Visibility]"});
 
         var multiColumnCount = this.cubeConfig.countField && this.cubeConfig.countField != this.cubeConfig.objectName;
 
@@ -292,7 +419,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             name: this.cubeConfig.name,
             success: function (cellSet, mdx, config)
             {
-                this.updateCountsUnion(cellSet, multiColumnCount);
+                this.updateCounts(cellSet, "Visibility", multiColumnCount);
             },
             scope: this,
 
@@ -300,7 +427,7 @@ Ext4.define('LABKEY.study.store.Facets', {
             onRows: onRows,
             countFilter: filters,
             includeNullMemberInCount: false,
-            countDistinctLevel: this.cubeConfig.countDistinctLevel
+            countDistinctLevel: "[Study].[Container]"
         };
         if (multiColumnCount)
         {
@@ -320,9 +447,23 @@ Ext4.define('LABKEY.study.store.Facets', {
         //this.doneRendering();
     },
 
-    /* handle query response to update all the member counts with all filters applied */
-    updateCountsUnion : function (cellSet, multiColumnCount)
+    updateCounts: function(cellSet, cellSetType, multiColumnCount)
     {
+        this.mergeCellSets(cellSet);
+        if (this.cubeConfig.objectName == "Publication")
+            this.updateCountsUnion(multiColumnCount);
+        else
+        {
+            this.cellSets[cellSetType] = true;
+            if (this.cellSets.Visibility && this.cellSets.Default)
+                this.updateCountsUnion(multiColumnCount);
+        }
+    },
+
+    /* handle query response to update all the member counts with all filters applied */
+    updateCountsUnion : function (multiColumnCount)
+    {
+        var cellSet = {cells: this.cellSetCells};
         var facet, member, f, m;
         // map from hierarchyName to facet
         var map = {};
@@ -341,7 +482,8 @@ Ext4.define('LABKEY.study.store.Facets', {
         }
 
         this.updateCountsZero();
-        var positions = this.getAxisPositions(cellSet, 1);
+        // var positions = this.getAxisPositions(cellSet, 1);
+        var positions = this.cellSetPositions.map(function(inner){return inner[0]});
         var data;
         if (!objectStore.unfilteredCount)
             objectStore.setUnfilteredCount();

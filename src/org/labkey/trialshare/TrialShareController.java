@@ -1041,7 +1041,13 @@ public class TrialShareController extends SpringActionController
         {
             Map<String, Object> levelMembers = new HashMap<>();
 
-            if (_objectName.equalsIgnoreCase(PUBLICATION_OBJECT) )
+            if (_objectName.equalsIgnoreCase(STUDY_OBJECT))
+            {
+                Map<String, Object> members = new HashMap<>();
+                members.put("[Study].[Container]", TrialShareManager.get().getVisibleStudyContainers(getUser(), getContainer()));
+                levelMembers.put("[Study].[Study]", members);
+            }
+            else if (_objectName.equalsIgnoreCase(PUBLICATION_OBJECT) )
             {
                 levelMembers.put("[Publication].[Publication]", TrialShareManager.get().getVisiblePublications(getUser(), getContainer()));
             }
