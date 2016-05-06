@@ -49,7 +49,7 @@ public class StudyITNFolderType extends MultiPortalFolderType
     {
         super(STUDY_ITN_FOLDER_TYPE_NAME,
                 "Standard Study folder type with tabs pre-configured for ITN TrialShare.",
-                Collections.<Portal.WebPart>singletonList(Portal.getPortalPart("Study Overview").createWebPart()),
+                Collections.singletonList(Portal.getPortalPart("Study Overview").createWebPart()),
                 null,
                 getDefaultModuleSet(module, getModule("Experiment"), getModule("Study"), getModule("Pipeline")),
                 getModule("Study"));
