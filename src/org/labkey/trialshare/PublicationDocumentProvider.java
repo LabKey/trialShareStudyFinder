@@ -55,6 +55,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
     {
         PublicationDocumentProvider dp = new PublicationDocumentProvider();
         SearchService ss = ServiceRegistry.get(SearchService.class);
+        ss.deleteResourcesForPrefix("trialShare:publication:");
         dp.enumerateDocuments(ss.defaultTask(), getDocumentContainer(), null);
     }
 
@@ -84,13 +85,11 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                     "pub.Keywords,  " +
                     "pub.PermissionsContainer,  " +
                     "pub.ManuscriptContainer,  " +
-                    "pa.Assay,  " +
                     "pc.Condition,  " +
                     "ps.ShortName as StudyShortName,  " +
                     "ps.StudyId,  " +
                     "pta.TherapeuticArea  " +
                 "FROM ManuscriptsAndAbstracts pub  " +
-                    "   LEFT JOIN (SELECT PublicationId, group_concat(Assay) AS Assay FROM PublicationAssay GROUP BY PublicationId) pa ON pub.Key = pa.PublicationId  " +
                     "   LEFT JOIN (SELECT PublicationId, group_concat(Condition) AS Condition FROM PublicationCondition GROUP BY PublicationId) pc on pub.Key = pc.PublicationId  " +
                     "   LEFT JOIN (SELECT PublicationId, ShortName, group_concat(StudyId) AS StudyId FROM PublicationStudy GROUP BY ShortName, PublicationId) ps on pub.Key = ps.PublicationId  " +
                     "   LEFT JOIN (SELECT PublicationId, group_concat(TherapeuticArea) AS TherapeuticArea FROM PublicationTherapeuticArea GROUP BY PublicationId) pta on pub.Key = pta.PublicationId  " +
@@ -112,7 +111,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
                 StringBuilder keywords = new StringBuilder();
                 // See #26028: identifiers that have punctuation in them (e.g., DOI) are not indexed well as identifiers, so we use keywords instead
-                for (String field : new String[]{"Author", "Year", "Status", "PrimaryStudy", "Title", "PublicationType", "Journal", "TherapeuticArea", "StudyShortName", "Assay", "Condition", "DOI"})
+                for (String field : new String[]{"Author", "Year", "Status", "PrimaryStudy", "Title", "PublicationType", "Journal", "TherapeuticArea", "StudyShortName", "Condition", "DOI"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");
@@ -153,7 +152,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
         }
         catch (SQLException e)
         {
-           _logger.error("Problem executing query for study indexing", e);
+           _logger.error("Problem executing query for publication indexing", e);
         }
     }
 

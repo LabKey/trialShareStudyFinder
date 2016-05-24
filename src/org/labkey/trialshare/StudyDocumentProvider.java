@@ -51,6 +51,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
     {
         StudyDocumentProvider dp = new StudyDocumentProvider();
         SearchService ss = ServiceRegistry.get(SearchService.class);
+        ss.deleteResourcesForPrefix("trialShare:study:");
         dp.enumerateDocuments(ss.defaultTask(), getDocumentContainer(), null);
     }
 
