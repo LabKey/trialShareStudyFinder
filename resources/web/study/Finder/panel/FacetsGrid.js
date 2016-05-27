@@ -214,10 +214,10 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                                 objectName: objectName,
                                 displayClearLabel: function(values)
                                 {
-                                    var html = '<span class="labkey-clear-filter inactive">[clear]</span>';
+                                    var html = '<span class="labkey-clear-filter inactive">clear</span>';
                                     if (LABKEY.study.panel.FacetsGrid.hasFilters(this.objectName, values.name))
                                     {
-                                        html = '<span class="labkey-clear-filter active">[clear]</span>';
+                                        html = '<span class="labkey-clear-filter active">clear</span>';
                                     }
                                     return  html;
                                 },

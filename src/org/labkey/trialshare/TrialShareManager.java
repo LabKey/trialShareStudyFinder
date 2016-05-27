@@ -173,7 +173,8 @@ public class TrialShareManager
         if (publicationsList != null)
         {
             List<StudyPublicationBean> publications = (new TableSelector(publicationsList, null, null)).getArrayList(StudyPublicationBean.class);
-            for (StudyPublicationBean publication : publications) {
+            for (StudyPublicationBean publication : publications)
+            {
                 if (publication.getShow() && publication.hasPermission(user))
                 {
                     publicationIds.add(publication.getCubeId());

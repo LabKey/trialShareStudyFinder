@@ -173,7 +173,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             showSeparator: false
         });
 
-        studyLinksMenu.on('click', function(menu, item) {
+        studyLinksMenu.on('click', function(menu, item, e, eOpts) {
                    window.open(LABKEY.ActionURL.buildURL("project", 'begin.view', item.value));
                 },
                 this
