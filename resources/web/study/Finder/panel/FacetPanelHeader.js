@@ -55,7 +55,7 @@ Ext4.define("LABKEY.study.panel.FacetPanelHeader", {
                         flex: 10
                     },
                     Ext4.create("Ext.button.Button", {
-                        text: '[clear all]',
+                        text: 'clear all',
                         cls: 'labkey-clear-all inactive',
                         scope: this,
                         handler: function() {
