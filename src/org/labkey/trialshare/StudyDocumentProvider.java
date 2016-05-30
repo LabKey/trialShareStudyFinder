@@ -15,6 +15,7 @@
  */
 package org.labkey.trialshare;
 
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.module.Module;
@@ -29,8 +30,6 @@ import org.labkey.api.util.StringUtilsLabKey;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.webdav.SimpleDocumentResource;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,7 +39,7 @@ import java.util.Map;
 
 public class StudyDocumentProvider implements SearchService.DocumentProvider
 {
-    private static final Logger _logger = LoggerFactory.getLogger(StudyDocumentProvider.class);
+    private static final Logger _logger = Logger.getLogger(StudyDocumentProvider.class);
     public static Container getDocumentContainer()
     {
         Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
