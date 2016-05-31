@@ -15,11 +15,10 @@
  */
 package org.labkey.trialshare;
 
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
-import org.labkey.api.data.SqlExecutor;
-import org.labkey.api.data.TableInfo;
 import org.labkey.api.module.Module;
 import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.QuerySchema;
@@ -32,8 +31,6 @@ import org.labkey.api.util.StringUtilsLabKey;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.webdav.SimpleDocumentResource;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,7 +40,7 @@ import java.util.Map;
 
 public class PublicationDocumentProvider implements SearchService.DocumentProvider
 {
-    private static final Logger _logger = LoggerFactory.getLogger(PublicationDocumentProvider.class);
+    private static final Logger _logger = Logger.getLogger(PublicationDocumentProvider.class);
 
     public static Container getDocumentContainer()
     {
@@ -55,6 +52,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
     {
         PublicationDocumentProvider dp = new PublicationDocumentProvider();
         SearchService ss = ServiceRegistry.get(SearchService.class);
+        ss.deleteResourcesForPrefix("trialShare:publication:");
         dp.enumerateDocuments(ss.defaultTask(), getDocumentContainer(), null);
     }
 
@@ -84,13 +82,11 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                     "pub.Keywords,  " +
                     "pub.PermissionsContainer,  " +
                     "pub.ManuscriptContainer,  " +
-                    "pa.Assay,  " +
                     "pc.Condition,  " +
                     "ps.ShortName as StudyShortName,  " +
                     "ps.StudyId,  " +
                     "pta.TherapeuticArea  " +
                 "FROM ManuscriptsAndAbstracts pub  " +
-                    "   LEFT JOIN (SELECT PublicationId, group_concat(Assay) AS Assay FROM PublicationAssay GROUP BY PublicationId) pa ON pub.Key = pa.PublicationId  " +
                     "   LEFT JOIN (SELECT PublicationId, group_concat(Condition) AS Condition FROM PublicationCondition GROUP BY PublicationId) pc on pub.Key = pc.PublicationId  " +
                     "   LEFT JOIN (SELECT PublicationId, ShortName, group_concat(StudyId) AS StudyId FROM PublicationStudy GROUP BY ShortName, PublicationId) ps on pub.Key = ps.PublicationId  " +
                     "   LEFT JOIN (SELECT PublicationId, group_concat(TherapeuticArea) AS TherapeuticArea FROM PublicationTherapeuticArea GROUP BY PublicationId) pta on pub.Key = pta.PublicationId  " +
@@ -111,7 +107,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 Map<String, Object> properties = new HashMap<>();
 
                 StringBuilder keywords = new StringBuilder();
-                for (String field : new String[]{"Year", "Status", "Title", "PublicationType", "Journal", "TherapeuticArea" , "Assay", "Condition"})
+                for (String field : new String[]{"Year", "Status", "Title", "PublicationType", "Journal", "TherapeuticArea" , "Condition"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");
@@ -152,7 +148,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
         }
         catch (SQLException e)
         {
-           _logger.error("Problem executing query for study indexing", e);
+           _logger.error("Problem executing query for publication indexing", e);
         }
     }
 
