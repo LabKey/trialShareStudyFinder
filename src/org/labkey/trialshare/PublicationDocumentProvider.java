@@ -18,8 +18,6 @@ package org.labkey.trialshare;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
-import org.labkey.api.data.SqlExecutor;
-import org.labkey.api.data.TableInfo;
 import org.labkey.api.module.Module;
 import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.QuerySchema;
@@ -79,6 +77,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                     "pub.Year,  " +
                     "pub.Journal,  " +
                     "pub.Status,  " +
+                    "pub.SubmissionStatus, " +
                     "pub.Study as PrimaryStudy,  " +
                     "pub.StudyId as PrimaryStudyId,  " +
                     "pub.AbstractText,  " +
@@ -111,7 +110,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
                 StringBuilder keywords = new StringBuilder();
                 // See #26028: identifiers that have punctuation in them (e.g., DOI) are not indexed well as identifiers, so we use keywords instead
-                for (String field : new String[]{"Author", "Year", "Status", "PrimaryStudy", "Title", "PublicationType", "Journal", "TherapeuticArea", "StudyShortName", "Condition", "DOI"})
+                for (String field : new String[]{"Author", "Year", "Status", "PrimaryStudy", "Title", "SubmissionStatus", "PublicationType", "Journal", "TherapeuticArea", "StudyShortName", "Condition", "DOI"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");
