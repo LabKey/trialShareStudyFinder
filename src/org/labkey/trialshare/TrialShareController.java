@@ -798,10 +798,13 @@ public class TrialShareController extends SpringActionController
             facet = new StudyFacetBean("Publication Type", "Publication Types", "Publication.Publication Type", "PublicationType", "[Publication.Publication Type][(All)]", FacetFilter.Type.OR, 3);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Study", "Studies", "Publication.Study", "Study", "[Publication.Study].[(All)]", FacetFilter.Type.OR, 4);
+            facet = new StudyFacetBean("Submission Status", "Submission Statuses", "Publication.Submission Status", "SubmissionStatus", "[Publication.Submission Status][(All)]", FacetFilter.Type.OR, 4);
+            facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facets.add(facet);
+            facet = new StudyFacetBean("Study", "Studies", "Publication.Study", "Study", "[Publication.Study].[(All)]", FacetFilter.Type.OR, 5);
             facet.setFilterOptions(getFacetFilters(true, true, FacetFilter.Type.OR));
             facets.add(facet);
-            facet = new StudyFacetBean("Year", "Years", "Publication.Year", "Year", "[Publication.Year][(All)]", FacetFilter.Type.OR, 5);
+            facet = new StudyFacetBean("Year", "Years", "Publication.Year", "Year", "[Publication.Year][(All)]", FacetFilter.Type.OR, 6);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
             facets.add(facet);
 
