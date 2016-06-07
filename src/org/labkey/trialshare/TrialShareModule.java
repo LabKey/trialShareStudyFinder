@@ -16,6 +16,7 @@
 
 package org.labkey.trialshare;
 
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
@@ -24,13 +25,12 @@ import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.FolderTypeManager;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.module.ModuleProperty;
-import org.labkey.api.settings.AdminConsole;
 import org.labkey.api.search.SearchService;
 import org.labkey.api.services.ServiceRegistry;
+import org.labkey.api.settings.AdminConsole;
 import org.labkey.api.view.SimpleWebPartFactory;
 import org.labkey.api.view.WebPartFactory;
 import org.labkey.trialshare.view.DataFinderWebPart;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -118,7 +118,7 @@ public class TrialShareModule extends DefaultModule
             return c;
         Container pathContainer = ContainerManager.getForPath(containerPath);
         if (pathContainer == null)
-            LoggerFactory.getLogger(TrialShareModule.class).error(_cubeContainer.getName() + " not configured properly in container " +  c.getName() + ".  Check your module properties.");
+            Logger.getLogger(TrialShareModule.class).error(_cubeContainer.getName() + " not configured properly in container " +  c.getName() + ".  Check your module properties.");
 
         return pathContainer;
     }
