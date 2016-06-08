@@ -170,12 +170,15 @@ public class StudyBean
         {
             filter.addCondition(FieldKey.fromParts("PublicationType"), publicationType);
         }
-        List<StudyPublicationBean> allPublications = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class);
-        this.publications.clear();
-        for (StudyPublicationBean publication : allPublications)
+        if (listSchema != null && listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE) != null)
         {
-            if (publication.getShow() && publication.hasPermission(user))
-                this.publications.add(publication);
+            List<StudyPublicationBean> allPublications = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class);
+            this.publications.clear();
+            for (StudyPublicationBean publication : allPublications)
+            {
+                if (publication.getShow() && publication.hasPermission(user))
+                    this.publications.add(publication);
+            }
         }
     }
 
