@@ -48,7 +48,7 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                     '   <tpl else>',
                     '       <span class="labkey-facet-member">',
                     '   </tpl>',
-                    '       <span class="labkey-facet-member-name" title="{name}">{name}</span>',
+                    '       <span class="labkey-facet-member-name" title="{name}">{name:this.getDisplayName}</span>',
                     '       <span class="labkey-facet-member-count">{count:this.formatNumber} / {unfilteredCount:this.formatNumber}</span>',
                     '   <tpl if="unfilteredCount">',
                     '       <span class="labkey-facet-unfilteredPercent-bar" style="width:{unfilteredPercent}%;"></span>',
@@ -58,6 +58,15 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                     '   </tpl>',
                     '       </span>',
                     {
+                        getDisplayName : function(name)
+                        {
+                            if (!Ext4.isString(name) || name.length === 0 || name === "#null")
+                            {
+                                return "None";
+                            }
+                            return name;
+                        },
+
                         formatNumber :  Ext4.util.Format.numberRenderer('0,000')
                     }
             )
