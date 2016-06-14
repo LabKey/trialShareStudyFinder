@@ -61,6 +61,9 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
 
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(User.getSearchUser(), c);
 
+        if (!listSchema.getTableNames().containsAll(TrialShareQuerySchema.getRequiredStudyLists()))
+            return;
+
         String sql =
                 "SELECT  "+
                         "sa.StudyId, "+

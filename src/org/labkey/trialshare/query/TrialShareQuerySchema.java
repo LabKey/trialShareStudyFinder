@@ -9,26 +9,28 @@ import org.labkey.api.security.User;
 import org.labkey.trialshare.TrialShareModule;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by susanh on 2/23/16.
  */
 public class TrialShareQuerySchema
 {
-    public static final String STUDY_TABLE = "studyProperties";
-    public static final String STUDY_ACCESS_TABLE = "studyAccess";
-    public static final String STUDY_ASSAY_TABLE = "studyAssay";
-    public static final String STUDY_CONDITION_TABLE = "studyCondition";
-    public static final String STUDY_AGE_GROUP_TABLE = "studyAgeGroup";
-    public static final String STUDY_PHASE_TABLE = "studyPhase";
-    public static final String STUDY_THERAPEUTIC_AREA_TABLE = "studyTherapeuticArea";
+    public static final String STUDY_TABLE = "StudyProperties";
+    public static final String STUDY_ACCESS_TABLE = "StudyAccess";
+    public static final String STUDY_ASSAY_TABLE = "StudyAssay";
+    public static final String STUDY_CONDITION_TABLE = "StudyCondition";
+    public static final String STUDY_AGE_GROUP_TABLE = "StudyAgeGroup";
+    public static final String STUDY_PHASE_TABLE = "StudyPhase";
+    public static final String STUDY_THERAPEUTIC_AREA_TABLE = "StudyTherapeuticArea";
 
-    public static final String PUBLICATION_TABLE = "manuscriptsAndAbstracts";
-    public static final String PUBLICATION_ASSAY_TABLE = "publicationAssay";
-    public static final String PUBLICATION_CONDITION_TABLE = "publicationCondition";
-    public static final String PUBLICATION_STUDY_TABLE = "publicationStudy";
-    public static final String PUBLICATION_THERAPEUTIC_AREA_TABLE = "publicationTherapeuticArea";
+    public static final String PUBLICATION_TABLE = "ManuscriptsAndAbstracts";
+    public static final String PUBLICATION_ASSAY_TABLE = "PublicationAssay";
+    public static final String PUBLICATION_CONDITION_TABLE = "PublicationCondition";
+    public static final String PUBLICATION_STUDY_TABLE = "PublicationStudy";
+    public static final String PUBLICATION_THERAPEUTIC_AREA_TABLE = "PublicationTherapeuticArea";
 
     // study visibility values
     public static final String OPERATIONAL_VISIBILITY = "Operational";
@@ -37,12 +39,42 @@ public class TrialShareQuerySchema
     // publication status values
     public static final String IN_PROGRESS_STATUS = "In Progress";
     public static final String COMPLETED_STATUS = "Complete";
+    private static final Set<String> _requiredPublicationLists = new HashSet<>();
+    static
+    {
+        _requiredPublicationLists.add(PUBLICATION_TABLE);
+        _requiredPublicationLists.add(PUBLICATION_CONDITION_TABLE);
+        _requiredPublicationLists.add(PUBLICATION_STUDY_TABLE);
+        _requiredPublicationLists.add(PUBLICATION_THERAPEUTIC_AREA_TABLE);
+    }
+
+
+    private static final Set<String> _requiredStudyLists = new HashSet<>();
+    static {
+        _requiredStudyLists.add(STUDY_ACCESS_TABLE);
+        _requiredStudyLists.add(STUDY_TABLE);
+        _requiredStudyLists.add(STUDY_ASSAY_TABLE);
+        _requiredStudyLists.add(STUDY_CONDITION_TABLE);
+        _requiredStudyLists.add(STUDY_AGE_GROUP_TABLE);
+        _requiredStudyLists.add(STUDY_PHASE_TABLE);
+        _requiredStudyLists.add(STUDY_THERAPEUTIC_AREA_TABLE);
+    }
 
     private QuerySchema _listsSchema = null;
 
     public TrialShareQuerySchema(User user, Container container)
     {
         setSchema(user, container);
+    }
+
+    public static Set<String> getRequiredPublicationLists()
+    {
+        return _requiredPublicationLists;
+    }
+
+    public static Set<String> getRequiredStudyLists()
+    {
+        return _requiredStudyLists;
     }
 
     public QuerySchema getSchema()
