@@ -41,6 +41,7 @@ import java.util.Map;
 public class StudyDocumentProvider implements SearchService.DocumentProvider
 {
     private static final Logger _logger = LoggerFactory.getLogger(StudyDocumentProvider.class);
+
     public static Container getDocumentContainer()
     {
         Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
@@ -61,6 +62,9 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
     {
 
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(User.getSearchUser(), c);
+
+        if (!listSchema.getTableNames().containsAll(TrialShareQuerySchema.getRequiredStudyLists()))
+            return;
 
         String sql =
                 "SELECT  "+

@@ -64,6 +64,9 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(User.getSearchUser(), c);
 
+        if (!listSchema.getTableNames().containsAll(TrialShareQuerySchema.getRequiredPublicationLists()))
+            return;
+
         String sql =
                 "SELECT  " +
                     "pub.Key as PublicationId, " +
