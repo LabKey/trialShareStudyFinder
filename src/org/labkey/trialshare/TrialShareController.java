@@ -36,6 +36,9 @@ import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
+import org.labkey.api.query.QuerySettings;
+import org.labkey.api.query.QueryView;
+import org.labkey.api.query.UserSchema;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.ReadPermission;
@@ -68,11 +71,33 @@ import java.util.Map;
 public class TrialShareController extends SpringActionController
 {
     public static final String OBJECT_NAME_PARAM = "object";
-    public static final String STUDY_OBJECT = "Study";
-    public static final String PUBLICATION_OBJECT = "Publication";
+    private enum ObjectName
+    {
+        study("Study", "Studies"),
+        publication("Publication", "Publications");
+
+        private String _displayName;
+        private String _pluralName;
+
+        ObjectName(String displayName, String pluralName)
+        {
+            _displayName = displayName;
+            _pluralName = pluralName;
+        }
+
+        public String getPluralName()
+        {
+            return _pluralName;
+        }
+
+        public String getDisplayName()
+        {
+            return _displayName;
+        }
+    }
 
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(TrialShareController.class);
-    public static final String NAME = "trialshare";
+    static final String NAME = "trialshare";
 
     public enum DetailType
     {
@@ -84,7 +109,7 @@ public class TrialShareController extends SpringActionController
         private String _dbFieldValue;
         private String _sectionHeader;
 
-        private DetailType(String dbField, String sectionHeader)
+        DetailType(String dbField, String sectionHeader)
         {
             _dbFieldValue = dbField;
             _sectionHeader = sectionHeader;
@@ -247,20 +272,28 @@ public class TrialShareController extends SpringActionController
         return new ActionURL(CubeAdminAction.class, ContainerManager.getRoot());
     }
 
-    public static FinderBean getFinderBean(Container container, String objectName)
+    public static FinderBean getFinderBean(Container container, String name)
     {
         FinderBean bean = new FinderBean();
+        ObjectName objectName = null;
+        if (name != null)
+        {
+            try
+            {
+                objectName = ObjectName.valueOf(name.toLowerCase());
+            }
+            catch (IllegalArgumentException e)
+            {
+            }
+        }
         bean.setDataModuleName(TrialShareModule.NAME);
-        bean.addCubeConfig(getCubeConfigBean(STUDY_OBJECT, container, STUDY_OBJECT.equalsIgnoreCase(objectName)));
-        bean.addCubeConfig(getCubeConfigBean(PUBLICATION_OBJECT, container, PUBLICATION_OBJECT.equalsIgnoreCase(objectName)));
+        bean.addCubeConfig(getCubeConfigBean(ObjectName.study, container, ObjectName.study == objectName));
+        bean.addCubeConfig(getCubeConfigBean(ObjectName.publication, container, ObjectName.publication == objectName));
         return bean;
     }
 
-    public static CubeConfigBean getCubeConfigBean(String objectName, Container container, Boolean isDefault)
+    static CubeConfigBean getCubeConfigBean(ObjectName objectName, Container container, Boolean isDefault)
     {
-        if (objectName == null)
-            objectName = STUDY_OBJECT;
-
         CubeConfigBean bean = new CubeConfigBean();
         bean.setSchemaName("lists");
         bean.setDataModuleName(TrialShareModule.NAME);
@@ -269,10 +302,10 @@ public class TrialShareController extends SpringActionController
         Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
         bean.setCubeContainer(((TrialShareModule) trialShareModule).getCubeContainer(container));
 
-        if (objectName.equalsIgnoreCase(STUDY_OBJECT))
+        if (objectName == ObjectName.study)
         {
-            bean.setObjectName(STUDY_OBJECT);
-            bean.setObjectNamePlural("Studies");
+            bean.setObjectName(objectName.getDisplayName());
+            bean.setObjectNamePlural(objectName.getPluralName());
             bean.setCubeName("StudyCube");
             bean.setConfigId("TrialShare:/StudyCube");
             bean.setFilterByLevel("[Study].[Study]");
@@ -283,12 +316,12 @@ public class TrialShareController extends SpringActionController
             bean.setSearchCategory(TrialShareModule.searchCategoryStudy.getName());
             bean.setSearchScope("All");
             bean.setHasContainerFilter(true);
-            bean.setCountField(STUDY_OBJECT);
+            bean.setCountField(objectName.getDisplayName());
         }
-        else if (objectName.equalsIgnoreCase(PUBLICATION_OBJECT))
+        else if (objectName == ObjectName.publication)
         {
-            bean.setObjectName(PUBLICATION_OBJECT);
-            bean.setObjectNamePlural("Publications");
+            bean.setObjectName(objectName.getDisplayName());
+            bean.setObjectNamePlural(objectName.getPluralName());
             bean.setCubeName("PublicationCube");
             bean.setConfigId("TrialShare:/PublicationCube");
             bean.setFilterByLevel("[Publication].[Publication]");
@@ -299,7 +332,7 @@ public class TrialShareController extends SpringActionController
             bean.setSearchCategory(TrialShareModule.searchCategoryPublication.getName());
             bean.setSearchScope("All");
             bean.setHasContainerFilter(false);
-            bean.setCountField(PUBLICATION_OBJECT);
+            bean.setCountField(objectName.getDisplayName());
         }
 
         return bean;
@@ -742,7 +775,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
         {
-            if (form.getObjectName().equalsIgnoreCase(PUBLICATION_OBJECT))
+            if (form.getObjectName() == ObjectName.publication)
                 return success(getPublicationFacets());
             else
                 return success(getStudyFacets());
@@ -1004,53 +1037,62 @@ public class TrialShareController extends SpringActionController
 
     public static class CubeObjectTypeForm
     {
-        private String objectName;
+        private ObjectName _objectName = null;
 
 
-        public String getObjectName()
+        public ObjectName getObjectName()
         {
-            return objectName;
+            return _objectName;
         }
 
-        public void setObjectName(String objectName)
+        public void setObjectName(String name)
         {
-            this.objectName = objectName;
+            if (name == null)
+                this._objectName = null;
+            else
+            {
+                try
+                {
+                    this._objectName = ObjectName.valueOf(name.toLowerCase());
+                }
+                catch (IllegalArgumentException e)
+                {
+
+                }
+            }
         }
 
         public void validate(Errors errors)
         {
             if (getObjectName() == null)
-                errors.rejectValue("objectName", ERROR_REQUIRED, "Object name is required");
+                errors.rejectValue("objectName", ERROR_REQUIRED, "Object name not recognized or not supplied");
         }
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class AccessibleMembersAction extends ApiAction<AccessibleMembersForm>
+    public class AccessibleMembersAction extends ApiAction<CubeObjectTypeForm>
     {
-        private String _objectName;
-        private String _fieldName;
-
         @Override
-        public void validateForm(AccessibleMembersForm form, Errors errors)
+        public void validateForm(CubeObjectTypeForm form, Errors errors)
         {
-            _objectName = (null==form) ? null : form.getObjectName();
-            if (_objectName == null)
-                errors.reject(ERROR_MSG, "Object type not specified");
-            _fieldName = (null == form) ? null : form.getFieldName();
+            if (form == null)
+                errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
+            else
+                form.validate(errors);
         }
 
         @Override
-        public Object execute(AccessibleMembersForm accessibleMembersForm, BindException errors) throws Exception
+        public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
         {
             Map<String, Object> levelMembers = new HashMap<>();
 
-            if (_objectName.equalsIgnoreCase(STUDY_OBJECT))
+            if (form.getObjectName() == ObjectName.study)
             {
                 Map<String, Object> members = new HashMap<>();
                 members.put("[Study].[Container]", TrialShareManager.get().getVisibleStudyContainers(getUser(), getContainer()));
                 levelMembers.put("[Study].[Study]", members);
             }
-            else if (_objectName.equalsIgnoreCase(PUBLICATION_OBJECT) )
+            else if (form.getObjectName() == ObjectName.publication)
             {
                 levelMembers.put("[Publication].[Publication]", TrialShareManager.get().getVisiblePublications(getUser(), getContainer()));
             }
@@ -1058,31 +1100,39 @@ public class TrialShareController extends SpringActionController
         }
     }
 
-    public static class AccessibleMembersForm
+
+    @RequiresPermission(ReadPermission.class)
+    public class ManageDataAction extends SimpleViewAction<CubeObjectTypeForm>
     {
-        private String _objectName;
-        private String _fieldName;
 
-        public String getFieldName()
+        @Override
+        public void validate(CubeObjectTypeForm form, BindException errors)
         {
-            return _fieldName;
+            if (form == null)
+                errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
+            else
+                form.validate(errors);
         }
 
-        public void setFieldName(String fieldName)
+        @Override
+        public ModelAndView getView(CubeObjectTypeForm form, BindException errors) throws Exception
         {
-            _fieldName = fieldName;
+            UserSchema userSchema = TrialShareQuerySchema.getUserSchema(getUser(), getContainer());
+
+            ObjectName objectName = form.getObjectName(); // validation should assure that this is not null
+
+            QuerySettings settings = userSchema.getSettings(getViewContext(), QueryView.DATAREGIONNAME_DEFAULT, objectName.getPluralName().toLowerCase());
+            QueryView queryView = userSchema.createView(getViewContext(), settings, errors);
+            queryView.setShowInsertNewButton(true);
+            queryView.setShowImportDataButton(TrialShareManager.get().canImportData(getUser()));
+            return queryView;
+
         }
 
-        public String getObjectName()
+        @Override
+        public NavTree appendNavTrail(NavTree root)
         {
-            return _objectName;
-        }
-
-        public void setObjectName(String objectName)
-        {
-            _objectName = objectName;
+            return null;
         }
     }
-
-
 }

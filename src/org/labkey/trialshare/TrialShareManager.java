@@ -21,8 +21,10 @@ import org.labkey.api.data.Container;
 import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
+import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.security.User;
+import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.trialshare.data.StudyAccess;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
@@ -47,7 +49,13 @@ public class TrialShareManager
         return _instance;
     }
 
-    public boolean canSeeOperationalStudies(User user, Container container)
+    boolean canImportData(User user)
+    {
+        Container cubeContainer = ((TrialShareModule) ModuleLoader.getInstance().getModule(TrialShareModule.NAME)).getCubeContainer(null);
+        return cubeContainer.hasPermission(user, InsertPermission.class);
+    }
+
+    boolean canSeeOperationalStudies(User user, Container container)
     {
         SimpleFilter filter = new SimpleFilter();
         filter.addCondition(FieldKey.fromParts("Visibility"), TrialShareQuerySchema.OPERATIONAL_VISIBILITY);
@@ -67,7 +75,7 @@ public class TrialShareManager
         return false;
     }
 
-    public boolean canSeeIncompleteManuscripts(User user, Container container)
+    boolean canSeeIncompleteManuscripts(User user, Container container)
     {
         SimpleFilter filter = new SimpleFilter();
         filter.addCondition(FieldKey.fromParts("Status"), TrialShareQuerySchema.COMPLETED_STATUS, CompareType.NEQ_OR_NULL);
