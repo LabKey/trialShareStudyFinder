@@ -17,6 +17,7 @@ public class ManagePublicationsQueryView extends ManageCubeObjectQueryView
     {
         _defaultColumns.add("title");
         _defaultColumns.add("show");
+        _defaultColumns.add("key");
     }
     public ManagePublicationsQueryView(ViewContext context, BindException errors)
     {
@@ -24,6 +25,9 @@ public class ManagePublicationsQueryView extends ManageCubeObjectQueryView
 
         setSettings(getSchema().getSettings(context, QueryView.DATAREGIONNAME_DEFAULT, TrialShareQuerySchema.PUBLICATION_TABLE));
     }
+
+    @Override
+    protected String getKeyField() { return "Key"; }
 
     @Override
     protected Set<String> getDefaultColumns()

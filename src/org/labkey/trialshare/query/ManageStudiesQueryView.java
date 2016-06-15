@@ -27,6 +27,9 @@ public class ManageStudiesQueryView extends ManageCubeObjectQueryView
     }
 
     @Override
+    protected String getKeyField() { return "StudyId"; }
+
+    @Override
     protected Set<String> getDefaultColumns()
     {
         return _defaultColumns;

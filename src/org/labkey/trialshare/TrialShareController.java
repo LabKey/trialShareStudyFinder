@@ -943,4 +943,49 @@ public class TrialShareController extends SpringActionController
             return null;
         }
     }
+
+    @RequiresPermission(ReadPermission.class)
+    public class ExportDataAction extends ApiAction
+    {
+
+        @Override
+        public Object execute(Object o, BindException errors) throws Exception
+        {
+            return null;
+        }
+    }
+
+    @RequiresPermission(InsertPermission.class)
+    public class EditDataAction extends SimpleViewAction
+    {
+
+        @Override
+        public ModelAndView getView(Object o, BindException errors) throws Exception
+        {
+            return null;
+        }
+
+        @Override
+        public NavTree appendNavTrail(NavTree root)
+        {
+            return null;
+        }
+    }
+
+    @RequiresPermission(ReadPermission.class)
+    public class ViewDataAction extends SimpleViewAction
+    {
+
+        @Override
+        public ModelAndView getView(Object o, BindException errors) throws Exception
+        {
+            return null;
+        }
+
+        @Override
+        public NavTree appendNavTrail(NavTree root)
+        {
+            return null;
+        }
+    }
 }
