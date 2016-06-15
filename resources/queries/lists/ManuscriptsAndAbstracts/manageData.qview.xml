@@ -1,0 +1,7 @@
+<customView xmlns="http://labkey.org/data/xml/queryCustomView" label="Manage Data">
+    <columns>
+        <column name="Key" />
+        <column name="Title"/>
+        <column name="Show"/>
+    </columns>
+</customView>
