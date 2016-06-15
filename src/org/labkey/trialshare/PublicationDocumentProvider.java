@@ -18,8 +18,6 @@ package org.labkey.trialshare;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
-import org.labkey.api.module.Module;
-import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
 import org.labkey.api.search.SearchService;
@@ -45,8 +43,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
     public static Container getDocumentContainer()
     {
-        Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
-        return ((TrialShareModule) trialShareModule).getCubeContainer(null);
+        return TrialShareManager.get().getCubeContainer(null);
     }
 
     public static void reindex()

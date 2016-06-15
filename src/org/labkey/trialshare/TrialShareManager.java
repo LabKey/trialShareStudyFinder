@@ -16,6 +16,7 @@
 
 package org.labkey.trialshare;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.CompareType;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.SimpleFilter;
@@ -24,7 +25,6 @@ import org.labkey.api.data.TableSelector;
 import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.security.User;
-import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.trialshare.data.StudyAccess;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
@@ -49,10 +49,10 @@ public class TrialShareManager
         return _instance;
     }
 
-    boolean canImportData(User user)
+    @Nullable
+    public Container getCubeContainer(@Nullable Container container)
     {
-        Container cubeContainer = ((TrialShareModule) ModuleLoader.getInstance().getModule(TrialShareModule.NAME)).getCubeContainer(null);
-        return cubeContainer.hasPermission(user, InsertPermission.class);
+        return ((TrialShareModule) ModuleLoader.getInstance().getModule(TrialShareModule.NAME)).getCubeContainer(container);
     }
 
     boolean canSeeOperationalStudies(User user, Container container)

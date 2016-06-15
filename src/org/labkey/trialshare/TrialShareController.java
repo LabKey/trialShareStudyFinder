@@ -16,7 +16,6 @@
 package org.labkey.trialshare;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.FormViewAction;
 import org.labkey.api.action.Marshal;
@@ -25,22 +24,17 @@ import org.labkey.api.action.ReturnUrlForm;
 import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
-import org.labkey.api.admin.AdminUrls;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
-import org.labkey.api.module.Module;
-import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
-import org.labkey.api.query.QuerySettings;
-import org.labkey.api.query.QueryView;
-import org.labkey.api.query.UserSchema;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
+import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.Pair;
@@ -49,13 +43,17 @@ import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
+import org.labkey.api.view.UnauthorizedException;
 import org.labkey.api.view.VBox;
 import org.labkey.api.view.WebPartView;
+import org.labkey.trialshare.data.CubeConfigBean;
 import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.StudyAccess;
 import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
 import org.labkey.trialshare.data.StudyPublicationBean;
+import org.labkey.trialshare.query.ManagePublicationsQueryView;
+import org.labkey.trialshare.query.ManageStudiesQueryView;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 import org.labkey.trialshare.view.DataFinderWebPart;
 import org.springframework.validation.BindException;
@@ -71,7 +69,7 @@ import java.util.Map;
 public class TrialShareController extends SpringActionController
 {
     public static final String OBJECT_NAME_PARAM = "object";
-    private enum ObjectName
+    public enum ObjectName
     {
         study("Study", "Studies"),
         publication("Publication", "Publications");
@@ -160,10 +158,16 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(AdminPermission.class)
     public class CubeAdminAction extends FormViewAction<CubeAdminForm>
     {
+        Container _cubeContainer = null;
+
         @Override
         public void validateCommand(CubeAdminForm target, Errors errors)
         {
-            if (target.getPath() == null)
+            if (target.getPath() != null)
+                _cubeContainer = ContainerManager.getForPath(target.getPath());
+            if (_cubeContainer == null)
+                _cubeContainer = TrialShareManager.get().getCubeContainer(null);
+            if (_cubeContainer == null)
                 errors.reject("Container path is required", "Container path not provided");
         }
 
@@ -172,10 +176,12 @@ public class TrialShareController extends SpringActionController
         {
             CubeDefinitionBean bean = new CubeDefinitionBean();
 
-            Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
-            Container cubeContainer = ((TrialShareModule) trialShareModule).getCubeContainer(getContainer());
-            bean.addCubeDefinition(cubeContainer.getPath(), "TrialShare:/StudyCube");
-            bean.addCubeDefinition(cubeContainer.getPath(), "TrialShare:/PublicationCube");
+            Container cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
+            if (cubeContainer != null)
+            {
+                bean.addCubeDefinition(cubeContainer.getPath(), "TrialShare:/StudyCube");
+                bean.addCubeDefinition(cubeContainer.getPath(), "TrialShare:/PublicationCube");
+            }
             JspView view =  new JspView<>("/org/labkey/trialshare/view/cubeAdmin.jsp", bean, errors);
 
             view.setFrame(WebPartView.FrameType.PORTAL);
@@ -186,15 +192,18 @@ public class TrialShareController extends SpringActionController
         @Override
         public boolean handlePost(CubeAdminForm form, BindException errors) throws Exception
         {
-            if ("reindex".equalsIgnoreCase(form.getMethod()))
+            form.validate(errors);
+            if (errors.hasErrors())
+                return false;
+
+            if (form.doReindex())
             {
                 StudyDocumentProvider.reindex();
                 PublicationDocumentProvider.reindex();
             }
-            else
+            if (form.doClearCache())
             {
-                Container container = ContainerManager.getForPath(form.getPath());
-                QueryService.get().cubeDataChanged(container);
+                QueryService.get().cubeDataChanged(_cubeContainer);
             }
             return true;
         }
@@ -202,7 +211,11 @@ public class TrialShareController extends SpringActionController
         @Override
         public URLHelper getSuccessURL(CubeAdminForm form)
         {
-            return PageFlowUtil.urlProvider(AdminUrls.class).getAdminConsoleURL();
+            URLHelper url = getViewContext().getActionURL().getReturnURL();
+            if (url != null)
+                return url;
+            else
+                return getViewContext().getActionURL();
         }
 
         @Override
@@ -265,6 +278,23 @@ public class TrialShareController extends SpringActionController
         {
             _method = method;
         }
+
+        public boolean doReindex()
+        {
+            return getMethod().toLowerCase().contains("reindex");
+        }
+
+        public boolean doClearCache()
+        {
+            return getMethod().toLowerCase().contains("clearCache");
+        }
+
+        public void validate(Errors errors)
+        {
+            if (getMethod() == null)
+                errors.reject("Method is required", "Method is required");
+        }
+
     }
 
     public static ActionURL getCubeAdminURL()
@@ -299,8 +329,7 @@ public class TrialShareController extends SpringActionController
         bean.setDataModuleName(TrialShareModule.NAME);
         bean.setShowSearch(true);
         bean.setShowParticipantFilters(false);
-        Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
-        bean.setCubeContainer(((TrialShareModule) trialShareModule).getCubeContainer(container));
+        bean.setCubeContainer(TrialShareManager.get().getCubeContainer(container));
 
         if (objectName == ObjectName.study)
         {
@@ -366,229 +395,6 @@ public class TrialShareController extends SpringActionController
         public void addCubeConfig(CubeConfigBean cubeConfig)
         {
             _cubeConfigs.add(cubeConfig);
-        }
-    }
-
-    public static class CubeConfigBean
-    {
-        private String _objectName;
-        private String _objectNamePlural;
-        private String _cubeName;
-        private String _dataModuleName;
-        private String _configId;
-        private String _schemaName;
-        private Boolean _showSearch;
-        private String _filterByLevel;
-        private String _countDistinctLevel;
-        private String _filterByFacetUniqueName;
-        private Boolean _showParticipantFilters;
-        private Boolean _isDefault;
-        private String _subsetLevelName;
-        private String _cubeContainerPath;
-        private String _cubeContainerId;
-        private String _searchCategory;
-        private String _searchScope;
-        private Boolean _hasContainerFilter;
-        private String _countField;
-
-        public String getObjectName()
-        {
-            return _objectName;
-        }
-
-        public void setObjectName(String objectName)
-        {
-            _objectName = objectName;
-        }
-
-        public String getObjectNamePlural()
-        {
-            return _objectNamePlural;
-        }
-
-        public void setObjectNamePlural(String objectNamePlural)
-        {
-            _objectNamePlural = objectNamePlural;
-        }
-
-        public String getConfigId()
-        {
-            return _configId;
-        }
-
-        public void setConfigId(String configId)
-        {
-            _configId = configId;
-        }
-
-        public String getCubeName()
-        {
-            return _cubeName;
-        }
-
-        public void setCubeName(String cubeName)
-        {
-            _cubeName = cubeName;
-        }
-
-        public String getDataModuleName()
-        {
-            return _dataModuleName;
-        }
-
-        public void setDataModuleName(String dataModuleName)
-        {
-            _dataModuleName = dataModuleName;
-        }
-
-        public String getSchemaName()
-        {
-            return _schemaName;
-        }
-
-        public void setSchemaName(String schemaName)
-        {
-            _schemaName = schemaName;
-        }
-
-        public Boolean getShowSearch()
-        {
-            return _showSearch;
-        }
-
-        public void setShowSearch(Boolean showSearch)
-        {
-            _showSearch = showSearch;
-        }
-
-        public String getCountDistinctLevel()
-        {
-            return _countDistinctLevel;
-        }
-
-        public void setCountDistinctLevel(String countDistinctLevel)
-        {
-            _countDistinctLevel = countDistinctLevel;
-        }
-
-        public String getFilterByFacetUniqueName()
-        {
-            return _filterByFacetUniqueName;
-        }
-
-        public void setFilterByFacetUniqueName(String filterByFacetUniqueName)
-        {
-            _filterByFacetUniqueName = filterByFacetUniqueName;
-        }
-
-        public String getFilterByLevel()
-        {
-            return _filterByLevel;
-        }
-
-        public void setFilterByLevel(String filterByLevel)
-        {
-            _filterByLevel = filterByLevel;
-        }
-
-        public Boolean getShowParticipantFilters()
-        {
-            return _showParticipantFilters;
-        }
-
-        public void setShowParticipantFilters(Boolean showParticipantFilters)
-        {
-            _showParticipantFilters = showParticipantFilters;
-        }
-
-        public Boolean getIsDefault()
-        {
-            return _isDefault;
-        }
-
-        public void setIsDefault(Boolean aDefault)
-        {
-            _isDefault = aDefault;
-        }
-
-        public String getSubsetLevelName()
-        {
-            return _subsetLevelName;
-        }
-
-        public void setSubsetLevelName(String subsetLevelName)
-        {
-            _subsetLevelName = subsetLevelName;
-        }
-
-
-        public void setCubeContainer(@Nullable Container cubeContainer)
-        {
-            if (cubeContainer != null)
-            {
-                _cubeContainerId = cubeContainer.getId();
-                _cubeContainerPath = cubeContainer.getPath();
-            }
-        }
-
-        public String getCubeContainerId()
-        {
-            return _cubeContainerId;
-        }
-
-        public void setCubeContainerId(String cubeContainerId)
-        {
-            _cubeContainerId = cubeContainerId;
-        }
-
-        public String getCubeContainerPath()
-        {
-            return _cubeContainerPath;
-        }
-
-        public void setCubeContainerPath(String cubeContainerPath)
-        {
-            _cubeContainerPath = cubeContainerPath;
-        }
-
-        public String getSearchCategory()
-        {
-            return _searchCategory;
-        }
-
-        public void setSearchCategory(String searchCategory)
-        {
-            _searchCategory = searchCategory;
-        }
-
-        public String getSearchScope()
-        {
-            return _searchScope;
-        }
-
-        public void setSearchScope(String searchScope)
-        {
-            _searchScope = searchScope;
-        }
-
-        public Boolean getHasContainerFilter()
-        {
-            return _hasContainerFilter;
-        }
-
-        public void setHasContainerFilter(Boolean hasContainerFilter)
-        {
-            _hasContainerFilter = hasContainerFilter;
-        }
-
-        public String getCountField()
-        {
-            return _countField;
-        }
-
-        public void setCountField(String countField)
-        {
-            _countField = countField;
         }
     }
 
@@ -1117,16 +923,18 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(CubeObjectTypeForm form, BindException errors) throws Exception
         {
-            UserSchema userSchema = TrialShareQuerySchema.getUserSchema(getUser(), getContainer());
+            Container cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
+            if (!cubeContainer.hasPermission(getUser(), InsertPermission.class))
+                throw new UnauthorizedException();
 
-            ObjectName objectName = form.getObjectName(); // validation should assure that this is not null
+            JspView<CubeObjectTypeForm> view = new JspView("/org/labkey/trialshare/view/manageData.jsp", form);
+            view.setTitle("Manage " + form.getObjectName().getPluralName());
 
-            QuerySettings settings = userSchema.getSettings(getViewContext(), QueryView.DATAREGIONNAME_DEFAULT, objectName.getPluralName().toLowerCase());
-            QueryView queryView = userSchema.createView(getViewContext(), settings, errors);
-            queryView.setShowInsertNewButton(true);
-            queryView.setShowImportDataButton(TrialShareManager.get().canImportData(getUser()));
-            return queryView;
-
+            if (form.getObjectName() == ObjectName.publication)
+                view.setView("manageObjectsView", new ManagePublicationsQueryView(getViewContext(), errors));
+            else
+                view.setView("manageObjectsView", new ManageStudiesQueryView(getViewContext(), errors));
+            return view;
         }
 
         @Override

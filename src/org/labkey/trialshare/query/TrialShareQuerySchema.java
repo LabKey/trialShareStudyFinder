@@ -2,13 +2,12 @@ package org.labkey.trialshare.query;
 
 import org.labkey.api.data.Container;
 import org.labkey.api.data.TableInfo;
-import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
 import org.labkey.api.query.UserSchema;
 import org.labkey.api.security.User;
-import org.labkey.trialshare.TrialShareModule;
+import org.labkey.trialshare.TrialShareManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -91,7 +90,7 @@ public class TrialShareQuerySchema
 
     public static QuerySchema getSchema(User user, Container container)
     {
-        Container cubeContainer = ((TrialShareModule) ModuleLoader.getInstance().getModule(TrialShareModule.NAME)).getCubeContainer(container);
+        Container cubeContainer = TrialShareManager.get().getCubeContainer(container);
         if (cubeContainer == null)
             cubeContainer = container;
         QuerySchema coreSchema = DefaultSchema.get(user, cubeContainer).getSchema("core");
@@ -100,7 +99,7 @@ public class TrialShareQuerySchema
 
     public static UserSchema getUserSchema(User user, Container container)
     {
-        Container cubeContainer = ((TrialShareModule) ModuleLoader.getInstance().getModule(TrialShareModule.NAME)).getCubeContainer(container);
+        Container cubeContainer = TrialShareManager.get().getCubeContainer(container);
         if (cubeContainer == null)
             cubeContainer = container;
         return QueryService.get().getUserSchema(user, cubeContainer, "lists");
