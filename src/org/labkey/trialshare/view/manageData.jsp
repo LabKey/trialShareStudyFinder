@@ -41,7 +41,9 @@
     {
         if (objectName != thisObjectName)
         {
-            out.println(PageFlowUtil.textLink(" Manage " + objectName.getPluralName(), new ActionURL(TrialShareController.ManageDataAction.class, this.getContainer()).addParameter("objectName", objectName.toString())));
+            out.println(PageFlowUtil.textLink(" Manage " + objectName.getPluralName(), new ActionURL(TrialShareController.ManageDataAction.class, this.getContainer())
+                    .addParameter("objectName", objectName.toString())
+                    .addParameter("query.viewName", "manageData")));
         }
     }
 %>
