@@ -164,18 +164,21 @@ public class StudyBean
         QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
         QuerySchema listSchema = coreSchema.getSchema("lists");
 
-        SimpleFilter filter = new SimpleFilter();
-        filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
-        if (publicationType != null)
+        if (listSchema != null)
         {
-            filter.addCondition(FieldKey.fromParts("PublicationType"), publicationType);
-        }
-        List<StudyPublicationBean> allPublications = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class);
-        this.publications.clear();
-        for (StudyPublicationBean publication : allPublications)
-        {
-            if (publication.getShow() && publication.hasPermission(user))
-                this.publications.add(publication);
+            SimpleFilter filter = new SimpleFilter();
+            filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
+            if (publicationType != null)
+            {
+                filter.addCondition(FieldKey.fromParts("PublicationType"), publicationType);
+            }
+            List<StudyPublicationBean> allPublications = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class);
+            this.publications.clear();
+            for (StudyPublicationBean publication : allPublications)
+            {
+                if (publication.getShow() && publication.hasPermission(user))
+                    this.publications.add(publication);
+            }
         }
     }
 
