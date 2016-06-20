@@ -24,6 +24,7 @@ import org.labkey.api.action.ReturnUrlForm;
 import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
+import org.labkey.api.data.ButtonBar;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.SimpleFilter;
@@ -32,6 +33,8 @@ import org.labkey.api.data.TableSelector;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
+import org.labkey.api.query.QueryUpdateForm;
+import org.labkey.api.query.UserSchemaAction;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.InsertPermission;
@@ -44,6 +47,7 @@ import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
 import org.labkey.api.view.UnauthorizedException;
+import org.labkey.api.view.UpdateView;
 import org.labkey.api.view.VBox;
 import org.labkey.api.view.WebPartView;
 import org.labkey.trialshare.data.CubeConfigBean;
@@ -91,6 +95,15 @@ public class TrialShareController extends SpringActionController
         public String getDisplayName()
         {
             return _displayName;
+        }
+
+        public static ObjectName getFromTableName(String tableName)
+        {
+            if (TrialShareQuerySchema.PUBLICATION_TABLE.equalsIgnoreCase(tableName))
+                return publication;
+            else if (TrialShareQuerySchema.STUDY_TABLE.equalsIgnoreCase(tableName))
+                return study;
+            return null;
         }
     }
 
@@ -567,10 +580,10 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class FacetsAction extends ApiAction<CubeObjectTypeForm>
+    public class FacetsAction extends ApiAction<CubeObjectNameForm>
     {
         @Override
-        public void validateForm(CubeObjectTypeForm form, Errors errors)
+        public void validateForm(CubeObjectNameForm form, Errors errors)
         {
             if (form == null)
                 errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
@@ -579,7 +592,7 @@ public class TrialShareController extends SpringActionController
         }
 
         @Override
-        public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
+        public Object execute(CubeObjectNameForm form, BindException errors) throws Exception
         {
             if (form.getObjectName() == ObjectName.publication)
                 return success(getPublicationFacets());
@@ -831,20 +844,19 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class SubsetsAction extends ApiAction<CubeObjectTypeForm>
+    public class SubsetsAction extends ApiAction<CubeObjectNameForm>
     {
 
         @Override
-        public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
+        public Object execute(CubeObjectNameForm form, BindException errors) throws Exception
         {
             return success();
         }
     }
 
-    public static class CubeObjectTypeForm
+    public static class CubeObjectNameForm
     {
         private ObjectName _objectName = null;
-
 
         public ObjectName getObjectName()
         {
@@ -875,11 +887,26 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+    public static class CubeObjectForm extends CubeObjectNameForm
+    {
+        private Object _cubeObject = null;
+
+        public Object getCubeObject()
+        {
+            return _cubeObject;
+        }
+
+        public void setCubeObject(Object cubeObject)
+        {
+            _cubeObject = cubeObject;
+        }
+    }
+
     @RequiresPermission(ReadPermission.class)
-    public class AccessibleMembersAction extends ApiAction<CubeObjectTypeForm>
+    public class AccessibleMembersAction extends ApiAction<CubeObjectNameForm>
     {
         @Override
-        public void validateForm(CubeObjectTypeForm form, Errors errors)
+        public void validateForm(CubeObjectNameForm form, Errors errors)
         {
             if (form == null)
                 errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
@@ -888,7 +915,7 @@ public class TrialShareController extends SpringActionController
         }
 
         @Override
-        public Object execute(CubeObjectTypeForm form, BindException errors) throws Exception
+        public Object execute(CubeObjectNameForm form, BindException errors) throws Exception
         {
             Map<String, Object> levelMembers = new HashMap<>();
 
@@ -908,11 +935,11 @@ public class TrialShareController extends SpringActionController
 
 
     @RequiresPermission(ReadPermission.class)
-    public class ManageDataAction extends SimpleViewAction<CubeObjectTypeForm>
+    public class ManageDataAction extends SimpleViewAction<CubeObjectNameForm>
     {
 
         @Override
-        public void validate(CubeObjectTypeForm form, BindException errors)
+        public void validate(CubeObjectNameForm form, BindException errors)
         {
             if (form == null)
                 errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
@@ -921,13 +948,15 @@ public class TrialShareController extends SpringActionController
         }
 
         @Override
-        public ModelAndView getView(CubeObjectTypeForm form, BindException errors) throws Exception
+        public ModelAndView getView(CubeObjectNameForm form, BindException errors) throws Exception
         {
             Container cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
+            if (cubeContainer == null)
+                throw new Exception("Invalid configuration.  No cube container defined");
             if (!cubeContainer.hasPermission(getUser(), InsertPermission.class))
                 throw new UnauthorizedException();
 
-            JspView<CubeObjectTypeForm> view = new JspView("/org/labkey/trialshare/view/manageData.jsp", form);
+            JspView<CubeObjectNameForm> view = new JspView("/org/labkey/trialshare/view/manageData.jsp", form);
             view.setTitle("Manage " + form.getObjectName().getPluralName());
 
             if (form.getObjectName() == ObjectName.publication)
@@ -944,6 +973,11 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+    private ActionURL getManageDataUrl(ObjectName name)
+    {
+        return new ActionURL(ManageDataAction.class, getContainer()).addParameter("objectName", name.toString());
+
+    }
     @RequiresPermission(ReadPermission.class)
     public class ExportDataAction extends ApiAction
     {
@@ -956,20 +990,104 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(InsertPermission.class)
-    public class EditDataAction extends SimpleViewAction
+    public class InsertDataAction extends FormViewAction<CubeObjectForm>
     {
+        private ObjectName _objectName = null;
 
         @Override
-        public ModelAndView getView(Object o, BindException errors) throws Exception
+        public void validateCommand(CubeObjectForm target, Errors errors)
         {
-            return null;
+            _objectName = target.getObjectName();
+            if (_objectName == null)
+                errors.rejectValue(ERROR_REQUIRED, "Object name is required");
+
+        }
+
+        public ModelAndView getView(CubeObjectForm tableForm, boolean reshow, BindException errors) throws Exception
+        {
+            setTitle("Update or Insert Publication");
+            return new JspView("/org/labkey/trialshare/view/insertPublication.jsp", tableForm);
+
+        }
+
+        public boolean handlePost(CubeObjectForm tableForm, BindException errors) throws Exception
+        {
+            if (_objectName == ObjectName.publication)
+                TrialShareManager.get().insertPublication(getUser(), getContainer(), (StudyPublicationBean) tableForm.getCubeObject());
+
+            return 0 == errors.getErrorCount();
         }
 
         @Override
+        public URLHelper getSuccessURL(CubeObjectForm form)
+        {
+            ActionURL returnURL = getActionURLParam(ActionURL.Param.returnUrl);
+            if (returnURL == null)
+            {
+               returnURL = getManageDataUrl(form.getObjectName());
+            }
+            return returnURL;
+        }
+
         public NavTree appendNavTrail(NavTree root)
         {
-            return null;
+            String name = getViewContext().getActionURL().getParameter("objectName");
+            if (name != null)
+            {
+                ObjectName objectName = ObjectName.valueOf(name);
+                root.addChild("Manage " + objectName.getPluralName(), getSuccessURL(null));
+                root.addChild("Insert " + objectName.getDisplayName());
+            }
+            return root;
         }
+    }
+
+    private ActionURL getActionURLParam(ActionURL.Param param)
+    {
+        String url = getViewContext().getActionURL().getParameter(param);
+        if (url != null)
+        {
+            try
+            {
+                return new ActionURL(url);
+            }
+            catch (IllegalArgumentException ignored) {}
+        }
+        return null;
+    }
+
+
+    @RequiresPermission(InsertPermission.class)
+    public class EditDataAction extends UserSchemaAction
+    {
+
+        public ModelAndView getView(QueryUpdateForm tableForm, boolean reshow, BindException errors) throws Exception
+        {
+            ButtonBar bb = createSubmitCancelButtonBar(tableForm);
+            UpdateView view = new UpdateView(tableForm, errors);
+
+            view.getDataRegion().setButtonBar(bb);
+            return view;
+        }
+
+        public boolean handlePost(QueryUpdateForm tableForm, BindException errors) throws Exception
+        {
+            doInsertUpdate(tableForm, errors, false);
+            return 0 == errors.getErrorCount();
+        }
+
+        public NavTree appendNavTrail(NavTree root)
+        {
+            if (_table != null)
+            {
+                ObjectName objectName = ObjectName.getFromTableName(_table.getName());
+                root.addChild("Manage " + objectName.getPluralName(), getSuccessURL(null));
+                root.addChild("Edit " + objectName.getDisplayName());
+            }
+            return root;
+        }
+
+
     }
 
     @RequiresPermission(ReadPermission.class)

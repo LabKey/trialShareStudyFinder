@@ -2,6 +2,7 @@ package org.labkey.trialshare.query;
 
 import org.labkey.api.query.QueryView;
 import org.labkey.api.view.ViewContext;
+import org.labkey.trialshare.TrialShareController;
 import org.springframework.validation.BindException;
 
 import java.util.HashSet;
@@ -24,6 +25,12 @@ public class ManageStudiesQueryView extends ManageCubeObjectQueryView
     {
         super(context, errors);
         setSettings(getSchema().getSettings(context, QueryView.DATAREGIONNAME_DEFAULT, TrialShareQuerySchema.STUDY_TABLE));
+    }
+
+    @Override
+    protected TrialShareController.ObjectName getCubeObjectName()
+    {
+        return TrialShareController.ObjectName.study;
     }
 
     @Override

@@ -16,10 +16,13 @@
 
 package org.labkey.trialshare;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.CompareType;
 import org.labkey.api.data.Container;
+import org.labkey.api.data.DbScope;
 import org.labkey.api.data.SimpleFilter;
+import org.labkey.api.data.Table;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
 import org.labkey.api.module.ModuleLoader;
@@ -29,6 +32,7 @@ import org.labkey.trialshare.data.StudyAccess;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -190,5 +194,111 @@ public class TrialShareManager
             }
         }
         return publicationIds;
+    }
+
+    public void insertPublication(User user, Container container, StudyPublicationBean publication)
+    {
+        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
+        {
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
+            // insert the primary fields
+            Map<String, Object> pubData = Table.insert(user, TrialShareQuerySchema.getPublicationsTableInfo(user, container), publication.getPrimaryFields());
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put(TrialShareQuerySchema.PUBLICATION_ID_FIELD, pubData.get(TrialShareQuerySchema.PUBLICATION_ID_FIELD));
+
+            // insert the one-to-many data
+            // conditions
+            for (String condition : publication.getConditions())
+            {
+                dataMap.put(TrialShareQuerySchema.CONDITION_FIELD, condition);
+                Table.insert(user, schema.getPublicationConditionTableInfo(), dataMap);
+            }
+            dataMap.remove(TrialShareQuerySchema.CONDITION_FIELD);
+
+            // studies
+            for (Map.Entry<String, String> entry : publication.getStudyIds().entrySet())
+            {
+                dataMap.put(TrialShareQuerySchema.STUDY_ID_FIELD, entry.getKey());
+                dataMap.put(TrialShareQuerySchema.STUDY_SHORT_NAME_FIELD, entry.getValue());
+                Table.insert(user, schema.getPublicationStudyTableInfo(), dataMap);
+            }
+            dataMap.remove(TrialShareQuerySchema.STUDY_ID_FIELD);
+            dataMap.remove(TrialShareQuerySchema.STUDY_SHORT_NAME_FIELD);
+
+            // Therapeutic Areas
+            for (String area : publication.getTherapeuticAreas())
+            {
+                dataMap.put(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, area);
+                Table.insert(user, schema.getPublicationTherapeuticAreaTableInfo(), dataMap);
+            }
+
+            transaction.commit();
+        }
+    }
+
+    public void updatePublication(User user, Container container, StudyPublicationBean publication)
+    {
+        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
+        {
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
+            // insert the primary fields
+            Table.update(user, TrialShareQuerySchema.getPublicationsTableInfo(user, container), publication.getPrimaryFields(), publication.getId());
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put(TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId());
+
+            // update the many-to-one data
+            SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), publication.getId());
+
+            // conditions
+            // first get rid of the current values for this publication
+            Table.delete(schema.getPublicationConditionTableInfo(), filter);
+            // now add the new values
+            for (String condition : publication.getConditions())
+            {
+                dataMap.put(TrialShareQuerySchema.CONDITION_FIELD, condition);
+                Table.insert(user, schema.getPublicationConditionTableInfo(), dataMap);
+            }
+            dataMap.remove(TrialShareQuerySchema.CONDITION_FIELD);
+
+            // studies
+            // get rid of the current values for this publication
+            Table.delete(schema.getPublicationStudyTableInfo(), filter);
+            for (Map.Entry<String, String> entry : publication.getStudyIds().entrySet())
+            {
+                dataMap.put(TrialShareQuerySchema.STUDY_ID_FIELD, entry.getKey());
+                dataMap.put(TrialShareQuerySchema.STUDY_SHORT_NAME_FIELD, entry.getValue());
+                Table.insert(user, schema.getPublicationStudyTableInfo(), dataMap);
+            }
+            dataMap.remove(TrialShareQuerySchema.STUDY_ID_FIELD);
+            dataMap.remove(TrialShareQuerySchema.STUDY_SHORT_NAME_FIELD);
+
+            // Therapeutic Areas
+            Table.delete(schema.getPublicationTherapeuticAreaTableInfo(), filter);
+            for (String area : publication.getTherapeuticAreas())
+            {
+                dataMap.put(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, area);
+                Table.insert(user, schema.getPublicationTherapeuticAreaTableInfo(), dataMap);
+            }
+
+            transaction.commit();
+        }
+    }
+
+    public void deletePublication(User user, @NotNull Container container, @NotNull Integer publicationId)
+    {
+        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
+        {
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
+
+            SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), publicationId);
+            Table.delete(schema.getPublicationConditionTableInfo(), filter);
+            Table.delete(schema.getPublicationStudyTableInfo(), filter);
+            Table.delete(schema.getPublicationTherapeuticAreaTableInfo(), filter);
+
+            filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_KEY_FIELD), publicationId);
+            Table.delete(schema.getPublicationsTableInfo(), filter);
+            transaction.commit();
+        }
+
     }
 }

@@ -1,6 +1,5 @@
 package org.labkey.trialshare.query;
 
-import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.data.ActionButton;
 import org.labkey.api.data.ButtonBar;
 import org.labkey.api.data.Container;
@@ -23,7 +22,6 @@ import org.springframework.validation.BindException;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -44,6 +42,7 @@ abstract class ManageCubeObjectQueryView extends QueryView
         setShowUpdateColumn(_cubeContainer.hasPermission(getUser(), InsertPermission.class));
     }
 
+    protected abstract TrialShareController.ObjectName getCubeObjectName();
 
     @Override
     protected void populateButtonBar(DataView view, ButtonBar bar, boolean exportAsWebPage)
@@ -109,19 +108,6 @@ abstract class ManageCubeObjectQueryView extends QueryView
 
     protected abstract Set<String> getDefaultColumns();
 
-    @Override
-    protected void configureDataRegion(DataRegion rgn)
-    {
-        super.configureDataRegion(rgn);
-        Set<String> columnsToShow = getDefaultColumns();
-        List<String> toRemove = new ArrayList<>();
-        for (DisplayColumn column : rgn.getDisplayColumns())
-        {
-            if (column.isQueryColumn() && !columnsToShow.contains(column.getName()))
-                toRemove.add(column.getName());
-        }
-        rgn.removeColumns(StringUtils.join(toRemove, ","));
-    }
 
     @Override
     protected ActionURL urlFor(QueryAction action)
@@ -131,7 +117,14 @@ abstract class ManageCubeObjectQueryView extends QueryView
         if (action.equals(QueryAction.exportRowsExcel) || action.equals(QueryAction.exportRowsXLSX))
         {
             ActionURL url = super.urlFor(action);
-            url.setAction(TrialShareController.ExportDataAction.class);
+            url.setAction(TrialShareController.ExportDataAction.class).addParameter("objectName", getCubeObjectName().toString());
+            return url;
+        }
+        if (action.equals(QueryAction.insertQueryRow))
+        {
+            ActionURL url = super.urlFor(action);
+            url.setAction(TrialShareController.InsertDataAction.class).addParameter("objectName", getCubeObjectName().toString());
+            return url;
         }
         return super.urlFor(action);
     }

@@ -1,0 +1,16 @@
+<customView xmlns="http://labkey.org/data/xml/queryCustomView" label="Data Finder Details">
+    <columns>
+        <column name="Key" />
+        <column name="Title"/>
+        <!--<column name="Author"/>-->
+        <column name="SubmissionStatus"/>
+        <!--<column name="DOI"/>-->
+        <!--<column name="PMID"/>-->
+        <!--<column name="PMCID"/>-->
+        <!--<column name="PublicationType"/>-->
+        <!--<column name="Year"/>-->
+        <!--<column name="Journal"/>-->
+        <!--<column name="Show"/>-->
+        <column name="StudiesList"/>
+    </columns>
+</customView>

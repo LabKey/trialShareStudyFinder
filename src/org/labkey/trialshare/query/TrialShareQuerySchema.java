@@ -33,6 +33,13 @@ public class TrialShareQuerySchema
     public static final String PUBLICATION_STUDY_TABLE = "PublicationStudy";
     public static final String PUBLICATION_THERAPEUTIC_AREA_TABLE = "PublicationTherapeuticArea";
 
+    public static final String PUBLICATION_KEY_FIELD = "Key"; // this is the name of the key field in the publicaiton table itself
+    public static final String PUBLICATION_ID_FIELD = "PublicationId";
+    public static final String CONDITION_FIELD = "Condition";
+    public static final String STUDY_ID_FIELD = "StudyId";
+    public static final String STUDY_SHORT_NAME_FIELD = "ShortName";
+    public static final String THERAPEUTIC_AREA_FIELD = "TherapeuticArea";
+
     // study visibility values
     public static final String OPERATIONAL_VISIBILITY = "Operational";
     public static final String PUBLIC_VISIBILITY = "Public";

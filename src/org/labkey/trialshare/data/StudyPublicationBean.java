@@ -18,6 +18,7 @@ package org.labkey.trialshare.data;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
+import org.labkey.api.data.DbScope;
 import org.labkey.api.reports.Report;
 import org.labkey.api.reports.ReportService;
 import org.labkey.api.reports.model.ViewCategory;
@@ -29,104 +30,112 @@ import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.ViewContext;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
+import org.springframework.validation.BindException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StudyPublicationBean
 {
+    private static final String KEY_FIELD = "Key";
+    private static final String STUDY_ID_FIELD = "StudyId";
+    private static final String TITLE_FIELD = "Title";
+    private static final String AUTHOR_FIELD = "Author";
+    private static final String DOI_FIELD = "DOI";
+    private static final String PMID_FIELD = "PMID";
+    private static final String PMCID_FIELD = "PMCID";
+    private static final String ISSUE_NUMBER_FIELD = "IssueNo";
+    private static final String PAGES_FIELD = "Pages";
+    private static final String PUBLICATION_TYPE_FIELD = "PublicationType"; // TODO convert to lookup
+    private static final String YEAR_FIELD = "Year";
+    private static final String JOURNAL_FIELD = "Journal";
+    private static final String STATUS_FIELD = "Status";
+    private static final String CITATION_FIELD = "Citation";
+    private static final String ABSTRACT_FIELD = "Abstract";
+    private static final String DATA_URL_FIELD = "DataUrl";
+    private static final String IS_HIGHLIGHTED_FIELD = "IsHighlighted";
+    private static final String MANUSCRIPT_CONTAINER_FIELD = "ManuscriptContaienr";
+    private static final String KEYWORDS_FIELD = "Keywords";
+    private static final String PERMISSIONS_CONTAINER_FIELD = "PermissionsContainer";
+    private static final String IS_SHOWN_FIELD = "Show";
+
     public static final String FIGURES_CATEGORY_TEXT = "Manuscript Figures";
 
     private static final int AUTHORS_PER_ABBREV = 3;
+    private Map<String, Object> _primaryFields = new HashMap<>();
 
-    // common fields
-    private Integer id;
-    private String studyId;
-    private String pmid; // PubMed Id
-    private String pmcid; // PubMed Central reference number
-    private String doi;
-    private String author;
-    private String issue;
-    private String journal;
-    private String pages;
-    private String title;
-    private String year;
-    private String abstractText;
-    private String citation;
-    private String status;
-    private String dataUrl;
     private List<StudyBean> studies;
-    private Boolean isHighlighted = false;
-    private String publicationType;
-    private String permissionsContainer;
     private List<URLData> thumbnails;
-    private String manuscriptContainer;
-    private String keywords;
-    private Boolean show;
     private List<URLData> urls = new ArrayList<>();
+    private Map<String, String> studyIds = new HashMap<>();
+    private List<String> conditions = new ArrayList<>();
+    private List<String> therapeuticAreas = new ArrayList<>();
+
 
 
     public Integer getId()
     {
-        return id;
+        return (Integer) _primaryFields.get(KEY_FIELD);
     }
 
     public void setId(Integer id)
     {
-        this.id = id;
+        _primaryFields.put(KEY_FIELD, id);
     }
 
     public void setKey(Integer id)
     {
-        this.id = id;
+        _primaryFields.put(KEY_FIELD, id);
     }
 
-    public void set_Key(Integer id) { this.id = id; } // this is required because for SQLServer we alias "Key" as "_Key" in our query
+    public void set_Key(Integer id) { _primaryFields.put(KEY_FIELD, id); } // this is required because for SQLServer we alias "Key" as "_Key" in our query
 
     public String getStudyId()
     {
-        return studyId;
+        return (String) _primaryFields.get(STUDY_ID_FIELD);
     }
 
     public void setStudyId(String studyId)
     {
-        this.studyId = studyId;
+        _primaryFields.put(STUDY_ID_FIELD, studyId);
     }
 
     public String getPmid()
     {
-        return pmid;
+        return (String) _primaryFields.get(PMID_FIELD);
     }
 
     public void setPmid(String pmid)
     {
-        this.pmid = pmid;
+        _primaryFields.put(PMID_FIELD, pmid);
     }
 
     public String getPmcid()
     {
-        return pmcid;
+        return (String) _primaryFields.get(PMCID_FIELD);
     }
 
     public void setPmcid(String pmcid)
     {
-        this.pmcid = pmcid;
+        _primaryFields.put(PMCID_FIELD, pmcid);
     }
 
     public String getDoi()
     {
-        return doi;
+        return (String) _primaryFields.get(DOI_FIELD);
     }
 
     public void setDoi(String doi)
     {
-        this.doi = doi;
+        _primaryFields.put(DOI_FIELD, doi);
     }
 
     public String getAuthor()
     {
-        return author;
+        return (String) _primaryFields.get(AUTHOR_FIELD);
     }
 
     public String getAuthorAbbrev()
@@ -147,77 +156,77 @@ public class StudyPublicationBean
 
     public void setAuthor(String author)
     {
-        this.author = author;
+        _primaryFields.put(AUTHOR_FIELD, author);
     }
 
-    public String getIssue()
+    public String getIssueNumber()
     {
-        return issue;
+        return (String) _primaryFields.get(ISSUE_NUMBER_FIELD);
     }
 
-    public void setIssue(String issue)
+    public void setIssueNumber(String issue)
     {
-        this.issue = issue;
+        _primaryFields.put(ISSUE_NUMBER_FIELD, issue);
     }
 
     public String getJournal()
     {
-        return journal;
+        return (String) _primaryFields.get(JOURNAL_FIELD);
     }
 
     public void setJournal(String journal)
     {
-        this.journal = journal;
+        _primaryFields.put(JOURNAL_FIELD, journal);
     }
 
     public String getPages()
     {
-        return pages;
+        return (String) _primaryFields.get(PAGES_FIELD);
     }
 
     public void setPages(String pages)
     {
-        this.pages = pages;
+        _primaryFields.put(PAGES_FIELD, pages);
     }
 
     public String getTitle()
     {
-        return title;
+        return (String) _primaryFields.get(TITLE_FIELD);
     }
 
     public void setTitle(String title)
     {
-        this.title = title;
+        _primaryFields.put(TITLE_FIELD, title);
     }
 
     public String getYear()
     {
-        return year;
+       return (String) _primaryFields.get(YEAR_FIELD);
     }
 
     public void setYear(String year)
     {
-        this.year = year;
+        _primaryFields.put(YEAR_FIELD, year);
     }
 
     public String getCitation()
     {
-        return citation;
+        return (String) _primaryFields.get(CITATION_FIELD);
     }
 
     public void setCitation(String citation)
     {
-        this.citation = citation;
+        _primaryFields.put(CITATION_FIELD, citation);
     }
 
     public String getAbstractText()
     {
-        return abstractText;
+        return (String) _primaryFields.get(ABSTRACT_FIELD);
     }
 
     public void setAbstractText(String abstractText)
     {
-        this.abstractText = abstractText;
+        _primaryFields.put(ABSTRACT_FIELD, abstractText);
     }
 
     public void setDescription1(String description1)
@@ -315,12 +324,12 @@ public class StudyPublicationBean
 
     public String getStatus()
     {
-        return status;
+        return (String) _primaryFields.get(STATUS_FIELD);
     }
 
     public void setStatus(String status)
     {
-        this.status = status;
+        _primaryFields.put(STATUS_FIELD, status);
     }
 
     public List<StudyBean> getStudies()
@@ -335,42 +344,42 @@ public class StudyPublicationBean
 
     public String getDataUrl()
     {
-        return dataUrl;
+        return (String) _primaryFields.get(DATA_URL_FIELD);
     }
 
     public void setDataUrl(String dataUrl)
     {
-        this.dataUrl = dataUrl;
+        _primaryFields.put(DATA_URL_FIELD, dataUrl);
     }
 
     public Boolean getIsHighlighted()
     {
-        return isHighlighted;
+        return (Boolean) _primaryFields.get(IS_HIGHLIGHTED_FIELD);
     }
 
     public void setIsHighlighted(Boolean highlighted)
     {
-        isHighlighted = highlighted;
+        _primaryFields.put(IS_HIGHLIGHTED_FIELD, highlighted);
     }
 
     public String getPublicationType()
     {
-        return publicationType;
+        return (String) _primaryFields.get(PUBLICATION_TYPE_FIELD);
     }
 
     public void setPublicationType(String publicationType)
     {
-        this.publicationType = publicationType;
+        _primaryFields.put(PUBLICATION_TYPE_FIELD, publicationType);
     }
 
     public String getManuscriptContainer()
     {
-        return manuscriptContainer;
+        return (String) _primaryFields.get(MANUSCRIPT_CONTAINER_FIELD);
     }
 
     public void setManuscriptContainer(String manuscriptContainer)
     {
-        this.manuscriptContainer = manuscriptContainer;
+        _primaryFields.put(MANUSCRIPT_CONTAINER_FIELD, manuscriptContainer);
     }
 
     public List<URLData> getThumbnails()
@@ -441,32 +450,62 @@ public class StudyPublicationBean
 
     public String getKeywords()
     {
-        return keywords;
+        return (String) _primaryFields.get(KEYWORDS_FIELD);
     }
 
     public void setKeywords(String keywords)
     {
-        this.keywords = keywords;
+        _primaryFields.put(KEYWORDS_FIELD, keywords);
     }
 
     public String getPermissionsContainer()
     {
-        return permissionsContainer;
+        return (String) _primaryFields.get(PERMISSIONS_CONTAINER_FIELD);
     }
 
     public void setPermissionsContainer(String permissionsContainer)
     {
-        this.permissionsContainer = permissionsContainer;
+        _primaryFields.put(PERMISSIONS_CONTAINER_FIELD, permissionsContainer);
     }
 
     public Boolean getShow()
     {
-        return show;
+        return (Boolean) _primaryFields.get(IS_SHOWN_FIELD);
     }
 
     public void setShow(Boolean show)
     {
-        this.show = show;
+        _primaryFields.put(IS_SHOWN_FIELD, show);
+    }
+
+    public List<String> getConditions()
+    {
+        return conditions;
+    }
+
+    public void setConditions(List<String> conditions)
+    {
+        this.conditions = conditions;
+    }
+
+    public Map<String, String> getStudyIds()
+    {
+        return studyIds;
+    }
+
+    public void setStudyIds(Map<String, String> studyIds)
+    {
+        this.studyIds = studyIds;
+    }
+
+    public List<String> getTherapeuticAreas()
+    {
+        return therapeuticAreas;
+    }
+
+    public void setTherapeuticAreas(List<String> therapeuticAreas)
+    {
+        this.therapeuticAreas = therapeuticAreas;
     }
 
     public Boolean inProgress()
@@ -499,4 +538,25 @@ public class StudyPublicationBean
         }
         return false;
     }
+
+    public Map<String, Object> getPrimaryFields()
+    {
+       return _primaryFields;
+    }
+
+
+    private void save(User user, Container container, BindException errors)
+    {
+
+        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
+        {
+
+            transaction.commit();
+        }
+        catch (Exception e)
+        {
+            errors.reject("Error saving data", "Error saving publication data: " + e.getMessage());
+        }
+    }
+
 }

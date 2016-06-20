@@ -24,8 +24,8 @@
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%@ page extends="org.labkey.api.jsp.JspBase"%>
 <%
-    JspView<TrialShareController.CubeObjectTypeForm> me = (JspView<TrialShareController.CubeObjectTypeForm>) HttpView.currentView();
-    TrialShareController.CubeObjectTypeForm bean = me.getModelBean();
+    JspView<TrialShareController.CubeObjectNameForm> me = (JspView<TrialShareController.CubeObjectNameForm>) HttpView.currentView();
+    TrialShareController.CubeObjectNameForm bean = me.getModelBean();
     TrialShareController.ObjectName thisObjectName = bean.getObjectName();
     ModelAndView manageObjectsView = me.getView("manageObjectsView");
 
