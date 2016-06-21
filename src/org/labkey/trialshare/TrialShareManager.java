@@ -29,6 +29,8 @@ import org.labkey.api.data.TableSelector;
 import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.BatchValidationException;
 import org.labkey.api.query.FieldKey;
+import org.labkey.api.query.InvalidKeyException;
+import org.labkey.api.query.QueryUpdateServiceException;
 import org.labkey.api.security.User;
 import org.labkey.trialshare.data.PublicationEditBean;
 import org.labkey.trialshare.data.StudyAccess;
@@ -36,6 +38,7 @@ import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 import org.springframework.validation.BindException;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,6 +46,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.labkey.api.action.SpringActionController.ERROR_CONVERSION;
+import static org.labkey.api.action.SpringActionController.ERROR_MSG;
 
 public class TrialShareManager
 {
@@ -327,23 +333,63 @@ public class TrialShareManager
         }
     }
 
-    public void deletePublication(@NotNull User user, @NotNull Container container, @NotNull Integer publicationId)
+    private void deleteJoinTableData(@NotNull TableInfo tableInfo, @NotNull String keyName, @NotNull User user, @NotNull Container container, SimpleFilter objectIdFilter) throws SQLException, QueryUpdateServiceException, BatchValidationException, InvalidKeyException
     {
-        if (publicationId == null)
+        // select the keys of the rows that have the object ids selected by the object filter
+        List<Integer> keys = new TableSelector(tableInfo, Collections.singleton(keyName), objectIdFilter, null).getArrayList(Integer.class);
+
+        List<Map<String, Object>> pkMaps = new ArrayList<>();
+        for (Integer key : keys)
+        {
+            Map<String, Object> keyMap = new HashMap<>();
+            keyMap.put(keyName, key);
+            pkMaps.add(keyMap);
+        }
+        tableInfo.getUpdateService().deleteRows(user, container, pkMaps, null, null);
+    }
+
+    public void deletePublications(@NotNull User user, @NotNull Container container, Set<String> publicationIds, BindException errors)
+    {
+        Set<Integer> integerIds = new HashSet<>();
+        for (String id : publicationIds)
+        {
+            try
+            {
+               integerIds.add(Integer.valueOf(id));
+            }
+            catch (NumberFormatException e)
+            {
+                errors.reject(ERROR_CONVERSION, "Invalid id (expecting integer): " + id);
+            }
+        }
+
+        if (errors.hasErrors())
             return;
+        SimpleFilter idFilter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), integerIds, CompareType.IN);
 
         try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
         {
             TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
 
-            SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), publicationId);
-            Table.delete(schema.getPublicationConditionTableInfo(), filter);
-            Table.delete(schema.getPublicationStudyTableInfo(), filter);
-            Table.delete(schema.getPublicationTherapeuticAreaTableInfo(), filter);
+            deleteJoinTableData(schema.getPublicationStudyTableInfo(), "Key", user, container, idFilter);
+            deleteJoinTableData(schema.getPublicationConditionTableInfo(), "Key", user, container, idFilter);
+            deleteJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), "Key", user, container, idFilter);
 
-            filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_KEY_FIELD), publicationId);
-            Table.delete(schema.getPublicationsTableInfo(), filter);
+            List<Map<String, Object>> pkMaps = new ArrayList<>();
+            for (Integer id : integerIds)
+            {
+                Map<String, Object> keyMap = new HashMap<>();
+                keyMap.put(TrialShareQuerySchema.PUBLICATION_KEY_FIELD, id);
+                pkMaps.add(keyMap);
+            }
+
+            schema.getPublicationsTableInfo().getUpdateService().deleteRows(user, container, pkMaps, null, null);
+
             transaction.commit();
+        }
+        catch (Exception e)
+        {
+            errors.reject(ERROR_MSG, e.getMessage());
         }
 
     }
@@ -379,4 +425,13 @@ public class TrialShareManager
 //        }
 //
 //    }
+
+    public void deleteStudies(@NotNull User user, @NotNull Container container, Set<String> ids, BindException errors)
+    {
+//        for (String id : ids)
+//        {
+//            deleteStudy(user, container, id);
+//        }
+    }
+
 }

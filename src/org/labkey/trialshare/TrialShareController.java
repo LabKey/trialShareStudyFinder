@@ -17,6 +17,7 @@ package org.labkey.trialshare;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.action.ApiAction;
+import org.labkey.api.action.FormHandlerAction;
 import org.labkey.api.action.FormViewAction;
 import org.labkey.api.action.Marshal;
 import org.labkey.api.action.Marshaller;
@@ -27,16 +28,19 @@ import org.labkey.api.action.SpringActionController;
 import org.labkey.api.data.ButtonBar;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
+import org.labkey.api.data.DataRegionSelection;
 import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
 import org.labkey.api.query.FieldKey;
+import org.labkey.api.query.QueryForm;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
 import org.labkey.api.query.QueryUpdateForm;
 import org.labkey.api.query.UserSchemaAction;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
+import org.labkey.api.security.permissions.DeletePermission;
 import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
@@ -70,6 +74,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Marshal(Marshaller.Jackson)
 public class TrialShareController extends SpringActionController
@@ -976,16 +981,6 @@ public class TrialShareController extends SpringActionController
         return new ActionURL(ManageDataAction.class, getContainer()).addParameter("objectName", name.toString()).addParameter("query.viewName", "manageData");
 
     }
-    @RequiresPermission(ReadPermission.class)
-    public class ExportDataAction extends ApiAction
-    {
-
-        @Override
-        public Object execute(Object o, BindException errors) throws Exception
-        {
-            return null;
-        }
-    }
 
     @RequiresPermission(InsertPermission.class)
     public class InsertDataFormAction extends SimpleViewAction<CubeObjectNameForm>
@@ -1044,6 +1039,72 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+    @RequiresPermission(DeletePermission.class)
+    public class DeleteCubeObjectsAction extends FormHandlerAction<CubeObjectQueryForm>
+    {
+
+        @Override
+        public void validateCommand(CubeObjectQueryForm form, Errors errors)
+        {
+            if (form == null)
+                errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
+            else
+                form.validate(errors);
+        }
+
+        @Override
+        public boolean handlePost(CubeObjectQueryForm form, BindException errors) throws Exception
+        {
+            Set<String> ids = DataRegionSelection.getSelected(form.getViewContext(), null, true, true);
+            if (form.getObjectName() == ObjectName.publication)
+                TrialShareManager.get().deletePublications(getUser(), getContainer(), ids, errors);
+            else if (form.getObjectName() == ObjectName.study)
+                TrialShareManager.get().deleteStudies(getUser(), getContainer(), ids, errors);
+            else
+                errors.reject(ERROR_MSG, "Invalid object name: " + form.getObjectName());
+            return !errors.hasErrors();
+        }
+
+        @Override
+        public URLHelper getSuccessURL(CubeObjectQueryForm queryForm)
+        {
+            return getManageDataUrl(ObjectName.publication);
+        }
+    }
+
+    public static class CubeObjectQueryForm extends QueryForm
+    {
+        private ObjectName _objectName = null;
+
+        public ObjectName getObjectName()
+        {
+            return _objectName;
+        }
+
+        public void setObjectName(String name)
+        {
+            if (name == null)
+                this._objectName = null;
+            else
+            {
+                try
+                {
+                    this._objectName = ObjectName.valueOf(name.toLowerCase());
+                }
+                catch (IllegalArgumentException e)
+                {
+
+                }
+            }
+        }
+
+        public void validate(Errors errors)
+        {
+            if (getObjectName() == null)
+                errors.rejectValue("objectName", ERROR_REQUIRED, "Object name not recognized or not supplied");
+        }
+    }
+
     @RequiresPermission(InsertPermission.class)
     public class EditDataAction extends UserSchemaAction
     {
@@ -1076,8 +1137,6 @@ public class TrialShareController extends SpringActionController
             }
             return root;
         }
-
-
     }
 
     @RequiresPermission(ReadPermission.class)

@@ -38,6 +38,7 @@ abstract class ManageCubeObjectQueryView extends QueryView
         _cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
         setShowInsertNewButton(true);
         setShowImportDataButton(false);
+        setShowExportButtons(false);
         setShowDetailsColumn(true);
         setShowUpdateColumn(_cubeContainer.hasPermission(getUser(), InsertPermission.class));
     }
@@ -112,15 +113,13 @@ abstract class ManageCubeObjectQueryView extends QueryView
     @Override
     protected ActionURL urlFor(QueryAction action)
     {
-        if (action.equals(QueryAction.exportRowsTsv) || action.equals(QueryAction.exportScript))
-            return null;
-        if (action.equals(QueryAction.exportRowsExcel) || action.equals(QueryAction.exportRowsXLSX))
+        if (action.equals(QueryAction.deleteQueryRows))
         {
             ActionURL url = super.urlFor(action);
-            url.setAction(TrialShareController.ExportDataAction.class).addParameter("objectName", getCubeObjectName().toString());
+            url.setAction(TrialShareController.DeleteCubeObjectsAction.class).addParameter("objectName", getCubeObjectName().toString());
             return url;
         }
-        if (action.equals(QueryAction.insertQueryRow))
+        else if (action.equals(QueryAction.insertQueryRow))
         {
             ActionURL url = super.urlFor(action);
             url.setAction(TrialShareController.InsertDataFormAction.class).addParameter("objectName", getCubeObjectName().toString());
