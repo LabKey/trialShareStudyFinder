@@ -28,6 +28,11 @@
     border-top-width: 0;
 }
 
+.labkey-data-finder-editor-message
+{
+    padding-bottom: 20px;
+}
+
 .labkey-studies-panel,
 .labkey-publications-panel
 {

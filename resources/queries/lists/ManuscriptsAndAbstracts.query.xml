@@ -3,9 +3,8 @@
         <tables xmlns="http://labkey.org/data/xml">
             <table tableName="ManuscriptsAndAbstracts" tableDbType="NOT_IN_DB">
                 <columns>
-                    <column columnName="StudiesList" wrappedColumnName="key">
-                        <shownInInsertView>true</shownInInsertView>
-                        <shownInUpdateView>true</shownInUpdateView>
+                    <column columnName="StudyIds" wrappedColumnName="key">
+                        <columnTitle>Studies</columnTitle>
                         <fk>
                             <fkDbSchema>lists</fkDbSchema>
                             <fkTable>PublicationStudy</fkTable>
@@ -14,6 +13,15 @@
                             <fkJunctionLookup>StudyId</fkJunctionLookup>
                         </fk>
                         <hidden>false</hidden>
+                    </column>
+                    <column columnName="Conditions" wrappedColumnName="key">
+                        <fk>
+                            <fkDbSchema>lists</fkDbSchema>
+                            <fkTable>PublicationCondition</fkTable>
+                            <fkColumnName>publicationId</fkColumnName>
+                            <fkMultiValued>junction</fkMultiValued>
+                            <fkJunctionLookup>Condition</fkJunctionLookup>
+                        </fk>
                     </column>
                 </columns>
             </table>

@@ -1,16 +1,29 @@
 <customView xmlns="http://labkey.org/data/xml/queryCustomView" label="Data Finder Details">
     <columns>
         <column name="Key" />
+        <column name="Show"/>
         <column name="Title"/>
-        <!--<column name="Author"/>-->
+        <column name="PublicationType"/>
+        <column name="Status"/>
+        <column name="Author"/>
+        <column name="Citation"/>
+        <column name="Year"/>
+        <column name="Journal"/>
+        <column name="AbstractText"/>
+        <column name="DOI"/>
+        <column name="PMID"/>
+        <column name="PMCID"/>
         <column name="SubmissionStatus"/>
-        <!--<column name="DOI"/>-->
-        <!--<column name="PMID"/>-->
-        <!--<column name="PMCID"/>-->
-        <!--<column name="PublicationType"/>-->
-        <!--<column name="Year"/>-->
-        <!--<column name="Journal"/>-->
-        <!--<column name="Show"/>-->
-        <column name="StudiesList"/>
+        <column name="ManuscriptContainer"/>
+        <column name="PermissionsContainer"/>
+        <column name="Keywords"/>
+        <column name="StudyIds"/>
+        <column name="Conditions"/>
+        <column name="Link1"/>
+        <column name="Description1"/>
+        <column name="Link2"/>
+        <column name="Description2"/>
+        <column name="Link3"/>
+        <column name="Description3"/>
     </columns>
 </customView>

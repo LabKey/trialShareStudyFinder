@@ -16,9 +16,10 @@
 package org.labkey.trialshare.data;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
+import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
-import org.labkey.api.data.DbScope;
 import org.labkey.api.reports.Report;
 import org.labkey.api.reports.ReportService;
 import org.labkey.api.reports.model.ViewCategory;
@@ -30,13 +31,16 @@ import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.ViewContext;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
-import org.springframework.validation.BindException;
+import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import static org.labkey.api.action.SpringActionController.ERROR_CONVERSION;
+import static org.labkey.api.action.SpringActionController.ERROR_REQUIRED;
 
 public class StudyPublicationBean
 {
@@ -49,32 +53,30 @@ public class StudyPublicationBean
     private static final String PMCID_FIELD = "PMCID";
     private static final String ISSUE_NUMBER_FIELD = "IssueNo";
     private static final String PAGES_FIELD = "Pages";
-    private static final String PUBLICATION_TYPE_FIELD = "PublicationType"; // TODO convert to lookup
+    private static final String PUBLICATION_TYPE_FIELD = "PublicationType";
     private static final String YEAR_FIELD = "Year";
     private static final String JOURNAL_FIELD = "Journal";
     private static final String STATUS_FIELD = "Status";
+    private static final String SUBMISSION_STATUS_FIELD = "SubmissionStatus";
     private static final String CITATION_FIELD = "Citation";
     private static final String ABSTRACT_FIELD = "Abstract";
     private static final String DATA_URL_FIELD = "DataUrl";
     private static final String IS_HIGHLIGHTED_FIELD = "IsHighlighted";
-    private static final String MANUSCRIPT_CONTAINER_FIELD = "ManuscriptContaienr";
+    private static final String MANUSCRIPT_CONTAINER_FIELD = "ManuscriptContainer";
     private static final String KEYWORDS_FIELD = "Keywords";
     private static final String PERMISSIONS_CONTAINER_FIELD = "PermissionsContainer";
     private static final String IS_SHOWN_FIELD = "Show";
 
-    public static final String FIGURES_CATEGORY_TEXT = "Manuscript Figures";
+    private static final Pattern PMCID_PATTERN = Pattern.compile("[Pp][Mm][Cc]\\d+");
+
+    private static final String FIGURES_CATEGORY_TEXT = "Manuscript Figures";
 
     private static final int AUTHORS_PER_ABBREV = 3;
-    private Map<String, Object> _primaryFields = new HashMap<>();
+    private Map<String, Object> _primaryFields = new CaseInsensitiveHashMap<>();
 
     private List<StudyBean> studies;
     private List<URLData> thumbnails;
     private List<URLData> urls = new ArrayList<>();
-    private Map<String, String> studyIds = new HashMap<>();
-    private List<String> conditions = new ArrayList<>();
-    private List<String> therapeuticAreas = new ArrayList<>();
-
-
 
     public Integer getId()
     {
@@ -332,6 +334,16 @@ public class StudyPublicationBean
         _primaryFields.put(STATUS_FIELD, status);
     }
 
+    public String getSubmissionStatus()
+    {
+        return (String) _primaryFields.get(SUBMISSION_STATUS_FIELD);
+    }
+
+    public void setSubmissionStatus(String status)
+    {
+        _primaryFields.put(SUBMISSION_STATUS_FIELD, status);
+    }
+
     public List<StudyBean> getStudies()
     {
         return studies;
@@ -478,36 +490,6 @@ public class StudyPublicationBean
         _primaryFields.put(IS_SHOWN_FIELD, show);
     }
 
-    public List<String> getConditions()
-    {
-        return conditions;
-    }
-
-    public void setConditions(List<String> conditions)
-    {
-        this.conditions = conditions;
-    }
-
-    public Map<String, String> getStudyIds()
-    {
-        return studyIds;
-    }
-
-    public void setStudyIds(Map<String, String> studyIds)
-    {
-        this.studyIds = studyIds;
-    }
-
-    public List<String> getTherapeuticAreas()
-    {
-        return therapeuticAreas;
-    }
-
-    public void setTherapeuticAreas(List<String> therapeuticAreas)
-    {
-        this.therapeuticAreas = therapeuticAreas;
-    }
-
     public Boolean inProgress()
     {
         return getStatus().equalsIgnoreCase(TrialShareQuerySchema.IN_PROGRESS_STATUS);
@@ -545,18 +527,31 @@ public class StudyPublicationBean
     }
 
 
-    private void save(User user, Container container, BindException errors)
+    public void validate(Errors errors)
     {
-
-        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
+        if (getTitle() == null)
+            errors.rejectValue("title", ERROR_REQUIRED, "Title field is required");
+        if (getStatus() == null)
+            errors.rejectValue("status", ERROR_REQUIRED, "Status field is required");
+        if (getPublicationType() == null)
+            errors.rejectValue("publicationType", ERROR_REQUIRED, "Publication Type field is required");
+        if (getPmid() != null && !StringUtils.isNumeric(getPmid()))
         {
-
-            transaction.commit();
+            errors.rejectValue("pmid", ERROR_CONVERSION, "PMID must be an integer");
         }
-        catch (Exception e)
+        if (getPmcid() != null && !PMCID_PATTERN.matcher(getPmcid()).matches())
         {
-            errors.reject("Error saving data", "Error saving publication data: " + e.getMessage());
+            errors.rejectValue("pmcid", ERROR_CONVERSION, "Incorrect format for PMCID.  Expected PMC#");
         }
+        if (getYear() != null && !StringUtils.isNumeric(getPmid()))
+        {
+            errors.rejectValue("year", ERROR_CONVERSION, "Year must be an integer");
+        }
+    }
+
+    private boolean isValidUrl(String url)
+    {
+        return new UrlValidator(new String[]{"http","https"}).isValid(url);
     }
 
 }

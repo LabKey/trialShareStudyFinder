@@ -123,7 +123,7 @@ abstract class ManageCubeObjectQueryView extends QueryView
         if (action.equals(QueryAction.insertQueryRow))
         {
             ActionURL url = super.urlFor(action);
-            url.setAction(TrialShareController.InsertDataAction.class).addParameter("objectName", getCubeObjectName().toString());
+            url.setAction(TrialShareController.InsertDataFormAction.class).addParameter("objectName", getCubeObjectName().toString());
             return url;
         }
         return super.urlFor(action);

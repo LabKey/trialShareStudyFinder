@@ -41,6 +41,7 @@ import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.Pair;
+import org.labkey.api.util.ReturnURLString;
 import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
@@ -52,6 +53,7 @@ import org.labkey.api.view.VBox;
 import org.labkey.api.view.WebPartView;
 import org.labkey.trialshare.data.CubeConfigBean;
 import org.labkey.trialshare.data.FacetFilter;
+import org.labkey.trialshare.data.PublicationEditBean;
 import org.labkey.trialshare.data.StudyAccess;
 import org.labkey.trialshare.data.StudyBean;
 import org.labkey.trialshare.data.StudyFacetBean;
@@ -299,7 +301,7 @@ public class TrialShareController extends SpringActionController
 
         public boolean doClearCache()
         {
-            return getMethod().toLowerCase().contains("clearCache");
+            return getMethod().toLowerCase().contains("clearcache");
         }
 
         public void validate(Errors errors)
@@ -461,10 +463,9 @@ public class TrialShareController extends SpringActionController
 
                     for (StudyPublicationBean pub : publications)
                     {
-                        if (pub.getShow() && pub.hasPermission(getUser()))
+                        if (pub.getShow() != null && pub.getShow() && pub.hasPermission(getUser()))
                         {
-                            if (pubCounts.get(pub.getStudyId()) == null)
-                                pubCounts.put(pub.getStudyId(), new Pair<>(0, 0));
+                            pubCounts.putIfAbsent(pub.getStudyId(), new Pair<>(0, 0));
                             Pair<Integer, Integer> countPair = pubCounts.get(pub.getStudyId());
                             if (pub.getPublicationType() != null)
                                 if (pub.getPublicationType().equalsIgnoreCase("Manuscript"))
@@ -485,10 +486,7 @@ public class TrialShareController extends SpringActionController
                         Container container = ContainerManager.getForId(studyAccess.getStudyContainer());
                         if (container != null && container.hasPermission(getUser(), ReadPermission.class))
                         {
-                            if (studyAccessMap.get(studyAccess.getStudyId()) == null)
-                            {
-                                studyAccessMap.put(studyAccess.getStudyId(), new ArrayList<>());
-                            }
+                            studyAccessMap.putIfAbsent(studyAccess.getStudyId(), new ArrayList<>());
                             studyAccessMap.get(studyAccess.getStudyId()).add(studyAccess);
                         }
                     }
@@ -854,7 +852,7 @@ public class TrialShareController extends SpringActionController
         }
     }
 
-    public static class CubeObjectNameForm
+    public static class CubeObjectNameForm extends ReturnUrlForm
     {
         private ObjectName _objectName = null;
 
@@ -975,7 +973,7 @@ public class TrialShareController extends SpringActionController
 
     private ActionURL getManageDataUrl(ObjectName name)
     {
-        return new ActionURL(ManageDataAction.class, getContainer()).addParameter("objectName", name.toString());
+        return new ActionURL(ManageDataAction.class, getContainer()).addParameter("objectName", name.toString()).addParameter("query.viewName", "manageData");
 
     }
     @RequiresPermission(ReadPermission.class)
@@ -990,72 +988,61 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(InsertPermission.class)
-    public class InsertDataAction extends FormViewAction<CubeObjectForm>
+    public class InsertDataFormAction extends SimpleViewAction<CubeObjectNameForm>
     {
         private ObjectName _objectName = null;
 
         @Override
-        public void validateCommand(CubeObjectForm target, Errors errors)
+        public void validate(CubeObjectNameForm form, BindException errors)
         {
-            _objectName = target.getObjectName();
+            _objectName = form.getObjectName();
             if (_objectName == null)
-                errors.rejectValue(ERROR_REQUIRED, "Object name is required");
-
-        }
-
-        public ModelAndView getView(CubeObjectForm tableForm, boolean reshow, BindException errors) throws Exception
-        {
-            setTitle("Update or Insert Publication");
-            return new JspView("/org/labkey/trialshare/view/insertPublication.jsp", tableForm);
-
-        }
-
-        public boolean handlePost(CubeObjectForm tableForm, BindException errors) throws Exception
-        {
-            if (_objectName == ObjectName.publication)
-                TrialShareManager.get().insertPublication(getUser(), getContainer(), (StudyPublicationBean) tableForm.getCubeObject());
-
-            return 0 == errors.getErrorCount();
+                errors.reject("Object name is required");
         }
 
         @Override
-        public URLHelper getSuccessURL(CubeObjectForm form)
+        public ModelAndView getView(CubeObjectNameForm form, BindException errors) throws Exception
         {
-            ActionURL returnURL = getActionURLParam(ActionURL.Param.returnUrl);
-            if (returnURL == null)
-            {
-               returnURL = getManageDataUrl(form.getObjectName());
-            }
-            return returnURL;
+            setTitle("Update or Insert " + form.getObjectName().getDisplayName());
+            if (form.getReturnUrl() == null)
+                form.setReturnUrl(new ReturnURLString(getManageDataUrl(form.getObjectName()).toString()));
+            return new JspView("/org/labkey/trialshare/view/insertPublication.jsp", form);
         }
 
+        @Override
         public NavTree appendNavTrail(NavTree root)
         {
             String name = getViewContext().getActionURL().getParameter("objectName");
             if (name != null)
             {
                 ObjectName objectName = ObjectName.valueOf(name);
-                root.addChild("Manage " + objectName.getPluralName(), getSuccessURL(null));
+                root.addChild("Manage " + objectName.getPluralName(), getManageDataUrl(objectName));
                 root.addChild("Insert " + objectName.getDisplayName());
             }
             return root;
         }
+
     }
 
-    private ActionURL getActionURLParam(ActionURL.Param param)
+    @RequiresPermission(InsertPermission.class)
+    public class InsertPublicationAction extends ApiAction<PublicationEditBean>
     {
-        String url = getViewContext().getActionURL().getParameter(param);
-        if (url != null)
+        @Override
+        public void validateForm(PublicationEditBean form, Errors errors)
         {
-            try
-            {
-                return new ActionURL(url);
-            }
-            catch (IllegalArgumentException ignored) {}
+            if (form == null)
+                errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
+            else
+                form.validate(errors);
         }
-        return null;
-    }
 
+        @Override
+        public Object execute(PublicationEditBean form, BindException errors) throws Exception
+        {
+            TrialShareManager.get().insertPublication(getUser(), getContainer(), form, errors);
+            return success();
+        }
+    }
 
     @RequiresPermission(InsertPermission.class)
     public class EditDataAction extends UserSchemaAction
@@ -1081,8 +1068,11 @@ public class TrialShareController extends SpringActionController
             if (_table != null)
             {
                 ObjectName objectName = ObjectName.getFromTableName(_table.getName());
-                root.addChild("Manage " + objectName.getPluralName(), getSuccessURL(null));
-                root.addChild("Edit " + objectName.getDisplayName());
+                if (objectName != null)
+                {
+                    root.addChild("Manage " + objectName.getPluralName(), getManageDataUrl(objectName));
+                    root.addChild("Edit " + objectName.getDisplayName());
+                }
             }
             return root;
         }
