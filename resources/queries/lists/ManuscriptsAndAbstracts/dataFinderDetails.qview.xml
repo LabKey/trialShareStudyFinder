@@ -19,6 +19,7 @@
         <column name="Keywords"/>
         <column name="StudyIds"/>
         <column name="Conditions"/>
+        <column name="TherapeuticAreas"/>
         <column name="Link1"/>
         <column name="Description1"/>
         <column name="Link2"/>

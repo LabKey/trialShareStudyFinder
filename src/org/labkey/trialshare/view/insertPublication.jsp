@@ -45,7 +45,7 @@
         //create a formpanel using a store config object
         Ext4.create('LABKEY.study.panel.JunctionEditFormPanel', {
             objectName : 'Publication',
-            joinTableFields : ["StudyIds", "Conditions"],
+            joinTableFields : ["StudyIds", "Conditions", "TherapeuticAreas"],
             store: {
                 schemaName: 'lists',
                 queryName: 'manuscriptsAndAbstracts',
@@ -95,6 +95,9 @@
                     width: 800
                 },
                 Conditions : {
+                    width: 800
+                },
+                TherapeuticAreas : {
                     width: 800
                 },
                 DOI : {

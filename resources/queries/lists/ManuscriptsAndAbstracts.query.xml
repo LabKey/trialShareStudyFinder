@@ -23,6 +23,15 @@
                             <fkJunctionLookup>Condition</fkJunctionLookup>
                         </fk>
                     </column>
+                    <column columnName="TherapeuticAreas" wrappedColumnName="key">
+                        <fk>
+                            <fkDbSchema>lists</fkDbSchema>
+                            <fkTable>PublicationTherapeuticArea</fkTable>
+                            <fkColumnName>publicationId</fkColumnName>
+                            <fkMultiValued>junction</fkMultiValued>
+                            <fkJunctionLookup>TherapeuticArea</fkJunctionLookup>
+                        </fk>
+                    </column>
                 </columns>
             </table>
         </tables>

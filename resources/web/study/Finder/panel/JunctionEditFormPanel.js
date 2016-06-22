@@ -162,6 +162,7 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
             {
                 this.getForm().findField(obj.errors[i].field).markInvalid([obj.errors[i].message]);
             }
+            Ext4.Msg.alert("Error", "There were problems submitting your data.");
         }
 
         Ext4.Ajax.request({
