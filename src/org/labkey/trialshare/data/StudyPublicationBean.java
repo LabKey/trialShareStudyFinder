@@ -492,7 +492,7 @@ public class StudyPublicationBean
 
     public Boolean inProgress()
     {
-        return getStatus().equalsIgnoreCase(TrialShareQuerySchema.IN_PROGRESS_STATUS);
+        return getStatus() != null && getStatus().equalsIgnoreCase(TrialShareQuerySchema.IN_PROGRESS_STATUS);
     }
 
     public String getCubeId()
