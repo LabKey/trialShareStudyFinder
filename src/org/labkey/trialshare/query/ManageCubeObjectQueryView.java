@@ -11,6 +11,8 @@ import org.labkey.api.data.TableInfo;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QueryAction;
 import org.labkey.api.query.QueryView;
+import org.labkey.api.security.User;
+import org.labkey.api.security.permissions.DeletePermission;
 import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.view.ActionURL;
@@ -44,6 +46,22 @@ abstract class ManageCubeObjectQueryView extends QueryView
     }
 
     protected abstract TrialShareController.ObjectName getCubeObjectName();
+
+    protected abstract TableInfo getTable(User user, Container container);
+
+    @Override
+    protected boolean canInsert()
+    {
+        TableInfo table = getTable(getUser(), getContainer());
+        return table != null && table.hasPermission(getUser(), InsertPermission.class);
+    }
+
+    @Override
+    protected boolean canDelete()
+    {
+        TableInfo table = getTable(getUser(), getContainer());
+        return table != null && table.hasPermission(getUser(), DeletePermission.class);
+    }
 
     @Override
     protected void populateButtonBar(DataView view, ButtonBar bar, boolean exportAsWebPage)
@@ -82,6 +100,7 @@ abstract class ManageCubeObjectQueryView extends QueryView
                 String id = String.valueOf(ctx.get(keyFieldKey));
                 ActionURL actionUrl = new ActionURL(TrialShareController.ViewDataAction.class, cubeContainer);
                 actionUrl.addParameter("id", id);
+                actionUrl.addParameter("objectName", getCubeObjectName().toString());
                 out.write(PageFlowUtil.textLink("Details", actionUrl));
             }
         };
@@ -99,6 +118,7 @@ abstract class ManageCubeObjectQueryView extends QueryView
                 FieldKey keyFieldKey = FieldKey.fromParts(getKeyField());
                 String id = String.valueOf(ctx.get(keyFieldKey));
                 ActionURL actionUrl = new ActionURL(TrialShareController.EditDataAction.class, cubeContainer).addParameter("id", id);
+                actionUrl.addParameter("objectName", getCubeObjectName().toString());
                 out.write(PageFlowUtil.textLink("Edit", actionUrl));
             }
         };
