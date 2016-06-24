@@ -111,15 +111,8 @@
                 TherapeuticAreas : {
                     width: 800
                 },
-                DOI : {
-                    name: 'doi'
-                },
                 PMID : {
-                    name: 'pmid',
                     xtype: 'textfield'
-                },
-                PMCID : {
-                    name: 'pmcid'
                 },
                 AbstractText : {
                     width: 1000,

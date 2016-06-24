@@ -44,7 +44,7 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
     },
 
     shouldShowInView: function(metadata) {
-        if (this.mode == "edit")
+        if (this.mode == "edit" || this.mode == "insert")
             return this.shouldShowInInsertView(metadata);
         else
             return this.shouldShowInDisplayView(metadata);
@@ -176,7 +176,11 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
             obj = Ext4.JSON.decode(response.responseText);
             for (var i = 0; i < obj.errors.length; i++)
             {
-                this.getForm().findField(obj.errors[i].field).markInvalid([obj.errors[i].message]);
+                var field = this.getForm().findField(obj.errors[i].field);
+                if (field)
+                    field.markInvalid([obj.errors[i].message]);
+                else
+                    console.log("Unable to find field for invalidation", obj.errors[i]);
             }
             Ext4.Msg.alert("Error", "There were problems submitting your data. Please check the form for errors.");
         }

@@ -33,15 +33,15 @@
                         </fk>
                         <hidden>false</hidden>
                     </column>
-                    <!--<column columnName="TherapeuticAreas" wrappedColumnName="StudyId">-->
-                        <!--<fk>-->
-                            <!--<fkDbSchema>lists</fkDbSchema>-->
-                            <!--<fkTable>StudyTherapeuticArea</fkTable>-->
-                            <!--<fkColumnName>studyId</fkColumnName>-->
-                            <!--<fkMultiValued>junction</fkMultiValued>-->
-                            <!--<fkJunctionLookup>TherapeuticArea</fkJunctionLookup>-->
-                        <!--</fk>-->
-                    <!--</column>-->
+                    <column columnName="TherapeuticAreas" wrappedColumnName="StudyId">
+                        <fk>
+                            <fkDbSchema>lists</fkDbSchema>
+                            <fkTable>StudyTherapeuticArea</fkTable>
+                            <fkColumnName>studyId</fkColumnName>
+                            <fkMultiValued>junction</fkMultiValued>
+                            <fkJunctionLookup>TherapeuticArea</fkJunctionLookup>
+                        </fk>
+                    </column>
                 </columns>
             </table>
         </tables>

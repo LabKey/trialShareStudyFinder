@@ -41,6 +41,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.api.action.SpringActionController.ERROR_REQUIRED;
+
 /**
  * Created by susanh on 12/7/15.
  */
@@ -416,7 +418,12 @@ public class StudyBean
 
     public void validate(Errors errors)
     {
-// TODO
+        if (getShortName() == null)
+            errors.rejectValue("ShortName", ERROR_REQUIRED, "Short Name is required");
+        if (getStudyId() == null)
+            errors.rejectValue("StudyId", ERROR_REQUIRED, "Study Id is required");
+        if (getTitle() == null)
+            errors.rejectValue("Title", ERROR_REQUIRED, "Title is required");
     }
 }
 

@@ -530,22 +530,22 @@ public class StudyPublicationBean
     public void validate(Errors errors)
     {
         if (getTitle() == null)
-            errors.rejectValue("title", ERROR_REQUIRED, "Title field is required");
+            errors.rejectValue("Title", ERROR_REQUIRED, "Title is required");
         if (getStatus() == null)
-            errors.rejectValue("status", ERROR_REQUIRED, "Status field is required");
+            errors.rejectValue("Status", ERROR_REQUIRED, "Status is required");
         if (getPublicationType() == null)
-            errors.rejectValue("publicationType", ERROR_REQUIRED, "Publication Type field is required");
+            errors.rejectValue("PublicationType", ERROR_REQUIRED, "Publication type is required");
         if (getPmid() != null && !StringUtils.isNumeric(getPmid()))
         {
-            errors.rejectValue("pmid", ERROR_CONVERSION, "PMID must be an integer");
+            errors.rejectValue("PMID", ERROR_CONVERSION, "PMID must be an integer");
         }
         if (getPmcid() != null && !PMCID_PATTERN.matcher(getPmcid()).matches())
         {
-            errors.rejectValue("pmcid", ERROR_CONVERSION, "Incorrect format for PMCID.  Expected PMC#");
+            errors.rejectValue("PMCID", ERROR_CONVERSION, "Incorrect format for PMCID.  Expected PMC#");
         }
         if (getYear() != null && !StringUtils.isNumeric(getPmid()))
         {
-            errors.rejectValue("year", ERROR_CONVERSION, "Year must be an integer");
+            errors.rejectValue("Year", ERROR_CONVERSION, "Year must be an integer");
         }
     }
 
