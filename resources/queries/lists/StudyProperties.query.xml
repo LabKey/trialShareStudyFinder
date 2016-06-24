@@ -1,0 +1,49 @@
+<query xmlns="http://labkey.org/data/xml/query">
+    <metadata>
+        <tables xmlns="http://labkey.org/data/xml">
+            <table tableName="StudyProperties" tableDbType="NOT_IN_DB">
+                <columns>
+                    <column columnName="AgeGroups" wrappedColumnName="StudyId">
+                        <fk>
+                            <fkDbSchema>lists</fkDbSchema>
+                            <fkTable>StudyAgeGroup</fkTable>
+                            <fkColumnName>StudyId</fkColumnName>
+                            <fkMultiValued>junction</fkMultiValued>
+                            <fkJunctionLookup>AgeGroup</fkJunctionLookup>
+                        </fk>
+                        <hidden>false</hidden>
+                    </column>
+                    <column columnName="Phases" wrappedColumnName="StudyId">
+                        <fk>
+                            <fkDbSchema>lists</fkDbSchema>
+                            <fkTable>StudyPhase</fkTable>
+                            <fkColumnName>StudyId</fkColumnName>
+                            <fkMultiValued>junction</fkMultiValued>
+                            <fkJunctionLookup>Phase</fkJunctionLookup>
+                        </fk>
+                        <hidden>false</hidden>
+                    </column>
+                    <column columnName="Conditions" wrappedColumnName="StudyId">
+                        <fk>
+                            <fkDbSchema>lists</fkDbSchema>
+                            <fkTable>StudyCondition</fkTable>
+                            <fkColumnName>StudyId</fkColumnName>
+                            <fkMultiValued>junction</fkMultiValued>
+                            <fkJunctionLookup>Condition</fkJunctionLookup>
+                        </fk>
+                        <hidden>false</hidden>
+                    </column>
+                    <!--<column columnName="TherapeuticAreas" wrappedColumnName="StudyId">-->
+                        <!--<fk>-->
+                            <!--<fkDbSchema>lists</fkDbSchema>-->
+                            <!--<fkTable>StudyTherapeuticArea</fkTable>-->
+                            <!--<fkColumnName>studyId</fkColumnName>-->
+                            <!--<fkMultiValued>junction</fkMultiValued>-->
+                            <!--<fkJunctionLookup>TherapeuticArea</fkJunctionLookup>-->
+                        <!--</fk>-->
+                    <!--</column>-->
+                </columns>
+            </table>
+        </tables>
+    </metadata>
+</query>

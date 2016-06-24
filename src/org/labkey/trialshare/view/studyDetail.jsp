@@ -47,7 +47,7 @@
     Container c = context.getContainer();
     TrialShareController.StudyDetailBean studyDetail = me.getModelBean();
     StudyBean study = studyDetail.getStudy();
-    String descriptionHTML = study.getDescription(c, context.getUser());
+    String descriptionHTML = study.getDescription();
     if (StringUtils.isEmpty(descriptionHTML))
         descriptionHTML = h(study.getBriefDescription());
 

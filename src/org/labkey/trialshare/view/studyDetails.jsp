@@ -17,7 +17,9 @@
 %>
 <%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
+<%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.template.ClientDependency" %>
+<%@ page import="org.labkey.trialshare.TrialShareController" %>
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%@ page extends="org.labkey.api.jsp.JspBase"%>
@@ -34,7 +36,9 @@
     }
 %>
 <%
-    String renderId = "insert-publication-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
+    TrialShareController.CubeObjectDetailBean bean = ((JspView<TrialShareController.CubeObjectDetailBean>) HttpView.currentView()).getModelBean();
+
+    String renderId = "study-details-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
 %>
 <labkey:errors/>
 <div id="<%= h(renderId)%>" class="requests-editor"></div>
@@ -42,57 +46,51 @@
 <script type="text/javascript">
     Ext4.onReady(function(){
 
-        //create a formpanel using a store config object
         Ext4.create('LABKEY.study.panel.JunctionEditFormPanel', {
-            objectName : 'Publication',
-            joinTableFields : ["StudyIds", "Conditions", "TherapeuticAreas"],
+            objectName : 'Study',
+            mode: 'insert',
+            joinTableFields : ["AgeGroups", "Phases", "Conditions", "TherapeuticAreas"],
             store: {
                 schemaName: 'lists',
-                queryName: 'manuscriptsAndAbstracts',
+                queryName: 'studyProperties',
                 viewName: 'dataFinderDetails',
-                autoLoad: true
+                autoLoad: true,
+                <%
+                if (bean.getId() != null)
+                {
+                %>
+                filterArray: [LABKEY.Filter.create('<%=h(bean.getIdField())%>', '<%=h(bean.getId())%>', LABKEY.Filter.Types.EQUAL)]
+                <%
+                }
+                %>
             },
             renderTo: <%=q(renderId)%>,
             bindConfig: {
                 autoCreateRecordOnChange: true,
-                autoBindFirstRecord: false
+                autoBindFirstRecord: <%= bean.getId() != null %>
             },
-            //this config will be applied to the Ext fields created in this FormPanel only.
             metadata: {
                 Title: {
                     width: 1000,
                     isRequired: true
                 },
-                Author: {
+                StudyId: {
+                    isRequired: true
+                },
+                ShortName: {
+                    isRequired: true
+                },
+                IconUrl: {
+                    width: 1000
+                },
+                ExternalURL: {
+                    width: 1000
+                },
+                ExternalUrlDescription : {
                     width: 1000,
                     height: 50,
                     xtype: 'textarea',
-                    stripNewLines : true
-                },
-                Journal: {
-                    width: 800
-                },
-                Status : {
-                    isRequired: true
-                },
-                PublicationType : {
-                    isRequired: true
-                },
-                ManuscriptContainer : {
-                    containerFilter: "AllFolders",
-                    width: 500
-                },
-                PermissionsContainer : {
-                    containerFilter: "AllFolders",
-                    width: 500
-                },
-                Citation : {
-                    width: 1000,
-                    height: 30,
-                    xtype: 'textarea'
-                },
-                StudyIds : {
-                    width: 800
+                    stripNewLines: true
                 },
                 Conditions : {
                     width: 800
@@ -100,44 +98,16 @@
                 TherapeuticAreas : {
                     width: 800
                 },
-                DOI : {
-                    name: 'doi'
+                Phases : {
+                    width: 500
                 },
-                PMID : {
-                    name: 'pmid',
-                    xtype: 'textfield'
-                },
-                PMCID : {
-                    name: 'pmcid'
-                },
-                AbstractText : {
+                Description : {
                     width: 1000,
                     height: 100,
-                    xtype: 'htmleditor'
+                    xtype: 'textarea'
                 },
-                Link1 : {
-                    width: 1000
-                },
-                Description1 : {
-                    width: 1000
-                },
-                Link2 : {
-                    width: 1000
-                },
-                Description2 : {
-                    width: 1000
-                },
-                Link3 : {
-                    width: 1000
-                },
-                Description3 : {
-                    width: 1000
-                },
-                Keywords: {
-                    width: 800,
-                    height: 50,
-                    xtype: 'textarea',
-                    stripNewLines : true
+                Investigator : {
+                    width: 800
                 }
             }
          });

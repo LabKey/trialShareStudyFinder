@@ -1,0 +1,18 @@
+<customView xmlns="http://labkey.org/data/xml/queryCustomView" label="Data Finder Details">
+    <columns>
+        <column name="ShortName" />
+        <column name="StudyId"/>
+        <column name="Title"/>
+        <column name="ParticipantCount"/>
+        <column name="StudyType"/>
+        <column name="IconUrl"/>
+        <column name="ExternalURL"/>
+        <column name="ExternalUrlDescription"/>
+        <column name="Description"/>
+        <column name="Investigator"/>
+        <column name="AgeGroups"/>
+        <column name="Phases"/>
+        <column name="Conditions"/>
+        <column name="TherapeuticAreas"/>
+    </columns>
+</customView>

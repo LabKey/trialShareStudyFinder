@@ -22,6 +22,7 @@
                             <fkMultiValued>junction</fkMultiValued>
                             <fkJunctionLookup>Condition</fkJunctionLookup>
                         </fk>
+                        <hidden>false</hidden>
                     </column>
                     <column columnName="TherapeuticAreas" wrappedColumnName="key">
                         <fk>
@@ -31,6 +32,7 @@
                             <fkMultiValued>junction</fkMultiValued>
                             <fkJunctionLookup>TherapeuticArea</fkJunctionLookup>
                         </fk>
+                        <hidden>false</hidden>
                     </column>
                 </columns>
             </table>

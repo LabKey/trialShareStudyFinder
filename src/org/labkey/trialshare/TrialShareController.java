@@ -15,44 +15,43 @@
  */
 package org.labkey.trialshare;
 
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.FormHandlerAction;
 import org.labkey.api.action.FormViewAction;
+import org.labkey.api.action.HasValidator;
 import org.labkey.api.action.Marshal;
 import org.labkey.api.action.Marshaller;
 import org.labkey.api.action.ReturnUrlForm;
 import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
-import org.labkey.api.data.ButtonBar;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.DataRegionSelection;
-import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
-import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QueryForm;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
-import org.labkey.api.query.QueryUpdateForm;
-import org.labkey.api.query.UserSchemaAction;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.DeletePermission;
 import org.labkey.api.security.permissions.InsertPermission;
 import org.labkey.api.security.permissions.ReadPermission;
+import org.labkey.api.security.permissions.UpdatePermission;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.util.Pair;
-import org.labkey.api.util.ReturnURLString;
 import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
 import org.labkey.api.view.UnauthorizedException;
-import org.labkey.api.view.UpdateView;
 import org.labkey.api.view.VBox;
 import org.labkey.api.view.WebPartView;
 import org.labkey.trialshare.data.CubeConfigBean;
@@ -60,6 +59,7 @@ import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.PublicationEditBean;
 import org.labkey.trialshare.data.StudyAccess;
 import org.labkey.trialshare.data.StudyBean;
+import org.labkey.trialshare.data.StudyEditBean;
 import org.labkey.trialshare.data.StudyFacetBean;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.ManagePublicationsQueryView;
@@ -80,6 +80,7 @@ import java.util.Set;
 public class TrialShareController extends SpringActionController
 {
     public static final String OBJECT_NAME_PARAM = "object";
+
     public enum ObjectName
     {
         study("Study", "Studies"),
@@ -152,7 +153,9 @@ public class TrialShareController extends SpringActionController
         {
             _sectionHeader = sectionHeader;
         }
-    };
+    }
+
+    ;
 
     public TrialShareController()
     {
@@ -202,7 +205,7 @@ public class TrialShareController extends SpringActionController
                 bean.addCubeDefinition(cubeContainer.getPath(), "TrialShare:/StudyCube");
                 bean.addCubeDefinition(cubeContainer.getPath(), "TrialShare:/PublicationCube");
             }
-            JspView view =  new JspView<>("/org/labkey/trialshare/view/cubeAdmin.jsp", bean, errors);
+            JspView view = new JspView<>("/org/labkey/trialshare/view/cubeAdmin.jsp", bean, errors);
 
             view.setFrame(WebPartView.FrameType.PORTAL);
             view.setTitle("Data Cube Definitions");
@@ -498,8 +501,8 @@ public class TrialShareController extends SpringActionController
                 }
                 studies.removeIf(studyBean ->
                 {
-                        List<StudyAccess> accessList = studyAccessMap.get(studyBean.getStudyId());
-                        return accessList == null || accessList.isEmpty();
+                    List<StudyAccess> accessList = studyAccessMap.get(studyBean.getStudyId());
+                    return accessList == null || accessList.isEmpty();
                 });
                 for (StudyBean study : studies)
                 {
@@ -718,7 +721,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public void validate(StudyIdForm form, BindException errors)
         {
-            _studyId = (null==form) ? null : form.getStudyId();
+            _studyId = (null == form) ? null : form.getStudyId();
             if (StringUtils.isEmpty(_studyId))
                 errors.reject(ERROR_MSG, "Study not specified");
         }
@@ -797,7 +800,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public void validateForm(PublicationIdForm form, Errors errors)
         {
-            _id = (null==form) ? null : form.getId();
+            _id = (null == form) ? null : form.getId();
             if (_id == null)
                 errors.reject(ERROR_MSG, "Publication not specified");
         }
@@ -805,7 +808,8 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(PublicationIdForm form, BindException errors) throws Exception
         {
-            QuerySchema listSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(getUser(), getContainer());
+            QuerySchema listSchema = schema.getSchema(getUser(), getContainer());
             StudyPublicationBean publication = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE))).getObject(_id, StudyPublicationBean.class);
             String containerId = publication.getManuscriptContainer();
             if (containerId != null)
@@ -815,10 +819,10 @@ public class TrialShareController extends SpringActionController
                     publication.setDataUrl(new ActionURL("project" + PageFlowUtil.encodeURI(container.getPath() + "/begin.view?pageId=study.DATA_ANALYSIS")).toString());
             }
             publication.setThumbnails(getUser(), getViewContext().getActionURL());
-            SimpleFilter filter = new SimpleFilter();
-            filter.addCondition(FieldKey.fromParts("key"), _id);
-            publication.setStudies((new TableSelector(listSchema.getTable("publicationStudy"), filter, null)).getArrayList(StudyBean.class));
-            for (StudyBean study : publication.getStudies())
+
+
+            publication.setStudies(schema.getPublicationStudies(_id));
+           for (StudyBean study : publication.getStudies())
             {
                 study.setStudyAccessList(getUser(), getContainer());
                 study.setUrl(getUser(), false);
@@ -849,7 +853,6 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(ReadPermission.class)
     public class SubsetsAction extends ApiAction<CubeObjectNameForm>
     {
-
         @Override
         public Object execute(CubeObjectNameForm form, BindException errors) throws Exception
         {
@@ -857,7 +860,7 @@ public class TrialShareController extends SpringActionController
         }
     }
 
-    public static class CubeObjectNameForm extends ReturnUrlForm
+    public static class CubeObjectNameForm
     {
         private ObjectName _objectName = null;
 
@@ -983,45 +986,9 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(InsertPermission.class)
-    public class InsertDataFormAction extends SimpleViewAction<CubeObjectNameForm>
+    public class InsertPublicationAction extends CaseInsensitiveApiAction<PublicationEditBean>
     {
-        private ObjectName _objectName = null;
 
-        @Override
-        public void validate(CubeObjectNameForm form, BindException errors)
-        {
-            _objectName = form.getObjectName();
-            if (_objectName == null)
-                errors.reject("Object name is required");
-        }
-
-        @Override
-        public ModelAndView getView(CubeObjectNameForm form, BindException errors) throws Exception
-        {
-            setTitle("Update or Insert " + form.getObjectName().getDisplayName());
-            if (form.getReturnUrl() == null)
-                form.setReturnUrl(new ReturnURLString(getManageDataUrl(form.getObjectName()).toString()));
-            return new JspView("/org/labkey/trialshare/view/insertPublication.jsp", form);
-        }
-
-        @Override
-        public NavTree appendNavTrail(NavTree root)
-        {
-            String name = getViewContext().getActionURL().getParameter("objectName");
-            if (name != null)
-            {
-                ObjectName objectName = ObjectName.valueOf(name);
-                root.addChild("Manage " + objectName.getPluralName(), getManageDataUrl(objectName));
-                root.addChild("Insert " + objectName.getDisplayName());
-            }
-            return root;
-        }
-
-    }
-
-    @RequiresPermission(InsertPermission.class)
-    public class InsertPublicationAction extends ApiAction<PublicationEditBean>
-    {
         @Override
         public void validateForm(PublicationEditBean form, Errors errors)
         {
@@ -1038,6 +1005,68 @@ public class TrialShareController extends SpringActionController
             return success();
         }
     }
+
+    @RequiresPermission(UpdatePermission.class)
+    public class EditPublicationAction extends CaseInsensitiveApiAction<PublicationEditBean>
+    {
+        @Override
+        public void validateForm(PublicationEditBean form, Errors errors)
+        {
+            if (form == null)
+                errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
+            else
+                form.validate(errors);
+        }
+
+        @Override
+        public Object execute(PublicationEditBean form, BindException errors) throws Exception
+        {
+            TrialShareManager.get().updatePublication(getUser(), getContainer(), form, errors);
+            return success();
+        }
+    }
+
+    @RequiresPermission(InsertPermission.class)
+    public class InsertStudyAction extends CaseInsensitiveApiAction<StudyEditBean>
+    {
+
+        @Override
+        public void validateForm(StudyEditBean form, Errors errors)
+        {
+            if (form == null)
+                errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
+            else
+                form.validate(errors);
+        }
+
+        @Override
+        public Object execute(StudyEditBean form, BindException errors) throws Exception
+        {
+            TrialShareManager.get().insertStudy(getUser(), getContainer(), form, errors);
+            return success();
+        }
+    }
+
+    @RequiresPermission(UpdatePermission.class)
+    public class EditStudyAction extends CaseInsensitiveApiAction<StudyEditBean>
+    {
+        @Override
+        public void validateForm(StudyEditBean form, Errors errors)
+        {
+            if (form == null)
+                errors.reject(ERROR_MSG, "Invalid form.  Please check your syntax.");
+            else
+                form.validate(errors);
+        }
+
+        @Override
+        public Object execute(StudyEditBean form, BindException errors) throws Exception
+        {
+            TrialShareManager.get().updateStudy(getUser(), getContainer(), form, errors);
+            return success();
+        }
+    }
+
 
     @RequiresPermission(DeletePermission.class)
     public class DeleteCubeObjectsAction extends FormHandlerAction<CubeObjectQueryForm>
@@ -1072,7 +1101,7 @@ public class TrialShareController extends SpringActionController
         }
     }
 
-    public static class CubeObjectQueryForm extends QueryForm
+    public static class CubeObjectQueryForm extends QueryForm implements HasValidator
     {
         private ObjectName _objectName = null;
 
@@ -1091,7 +1120,7 @@ public class TrialShareController extends SpringActionController
                 {
                     this._objectName = ObjectName.valueOf(name.toLowerCase());
                 }
-                catch (IllegalArgumentException e)
+                catch (IllegalArgumentException ignore)
                 {
 
                 }
@@ -1106,53 +1135,123 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(InsertPermission.class)
-    public class EditDataAction extends UserSchemaAction
+    public class InsertDataFormAction extends CubeObjectDetailFormAction
     {
-
-        public ModelAndView getView(QueryUpdateForm tableForm, boolean reshow, BindException errors) throws Exception
+        protected String getMode()
         {
-            ButtonBar bb = createSubmitCancelButtonBar(tableForm);
-            UpdateView view = new UpdateView(tableForm, errors);
+            return "insert";
+        }
+    }
 
-            view.getDataRegion().setButtonBar(bb);
-            return view;
+
+    @RequiresPermission(UpdatePermission.class)
+    public class EditDataAction extends CubeObjectDetailFormAction
+    {
+        protected String getMode()
+        {
+            return "edit";
+        }
+    }
+
+    @RequiresPermission(ReadPermission.class)
+    public class ViewDataAction extends CubeObjectDetailFormAction
+    {
+        protected String getMode()
+        {
+            return "view";
+        }
+    }
+
+    @RequiresPermission(ReadPermission.class)
+    private abstract class CubeObjectDetailFormAction extends SimpleViewAction<CubeObjectDetailBean>
+    {
+        @Override
+        public void validate(CubeObjectDetailBean form, BindException errors)
+        {
+            if (form.getObjectName() == null)
+                errors.reject("Object name is required");
         }
 
-        public boolean handlePost(QueryUpdateForm tableForm, BindException errors) throws Exception
+        protected abstract String getMode();
+
+        @Override
+        public ModelAndView getView(CubeObjectDetailBean bean, BindException errors) throws Exception
         {
-            doInsertUpdate(tableForm, errors, false);
-            return 0 == errors.getErrorCount();
+            setTitle(StringUtils.capitalize(getMode()) + bean.getObjectName().getDisplayName());
+            bean.setMode(getMode());
+            if (bean.getObjectName() == ObjectName.publication)
+                return new JspView("/org/labkey/trialshare/view/publicationDetails.jsp", bean);
+            else
+                return new JspView("/org/labkey/trialshare/view/studyDetails.jsp", bean);
         }
 
+        @Override
         public NavTree appendNavTrail(NavTree root)
         {
-            if (_table != null)
+            String name = getViewContext().getActionURL().getParameter("objectName");
+            if (name != null)
             {
-                ObjectName objectName = ObjectName.getFromTableName(_table.getName());
-                if (objectName != null)
-                {
-                    root.addChild("Manage " + objectName.getPluralName(), getManageDataUrl(objectName));
-                    root.addChild("Edit " + objectName.getDisplayName());
-                }
+                ObjectName objectName = ObjectName.valueOf(name);
+                root.addChild("Manage " + objectName.getPluralName(), getManageDataUrl(objectName));
+                root.addChild(StringUtils.capitalize(getMode()) + " " + objectName.getDisplayName());
             }
             return root;
         }
     }
 
-    @RequiresPermission(ReadPermission.class)
-    public class ViewDataAction extends SimpleViewAction
+    public static class CubeObjectDetailBean extends CubeObjectNameForm
     {
+        private String _mode;
+        private Object _id;
 
-        @Override
-        public ModelAndView getView(Object o, BindException errors) throws Exception
+        public CubeObjectDetailBean()
         {
-            return null;
         }
 
-        @Override
-        public NavTree appendNavTrail(NavTree root)
+        public CubeObjectDetailBean(@NotNull String mode)
         {
-            return null;
+            _mode = mode;
+        }
+
+        public Object getId()
+        {
+            return _id;
+        }
+
+        public void setId(Object id)
+        {
+            _id = id;
+        }
+
+        public String getMode()
+        {
+            return _mode;
+        }
+
+        public void setMode(String mode)
+        {
+            _mode = mode;
+        }
+
+        public String getIdField()
+        {
+            if (getObjectName() == ObjectName.publication)
+                return "Key";
+            else
+                return "StudyId";
+        }
+
+    }
+
+
+    private abstract class CaseInsensitiveApiAction<FORM> extends ApiAction<FORM>
+    {
+        @Override
+        protected ObjectReader getObjectReader(Class c)
+        {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+            return objectMapper.reader(c);
         }
     }
 }

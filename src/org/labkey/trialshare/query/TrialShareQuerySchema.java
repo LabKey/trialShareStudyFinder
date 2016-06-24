@@ -1,6 +1,8 @@
 package org.labkey.trialshare.query;
 
 import org.labkey.api.data.Container;
+import org.labkey.api.data.SQLFragment;
+import org.labkey.api.data.SqlSelector;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.query.DefaultSchema;
 import org.labkey.api.query.QuerySchema;
@@ -8,6 +10,7 @@ import org.labkey.api.query.QueryService;
 import org.labkey.api.query.UserSchema;
 import org.labkey.api.security.User;
 import org.labkey.trialshare.TrialShareManager;
+import org.labkey.trialshare.data.StudyBean;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,7 +40,8 @@ public class TrialShareQuerySchema
     public static final String PUBLICATION_ID_FIELD = "PublicationId";
     public static final String CONDITION_FIELD = "Condition";
     public static final String STUDY_ID_FIELD = "StudyId";
-    public static final String STUDY_SHORT_NAME_FIELD = "ShortName";
+    public static final String AGE_GROUP_FIELD = "AgeGroup";
+    public static final String PHASE_FIELD = "Phase";
     public static final String THERAPEUTIC_AREA_FIELD = "TherapeuticArea";
 
     // study visibility values
@@ -176,6 +180,19 @@ public class TrialShareQuerySchema
     public TableInfo getPublicationTherapeuticAreaTableInfo()
     {
         return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_THERAPEUTIC_AREA_TABLE);
+    }
+
+    public List<StudyBean> getPublicationStudies(Integer id)
+    {
+        SQLFragment sql = new SQLFragment("SELECT * FROM ");
+        sql.append(getPublicationStudyTableInfo(), "ps");
+        sql.append(" LEFT JOIN ");
+        sql.append(getStudyPropertiesTableInfo(), "sp");
+        sql.append(" ON ps.StudyId = sp.StudyId ");
+        sql.append( "WHERE ps.PublicationId = ? ");
+        sql.add(id);
+
+        return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyBean.class);
     }
 
     public List<TableInfo> getStudyTables() {

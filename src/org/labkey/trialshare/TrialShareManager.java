@@ -23,17 +23,18 @@ import org.labkey.api.data.CompareType;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.DbScope;
 import org.labkey.api.data.SimpleFilter;
-import org.labkey.api.data.Table;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
 import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.BatchValidationException;
+import org.labkey.api.query.DuplicateKeyException;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.InvalidKeyException;
 import org.labkey.api.query.QueryUpdateServiceException;
 import org.labkey.api.security.User;
 import org.labkey.trialshare.data.PublicationEditBean;
 import org.labkey.trialshare.data.StudyAccess;
+import org.labkey.trialshare.data.StudyEditBean;
 import org.labkey.trialshare.data.StudyPublicationBean;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 import org.springframework.validation.BindException;
@@ -228,52 +229,9 @@ public class TrialShareManager
 
             // insert the one-to-many data
             // conditions
-
-            for (String condition : publication.getConditions())
-            {
-                Map<String, Object> dataMap = new CaseInsensitiveHashMap<>();
-                dataMap.put(TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey);
-                dataMap.put(TrialShareQuerySchema.CONDITION_FIELD, condition);
-                dataList.add(dataMap);
-            }
-            if (!dataList.isEmpty())
-            {
-                schema.getPublicationConditionTableInfo().getUpdateService().insertRows(user, container, dataList, batchValidationErrors, null, null);
-                if (batchValidationErrors.hasErrors())
-                    throw batchValidationErrors;
-                dataList.clear();
-            }
-
-            // studies
-            for (String studyId : publication.getStudyIds())
-            {
-                Map<String, Object> dataMap = new CaseInsensitiveHashMap<>();
-                dataMap.put(TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey);
-                dataMap.put(TrialShareQuerySchema.STUDY_ID_FIELD, studyId);
-                dataList.add(dataMap);
-            }
-            if (!dataList.isEmpty())
-            {
-                schema.getPublicationStudyTableInfo().getUpdateService().insertRows(user, container, dataList, batchValidationErrors, null, null);
-                if (batchValidationErrors.hasErrors())
-                    throw batchValidationErrors;
-                dataList.clear();
-            }
-
-            // Therapeutic Areas
-            for (String area : publication.getTherapeuticAreas())
-            {
-                Map<String, Object> dataMap = new CaseInsensitiveHashMap<>();
-                dataMap.put(TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey);
-                dataMap.put(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, area);
-                dataList.add(dataMap);
-            }
-            if (!dataList.isEmpty())
-            {
-                schema.getPublicationTherapeuticAreaTableInfo().getUpdateService().insertRows(user, container, dataList, batchValidationErrors, null, null);
-                if (batchValidationErrors.hasErrors())
-                    throw batchValidationErrors;
-            }
+            addJoinTableData(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey, TrialShareQuerySchema.CONDITION_FIELD, publication.getConditions(), user, container);
+            addJoinTableData(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey, TrialShareQuerySchema.STUDY_ID_FIELD, publication.getStudyIds(), user, container);
+            addJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, publication.getTherapeuticAreas(), user, container);
 
             transaction.commit();
         }
@@ -283,70 +241,49 @@ public class TrialShareManager
         }
     }
 
-    public void updatePublication(User user, Container container, PublicationEditBean publication)
+    public void updatePublication(User user, Container container, PublicationEditBean publication, BindException errors)
     {
         if (publication == null)
+        {
+            errors.reject(ERROR_MSG, "No publication data provided to update");
             return;
+        }
+        if (publication.getId() == null)
+        {
+            errors.reject(ERROR_MSG, "Publication id is null");
+            return;
+        }
 
         try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
         {
             TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
-            // insert the primary fields
-            Table.update(user, schema.getPublicationsTableInfo(), publication.getPrimaryFields(), publication.getId());
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put(TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId());
+
+            // update the primary fields
+            schema.getPublicationsTableInfo().getUpdateService().updateRows(user, container, Collections.singletonList(publication.getPrimaryFields()), null, null, null);
 
             // update the many-to-one data
             SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), publication.getId());
 
+            // update the many-to-one data
             // conditions
             // first get rid of the current values for this publication
-            Table.delete(schema.getPublicationConditionTableInfo(), filter);
-            // now add the new values
-            for (String condition : publication.getConditions())
-            {
-                dataMap.put(TrialShareQuerySchema.CONDITION_FIELD, condition);
-                Table.insert(user, schema.getPublicationConditionTableInfo(), dataMap);
-            }
-            dataMap.remove(TrialShareQuerySchema.CONDITION_FIELD);
+            schema.getPublicationConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, filter), null, null);
+            addJoinTableData(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.CONDITION_FIELD, publication.getConditions(), user, container);
 
-            // studies
-            // get rid of the current values for this publication
-            Table.delete(schema.getPublicationStudyTableInfo(), filter);
-            for (String studyId : publication.getStudyIds())
-            {
-                dataMap.put(TrialShareQuerySchema.STUDY_ID_FIELD, studyId);
-                Table.insert(user, schema.getPublicationStudyTableInfo(), dataMap);
-            }
-            dataMap.remove(TrialShareQuerySchema.STUDY_ID_FIELD);
-            dataMap.remove(TrialShareQuerySchema.STUDY_SHORT_NAME_FIELD);
+            schema.getPublicationStudyTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, filter), null, null);
+            addJoinTableData(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.STUDY_ID_FIELD, publication.getStudyIds(), user, container);
 
-            // Therapeutic Areas
-            Table.delete(schema.getPublicationTherapeuticAreaTableInfo(), filter);
-            for (String area : publication.getTherapeuticAreas())
-            {
-                dataMap.put(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, area);
-                Table.insert(user, schema.getPublicationTherapeuticAreaTableInfo(), dataMap);
-            }
-
+            schema.getPublicationTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, filter), null, null);
+            addJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, publication.getTherapeuticAreas(), user, container);
             transaction.commit();
         }
-    }
-
-    private void deleteJoinTableData(@NotNull TableInfo tableInfo, @NotNull String keyName, @NotNull User user, @NotNull Container container, SimpleFilter objectIdFilter) throws SQLException, QueryUpdateServiceException, BatchValidationException, InvalidKeyException
-    {
-        // select the keys of the rows that have the object ids selected by the object filter
-        List<Integer> keys = new TableSelector(tableInfo, Collections.singleton(keyName), objectIdFilter, null).getArrayList(Integer.class);
-
-        List<Map<String, Object>> pkMaps = new ArrayList<>();
-        for (Integer key : keys)
+        catch (Exception e)
         {
-            Map<String, Object> keyMap = new HashMap<>();
-            keyMap.put(keyName, key);
-            pkMaps.add(keyMap);
+            errors.reject("Publication update failed", e.getMessage());
         }
-        tableInfo.getUpdateService().deleteRows(user, container, pkMaps, null, null);
+
     }
+
 
     public void deletePublications(@NotNull User user, @NotNull Container container, Set<String> publicationIds, BindException errors)
     {
@@ -394,44 +331,167 @@ public class TrialShareManager
 
     }
 
-//    public void insertStudy(@NotNull User user, @NotNull Container container, StudyBean study)
-//    {
-//        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
-//        {
-//            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
-//            // insert the primary fields
-//            Map<String, Object> studyData = Table.insert(user, schema.getStudyPropertiesTableInfo(), study.getPrimaryFields());
-//            Map<String, Object> dataMap = new HashMap<>();
-//            dataMap.put(TrialShareQuerySchema.STUDY_ID_FIELD, studyData.get(TrialShareQuerySchema.STUDY_ID_FIELD));
-//
-//            // insert the one-to-many data
-//            // conditions
-//            for (String condition : study.getConditions())
-//            {
-//                dataMap.put(TrialShareQuerySchema.CONDITION_FIELD, condition);
-//                Table.insert(user, schema.getPublicationConditionTableInfo(), dataMap);
-//            }
-//            dataMap.remove(TrialShareQuerySchema.CONDITION_FIELD);
-//
-//
-//            // Therapeutic Areas
-//            for (String area : study.getTherapeuticAreas())
-//            {
-//                dataMap.put(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, area);
-//                Table.insert(user, schema.getPublicationTherapeuticAreaTableInfo(), dataMap);
-//            }
-//
-//            transaction.commit();
-//        }
-//
-//    }
+    public void updateStudy(@NotNull User user, @NotNull Container container, StudyEditBean study, BindException errors)
+    {
+        if (study == null)
+        {
+            errors.reject(ERROR_MSG, "No study data provided to update");
+            return;
+        }
+        if (study.getStudyId() == null)
+        {
+            errors.reject(ERROR_MSG, "No study id provided");
+            return;
+        }
+
+        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
+        {
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
+
+            // update the primary fields
+            schema.getStudyPropertiesTableInfo().getUpdateService().updateRows(user, container, Collections.singletonList(study.getPrimaryFields()), null, null, null);
+
+            String studyId = study.getStudyId();
+            SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.STUDY_ID_FIELD), studyId);
+
+            // update the many-to-one data.  First get rid of the current values for the study
+            schema.getPublicationConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyConditionTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, filter), null, null);
+            addJoinTableData(schema.getStudyConditionTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.CONDITION_FIELD, study.getConditions(), user, container);
+
+            schema.getStudyAgeGroupTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, filter), null, null);
+            addJoinTableData(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.AGE_GROUP_FIELD, study.getAgeGroups(), user, container);
+
+            schema.getStudyPhaseTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, filter), null, null);
+            addJoinTableData(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.PHASE_FIELD, study.getPhases(), user, container);
+
+            schema.getStudyTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, filter), null, null);
+            addJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, study.getTherapeuticAreas(), user, container);
+
+            transaction.commit();
+        }
+        catch (Exception e)
+        {
+            errors.reject(ERROR_MSG, "Problem inserting study " + e.getMessage());
+        }
+
+    }
+
+    public void insertStudy(@NotNull User user, @NotNull Container container, StudyEditBean study, BindException errors)
+    {
+        if (study == null)
+        {
+            errors.reject(ERROR_MSG, "No study data provided to update");
+            return;
+        }
+        if (study.getStudyId() == null)
+        {
+            errors.reject(ERROR_MSG, "No study id provided");
+            return;
+        }
+
+        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
+        {
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
+            // insert the primary fields
+
+            BatchValidationException batchValidationErrors = new BatchValidationException();
+            List<Map<String, Object>> studyData = schema.getStudyPropertiesTableInfo().getUpdateService().insertRows(user, container, Collections.singletonList(study.getPrimaryFields()), batchValidationErrors, null, null);
+            if (batchValidationErrors.hasErrors())
+                throw batchValidationErrors;
+
+            String studyId = study.getStudyId();
+            // insert the one-to-many data
+            // conditions
+            addJoinTableData(schema.getStudyConditionTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.CONDITION_FIELD, study.getConditions(), user, container);
+            addJoinTableData(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.AGE_GROUP_FIELD, study.getAgeGroups(), user, container);
+            addJoinTableData(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.PHASE_FIELD, study.getPhases(), user, container);
+            addJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, study.getTherapeuticAreas(), user, container);
+
+            transaction.commit();
+        }
+        catch (Exception e)
+        {
+            errors.reject(ERROR_MSG, "Problem inserting study " + e.getMessage());
+        }
+    }
+
 
     public void deleteStudies(@NotNull User user, @NotNull Container container, Set<String> ids, BindException errors)
     {
-//        for (String id : ids)
-//        {
-//            deleteStudy(user, container, id);
-//        }
+
+        if (errors.hasErrors())
+            return;
+        SimpleFilter idFilter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.STUDY_ID_FIELD), ids, CompareType.IN);
+
+        try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
+        {
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
+
+            deleteJoinTableData(schema.getStudyPhaseTableInfo(), "Key", user, container, idFilter);
+            deleteJoinTableData(schema.getStudyAgeGroupTableInfo(), "Key", user, container, idFilter);
+            deleteJoinTableData(schema.getStudyConditionTableInfo(), "Key", user, container, idFilter);
+            deleteJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), "Key", user, container, idFilter);
+            deleteJoinTableData(schema.getStudyAccessTableInfo(), "Key", user, container, idFilter);
+
+            List<Map<String, Object>> pkMaps = new ArrayList<>();
+            for (String id : ids)
+            {
+                Map<String, Object> keyMap = new HashMap<>();
+                keyMap.put(TrialShareQuerySchema.STUDY_ID_FIELD, id);
+                pkMaps.add(keyMap);
+            }
+
+            schema.getStudyPropertiesTableInfo().getUpdateService().deleteRows(user, container, pkMaps, null, null);
+
+            transaction.commit();
+        }
+        catch (Exception e)
+        {
+            errors.reject(ERROR_MSG, e.getMessage());
+        }
     }
+
+
+    private List<Map<String, Object>> getJoinTableIds(@NotNull TableInfo tableInfo, @NotNull String keyName, SimpleFilter objectIdFilter)
+    {
+        // select the keys of the rows that have the object ids selected by the object filter
+        List<Integer> keys = new TableSelector(tableInfo, Collections.singleton(keyName), objectIdFilter, null).getArrayList(Integer.class);
+
+        List<Map<String, Object>> pkMaps = new ArrayList<>();
+        for (Integer key : keys)
+        {
+            Map<String, Object> keyMap = new CaseInsensitiveHashMap<>();
+            keyMap.put(keyName, key);
+            pkMaps.add(keyMap);
+        }
+        return pkMaps;
+    }
+
+
+    private void deleteJoinTableData(@NotNull TableInfo tableInfo, @NotNull String keyName, @NotNull User user, @NotNull Container container, SimpleFilter objectIdFilter) throws SQLException, QueryUpdateServiceException, BatchValidationException, InvalidKeyException
+    {
+        tableInfo.getUpdateService().deleteRows(user, container, getJoinTableIds(tableInfo, keyName, objectIdFilter), null, null);
+    }
+
+    private void addJoinTableData(TableInfo tableInfo, String idField, Object id, String dataField, List<String> dataValues, User user, Container container) throws SQLException, QueryUpdateServiceException, BatchValidationException, DuplicateKeyException
+    {
+        BatchValidationException batchValidationErrors = new BatchValidationException();
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        for (String value : dataValues)
+        {
+            Map<String, Object> dataMap = new CaseInsensitiveHashMap<>();
+            dataMap.put(idField, id);
+            dataMap.put(dataField, value);
+            dataList.add(dataMap);
+        }
+        if (!dataList.isEmpty())
+        {
+            tableInfo.getUpdateService().insertRows(user, container, dataList, batchValidationErrors, null, null);
+            if (batchValidationErrors.hasErrors())
+                throw batchValidationErrors;
+            dataList.clear();
+        }
+    }
+
 
 }

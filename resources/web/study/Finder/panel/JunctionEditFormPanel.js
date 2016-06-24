@@ -10,6 +10,7 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
 
     defaultFieldWidth: 350,
     defaultFieldLabelWidth: 200,
+    mode: "view",
 
     initComponent : function() {
 
@@ -21,7 +22,7 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
             ui: 'footer',
             style: 'background-color: transparent;',
             items: [
-                LABKEY.ext4.FORMBUTTONS.getButton('SUBMIT'),
+                LABKEY.ext4.FORMBUTTONS.getButton('SUBMIT', {successURL : this.returnUrl}),
                 LABKEY.ext4.FORMBUTTONS.getButton('CANCEL', {returnURL : this.returnUrl})
             ]
         }];
@@ -32,8 +33,21 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
         return this.isJoinTableField(metadata.name) || LABKEY.ext4.Util.shouldShowInUpdateView(metadata);
     },
 
-    shouldShowInUpdateView: function(metadata) {
-        return this.shouldShowInInsertView(metadata);
+    shouldShowInDisplayView: function(metadata) {
+        var record = this.store.getAt(0); // there will only be a single item in the store when in view mode
+        if (record)
+        {
+            var field = record.get(metadata.name);
+            return field !== undefined && field !== ""
+        }
+        return false;
+    },
+
+    shouldShowInView: function(metadata) {
+        if (this.mode == "edit")
+            return this.shouldShowInInsertView(metadata);
+        else
+            return this.shouldShowInDisplayView(metadata);
     },
 
     configureJoinFields : function(store) {
@@ -85,10 +99,10 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
                 Ext4.Object.merge(config, this.metadata[field.name]);
             }
 
-            if (this.shouldShowInUpdateView(field)){
+            if (this.shouldShowInView(field)){
 
                 var fieldEditor = LABKEY.ext4.Util.getFormEditorConfig(field, config);
-                if (fieldEditor.isRequired)
+                if (fieldEditor.isRequired && this.mode != "view")
                     fieldEditor.fieldLabel = fieldEditor.fieldLabel + " *";
                 if (!fieldEditor.width)
                     fieldEditor.width = this.defaultFieldWidth;
@@ -115,7 +129,9 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
                     fieldEditor.xtype = 'displayfield';
                 }
 
-                fieldEditor.name = this.uncapitalize(fieldEditor.name); // this is necessary to match the bean properties, somehow...
+                if (this.mode == "view")
+                    fieldEditor.xtype = 'displayfield';
+
                 if (!field.compositeField)
                     toAdd.push(fieldEditor);
                 else
@@ -162,11 +178,11 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
             {
                 this.getForm().findField(obj.errors[i].field).markInvalid([obj.errors[i].message]);
             }
-            Ext4.Msg.alert("Error", "There were problems submitting your data.");
+            Ext4.Msg.alert("Error", "There were problems submitting your data. Please check the form for errors.");
         }
 
         Ext4.Ajax.request({
-            url: LABKEY.ActionURL.buildURL('trialShare', 'insert' + this.objectName + ".api"),
+            url: LABKEY.ActionURL.buildURL('trialShare', this.mode + this.objectName + ".api"),
             method: 'POST',
             jsonData: this.getFieldValues(),
             success: onSuccess,
@@ -180,7 +196,8 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
     {
         var fieldValues = {};
         var metadata = this.metadata;
-        // getValues returns the empty string for fields that are empty, which is not what we want.
+        // getValues returns the empty string for fields that are empty, which is not what we want,
+        // so we'll walk through the fields ourselves.
         this.getForm().getFields().each(function(item)
         {
             var value = item.value;
@@ -192,17 +209,5 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
             }
         });
         return fieldValues;
-        //
-        // // We have to convert these to something acceptable as an arrayList
-        // var values = this.getValues();
-        // for (var i = 0; i < this.joinTableFields.length; i++)
-        // {
-        //     var value = values[this.uncapitalize(this.joinTableFields[i])];
-        //     if (!Ext4.isArray(value))
-        //         values[this.uncapitalize(this.joinTableFields[i])] = null;
-        // }
-        //
-        // return values;
-
     }
 });
