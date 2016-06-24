@@ -252,6 +252,7 @@ Ext4.define('LABKEY.study.store.Facets', {
                 {
                     return uniqueNames.indexOf(m) >= 0;
                 });
+                return includedMembers;
             }
 
         }
