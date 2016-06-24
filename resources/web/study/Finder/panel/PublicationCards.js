@@ -112,7 +112,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '                   <tpl if="abstractText">',
         '                       <div class="labkey-publication-abstract">',
         '                           <span class="labkey-publication-detail-label">Abstract</span>',
-        '                           {abstractText:htmlEncode}',
+        '                           {abstractText}',
         '                       </div>',
         '                   </tpl>',
         '                   <tpl if="thumbnails">',
