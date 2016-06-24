@@ -32,7 +32,7 @@
 %>
 <labkey:errors/>
 <p>
-    You can import, edit, or delete <%=h(thisObjectName.getPluralName().toLowerCase())%> from this page.
+    You can insert, edit, or delete <%=h(thisObjectName.getPluralName().toLowerCase())%> from this page.
     Remember to refresh the cube when you are ready for your changes to show on the data finder.
 </p>
 <p>
