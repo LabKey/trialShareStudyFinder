@@ -5,6 +5,7 @@
         <column name="Title"/>
         <column name="PublicationType"/>
         <column name="Status"/>
+        <column name="SubmissionStatus"/>
         <column name="Author"/>
         <column name="Citation"/>
         <column name="Year"/>
@@ -13,7 +14,6 @@
         <column name="DOI"/>
         <column name="PMID"/>
         <column name="PMCID"/>
-        <column name="SubmissionStatus"/>
         <column name="ManuscriptContainer"/>
         <column name="PermissionsContainer"/>
         <column name="Keywords"/>
