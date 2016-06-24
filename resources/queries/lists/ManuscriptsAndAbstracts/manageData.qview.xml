@@ -2,6 +2,7 @@
     <columns>
         <column name="Key" />
         <column name="Title"/>
-        <column name="Show"/>
+        <column name="Status"/>
+        <column name="PublicationType"/>
     </columns>
 </customView>
