@@ -1,5 +1,6 @@
 SELECT 
     sa.StudyId,
+    sa.Visibility,
     sa.StudyContainer,
     sc.condition,
     sas.Assay,
