@@ -96,7 +96,7 @@
                     width: 800
                 },
                 TherapeuticAreas : {
-                    width: 800
+                    width: 500
                 },
                 Phases : {
                     width: 500

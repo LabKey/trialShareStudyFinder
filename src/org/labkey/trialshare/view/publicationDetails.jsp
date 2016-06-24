@@ -109,7 +109,7 @@
                     width: 800
                 },
                 TherapeuticAreas : {
-                    width: 800
+                    width: 500
                 },
                 PMID : {
                     xtype: 'textfield'

@@ -37,10 +37,11 @@
                         <fk>
                             <fkDbSchema>lists</fkDbSchema>
                             <fkTable>StudyTherapeuticArea</fkTable>
-                            <fkColumnName>studyId</fkColumnName>
+                            <fkColumnName>StudyId</fkColumnName>
                             <fkMultiValued>junction</fkMultiValued>
                             <fkJunctionLookup>TherapeuticArea</fkJunctionLookup>
                         </fk>
+                        <hidden>false</hidden>
                     </column>
                 </columns>
             </table>
