@@ -267,13 +267,13 @@ public class TrialShareManager
             // update the many-to-one data
             // conditions
             // first get rid of the current values for this publication
-            schema.getPublicationConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, filter), null, null);
+            schema.getPublicationConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.CONDITION_FIELD, publication.getConditions(), user, container);
 
-            schema.getPublicationStudyTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, filter), null, null);
+            schema.getPublicationStudyTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.STUDY_ID_FIELD, publication.getStudyIds(), user, container);
 
-            schema.getPublicationTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, filter), null, null);
+            schema.getPublicationTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, publication.getTherapeuticAreas(), user, container);
             transaction.commit();
         }
