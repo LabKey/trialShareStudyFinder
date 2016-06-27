@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.labkey.api.action.SpringActionController.ERROR_CONVERSION;
+import static org.labkey.api.action.SpringActionController.ERROR_MSG;
 import static org.labkey.api.action.SpringActionController.ERROR_REQUIRED;
 
 public class StudyPublicationBean
@@ -106,12 +106,22 @@ public class StudyPublicationBean
         _primaryFields.put(STUDY_ID_FIELD, studyId);
     }
 
-    public String getPmid()
+//    public String getPmid()
+//    {
+//        return (String) _primaryFields.get(PMID_FIELD);
+//    }
+
+    public String getPMID()
     {
         return (String) _primaryFields.get(PMID_FIELD);
     }
 
-    public void setPmid(String pmid)
+//    public void setPmid(String pmid)
+//    {
+//        _primaryFields.put(PMID_FIELD, pmid);
+//    }
+
+    public void setPMID(String pmid)
     {
         _primaryFields.put(PMID_FIELD, pmid);
     }
@@ -125,6 +135,16 @@ public class StudyPublicationBean
     {
         _primaryFields.put(PMCID_FIELD, pmcid);
     }
+
+//    public String getPMCID()
+//    {
+//        return getPmcid();
+//    }
+//
+//    public void setPMCID(String pmcid)
+//    {
+//        setPmcid(pmcid);
+//    }
 
     public String getDoi()
     {
@@ -202,12 +222,12 @@ public class StudyPublicationBean
         _primaryFields.put(TITLE_FIELD, title);
     }
 
-    public String getYear()
+    public Integer getYear()
     {
-       return (String) _primaryFields.get(YEAR_FIELD);
+       return (Integer) _primaryFields.get(YEAR_FIELD);
     }
 
-    public void setYear(String year)
+    public void setYear(Integer year)
     {
         _primaryFields.put(YEAR_FIELD, year);
     }
@@ -537,17 +557,13 @@ public class StudyPublicationBean
             errors.rejectValue("Status", ERROR_REQUIRED, "Status is required");
         if (getPublicationType() == null)
             errors.rejectValue("PublicationType", ERROR_REQUIRED, "Publication type is required");
-        if (getPmid() != null && !StringUtils.isNumeric(getPmid()))
+        if (getPMID() != null && !StringUtils.isNumeric(getPMID()))
         {
-            errors.rejectValue("PMID", ERROR_CONVERSION, "PMID must be an integer");
+            errors.rejectValue("PMID", ERROR_MSG, "PMID must be an integer");
         }
         if (getPmcid() != null && !PMCID_PATTERN.matcher(getPmcid()).matches())
         {
-            errors.rejectValue("PMCID", ERROR_CONVERSION, "Incorrect format for PMCID.  Expected PMC#");
-        }
-        if (getYear() != null && !StringUtils.isNumeric(getPmid()))
-        {
-            errors.rejectValue("Year", ERROR_CONVERSION, "Year must be an integer");
+            errors.rejectValue("PMCID", ERROR_MSG, "Incorrect format for PMCID.  Expected PMC#");
         }
     }
 

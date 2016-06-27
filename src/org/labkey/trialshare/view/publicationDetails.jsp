@@ -27,10 +27,7 @@
     public LinkedHashSet<ClientDependency> getClientDependencies()
     {
         LinkedHashSet<ClientDependency> resources = new LinkedHashSet<>();
-        resources.add(ClientDependency.fromPath("study/Finder/datafinder"));
-        resources.add(ClientDependency.fromPath("clientapi"));
-        resources.add(ClientDependency.fromPath("Ext4ClientApi"));
-        resources.add(ClientDependency.fromPath("study/Finder/panel/JunctionEditFormPanel.js"));
+        resources.add(ClientDependency.fromPath("study/Finder/dataFinderEditor"));
 
         return resources;
     }
@@ -46,104 +43,10 @@
 <script type="text/javascript">
     Ext4.onReady(function(){
 
-        Ext4.create('LABKEY.study.panel.JunctionEditFormPanel', {
+        Ext4.create('LABKEY.study.panel.PublicationDetailsFormPanel', {
             mode: "<%=h(bean.getMode())%>",
             objectName : 'Publication',
-            joinTableFields : ["StudyIds", "Conditions", "TherapeuticAreas"],
-            store: {
-                schemaName: 'lists',
-                queryName: 'manuscriptsAndAbstracts',
-                viewName: 'dataFinderDetails',
-                autoLoad: true,
-                <%
-                if (bean.getId() != null)
-                {
-                %>
-                filterArray: [LABKEY.Filter.create('<%=h(bean.getIdField())%>', <%=h(bean.getId())%>, LABKEY.Filter.Types.EQUAL)]
-                <%
-                }
-                %>
-            },
-            renderTo: <%=q(renderId)%>,
-            bindConfig: {
-                autoCreateRecordOnChange: true,
-                autoBindFirstRecord: <%= bean.getId() != null %>
-            },
-            metadata: {
-                Title: {
-                    width: 1000,
-                    isRequired: true
-                },
-                Author: {
-                    width: 1000,
-                    height: 50,
-                    xtype: 'textarea',
-                    stripNewLines : true
-                },
-                Journal: {
-                    width: 800
-                },
-                Status : {
-                    isRequired: true
-                },
-                PublicationType : {
-                    isRequired: true
-                },
-                ManuscriptContainer : {
-                    containerFilter: "AllFolders",
-                    width: 500
-                },
-                PermissionsContainer : {
-                    containerFilter: "AllFolders",
-                    width: 500
-                },
-                Citation : {
-                    width: 1000,
-                    height: 30,
-                    xtype: 'textarea'
-                },
-                StudyIds : {
-                    width: 800
-                },
-                Conditions : {
-                    width: 800
-                },
-                TherapeuticAreas : {
-                    width: 500
-                },
-                PMID : {
-                    xtype: 'textfield'
-                },
-                AbstractText : {
-                    width: 1000,
-                    height: 100,
-                    xtype: 'htmleditor'
-                },
-                Link1 : {
-                    width: 1000
-                },
-                Description1 : {
-                    width: 1000
-                },
-                Link2 : {
-                    width: 1000
-                },
-                Description2 : {
-                    width: 1000
-                },
-                Link3 : {
-                    width: 1000
-                },
-                Description3 : {
-                    width: 1000
-                },
-                Keywords: {
-                    width: 800,
-                    height: 50,
-                    xtype: 'textarea',
-                    stripNewLines : true
-                }
-            }
-         });
+            renderTo: <%=q(renderId)%>
+        });
     });
 </script>
