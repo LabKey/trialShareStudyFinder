@@ -11,6 +11,7 @@ import org.labkey.api.query.UserSchema;
 import org.labkey.api.security.User;
 import org.labkey.trialshare.TrialShareManager;
 import org.labkey.trialshare.data.StudyBean;
+import org.labkey.trialshare.data.StudyPublicationBean;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -194,6 +195,30 @@ public class TrialShareQuerySchema
         sql.add(id);
 
         return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyBean.class);
+    }
+
+    public List<StudyPublicationBean> getStudyPublications()
+    {
+        SQLFragment sql = new SQLFragment("SELECT pub.*, ps.StudyId FROM " );
+        sql.append(getPublicationStudyTableInfo(), "ps");
+        sql.append(" LEFT JOIN ");
+        sql.append(getPublicationsTableInfo(), "pub");
+        sql.append(" ON ps.PublicationId = pub.Key ");
+
+        return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyPublicationBean.class);
+    }
+
+    public List<StudyPublicationBean> getStudyPublications(String studyId)
+    {
+        SQLFragment sql = new SQLFragment("SELECT pub.*, ps.StudyId FROM " );
+        sql.append(getPublicationStudyTableInfo(), "ps");
+        sql.append(" LEFT JOIN ");
+        sql.append(getPublicationsTableInfo(), "pub");
+        sql.append(" ON ps.PublicationId = pub.Key ");
+        sql.append( "WHERE ps.StudyId = ? ");
+        sql.add(studyId);
+
+        return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyPublicationBean.class);
     }
 
     public List<TableInfo> getStudyTables() {

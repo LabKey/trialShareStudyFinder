@@ -33,11 +33,16 @@ import org.labkey.api.action.SpringActionController;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.DataRegionSelection;
+import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
+import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QueryForm;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
+import org.labkey.api.query.QuerySettings;
+import org.labkey.api.query.QueryView;
+import org.labkey.api.query.UserSchema;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.DeletePermission;
@@ -456,8 +461,8 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(Object form, BindException errors) throws Exception
         {
-            // TODO update to not use static methods
-            QuerySchema listsSchema = TrialShareQuerySchema.getSchema(getUser(), getContainer());
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(getUser(), getContainer());
+            QuerySchema listsSchema =schema.getSchema();
             TableInfo studyProperties = listsSchema.getTable(TrialShareQuerySchema.STUDY_TABLE);
 
             if (studyProperties != null)
@@ -467,7 +472,7 @@ public class TrialShareController extends SpringActionController
                 Map<String, Pair<Integer, Integer>> pubCounts = new HashMap<>();
                 if (publicationsList != null)
                 {
-                    List<StudyPublicationBean> publications = (new TableSelector(publicationsList).getArrayList(StudyPublicationBean.class));
+                    List<StudyPublicationBean> publications = schema.getStudyPublications();
 
                     for (StudyPublicationBean pub : publications)
                     {
@@ -793,6 +798,202 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
+    public class StudyDetailsAction extends ApiAction<StudyIdForm>
+    {
+        String _id;
+
+        @Override
+        public void validateForm(StudyIdForm form, Errors errors)
+        {
+            _id = (null == form) ? null : form.getStudyId();
+            if (_id == null)
+                errors.reject(ERROR_MSG, "Study not specified");
+        }
+
+        @Override
+        public Object execute(StudyIdForm sform, BindException errors) throws Exception
+        {
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(getUser(), getContainer());
+            QuerySchema listSchema = schema.getSchema();
+            StudyEditBean study = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.STUDY_TABLE))).getObject(_id, StudyEditBean.class);
+            study.setStudyAccessList(getUser(), getContainer());
+            study.setUrl(getUser(), true);
+            study.setPublications(getUser(), getContainer(), null);
+            return success(study);
+        }
+
+    }
+
+//    @ActionNames("selectRows, getQuery")
+//    @RequiresPermission(ReadPermission.class)
+//    @ApiVersion(9.1)
+//    @Action(ActionType.SelectData.class)
+//    public class SelectRowsAction extends ApiAction<APIQueryForm>
+//    {
+//        public ApiResponse execute(APIQueryForm form, BindException errors) throws Exception
+//        {
+////            ensureQueryExists(form);
+//
+//            // Issue 12233: add implicit maxRows=100k when using client API
+//            if (null == form.getLimit()
+//                    && null == getViewContext().getRequest().getParameter(form.getDataRegionName() + "." + QueryParam.maxRows)
+//                    && null == getViewContext().getRequest().getParameter(form.getDataRegionName() + "." + QueryParam.showRows))
+//            {
+//                form.getQuerySettings().setShowRows(ShowRows.PAGINATED);
+//                form.getQuerySettings().setMaxRows(100);
+//            }
+//
+//            if (form.getLimit() != null)
+//            {
+//                form.getQuerySettings().setShowRows(ShowRows.PAGINATED);
+//                form.getQuerySettings().setMaxRows(form.getLimit());
+//            }
+//            if (form.getStart() != null)
+//                form.getQuerySettings().setOffset(form.getStart());
+//            if (form.getContainerFilter() != null)
+//            {
+//                // If the user specified an incorrect filter, throw an IllegalArgumentException
+//                ContainerFilter.Type containerFilterType =
+//                        ContainerFilter.Type.valueOf(form.getContainerFilter());
+//                form.getQuerySettings().setContainerFilterName(containerFilterType.name());
+//            }
+//
+//            QueryView view = QueryView.create(form, errors);
+//
+//            view.setShowPagination(form.isIncludeTotalCount());
+//
+//            //if viewName was specified, ensure that it was actually found and used
+//            //QueryView.create() will happily ignore an invalid view name and just return the default view
+//            if (null != StringUtils.trimToNull(form.getViewName()) &&
+//                    null == view.getQueryDef().getCustomView(getUser(), getViewContext().getRequest(), form.getViewName()))
+//            {
+//                throw new NotFoundException("The view named '" + form.getViewName() + "' does not exist for this user!");
+//            }
+//
+//            boolean isEditable = false;
+//            boolean metaDataOnly = form.getQuerySettings().getMaxRows() == 0;
+//
+//            // 13.2 introduced the getData API action, a condensed response wire format, and a js wrapper to consume the wire format. Support this as an option for legacy API's.
+//            if (getRequestedApiVersion() >= 13.2)
+//            {
+//                ReportingApiQueryResponse response = new ReportingApiQueryResponse(view, isEditable, true, view.getQueryDef().getName(), form.getQuerySettings().getOffset(), null,
+//                        metaDataOnly, form.isIncludeDetailsColumn(), form.isIncludeUpdateColumn());
+//                response.includeStyle(form.isIncludeStyle());
+//                return response;
+//            }
+//            //if requested version is >= 9.1, use the extended api query response
+//            else if (getRequestedApiVersion() >= 9.1)
+//            {
+//                ExtendedApiQueryResponse response = new ExtendedApiQueryResponse(view, isEditable, true,
+//                        form.getSchemaName(), form.getQueryName(), form.getQuerySettings().getOffset(), null,
+//                        metaDataOnly, form.isIncludeDetailsColumn(), form.isIncludeUpdateColumn());
+//                response.includeStyle(form.isIncludeStyle());
+//                return response;
+//            }
+//            else
+//            {
+//                return new ApiQueryResponse(view, isEditable, true,
+//                        form.getSchemaName(), form.getQueryName(), form.getQuerySettings().getOffset(), null,
+//                        metaDataOnly, form.isIncludeDetailsColumn(), form.isIncludeUpdateColumn(),
+//                        form.isIncludeDisplayValues());
+//            }
+//        }
+//    }
+//
+//    public static class APIQueryForm extends QueryForm
+//    {
+//        private Integer _start;
+//        private Integer _limit;
+//        private boolean _includeDetailsColumn = false;
+//        private boolean _includeUpdateColumn = false;
+//        private String _containerFilter;
+//        private boolean _includeTotalCount = true;
+//        private boolean _includeStyle = false;
+//        private boolean _includeDisplayValues = false;
+//
+//        public Integer getStart()
+//        {
+//            return _start;
+//        }
+//
+//        public void setStart(Integer start)
+//        {
+//            _start = start;
+//        }
+//
+//        public Integer getLimit()
+//        {
+//            return _limit;
+//        }
+//
+//        public void setLimit(Integer limit)
+//        {
+//            _limit = limit;
+//        }
+//
+//        public String getContainerFilter()
+//        {
+//            return _containerFilter;
+//        }
+//
+//        public void setContainerFilter(String containerFilter)
+//        {
+//            _containerFilter = containerFilter;
+//        }
+//
+//        public boolean isIncludeTotalCount()
+//        {
+//            return _includeTotalCount;
+//        }
+//
+//        public void setIncludeTotalCount(boolean includeTotalCount)
+//        {
+//            _includeTotalCount = includeTotalCount;
+//        }
+//
+//        public boolean isIncludeStyle()
+//        {
+//            return _includeStyle;
+//        }
+//
+//        public void setIncludeStyle(boolean includeStyle)
+//        {
+//            _includeStyle = includeStyle;
+//        }
+//
+//        public boolean isIncludeDetailsColumn()
+//        {
+//            return _includeDetailsColumn;
+//        }
+//
+//        public void setIncludeDetailsColumn(boolean includeDetailsColumn)
+//        {
+//            _includeDetailsColumn = includeDetailsColumn;
+//        }
+//
+//        public boolean isIncludeUpdateColumn()
+//        {
+//            return _includeUpdateColumn;
+//        }
+//
+//        public void setIncludeUpdateColumn(boolean includeUpdateColumn)
+//        {
+//            _includeUpdateColumn = includeUpdateColumn;
+//        }
+//
+//        public boolean isIncludeDisplayValues()
+//        {
+//            return _includeDisplayValues;
+//        }
+//
+//        public void setIncludeDisplayValues(boolean includeDisplayValues)
+//        {
+//            _includeDisplayValues = includeDisplayValues;
+//        }
+//    }
+
+
+    @RequiresPermission(ReadPermission.class)
     public class PublicationDetailsAction extends ApiAction<PublicationIdForm>
     {
         Integer _id;
@@ -822,7 +1023,7 @@ public class TrialShareController extends SpringActionController
 
 
             publication.setStudies(schema.getPublicationStudies(_id));
-           for (StudyBean study : publication.getStudies())
+            for (StudyBean study : publication.getStudies())
             {
                 study.setStudyAccessList(getUser(), getContainer());
                 study.setUrl(getUser(), false);
@@ -1182,7 +1383,19 @@ public class TrialShareController extends SpringActionController
             if (bean.getObjectName() == ObjectName.publication)
                 return new JspView("/org/labkey/trialshare/view/publicationDetails.jsp", bean);
             else
-                return new JspView("/org/labkey/trialshare/view/studyDetails.jsp", bean);
+            {
+                JspView<CubeObjectNameForm> view = new JspView("/org/labkey/trialshare/view/studyDetails.jsp", bean);
+
+                UserSchema userSchema = TrialShareQuerySchema.getUserSchema(getUser(), getContainer());
+
+                QuerySettings settings = userSchema.getSettings(getViewContext(), QueryView.DATAREGIONNAME_DEFAULT, TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+                SimpleFilter filter = settings.getBaseFilter();
+                filter.addAllClauses(new SimpleFilter(FieldKey.fromParts("StudyId"), (String) bean.getId()));
+                QueryView queryView = userSchema.createView(getViewContext(), settings, errors);
+                view.setTitle("Study Access");
+                view.setView("studiesAccessView", queryView);
+                return view;
+            }
         }
 
         @Override
