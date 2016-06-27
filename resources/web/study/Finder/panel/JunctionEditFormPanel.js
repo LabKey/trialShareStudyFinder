@@ -14,19 +14,47 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
 
     initComponent : function() {
 
-        this.returnUrl = LABKEY.ActionURL.buildURL('trialShare', 'manageData.view', null, {objectName : this.objectName, 'query.viewName': 'manageData'});
+        this.manageDataUrl = LABKEY.ActionURL.buildURL('trialShare', 'manageData.view', null, {objectName : this.objectName, 'query.viewName': 'manageData'});
 
-        this.dockedItems = [{
-            xtype: 'toolbar',
-            dock: 'bottom',
-            ui: 'footer',
-            style: 'background-color: transparent;',
-            items: [
-                LABKEY.ext4.FORMBUTTONS.getButton('SUBMIT', {successURL : this.returnUrl}),
-                LABKEY.ext4.FORMBUTTONS.getButton('CANCEL', {returnURL : this.returnUrl})
-            ]
-        }];
+        if (this.mode == "view")
+            this.dockedItems = [];
+        else
+            this.dockedItems = [this.getToolBar()];
         this.callParent();
+    },
+
+    getToolBar : function()
+    {
+        if (!this.toolbar)
+        {
+            this.toolBar = {
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                style: 'background-color: transparent;'
+            };
+            this.toolBar.items = [
+                {
+                    text: 'Submit',
+                    formBind: true,
+                    successURL: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
+                    handler: function (btn)
+                    {
+                        var panel = btn.up('form');
+                        panel.doSubmit(btn);
+                    }
+                },
+                {
+                    text: 'Cancel',
+                    returnUrl: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
+                    handler: function (btn, key)
+                    {
+                        window.location = btn.returnUrl;
+                    }
+                }
+            ];
+        }
+        return this.toolBar;
     },
 
     shouldShowInInsertView: function(metadata) {
@@ -60,6 +88,14 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
                 field.editable = true;
                 field.facetingBehaviorType = "AUTOMATIC";
                 field.multiSelect = true;
+                field.convert = function(v, record)
+                {
+                    console.log(v, record);
+                    if (Ext4.isArray(v))
+                        return v;
+                    else if (Ext4.isString(v))
+                        return v.split(",");
+                }
             }
         }
     },
@@ -67,11 +103,6 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
     isJoinTableField : function(fieldName)
     {
         return this.joinTableFields.indexOf(fieldName) >= 0;
-    },
-
-    uncapitalize : function(name)
-    {
-        return name && name[0].toLowerCase() + name.slice(1)
     },
 
     /** Override **/
@@ -102,6 +133,8 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
             if (this.shouldShowInView(field)){
 
                 var fieldEditor = LABKEY.ext4.Util.getFormEditorConfig(field, config);
+                fieldEditor.cls = 'labkey-field-editor';
+                fieldEditor.labelCls ='labkey-field-editor-label';
                 if (fieldEditor.isRequired && this.mode != "view")
                     fieldEditor.fieldLabel = fieldEditor.fieldLabel + " *";
                 if (!fieldEditor.width)
@@ -122,7 +155,7 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
                     fieldEditor.store.containerFilter = fieldEditor.containerFilter;
                     fieldEditor.multiSelect = field.multiSelect;
                     fieldEditor.store.autoLoad = true;
-                    fieldEditor.delimiter = '; '
+                    fieldEditor.delimiter = '; ';
                 }
 
                 if (field.isAutoIncrement){
