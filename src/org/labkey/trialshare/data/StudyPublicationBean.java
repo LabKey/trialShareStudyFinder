@@ -15,6 +15,7 @@
  */
 package org.labkey.trialshare.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
@@ -521,6 +522,7 @@ public class StudyPublicationBean
         return false;
     }
 
+    @JsonIgnore
     public Map<String, Object> getPrimaryFields()
     {
        return _primaryFields;
