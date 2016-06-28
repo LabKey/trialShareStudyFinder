@@ -13,6 +13,13 @@ public class StudyEditBean extends StudyBean
     private List<String> _conditions = new ArrayList<>();
     private List<String> _therapeuticAreas = new ArrayList<>();
 
+    public StudyEditBean() {}
+
+    public StudyEditBean(StudyBean study)
+    {
+        setPrimaryFields(study.getPrimaryFields());
+    }
+
     public List<String> getAgeGroups()
     {
         return _ageGroups;

@@ -27,6 +27,21 @@
     border-top-width: 0;
 }
 
+.labkey-data-finder-editor
+{
+    padding: 5px;
+}
+
+.labkey-combo-disabled .x4-form-item-body
+{
+    opacity: 0.7
+}
+
+.labkey-combo-disabled .x4-trigger-cell
+{
+    display: none;
+}
+
 .labkey-data-finder-editor-message
 {
     padding-bottom: 20px;

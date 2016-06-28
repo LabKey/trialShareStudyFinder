@@ -8,6 +8,8 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
 
     cls: 'labkey-data-finder-editor',
 
+    bodyPadding: 5,
+
     fieldClsName: 'labkey-field-editor',
     fieldLabelClsName : 'labkey-field-editor-label',
 
@@ -20,38 +22,45 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
     mode: "view",
     multiSelectDelimiter: '; ',
 
+    cubeObject : null,
 
     stripNewLinesFields: [],
+    
 
-    initComponent : function() {
+    initComponent : function()
+    {
 
         this.manageDataUrl = LABKEY.ActionURL.buildURL('trialShare', 'manageData.view', null, {objectName : this.objectName, 'query.viewName': 'manageData'});
 
-        this.dockedItems = [{
-            xtype: 'toolbar',
-            dock: 'bottom',
-            ui: 'footer',
-            style: 'background-color: transparent;',
-            items: [
-                {
-                    text: 'Submit',
-                    formBind: true,
-                    successURL:  LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
-                    handler: function(btn)
+        if (this.mode != "view")
+        {
+            this.dockedItems = [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                style: 'background-color: transparent;',
+                items: [
                     {
-                        var panel = btn.up('form');
-                        panel.doSubmit(btn);
+                        text: 'Submit',
+                        formBind: true,
+                        successURL: LABKEY.ActionURL.getParameter('returnUrl') || this.nextStepUrl || this.manageDataUrl,
+                        handler: function (btn)
+                        {
+                            var panel = btn.up('form');
+                            panel.doSubmit(btn);
+                        }
+                    },
+                    {
+                        text: 'Cancel',
+                        returnUrl: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
+                        handler: function (btn, key)
+                        {
+                            window.location = btn.returnUrl;
+                        }
                     }
-                },
-                {
-                    text: 'Cancel',
-                    returnUrl: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
-                    handler: function(btn, key){
-                        window.location = btn.returnUrl;
-                    }
-                }
-            ]
-        }];
+                ]
+            }];
+        }
 
         this.callParent();
         this.add({
@@ -62,27 +71,34 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
             cls: 'labkey-data-finder-editor-message'
         });
         this.add(this.getFormFields());
-    },
-
-
-    shouldShowInDisplayView: function(metadata) {
-        var record = this.store.getAt(0); // there will only be a single item in the store when in view mode
-        if (record)
+        if (this.cubeObject)
         {
-            var field = record.get(metadata.name);
-            return field !== undefined && field !== ""
+            this.bindFormFields();
         }
-        return false;
     },
 
 
     // override this to set up the form for the cube object
     getFormFields: function()
     {
-        var items = [];
-        return items;
+        return [];
     },
 
+    bindFormFields : function()
+    {
+        if (this.cubeObject)
+        {
+            for (var fieldName in this.cubeObject)
+            {
+                if (this.cubeObject.hasOwnProperty(fieldName))
+                {
+                    var field = this.getForm().findField(fieldName);
+                    if (field)
+                        field.setValue(this.cubeObject[fieldName]);
+                }
+            }
+        }
+    },
 
     doSubmit: function(btn){
         btn.setDisabled(true);

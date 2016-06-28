@@ -33,16 +33,13 @@ import org.labkey.api.action.SpringActionController;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.DataRegionSelection;
-import org.labkey.api.data.SimpleFilter;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
-import org.labkey.api.query.FieldKey;
+import org.labkey.api.exp.list.ListDefinition;
+import org.labkey.api.exp.list.ListService;
 import org.labkey.api.query.QueryForm;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
-import org.labkey.api.query.QuerySettings;
-import org.labkey.api.query.QueryView;
-import org.labkey.api.query.UserSchema;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.DeletePermission;
@@ -824,175 +821,6 @@ public class TrialShareController extends SpringActionController
 
     }
 
-//    @ActionNames("selectRows, getQuery")
-//    @RequiresPermission(ReadPermission.class)
-//    @ApiVersion(9.1)
-//    @Action(ActionType.SelectData.class)
-//    public class SelectRowsAction extends ApiAction<APIQueryForm>
-//    {
-//        public ApiResponse execute(APIQueryForm form, BindException errors) throws Exception
-//        {
-////            ensureQueryExists(form);
-//
-//            // Issue 12233: add implicit maxRows=100k when using client API
-//            if (null == form.getLimit()
-//                    && null == getViewContext().getRequest().getParameter(form.getDataRegionName() + "." + QueryParam.maxRows)
-//                    && null == getViewContext().getRequest().getParameter(form.getDataRegionName() + "." + QueryParam.showRows))
-//            {
-//                form.getQuerySettings().setShowRows(ShowRows.PAGINATED);
-//                form.getQuerySettings().setMaxRows(100);
-//            }
-//
-//            if (form.getLimit() != null)
-//            {
-//                form.getQuerySettings().setShowRows(ShowRows.PAGINATED);
-//                form.getQuerySettings().setMaxRows(form.getLimit());
-//            }
-//            if (form.getStart() != null)
-//                form.getQuerySettings().setOffset(form.getStart());
-//            if (form.getContainerFilter() != null)
-//            {
-//                // If the user specified an incorrect filter, throw an IllegalArgumentException
-//                ContainerFilter.Type containerFilterType =
-//                        ContainerFilter.Type.valueOf(form.getContainerFilter());
-//                form.getQuerySettings().setContainerFilterName(containerFilterType.name());
-//            }
-//
-//            QueryView view = QueryView.create(form, errors);
-//
-//            view.setShowPagination(form.isIncludeTotalCount());
-//
-//            //if viewName was specified, ensure that it was actually found and used
-//            //QueryView.create() will happily ignore an invalid view name and just return the default view
-//            if (null != StringUtils.trimToNull(form.getViewName()) &&
-//                    null == view.getQueryDef().getCustomView(getUser(), getViewContext().getRequest(), form.getViewName()))
-//            {
-//                throw new NotFoundException("The view named '" + form.getViewName() + "' does not exist for this user!");
-//            }
-//
-//            boolean isEditable = false;
-//            boolean metaDataOnly = form.getQuerySettings().getMaxRows() == 0;
-//
-//            // 13.2 introduced the getData API action, a condensed response wire format, and a js wrapper to consume the wire format. Support this as an option for legacy API's.
-//            if (getRequestedApiVersion() >= 13.2)
-//            {
-//                ReportingApiQueryResponse response = new ReportingApiQueryResponse(view, isEditable, true, view.getQueryDef().getName(), form.getQuerySettings().getOffset(), null,
-//                        metaDataOnly, form.isIncludeDetailsColumn(), form.isIncludeUpdateColumn());
-//                response.includeStyle(form.isIncludeStyle());
-//                return response;
-//            }
-//            //if requested version is >= 9.1, use the extended api query response
-//            else if (getRequestedApiVersion() >= 9.1)
-//            {
-//                ExtendedApiQueryResponse response = new ExtendedApiQueryResponse(view, isEditable, true,
-//                        form.getSchemaName(), form.getQueryName(), form.getQuerySettings().getOffset(), null,
-//                        metaDataOnly, form.isIncludeDetailsColumn(), form.isIncludeUpdateColumn());
-//                response.includeStyle(form.isIncludeStyle());
-//                return response;
-//            }
-//            else
-//            {
-//                return new ApiQueryResponse(view, isEditable, true,
-//                        form.getSchemaName(), form.getQueryName(), form.getQuerySettings().getOffset(), null,
-//                        metaDataOnly, form.isIncludeDetailsColumn(), form.isIncludeUpdateColumn(),
-//                        form.isIncludeDisplayValues());
-//            }
-//        }
-//    }
-//
-//    public static class APIQueryForm extends QueryForm
-//    {
-//        private Integer _start;
-//        private Integer _limit;
-//        private boolean _includeDetailsColumn = false;
-//        private boolean _includeUpdateColumn = false;
-//        private String _containerFilter;
-//        private boolean _includeTotalCount = true;
-//        private boolean _includeStyle = false;
-//        private boolean _includeDisplayValues = false;
-//
-//        public Integer getStart()
-//        {
-//            return _start;
-//        }
-//
-//        public void setStart(Integer start)
-//        {
-//            _start = start;
-//        }
-//
-//        public Integer getLimit()
-//        {
-//            return _limit;
-//        }
-//
-//        public void setLimit(Integer limit)
-//        {
-//            _limit = limit;
-//        }
-//
-//        public String getContainerFilter()
-//        {
-//            return _containerFilter;
-//        }
-//
-//        public void setContainerFilter(String containerFilter)
-//        {
-//            _containerFilter = containerFilter;
-//        }
-//
-//        public boolean isIncludeTotalCount()
-//        {
-//            return _includeTotalCount;
-//        }
-//
-//        public void setIncludeTotalCount(boolean includeTotalCount)
-//        {
-//            _includeTotalCount = includeTotalCount;
-//        }
-//
-//        public boolean isIncludeStyle()
-//        {
-//            return _includeStyle;
-//        }
-//
-//        public void setIncludeStyle(boolean includeStyle)
-//        {
-//            _includeStyle = includeStyle;
-//        }
-//
-//        public boolean isIncludeDetailsColumn()
-//        {
-//            return _includeDetailsColumn;
-//        }
-//
-//        public void setIncludeDetailsColumn(boolean includeDetailsColumn)
-//        {
-//            _includeDetailsColumn = includeDetailsColumn;
-//        }
-//
-//        public boolean isIncludeUpdateColumn()
-//        {
-//            return _includeUpdateColumn;
-//        }
-//
-//        public void setIncludeUpdateColumn(boolean includeUpdateColumn)
-//        {
-//            _includeUpdateColumn = includeUpdateColumn;
-//        }
-//
-//        public boolean isIncludeDisplayValues()
-//        {
-//            return _includeDisplayValues;
-//        }
-//
-//        public void setIncludeDisplayValues(boolean includeDisplayValues)
-//        {
-//            _includeDisplayValues = includeDisplayValues;
-//        }
-//    }
-
-
     @RequiresPermission(ReadPermission.class)
     public class PublicationDetailsAction extends ApiAction<PublicationIdForm>
     {
@@ -1144,7 +972,6 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(ReadPermission.class)
     public class ManageDataAction extends SimpleViewAction<CubeObjectNameForm>
     {
-
         @Override
         public void validate(CubeObjectNameForm form, BindException errors)
         {
@@ -1208,7 +1035,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(UpdatePermission.class)
-    public class EditPublicationAction extends CaseInsensitiveApiAction<PublicationEditBean>
+    public class UpdatePublicationAction extends CaseInsensitiveApiAction<PublicationEditBean>
     {
         @Override
         public void validateForm(PublicationEditBean form, Errors errors)
@@ -1249,7 +1076,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(UpdatePermission.class)
-    public class EditStudyAction extends CaseInsensitiveApiAction<StudyEditBean>
+    public class UpdateStudyAction extends CaseInsensitiveApiAction<StudyEditBean>
     {
         @Override
         public void validateForm(StudyEditBean form, Errors errors)
@@ -1346,11 +1173,11 @@ public class TrialShareController extends SpringActionController
 
 
     @RequiresPermission(UpdatePermission.class)
-    public class EditDataAction extends CubeObjectDetailFormAction
+    public class UpdateDataAction extends CubeObjectDetailFormAction
     {
         protected String getMode()
         {
-            return "edit";
+            return "update";
         }
     }
 
@@ -1364,10 +1191,10 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    private abstract class CubeObjectDetailFormAction extends SimpleViewAction<CubeObjectDetailBean>
+    private abstract class CubeObjectDetailFormAction extends SimpleViewAction<CubeObjectDetailForm>
     {
         @Override
-        public void validate(CubeObjectDetailBean form, BindException errors)
+        public void validate(CubeObjectDetailForm form, BindException errors)
         {
             if (form.getObjectName() == null)
                 errors.reject("Object name is required");
@@ -1376,24 +1203,24 @@ public class TrialShareController extends SpringActionController
         protected abstract String getMode();
 
         @Override
-        public ModelAndView getView(CubeObjectDetailBean bean, BindException errors) throws Exception
+        public ModelAndView getView(CubeObjectDetailForm bean, BindException errors) throws Exception
         {
             setTitle(StringUtils.capitalize(getMode()) + bean.getObjectName().getDisplayName());
             bean.setMode(getMode());
             if (bean.getObjectName() == ObjectName.publication)
+            {
+                if (bean.getId() != null)
+                    bean.setCubeObject(TrialShareManager.get().getPublication(Integer.valueOf((String) bean.getId()), getUser(), getContainer()));
                 return new JspView("/org/labkey/trialshare/view/publicationDetails.jsp", bean);
+            }
             else
             {
+                ListDefinition def = ListService.get().getList(getContainer(), TrialShareQuerySchema.STUDY_ACCESS_TABLE);
+                bean.setAccessListId(def.getListId());
                 JspView<CubeObjectNameForm> view = new JspView("/org/labkey/trialshare/view/studyDetails.jsp", bean);
 
-                UserSchema userSchema = TrialShareQuerySchema.getUserSchema(getUser(), getContainer());
-
-                QuerySettings settings = userSchema.getSettings(getViewContext(), QueryView.DATAREGIONNAME_DEFAULT, TrialShareQuerySchema.STUDY_ACCESS_TABLE);
-                SimpleFilter filter = settings.getBaseFilter();
-                filter.addAllClauses(new SimpleFilter(FieldKey.fromParts("StudyId"), (String) bean.getId()));
-                QueryView queryView = userSchema.createView(getViewContext(), settings, errors);
-                view.setTitle("Study Access");
-                view.setView("studiesAccessView", queryView);
+                if (bean.getId() != null)
+                    bean.setCubeObject(TrialShareManager.get().getStudy((String) bean.getId(), getUser(), getContainer()));
                 return view;
             }
         }
@@ -1412,18 +1239,29 @@ public class TrialShareController extends SpringActionController
         }
     }
 
-    public static class CubeObjectDetailBean extends CubeObjectNameForm
+    public static class CubeObjectDetailForm extends CubeObjectForm
     {
+        private Integer _accessListId; // identifier of the list that containes access parameters (used only for studies currently)
         private String _mode;
         private Object _id;
 
-        public CubeObjectDetailBean()
+        public CubeObjectDetailForm()
         {
         }
 
-        public CubeObjectDetailBean(@NotNull String mode)
+        public CubeObjectDetailForm(@NotNull String mode)
         {
             _mode = mode;
+        }
+
+        public Integer getAccessListId()
+        {
+            return _accessListId;
+        }
+
+        public void setAccessListId(Integer accessListId)
+        {
+            _accessListId = accessListId;
         }
 
         public Object getId()

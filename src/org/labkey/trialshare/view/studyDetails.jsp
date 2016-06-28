@@ -15,6 +15,7 @@
      * limitations under the License.
      */
 %>
+<%@ page import="org.json.JSONObject" %>
 <%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
@@ -34,11 +35,11 @@
     }
 %>
 <%
-    JspView<TrialShareController.CubeObjectDetailBean> me = (JspView<TrialShareController.CubeObjectDetailBean>) HttpView.currentView();
-    TrialShareController.CubeObjectDetailBean bean = me.getModelBean();
+    JspView<TrialShareController.CubeObjectDetailForm> me = (JspView<TrialShareController.CubeObjectDetailForm>) HttpView.currentView();
+    TrialShareController.CubeObjectDetailForm bean = me.getModelBean();
 
-    ModelAndView studyAccessView = me.getView("studiesAccessView");
     String renderId = "study-details-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
+    String cubeObjectJson = bean.getCubeObject() == null ? "null" : new JSONObject(bean.getCubeObject()).toString(2);
 %>
 <labkey:errors/>
 <div id="<%= h(renderId)%>" class="requests-editor"></div>
@@ -49,14 +50,9 @@
         Ext4.create('LABKEY.study.panel.StudyDetailsFormPanel', {
             mode: "<%=h(bean.getMode())%>",
             objectName : 'Study',
-            renderTo: <%=q(renderId)%>
+            renderTo: <%=q(renderId)%>,
+            accessListId : <%= bean.getAccessListId() %>,
+            cubeObject : <%= text( cubeObjectJson )%>
         });
     });
 </script>
-
-<%
-    if (studyAccessView != null)
-    {
-        me.include(studyAccessView, out);
-    }
-%>

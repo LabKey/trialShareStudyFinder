@@ -11,8 +11,6 @@ SELECT
         pub.Journal,
         pub.Status,
         pub.SubmissionStatus,
-        pub.Study as PrimaryStudy,
-        pub.StudyId as PrimaryStudyId,
         pub.AbstractText,
         pub.Keywords,
         pub.PermissionsContainer,

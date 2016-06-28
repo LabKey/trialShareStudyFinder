@@ -15,6 +15,7 @@
      * limitations under the License.
      */
 %>
+<%@ page import="org.json.JSONObject" %>
 <%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
@@ -33,10 +34,13 @@
     }
 %>
 <%
-    TrialShareController.CubeObjectDetailBean bean = ((JspView<TrialShareController.CubeObjectDetailBean>) HttpView.currentView()).getModelBean();
+    TrialShareController.CubeObjectDetailForm bean = ((JspView<TrialShareController.CubeObjectDetailForm>) HttpView.currentView()).getModelBean();
 
     String renderId = "publication-details-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
+
+    String cubeObjectJson = bean.getCubeObject() == null ? "null" : new JSONObject(bean.getCubeObject()).toString(2);
 %>
+
 <labkey:errors/>
 <div id="<%= h(renderId)%>" class="requests-editor"></div>
 
@@ -46,7 +50,8 @@
         Ext4.create('LABKEY.study.panel.PublicationDetailsFormPanel', {
             mode: "<%=h(bean.getMode())%>",
             objectName : 'Publication',
-            renderTo: <%=q(renderId)%>
+            renderTo: <%=q(renderId)%>,
+            cubeObject : <%= text( cubeObjectJson )%>
         });
     });
 </script>

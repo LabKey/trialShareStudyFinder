@@ -8,47 +8,62 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
 
     stripNewLinesFields : ['ExternalUrlDescription'],
 
+    study : null,
+
+    initComponent: function()
+    {
+        if (this.mode == "insert")
+        {
+            this.nextStepUrl = LABKEY.ActionURL.buildURL("list", "grid", LABKEY.ActionURL.getContainer(),
+                    {
+                        listId: this.accessListId,
+                        returnUrl: window.location
+                    });
+        }
+        this.callParent();
+    },
+
     getFormFields: function()
     {
         var items = [];
         items.push(
                 {
-                    xtype           : 'textfield',
+                    xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Short Name *',
-                    name            : 'ShortName',
+                    name            : 'shortName',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth
                 });
         items.push(
                 {
-                    xtype           : 'textfield',
+                    xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Study Id *',
-                    name            : 'StudyId',
+                    name            : 'studyId',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth
                 });
         items.push(
                 {
-                    xtype           : 'textfield',
+                    xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Title *',
-                    name            : 'Title',
+                    name            : 'title',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
         items.push(
                 {
-                    xtype           : 'numberfield',
+                    xtype           : this.mode == "view" ? 'displayfield' : 'numberfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     minValue        : 0,
                     fieldLabel      : 'Participant Count',
-                    name            : 'ParticipantCount',
+                    name            : 'participantCount',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth
                 }
@@ -58,8 +73,10 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     xtype           : 'combo',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
                     fieldLabel      : 'Study Type',
-                    name            : 'StudyType',
+                    name            : 'studyType',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth,
                     valueField      : 'StudyType',
@@ -72,53 +89,55 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                 });
         items.push(
                 {
-                    xtype           : 'textfield',
+                    xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Icon Url',
-                    name            : 'IconUrl',
+                    name            : 'iconUrl',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
         items.push(
                 {
-                    xtype           : 'textfield',
+                    xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'External Url',
-                    name            : 'ExternalURL',
+                    name            : 'externalURL',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
         items.push(
                 {
-                    xtype           : 'textarea',
+                    xtype           : 'htmleditor',
+                    disabled        : this.mode == "view",
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'External Url Description',
-                    name            : 'ExternalUrlDescription',
-                    labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.largeFieldWidth,
-                    height          : 50
-                });
-        items.push(
-                {
-                    xtype           : 'textarea',
-                    cls             : this.fieldClsName,
-                    labelCls        : this.fieldLabelClsName,
-                    fieldLabel      : 'Description',
-                    name            : 'Description',
+                    name            : 'externalUrlDescription',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
                     height          : 100
                 });
         items.push(
                 {
-                    xtype           : 'textfield',
+                    xtype           : 'htmleditor',
+                    disabled        : this.mode == "view",
+                    cls             : this.fieldClsName,
+                    labelCls        : this.fieldLabelClsName,
+                    fieldLabel      : 'Description',
+                    name            : 'description',
+                    labelWidth      : this.defaultFieldLabelWidth,
+                    width           : this.largeFieldWidth,
+                    height          : 200
+                });
+        items.push(
+                {
+                    xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Investigator',
-                    name            : 'Investigator',
+                    name            : 'investigator',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
@@ -128,8 +147,10 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     xtype           : 'combo',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
                     fieldLabel      : 'Age Groups',
-                    name            : 'AgeGroups',
+                    name            : 'ageGroups',
                     multiSelect     : true,
                     delimiter       : this.multiSelectDelimiter,
                     labelWidth      : this.defaultFieldLabelWidth,
@@ -147,10 +168,12 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     xtype           : 'combo',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
                     multiSelect     : true,
                     delimiter       : this.multiSelectDelimiter,
                     fieldLabel      : 'Phases',
-                    name            : 'Phases',
+                    name            : 'phases',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.mediumFieldWidth,
                     valueField      : 'Phase',
@@ -164,11 +187,13 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'combo',
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
                     multiSelect     : true,
                     delimiter       : this.multiSelectDelimiter,
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
-                    name            : 'Conditions',
+                    name            : 'conditions',
                     store : {
                         model   : 'LABKEY.study.data.Condition',
                         autoLoad: true
@@ -178,7 +203,6 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     valueField      : 'Condition',
                     displayField    : 'Condition',
                     editable        : false,
-                    delimiter       : '; ',
                     width           : this.mediumLargeFieldWidth
                 }
         );
@@ -186,11 +210,13 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'combo',
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
                     multiSelect     : true,
                     delimiter       : this.multiSelectDelimiter,
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
-                    name            : 'TherapeuticAreas',
+                    name            : 'therapeuticAreas',
                     store : {
                         model   : 'LABKEY.study.data.TherapeuticArea',
                         autoLoad: true
@@ -200,10 +226,27 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     valueField      : 'TherapeuticArea',
                     displayField    : 'TherapeuticArea',
                     editable        : false,
-                    delimiter       : '; ',
                     width           : this.mediumFieldWidth
                 }
         );
+
+        if (this.mode != "insert")
+        {
+            items.push(
+                    {
+                        xtype : 'displayfield',
+                        hideLabel: true,
+                        width: 175,
+                        value: LABKEY.Utils.textLink({
+                            href: LABKEY.ActionURL.buildURL("list", "grid", LABKEY.ActionURL.getContainer(),
+                                    {
+                                        listId: this.accessListId,
+                                        'query.StudyId/ShortName~eq' : this.cubeObject.shortName,
+                                        returnUrl: window.location}),
+                            text: this.mode + ' Study Access Data'})
+                    }
+            );
+        }
         
         return items;
     }

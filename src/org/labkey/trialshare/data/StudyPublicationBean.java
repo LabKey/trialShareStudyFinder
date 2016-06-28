@@ -106,20 +106,10 @@ public class StudyPublicationBean
         _primaryFields.put(STUDY_ID_FIELD, studyId);
     }
 
-//    public String getPmid()
-//    {
-//        return (String) _primaryFields.get(PMID_FIELD);
-//    }
-
     public String getPMID()
     {
         return (String) _primaryFields.get(PMID_FIELD);
     }
-
-//    public void setPmid(String pmid)
-//    {
-//        _primaryFields.put(PMID_FIELD, pmid);
-//    }
 
     public void setPMID(String pmid)
     {
@@ -135,16 +125,6 @@ public class StudyPublicationBean
     {
         _primaryFields.put(PMCID_FIELD, pmcid);
     }
-
-//    public String getPMCID()
-//    {
-//        return getPmcid();
-//    }
-//
-//    public void setPMCID(String pmcid)
-//    {
-//        setPmcid(pmcid);
-//    }
 
     public String getDoi()
     {
@@ -548,22 +528,27 @@ public class StudyPublicationBean
        return _primaryFields;
     }
 
+    protected void setPrimaryFields(Map<String, Object> fields)
+    {
+       _primaryFields = fields;
+    }
+
 
     public void validate(Errors errors)
     {
         if (getTitle() == null)
-            errors.rejectValue("Title", ERROR_REQUIRED, "Title is required");
+            errors.rejectValue("title", ERROR_REQUIRED, "Title is required");
         if (getStatus() == null)
-            errors.rejectValue("Status", ERROR_REQUIRED, "Status is required");
+            errors.rejectValue("status", ERROR_REQUIRED, "Status is required");
         if (getPublicationType() == null)
-            errors.rejectValue("PublicationType", ERROR_REQUIRED, "Publication type is required");
+            errors.rejectValue("publicationType", ERROR_REQUIRED, "Publication type is required");
         if (getPMID() != null && !StringUtils.isNumeric(getPMID()))
         {
-            errors.rejectValue("PMID", ERROR_MSG, "PMID must be an integer");
+            errors.rejectValue("pmid", ERROR_MSG, "PMID must be an integer");
         }
         if (getPmcid() != null && !PMCID_PATTERN.matcher(getPmcid()).matches())
         {
-            errors.rejectValue("PMCID", ERROR_MSG, "Incorrect format for PMCID.  Expected PMC#");
+            errors.rejectValue("pmcid", ERROR_MSG, "Incorrect format for PMCID.  Expected PMC#");
         }
     }
 

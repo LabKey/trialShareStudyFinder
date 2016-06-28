@@ -12,6 +12,13 @@ public class PublicationEditBean extends StudyPublicationBean
     private List<String> _conditions = new ArrayList<>();
     private List<String> _therapeuticAreas = new ArrayList<>();
 
+    public PublicationEditBean() {}
+
+    public PublicationEditBean(StudyPublicationBean base)
+    {
+        setPrimaryFields(base.getPrimaryFields());
+    }
+
     public List<String> getConditions()
     {
         return _conditions;

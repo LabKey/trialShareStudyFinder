@@ -180,6 +180,7 @@ public class StudyBean
         if (listSchema != null)
         {
             SimpleFilter filter = new SimpleFilter();
+            // TODO fix this to not use the StudyId field from the PUBLICATION_TABLE
             filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
             if (publicationType != null)
             {
@@ -416,14 +417,19 @@ public class StudyBean
         return _primaryFields;
     }
 
+    protected void setPrimaryFields(Map<String, Object> primaryFields)
+    {
+        _primaryFields = primaryFields;
+    }
+
     public void validate(Errors errors)
     {
         if (getShortName() == null)
-            errors.rejectValue("ShortName", ERROR_REQUIRED, "Short Name is required");
+            errors.rejectValue("shortName", ERROR_REQUIRED, "Short Name is required");
         if (getStudyId() == null)
-            errors.rejectValue("StudyId", ERROR_REQUIRED, "Study Id is required");
+            errors.rejectValue("studyId", ERROR_REQUIRED, "Study Id is required");
         if (getTitle() == null)
-            errors.rejectValue("Title", ERROR_REQUIRED, "Title is required");
+            errors.rejectValue("title", ERROR_REQUIRED, "Title is required");
     }
 }
 

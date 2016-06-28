@@ -72,7 +72,7 @@ Ext4.define('LABKEY.study.panel.JunctionEditFormPanel', {
     },
 
     shouldShowInView: function(metadata) {
-        if (this.mode == "edit" || this.mode == "insert")
+        if (this.mode == "update" || this.mode == "insert")
             return this.shouldShowInInsertView(metadata);
         else
             return this.shouldShowInDisplayView(metadata);
