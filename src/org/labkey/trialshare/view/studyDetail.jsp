@@ -130,9 +130,9 @@
                         %><br/><span class="labkey-publication-author"><%=h(pub.getAuthor())%></span><%
                     }
                 %><%
-                    if (!StringUtils.isEmpty(pub.getPmid()))
+                    if (!StringUtils.isEmpty(pub.getPMID()))
                     {
-                        %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPmid(), null, null, linkProps)%><%
+                        %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPMID(), null, null, linkProps)%><%
                     }
                     for (URLData urlData : pub.getUrls())
                     {
