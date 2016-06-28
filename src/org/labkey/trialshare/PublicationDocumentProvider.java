@@ -37,6 +37,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.labkey.trialshare.query.TrialShareQuerySchema.IN_PROGRESS_STATUS;
+
 public class PublicationDocumentProvider implements SearchService.DocumentProvider
 {
     private static final Logger _logger = LoggerFactory.getLogger(PublicationDocumentProvider.class);
@@ -135,7 +137,12 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 else if (results.getString("ManuscriptContainer") != null)
                     containerId = results.getString("ManuscriptContainer");
                 else
+                {
+                    // Issue 26794: don't index publications that are in progress and do not have a permissions container
+                    if (IN_PROGRESS_STATUS.equals(results.getString("Status")))
+                        continue;
                     containerId = ContainerManager.getHomeContainer().getId();
+                }
 
                 ActionURL url = new ActionURL(TrialShareController.PublicationDetailsAction.class, c).addParameter("id", results.getString("PublicationId"));
                 url.setExtraPath(containerId);
