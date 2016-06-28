@@ -179,15 +179,8 @@ public class StudyBean
 
         if (listSchema != null)
         {
-            SimpleFilter filter = new SimpleFilter();
-            // TODO fix this to not use the StudyId field from the PUBLICATION_TABLE
-            filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
-            if (publicationType != null)
-            {
-                filter.addCondition(FieldKey.fromParts("PublicationType"), publicationType);
-            }
-            List<StudyPublicationBean> allPublications = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class);
-            this.publications.clear();
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
+            List<StudyPublicationBean> allPublications = schema.getStudyPublications(getStudyId(), publicationType);
             for (StudyPublicationBean publication : allPublications)
             {
                 if (publication.getShow() && publication.hasPermission(user))

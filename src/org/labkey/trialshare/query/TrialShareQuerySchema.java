@@ -1,5 +1,6 @@
 package org.labkey.trialshare.query;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.SQLFragment;
 import org.labkey.api.data.SqlSelector;
@@ -208,15 +209,21 @@ public class TrialShareQuerySchema
         return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyPublicationBean.class);
     }
 
-    public List<StudyPublicationBean> getStudyPublications(String studyId)
+    public List<StudyPublicationBean> getStudyPublications(String studyId, @Nullable String publicationType)
     {
-        SQLFragment sql = new SQLFragment("SELECT pub.*, ps.StudyId FROM " );
-        sql.append(getPublicationStudyTableInfo(), "ps");
-        sql.append(" LEFT JOIN ");
+        SQLFragment sql = new SQLFragment("SELECT pub.*, ps.StudyId FROM ");
         sql.append(getPublicationsTableInfo(), "pub");
+        sql.append(" LEFT JOIN ");
+        sql.append(getPublicationStudyTableInfo(), "ps");
         sql.append(" ON ps.PublicationId = pub.Key ");
-        sql.append( "WHERE ps.StudyId = ? ");
+        sql.append("WHERE ps.StudyId = ? ");
         sql.add(studyId);
+        if (publicationType != null)
+        {
+            sql.append(" AND pub.publicationType = ?");
+            sql.add(publicationType);
+        }
+
 
         return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyPublicationBean.class);
     }
