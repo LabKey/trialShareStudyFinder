@@ -173,15 +173,11 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
             showSeparator: false
         });
 
-        studyLinksMenu.on('click', function(menu, item) {
-                   window.open(LABKEY.ActionURL.buildURL("project", 'begin.view', item.value));
-                },
-                this
-        );
-
         for (var i = 0; i < studyLinks.length; i++) {
             studyLinksMenu.add({
                 text: studyLinks[i].displayName ? studyLinks[i].displayName : studyLinks[i].studyContainerPath,
+                href: LABKEY.ActionURL.getContextPath() + studyLinks[i].studyContainerPath,
+                hrefTarget: "_blank",
                 value: studyLinks[i].studyContainerPath
             });
         }

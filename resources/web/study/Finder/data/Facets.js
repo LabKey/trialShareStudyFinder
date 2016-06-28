@@ -208,12 +208,15 @@ Ext4.define('LABKEY.study.store.Facets', {
                         var filters = {};
                         for (var level in o.data)
                         {
+                            if (!o.data.hasOwnProperty(level))
+                                continue;
                             if (Ext4.isObject(o.data[level]) || (Ext4.isArray(o.data[level]) && o.data[level].length))
                             {
+                                var includedMembers = this.removeMembersNotInCube(level, o.data[level]);
                                 if (!filters[level])
-                                    filters[level] = o.data[level];
+                                    filters[level] = includedMembers;
                                 else
-                                    filters[level] = filters[level].concat(o.data[level]);
+                                    filters[level] = filters[level].concat(includedMembers);
                             }
                         }
                         this.makeCountDistinctQueries(filters);
@@ -226,6 +229,41 @@ Ext4.define('LABKEY.study.store.Facets', {
                 },
                 scope: this
             });
+        }
+    },
+
+    removeMembersNotInCube : function(level, filterData)
+    {
+        if (!filterData)
+            return filterData;
+        if (Ext4.isArray(filterData))
+        {
+            // split the level name into its parts to use for accessing the cube members
+            var levelParts = level.replace(/[\[\]]/g, "").split(".");
+            if (levelParts && levelParts.length > 1)
+            {
+                // find the uniqueNames of the current members of the cube for the given level
+                var uniqueNames = this.mdx._cube.hierarchyMap[levelParts[0]].levelMap[levelParts[1]].members.map(function (m)
+                {
+                    return m.uniqueName
+                });
+                // filter out the accessible members that are not currently part of the cube
+                var includedMembers = filterData.filter(function (m)
+                {
+                    return uniqueNames.indexOf(m) >= 0;
+                });
+                return includedMembers;
+            }
+
+        }
+        else if (Ext4.isObject(filterData))
+        {
+            for (var nextLevel in filterData)
+            {
+                if (filterData.hasOwnProperty(nextLevel))
+                    filterData[nextLevel] = this.removeMembersNotInCube(nextLevel, filterData[nextLevel]);
+            }
+            return filterData;
         }
     },
 
