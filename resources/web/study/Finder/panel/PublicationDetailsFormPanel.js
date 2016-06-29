@@ -177,6 +177,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     spinUpEnabled   : false,
+                    minValue        : 1,
                     spinDownEnabled : false,
                     fieldLabel      : 'PMID',
                     name            : 'pmid',
