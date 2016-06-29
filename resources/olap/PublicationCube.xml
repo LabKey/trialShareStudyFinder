@@ -29,9 +29,12 @@
                 <Level name="Featured" visible="true"  type="Boolean" column="Featured" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
-            <Hierarchy name="Study" hasAll="true" primaryKey="publicationId">
-                <Table name="publicationStudy" schema="lists"/>
-                <Level name="Study" visible="true" table="publicationStudy" type="String" column="ShortName" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+            <Hierarchy name="Study" hasAll="true" primaryKey="publicationId" schema="lists" primaryKeyTable="publicationStudy">
+                <Join leftKey="StudyId" rightKey="studyId">
+                    <Table name="publicationStudy" schema="lists"/>
+                    <Table name="StudyProperties" schema="lists"/>
+                </Join>
+                <Level name="Study" visible="true" table="StudyProperties" type="String" column="ShortName" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
             <Hierarchy name="Year" hasAll="true" primaryKey="Key">
