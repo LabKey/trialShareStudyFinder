@@ -193,7 +193,13 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     fieldLabel      : 'PMCID',
                     name            : 'PMCID',
                     labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.smallFieldWidth
+                    width           : this.smallFieldWidth,
+                    validator       : function(value) {
+                        if (!value || value == "" || value.match(/PMC\d+/))
+                                return true;
+                        else
+                                return "Invalid format for PMCID.  Expected PMC####."
+                    }
                 });
 
         items.push(
