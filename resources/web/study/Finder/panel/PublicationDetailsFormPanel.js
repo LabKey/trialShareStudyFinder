@@ -239,29 +239,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
 
         items.push(
                 {
-                    xtype           : 'combo',
-                    disabled        : this.mode == "view",
-                    disabledCls     : 'labkey-combo-disabled',
-                    multiSelect     : true,
-                    cls             : this.fieldClsName,
-                    labelCls        : this.fieldLabelClsName,
-                    name            : 'therapeuticAreas',
-                    store : {
-                        model   : 'LABKEY.study.data.TherapeuticArea',
-                        autoLoad: true
-                    },
-                    fieldLabel      : 'Therapeutic Areas',
-                    labelWidth      : this.defaultFieldLabelWidth,
-                    valueField      : 'TherapeuticArea',
-                    displayField    : 'TherapeuticArea',
-                    editable        : false,
-                    delimiter       : this.multiSelectDelimiter,
-                    width      : 500
-                }
-        );
-
-        items.push(
-                {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textarea',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
