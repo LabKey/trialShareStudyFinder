@@ -224,7 +224,6 @@ public class TrialShareQuerySchema
             sql.add(publicationType);
         }
 
-
         return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyPublicationBean.class);
     }
 
