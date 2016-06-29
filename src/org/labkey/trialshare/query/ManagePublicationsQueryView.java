@@ -19,9 +19,10 @@ public class ManagePublicationsQueryView extends ManageCubeObjectQueryView
     private static final Set<String> _defaultColumns = new HashSet<>();
     static
     {
-        _defaultColumns.add("title");
-        _defaultColumns.add("show");
         _defaultColumns.add("key");
+        _defaultColumns.add("title");
+        _defaultColumns.add("status");
+        _defaultColumns.add("publicationType");
     }
     public ManagePublicationsQueryView(ViewContext context, BindException errors)
     {
