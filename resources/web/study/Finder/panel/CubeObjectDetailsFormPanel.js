@@ -43,7 +43,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                     {
                         text: 'Submit',
                         formBind: true,
-                        successURL: LABKEY.ActionURL.getParameter('returnUrl') || this.nextStepUrl || this.manageDataUrl,
+                        successURL: this.nextStepUrl || LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
                         handler: function (btn)
                         {
                             var panel = btn.up('form');
@@ -105,12 +105,15 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
 
         function onSuccess(response, options){
             btn.setDisabled(false);
-            
-            if (!this.supressSuccessAlert) {
-                Ext4.Msg.alert("Success", "Your upload was successful!", function(){
-                    window.location = btn.successURL || LABKEY.ActionURL.buildURL('query', 'executeQuery', null, {schemaName: this.store.schemaName, 'query.queryName': this.store.queryName})
-                }, this);
+
+            var msg = "Your " + this.objectName.toLowerCase() + " was saved.";
+            if (this.mode == "insert" && this.objectName == "Study")
+            {
+                msg += " Enter study access data to make the study visible in the finder.";
             }
+            Ext4.Msg.alert("Success", msg, function(){
+                window.location = btn.successURL;
+            }, this);
         }
 
         function onError(response, options){
