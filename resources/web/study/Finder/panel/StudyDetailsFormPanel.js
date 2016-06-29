@@ -232,20 +232,23 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
 
         if (this.mode != "insert")
         {
-            items.push(
+            items.push (
                     {
-                        xtype : 'displayfield',
-                        hideLabel: true,
-                        width: 175,
-                        value: LABKEY.Utils.textLink({
-                            href: LABKEY.ActionURL.buildURL("list", "grid", LABKEY.ActionURL.getContainer(),
+                        tag: 'div',
+                        itemId: 'nextStepEl',
+                        html:LABKEY.Utils.textLink({
+                                href: LABKEY.ActionURL.buildURL("list", "grid", LABKEY.ActionURL.getContainer(),
                                     {
                                         listId: this.accessListId,
                                         'query.StudyId/ShortName~eq' : this.cubeObject.shortName,
-                                        returnUrl: window.location}),
-                            text: this.mode + ' Study Access Data'})
+                                        returnUrl: window.location
+                                    }),
+                                text: this.mode + ' Study Access Data'
+                        }),
+                        border: false,
+                        cls: 'labkey-data-finder-editor-message'
                     }
-            );
+            )
         }
         
         return items;
