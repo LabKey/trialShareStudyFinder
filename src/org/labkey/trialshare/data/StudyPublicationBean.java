@@ -116,22 +116,22 @@ public class StudyPublicationBean
         _primaryFields.put(PMID_FIELD, pmid);
     }
 
-    public String getPmcid()
+    public String getPMCID()
     {
         return (String) _primaryFields.get(PMCID_FIELD);
     }
 
-    public void setPmcid(String pmcid)
+    public void setPMCID(String pmcid)
     {
         _primaryFields.put(PMCID_FIELD, pmcid);
     }
 
-    public String getDoi()
+    public String getDOI()
     {
         return (String) _primaryFields.get(DOI_FIELD);
     }
 
-    public void setDoi(String doi)
+    public void setDOI(String doi)
     {
         _primaryFields.put(DOI_FIELD, doi);
     }
@@ -232,12 +232,6 @@ public class StudyPublicationBean
         _primaryFields.put(ABSTRACT_FIELD, abstractText);
     }
 
-    public void setDescription1(String description1)
-    {
-        setUrlText(0, description1);
-    }
-
-
     public String getUrl() {
         for (URLData urlData : urls)
         {
@@ -297,33 +291,48 @@ public class StudyPublicationBean
         return null;
     }
 
+
+    public void setDescription1(String description1)
+    {
+        setUrlText(0, description1);
+    }
+
+    public String getDescription1() { return getUrlData(0).getLinkText(); }
+
     public void setDescription2(String description2)
     {
         setUrlText(1, description2);
     }
+
+    public String getDescription2() { return getUrlData(1).getLinkText(); }
 
     public void setDescription3(String description3)
     {
         setUrlText(2, description3);
     }
 
+    public String getDescription3() { return getUrlData(2).getLinkText(); }
 
     public void setLink1(String link1)
     {
         setUrlLink(0, link1);
     }
 
+    public String getLink1() { return getUrlData(0).getLink(); }
 
     public void setLink2(String link2)
     {
         setUrlLink(1, link2);
     }
 
+    public String getLink2() { return getUrlData(1).getLink(); }
 
     public void setLink3(String link3)
     {
         setUrlLink(2, link3);
     }
+
+    public String getLink3() { return getUrlData(2).getLink(); }
 
     public String getStatus()
     {
@@ -546,7 +555,7 @@ public class StudyPublicationBean
         {
             errors.rejectValue("pmid", ERROR_MSG, "PMID must be an integer");
         }
-        if (getPmcid() != null && !PMCID_PATTERN.matcher(getPmcid()).matches())
+        if (getPMCID() != null && !PMCID_PATTERN.matcher(getPMCID()).matches())
         {
             errors.rejectValue("pmcid", ERROR_MSG, "Incorrect format for PMCID.  Expected PMC#");
         }

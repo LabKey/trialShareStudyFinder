@@ -17,6 +17,7 @@ public class PublicationEditBean extends StudyPublicationBean
     public PublicationEditBean(StudyPublicationBean base)
     {
         setPrimaryFields(base.getPrimaryFields());
+        setUrls(base.getUrls());
     }
 
     public List<String> getConditions()

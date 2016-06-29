@@ -165,7 +165,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'DOI',
-                    name            : 'doi',
+                    name            : 'DOI',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth
                 });
@@ -180,7 +180,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     minValue        : 1,
                     spinDownEnabled : false,
                     fieldLabel      : 'PMID',
-                    name            : 'pmid',
+                    name            : 'PMID',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth
                 });
@@ -191,7 +191,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'PMCID',
-                    name            : 'pmcid',
+                    name            : 'PMCID',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth
                 });

@@ -266,8 +266,7 @@ public class TrialShareManager
             SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), publication.getId());
 
             // update the many-to-one data
-            // conditions
-            // first get rid of the current values for this publication
+            // first get rid of the current values for this publication.  Then add the new data
             schema.getPublicationConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.CONDITION_FIELD, publication.getConditions(), user, container);
 
