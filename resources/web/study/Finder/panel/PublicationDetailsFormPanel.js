@@ -31,6 +31,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
+                    allowBlank      : false,
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Title *',
@@ -41,6 +42,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'combo',
+                    allowBlank      : false,
                     disabled        : this.mode == "view",
                     disabledCls     : 'labkey-combo-disabled',
                     cls             : this.fieldClsName,
@@ -60,6 +62,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'combo',
+                    allowBlank      : false,
                     disabled        : this.mode == "view",
                     disabledCls     : 'labkey-combo-disabled',
                     cls             : this.fieldClsName,
@@ -194,12 +197,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     name            : 'PMCID',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth,
-                    validator       : function(value) {
-                        if (!value || value == "" || value.match(/PMC\d+/))
-                                return true;
-                        else
-                                return "Invalid format for PMCID.  Expected PMC####."
-                    }
+                    regex           : /PMC\d+/
                 });
 
         items.push(

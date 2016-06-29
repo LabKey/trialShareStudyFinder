@@ -31,6 +31,7 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
+                    allowBlank      : false,
                     fieldLabel      : 'Short Name *',
                     name            : 'shortName',
                     labelWidth      : this.defaultFieldLabelWidth,
@@ -41,6 +42,7 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
+                    allowBlank      : false,
                     fieldLabel      : 'Study Id *',
                     name            : 'studyId',
                     labelWidth      : this.defaultFieldLabelWidth,
@@ -52,6 +54,7 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Title *',
+                    allowBlank      : false,
                     name            : 'title',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
