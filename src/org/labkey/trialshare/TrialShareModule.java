@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
-import org.labkey.api.module.DefaultModule;
+import org.labkey.api.module.CodeOnlyModule;
 import org.labkey.api.module.FolderTypeManager;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.module.ModuleProperty;
@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-public class TrialShareModule extends DefaultModule
+public class TrialShareModule extends CodeOnlyModule
 {
     public static final String NAME = "TrialShare";
     private final ModuleProperty _cubeContainer;
@@ -49,18 +49,6 @@ public class TrialShareModule extends DefaultModule
     public String getName()
     {
         return NAME;
-    }
-
-    @Override
-    public double getVersion()
-    {
-        return 16.10;
-    }
-
-    @Override
-    public boolean hasScripts()
-    {
-        return false;
     }
 
     public TrialShareModule()
