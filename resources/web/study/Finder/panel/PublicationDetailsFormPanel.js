@@ -142,7 +142,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
-                    fieldLabel      : 'Journal',
+                    fieldLabel      : 'Journal/Meeting',
                     name            : 'journal',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.mediumLargeFieldWidth
@@ -200,47 +200,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     regex           : /PMC\d+/
                 });
 
-        items.push(
-                {
-                    xtype           : 'combo',
-                    disabled        : this.mode == "view",
-                    disabledCls     : 'labkey-combo-disabled',
-                    cls             : this.fieldClsName,
-                    labelCls        : this.fieldLabelClsName,
-                    name            : 'manuscriptContainer',
-                    store           : {
-                        model   : 'LABKEY.study.data.Container',
-                        autoLoad: true
-                    },
-                    fieldLabel      : 'Manuscript Container',
-                    labelWidth      : this.defaultFieldLabelWidth,
-                    valueField      : 'EntityId',
-                    displayField    : 'Path',
-                    editable        : false,
-                    width           : this.mediumLargeFieldWidth
-                }
-        );
-
-        items.push(
-                {
-                    xtype           : 'combo',
-                    disabled        : this.mode == "view",
-                    disabledCls     : 'labkey-combo-disabled',
-                    cls             : this.fieldClsName,
-                    labelCls        : this.fieldLabelClsName,
-                    name            : 'permissionsContainer',
-                    store           : {
-                        model   : 'LABKEY.study.data.Container',
-                        autoLoad: true
-                    },
-                    fieldLabel      : 'Permissions Container',
-                    labelWidth      : this.defaultFieldLabelWidth,
-                    valueField      : 'EntityId',
-                    displayField    : 'Path',
-                    editable        : false,
-                    width           : this.mediumLargeFieldWidth
-                }
-        );
 
         items.push(
                 {
@@ -255,6 +214,30 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     height          : 50
                 }
         );
+
+        items.push(
+                {
+                    xtype           : 'combo',
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
+                    multiSelect     : true,
+                    cls             : this.fieldClsName,
+                    labelCls        : this.fieldLabelClsName,
+                    name            : 'therapeuticAreas',
+                    store : {
+                        model   : 'LABKEY.study.data.TherapeuticArea',
+                        autoLoad: true
+                    },
+                    fieldLabel      : 'Therapeutic Areas',
+                    labelWidth      : this.defaultFieldLabelWidth,
+                    valueField      : 'TherapeuticArea',
+                    displayField    : 'TherapeuticArea',
+                    editable        : false,
+                    delimiter       : this.multiSelectDelimiter,
+                    width           : this.mediumFieldWidth
+                }
+        );
+
 
         items.push(
                 {
@@ -293,6 +276,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                 }
         );
 
+
         items.push(
                 {
                     xtype           : 'combo',
@@ -316,28 +300,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                 }
         );
 
-        items.push(
-                {
-                    xtype           : 'combo',
-                    disabled        : this.mode == "view",
-                    disabledCls     : 'labkey-combo-disabled',
-                    multiSelect     : true,
-                    cls             : this.fieldClsName,
-                    labelCls        : this.fieldLabelClsName,
-                    name            : 'therapeuticAreas',
-                    store : {
-                        model   : 'LABKEY.study.data.TherapeuticArea',
-                        autoLoad: true
-                    },
-                    fieldLabel      : 'Therapeutic Areas',
-                    labelWidth      : this.defaultFieldLabelWidth,
-                    valueField      : 'TherapeuticArea',
-                    displayField    : 'TherapeuticArea',
-                    editable        : false,
-                    delimiter       : this.multiSelectDelimiter,
-                    width           : this.mediumFieldWidth
-                }
-        );
 
         items.push(
                 {
@@ -404,6 +366,48 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
+
+        items.push(
+                {
+                    xtype           : 'combo',
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
+                    cls             : this.fieldClsName,
+                    labelCls        : this.fieldLabelClsName,
+                    name            : 'manuscriptContainer',
+                    store           : {
+                        model   : 'LABKEY.study.data.Container',
+                        autoLoad: true
+                    },
+                    fieldLabel      : 'Manuscript Container',
+                    labelWidth      : this.defaultFieldLabelWidth,
+                    valueField      : 'EntityId',
+                    displayField    : 'Path',
+                    editable        : false,
+                    width           : this.mediumLargeFieldWidth
+                }
+        );
+
+        items.push(
+                {
+                    xtype           : 'combo',
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
+                    cls             : this.fieldClsName,
+                    labelCls        : this.fieldLabelClsName,
+                    name            : 'permissionsContainer',
+                    store           : {
+                        model   : 'LABKEY.study.data.Container',
+                        autoLoad: true
+                    },
+                    fieldLabel      : 'Permissions Container',
+                    labelWidth      : this.defaultFieldLabelWidth,
+                    valueField      : 'EntityId',
+                    displayField    : 'Path',
+                    editable        : false,
+                    width           : this.mediumLargeFieldWidth
+                }
+        );
         return items;
     }
 });
