@@ -112,12 +112,12 @@ public class StudyBean
         _primaryFields.put(TITLE_FIELD, title);
     }
 
-    public String getExternalUrl()
+    public String getExternalURL()
     {
         return (String) _primaryFields.get(EXTERNAL_URL_FIELD);
     }
 
-    public void setExternalUrl(String externalUrl)
+    public void setExternalURL(String externalUrl)
     {
         _primaryFields.put(EXTERNAL_URL_FIELD, externalUrl);
     }

@@ -18,17 +18,16 @@ package org.labkey.test.tests.trialshare;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.Git;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -43,7 +42,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-@Category({Git.class})
 public abstract class DataFinderTestBase extends BaseWebDriverTest
 {
     static final String MODULE_NAME = "TrialShare";
@@ -170,7 +168,13 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
         new PortalHelper(this).addWebPart(WEB_PART_NAME);
     }
 
-    protected abstract void importLists();
+    protected void importLists()
+    {
+        ListHelper listHelper = new ListHelper(this);
+        listHelper.importListArchive(dataListArchive);
+        goToProjectHome();
+        listHelper.importListArchive(lookupListArchive);
+    }
 
     protected abstract void createStudies();
 

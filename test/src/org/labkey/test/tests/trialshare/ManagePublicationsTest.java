@@ -2,14 +2,16 @@ package org.labkey.test.tests.trialshare;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.labkey.test.categories.Git;
 import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.pages.trialshare.ManageDataPage;
 import org.labkey.test.pages.trialshare.PublicationEditPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
-import org.labkey.test.pages.trialshare.StudyPropertiesQueryUpdatePage;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.pages.trialshare.StudiesListHelper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +25,10 @@ import static org.labkey.test.pages.trialshare.PublicationEditPage.TITLE;
 /**
  * Created by susanh on 6/29/16.
  */
-public class ManagePublicationTest extends DataFinderTestBase
+@Category({Git.class})
+public class ManagePublicationsTest extends DataFinderTestBase
 {
-    CubeObjectType _objectType = CubeObjectType.publication;
+    private CubeObjectType _objectType = CubeObjectType.publication;
 
     private static final String PUBLIC_STUDY_ID = "Casale";
     private static final String OPERATIONAL_STUDY_ID = "WISP-R";
@@ -71,22 +74,11 @@ public class ManagePublicationTest extends DataFinderTestBase
 
 
     @Override
-    protected void importLists()
-    {
-        ListHelper listHelper = new ListHelper(this);
-        listHelper.importListArchive(dataListArchive);
-        goToProjectHome();
-        listHelper.importListArchive(lookupListArchive);
-    }
-
-    @Override
     protected void createStudies()
     {
         createStudy(PUBLIC_STUDY_NAME);
         createStudy(OPERATIONAL_STUDY_NAME);
         goToProjectHome();
-//        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-//        queryUpdatePage.setStudyContainers();
     }
 
     @Override
@@ -146,7 +138,7 @@ public class ManagePublicationTest extends DataFinderTestBase
         Assert.assertTrue("Should be manage publications view", manageData.isManageDataView());
     }
 
-    @Test
+    @Test @Ignore("Finding the fields that are display/disabled fields is not yet implemented")
     public void testViewDetails()
     {
         goToProjectHome();
@@ -208,9 +200,9 @@ public class ManagePublicationTest extends DataFinderTestBase
     public void testInsertWithAllFields()
     {
         goToProjectHome();
-        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
-        queryUpdatePage.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
+        StudiesListHelper studiesListHelper = new StudiesListHelper(this);
+        studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
+        studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
@@ -258,9 +250,9 @@ public class ManagePublicationTest extends DataFinderTestBase
     public void testInsertMultiValuedFields()
     {
         goToProjectHome();
-        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
-        queryUpdatePage.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
+        StudiesListHelper studiesListHelper = new StudiesListHelper(this);
+        studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
+        studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
@@ -290,9 +282,9 @@ public class ManagePublicationTest extends DataFinderTestBase
     public void testEditMultiValuedFields()
     {
         goToProjectHome();
-        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
-        queryUpdatePage.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
+        StudiesListHelper studiesListHelper = new StudiesListHelper(this);
+        studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
+        studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
@@ -336,9 +328,9 @@ public class ManagePublicationTest extends DataFinderTestBase
     public void testUpdatePublication()
     {
         goToProjectHome();
-        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
-        queryUpdatePage.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
+        StudiesListHelper studiesListHelper = new StudiesListHelper(this);
+        studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
+        studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
@@ -414,9 +406,9 @@ public class ManagePublicationTest extends DataFinderTestBase
     public void testInsertAndDelete()
     {
         goToProjectHome();
-        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
-        queryUpdatePage.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
+        StudiesListHelper studiesListHelper = new StudiesListHelper(this);
+        studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
+        studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
@@ -453,9 +445,9 @@ public class ManagePublicationTest extends DataFinderTestBase
     public void testInsertAndRefresh()
     {
         goToProjectHome();
-        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
-        queryUpdatePage.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
-        queryUpdatePage.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
+        StudiesListHelper studiesListHelper = new StudiesListHelper(this);
+        studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
+        studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);

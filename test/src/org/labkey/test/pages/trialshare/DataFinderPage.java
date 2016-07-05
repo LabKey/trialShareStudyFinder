@@ -62,12 +62,15 @@ public class DataFinderPage extends LabKeyPage
 
     public boolean canManageData()
     {
-        return isElementPresent(Locators.manageData);
+        return this.testingStudies ? isElementPresent(Locators.manageStudyData) : isElementPresent(Locators.managePublicationData);
     }
 
     public void goToManageData()
     {
-        Locators.manageData.findElement(this.getDriver()).click();
+        if (this.testingStudies)
+            Locators.manageStudyData.findElement(this.getDriver()).click();
+        else
+            Locators.managePublicationData.findElement(this.getDriver()).click();
     }
 
     public String getCountSignal()
@@ -294,7 +297,8 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.CssLocator saveMenu = Locator.css("#saveMenu");
         public static final Locator.CssLocator loadMenu = Locator.css("#loadMenu");
         public static final Locator.IdLocator manageMenu = Locator.id("manageMenu");
-        public static final Locator.CssLocator manageData = Locator.css(".labkey-publications-panel .labkey-finder-manage-data");
+        public static final Locator.CssLocator managePublicationData = Locator.css(".labkey-publications-panel .labkey-finder-manage-data");
+        public static final Locator.CssLocator manageStudyData = Locator.css(".labkey-studies-panel .labkey-finder-manage-data");
 
         public static final Locator.CssLocator getSearchInput(Locator.CssLocator locator)
         {

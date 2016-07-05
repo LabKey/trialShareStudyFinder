@@ -35,11 +35,10 @@ import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.study.ManageParticipantGroupsPage;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
-import org.labkey.test.pages.trialshare.StudyPropertiesQueryUpdatePage;
+import org.labkey.test.pages.trialshare.StudiesListHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ReadOnlyTest;
@@ -99,12 +98,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         }
     }
 
-    protected void importLists()
-    {
-        ListHelper listHelper = new ListHelper(this);
-        listHelper.importListArchive(dataListArchive);
-    }
-
+    @Override
     protected void createStudies()
     {
         log("Creating a study container for each study");
@@ -119,7 +113,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         createStudy(PUBLIC_STUDY_NAME);
         createStudy(OPERATIONAL_STUDY_NAME);
         goToProjectHome();
-        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
+        StudiesListHelper queryUpdatePage = new StudiesListHelper(this);
         queryUpdatePage.setStudyContainers();
         goToProjectHome();
         PublicationsListHelper pubUpdatePage = new PublicationsListHelper(this);

@@ -16,6 +16,7 @@
 
 package org.labkey.trialshare;
 
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
@@ -54,6 +55,7 @@ import static org.labkey.api.action.SpringActionController.ERROR_MSG;
 public class TrialShareManager
 {
 
+    private static final Logger _logger = Logger.getLogger(TrialShareManager.class);
     private static final TrialShareManager _instance = new TrialShareManager();
 
     private TrialShareManager()
@@ -239,6 +241,7 @@ public class TrialShareManager
         }
         catch (Exception e)
         {
+            _logger.error(e);
             errors.reject(ERROR_MSG, "Publication insert failed: " + e.getMessage());
         }
     }
@@ -282,6 +285,7 @@ public class TrialShareManager
         }
         catch (Exception e)
         {
+            _logger.error(e);
             errors.reject(ERROR_MSG, "Publication update failed: " + e.getMessage());
         }
 
@@ -329,6 +333,7 @@ public class TrialShareManager
         }
         catch (Exception e)
         {
+            _logger.error(e);
             errors.reject(ERROR_MSG, e.getMessage());
         }
 
@@ -358,22 +363,23 @@ public class TrialShareManager
             SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.STUDY_ID_FIELD), studyId);
 
             // update the many-to-one data.  First get rid of the current values for the study
-            schema.getPublicationConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyConditionTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, filter), null, null);
+            schema.getStudyConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyConditionTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getStudyConditionTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.CONDITION_FIELD, study.getConditions(), user, container);
 
-            schema.getStudyAgeGroupTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, filter), null, null);
+            schema.getStudyAgeGroupTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.AGE_GROUP_FIELD, study.getAgeGroups(), user, container);
 
-            schema.getStudyPhaseTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, filter), null, null);
+            schema.getStudyPhaseTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.PHASE_FIELD, study.getPhases(), user, container);
 
-            schema.getStudyTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, filter), null, null);
+            schema.getStudyTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, study.getTherapeuticAreas(), user, container);
 
             transaction.commit();
         }
         catch (Exception e)
         {
+            _logger.error(e);
             errors.reject(ERROR_MSG, "Problem inserting study " + e.getMessage());
         }
 
@@ -414,6 +420,7 @@ public class TrialShareManager
         }
         catch (Exception e)
         {
+            _logger.error(e);
             errors.reject(ERROR_MSG, "Problem inserting study " + e.getMessage());
         }
     }
@@ -450,6 +457,7 @@ public class TrialShareManager
         }
         catch (Exception e)
         {
+            _logger.error(e);
             errors.reject(ERROR_MSG, e.getMessage());
         }
     }
