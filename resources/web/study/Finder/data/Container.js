@@ -14,7 +14,8 @@ Ext4.define('LABKEY.study.data.Container', {
             containerFilter : 'AllFolders',
             'query.columns' : "EntityId,DisplayName,Path",
             'query.queryName': "Containers",
-            'query.sort': "DisplayName"
+            'query.sort': "DisplayName",
+            limit : -1
         },
         reader : {
             type : 'json',
