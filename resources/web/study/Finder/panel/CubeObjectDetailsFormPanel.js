@@ -52,7 +52,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                     },
                     {
                         text: 'Cancel',
-                        returnUrl: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
+                        returnUrl: this.manageDataUrl || LABKEY.ActionURL.getParameter('returnUrl'),
                         handler: function (btn, key)
                         {
                             window.location = btn.returnUrl;
@@ -120,15 +120,22 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
             btn.setDisabled(false);
 
             obj = Ext4.JSON.decode(response.responseText);
-            for (var i = 0; i < obj.errors.length; i++)
+            if (obj.errors[0].field == "form")
             {
-                var field = this.getForm().findField(obj.errors[i].field);
-                if (field)
-                    field.markInvalid([obj.errors[i].message]);
-                else
-                    console.log("Unable to find field for invalidation", obj.errors[i]);
+                Ext4.Msg.alert("Error", "There were problems submitting your data. " + obj.errors[0].message);
             }
-            Ext4.Msg.alert("Error", "There were problems submitting your data. Please check the form for errors.");
+            else
+            {
+                for (var i = 0; i < obj.errors.length; i++)
+                {
+                    var field = this.getForm().findField(obj.errors[i].field);
+                    if (field)
+                        field.markInvalid([obj.errors[i].message]);
+                    else
+                        console.log("Unable to find field for invalidation", obj.errors[i]);
+                }
+                Ext4.Msg.alert("Error", "There were problems submitting your data. Please check the form for errors.");
+            }
         }
 
         Ext4.Ajax.request({
