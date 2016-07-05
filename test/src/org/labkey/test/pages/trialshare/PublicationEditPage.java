@@ -25,7 +25,6 @@ public class PublicationEditPage extends CubeObjectEditPage
     public static final String PERMISSIONS_CONTAINER  ="permissionsContainer";
     public static final String KEYWORDS ="keywords";
     public static final String STUDIES ="studyIds";
-    public static final String CONDITIONS ="conditions";
     public static final String THERAPEUTIC_AREAS ="therapeuticAreas";
     public static final String LINK1 ="link1";
     public static final String DESCRIPTION1 ="description1";
@@ -46,7 +45,6 @@ public class PublicationEditPage extends CubeObjectEditPage
     static
     {
         MULTI_SELECT_FIELD_NAMES.put(STUDIES, "Studies:");
-        MULTI_SELECT_FIELD_NAMES.put(CONDITIONS, "Conditions:");
         MULTI_SELECT_FIELD_NAMES.put(THERAPEUTIC_AREAS, "Therapeutic Areas:");
     }
 
@@ -68,7 +66,6 @@ public class PublicationEditPage extends CubeObjectEditPage
         FIELD_NAMES.add(PERMISSIONS_CONTAINER);
         FIELD_NAMES.add(KEYWORDS);
         FIELD_NAMES.add(STUDIES);
-        FIELD_NAMES.add(CONDITIONS);
         FIELD_NAMES.add(THERAPEUTIC_AREAS);
         FIELD_NAMES.add(LINK1);
         FIELD_NAMES.add(DESCRIPTION1);

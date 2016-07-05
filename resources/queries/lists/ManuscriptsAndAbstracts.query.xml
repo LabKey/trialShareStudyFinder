@@ -14,16 +14,6 @@
                         </fk>
                         <hidden>false</hidden>
                     </column>
-                    <column columnName="Conditions" wrappedColumnName="key">
-                        <fk>
-                            <fkDbSchema>lists</fkDbSchema>
-                            <fkTable>PublicationCondition</fkTable>
-                            <fkColumnName>publicationId</fkColumnName>
-                            <fkMultiValued>junction</fkMultiValued>
-                            <fkJunctionLookup>Condition</fkJunctionLookup>
-                        </fk>
-                        <hidden>false</hidden>
-                    </column>
                     <column columnName="TherapeuticAreas" wrappedColumnName="key">
                         <fk>
                             <fkDbSchema>lists</fkDbSchema>

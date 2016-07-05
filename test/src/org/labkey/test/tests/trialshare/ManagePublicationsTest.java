@@ -55,7 +55,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
         EXISTING_PUB_FIELDS.put(PublicationEditPage.PERMISSIONS_CONTAINER, OPERATIONAL_STUDY_SUBFOLDER_NAME);
         EXISTING_PUB_FIELDS.put(PublicationEditPage.KEYWORDS, EMPTY_VALUE);
         EXISTING_PUB_FIELDS.put(PublicationEditPage.STUDIES, EMPTY_VALUE);
-        EXISTING_PUB_FIELDS.put(PublicationEditPage.CONDITIONS, "Microscopic Polyangiitis");
         EXISTING_PUB_FIELDS.put(PublicationEditPage.THERAPEUTIC_AREAS, "Autoimmune");
         EXISTING_PUB_FIELDS.put(PublicationEditPage.LINK1, "https://www.immunetolerance.org/sites/files/Specks_NEJM_2013.pdf");
         EXISTING_PUB_FIELDS.put(PublicationEditPage.DESCRIPTION1, "Paper on immunetolerance.org");
@@ -226,7 +225,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
         newFields.put(PublicationEditPage.PERMISSIONS_CONTAINER, OPERATIONAL_STUDY_SUBFOLDER_NAME);
         newFields.put(PublicationEditPage.KEYWORDS, "key words keywords");
         newFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
-        newFields.put(PublicationEditPage.CONDITIONS, new String[]{"Allergy"});
         newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
         newFields.put(PublicationEditPage.LINK1, "http://link/to.this");
         newFields.put(PublicationEditPage.DESCRIPTION1, "Link 1 Description");
@@ -264,7 +262,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
         newFields.put(PublicationEditPage.STATUS, "In Progress");
 
         newFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID, OPERATIONAL_STUDY_ID});
-        newFields.put(PublicationEditPage.CONDITIONS, new String[]{"Allergy", "Asthma", "Autoimmune Disorders"});
         newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune", "Allergy"});
 
         manageData.goToInsertNew();
@@ -296,7 +293,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
         initialFields.put(PublicationEditPage.STATUS, "In Progress");
 
         initialFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
-        initialFields.put(PublicationEditPage.CONDITIONS, new String[]{"Allergy", "Asthma"});
         initialFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune", "Allergy"});
 
         manageData.goToInsertNew();
@@ -309,15 +305,12 @@ public class ManagePublicationsTest extends DataFinderTestBase
 
         Map<String, Object> newFields = new HashMap<>();
         newFields.put(PublicationEditPage.STUDIES, new String[]{OPERATIONAL_STUDY_ID});
-        // this removes "Allergy" and adds "Cat Allergy"
-        newFields.put(PublicationEditPage.CONDITIONS, new String[]{"Allergy", "Cat Allergy"});
         newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"T1DM"});
         editPage.setFormFields(newFields, false);
         editPage.submit();
 
         manageData.goToEditRecord((String) initialFields.get(TITLE));
         initialFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID, OPERATIONAL_STUDY_ID});
-        initialFields.put(PublicationEditPage.CONDITIONS, new String[]{"Asthma", "Cat Allergy"});
         initialFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune", "Allergy", "T1DM"});
 
         Map<String, String> unexpectedValues = editPage.compareFormValues(initialFields);
@@ -353,7 +346,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
         initialFields.put(PublicationEditPage.PERMISSIONS_CONTAINER, OPERATIONAL_STUDY_SUBFOLDER_NAME);
         initialFields.put(PublicationEditPage.KEYWORDS, "key words keywords");
         initialFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
-        initialFields.put(PublicationEditPage.CONDITIONS, new String[]{"Allergy"});
         initialFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
         initialFields.put(PublicationEditPage.LINK1, "http://link/to.this");
         initialFields.put(PublicationEditPage.DESCRIPTION1, "Link 1 Description");
@@ -419,7 +411,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
         initialFields.put(PublicationEditPage.PUBLICATION_TYPE, "Manuscript");
         initialFields.put(PublicationEditPage.STATUS, "In Progress");
         initialFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
-        initialFields.put(PublicationEditPage.CONDITIONS, new String[]{"Allergy"});
         initialFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
         manageData.goToInsertNew();
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
@@ -435,8 +426,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
         Assert.assertEquals("Found deleted publication", 0, listHelper.getPublicationCount((String) initialFields.get(PublicationEditPage.TITLE), true));
         goToProjectHome();
         Assert.assertEquals("Found studies for deleted publication", 0, listHelper.getPublicationStudyCount((String) initialFields.get(PublicationEditPage.TITLE), true));
-        goToProjectHome();
-        Assert.assertEquals("Found conditions for deleted publication", 0, listHelper.getPublicationConditionCount((String) initialFields.get(PublicationEditPage.TITLE), true));
         goToProjectHome();
         Assert.assertEquals("Found therapeutic areas for deleted publication", 0, listHelper.getPublicationTherapeuticAreaCount((String) initialFields.get(PublicationEditPage.TITLE), true));
     }

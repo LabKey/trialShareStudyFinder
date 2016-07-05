@@ -41,7 +41,7 @@ public class StudiesListHelper extends LabKeyPage
         DataRegionTable table = new DataRegionTable("query", _test);
         table.clickHeaderButtonByText("Insert New");
         selectOptionByText(Locators.studyContainerSelect, containerName);
-        setFormElement(Locators.studyVisibility, visibility);
+        selectOptionByText(Locators.studyVisibility, visibility);
         selectOptionByText(Locators.studyIdSelect, shortName);
         clickButton("Submit");
     }
@@ -116,9 +116,9 @@ public class StudiesListHelper extends LabKeyPage
 
     private static class Locators
     {
-        public static final Locator.XPathLocator studyContainerSelect = Locator.tagWithName("select", "quf_StudyContainer");
-        public static final Locator.XPathLocator studyIdSelect = Locator.tagWithName("select", "quf_StudyId");
-        public static final Locator studyVisibility = Locator.name("quf_Visibility");
+        static final Locator.XPathLocator studyContainerSelect = Locator.tagWithName("select", "quf_StudyContainer");
+        static final Locator.XPathLocator studyIdSelect = Locator.tagWithName("select", "quf_StudyId");
+        static final Locator.XPathLocator studyVisibility = Locator.tagWithName("select", "quf_Visibility");
     }
 
 }

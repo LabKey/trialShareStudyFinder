@@ -279,30 +279,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
 
         items.push(
                 {
-                    xtype           : 'combo',
-                    disabled        : this.mode == "view",
-                    disabledCls     : 'labkey-combo-disabled',
-                    multiSelect     : true,
-                    cls             : this.fieldClsName,
-                    labelCls        : this.fieldLabelClsName,
-                    name            : 'conditions',
-                    store : {
-                        model   : 'LABKEY.study.data.Condition',
-                        autoLoad: true
-                    },
-                    fieldLabel      : 'Conditions',
-                    labelWidth      : this.defaultFieldLabelWidth,
-                    valueField      : 'Condition',
-                    displayField    : 'Condition',
-                    editable        : false,
-                    delimiter       : this.multiSelectDelimiter,
-                    width           : this.mediumLargeFieldWidth
-                }
-        );
-
-
-        items.push(
-                {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,

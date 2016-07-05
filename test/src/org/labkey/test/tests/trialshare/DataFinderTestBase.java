@@ -58,7 +58,6 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     static final String CONTROLLER = "trialshare";
     static final String ACTION = "dataFinder";
     static File dataListArchive = TestFileUtils.getSampleData("DataFinder.lists.zip");
-    static File lookupListArchive = TestFileUtils.getSampleData("Lookups.lists.zip");
 
     public enum CubeObjectType {
 
@@ -172,8 +171,6 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     {
         ListHelper listHelper = new ListHelper(this);
         listHelper.importListArchive(dataListArchive);
-        goToProjectHome();
-        listHelper.importListArchive(lookupListArchive);
     }
 
     protected abstract void createStudies();

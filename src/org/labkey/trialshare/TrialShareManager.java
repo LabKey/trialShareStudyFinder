@@ -227,13 +227,10 @@ public class TrialShareManager
             List<Map<String, Object>> pubData = schema.getPublicationsTableInfo().getUpdateService().insertRows(user, container, Collections.singletonList(fields), batchValidationErrors, null, null);
             if (batchValidationErrors.hasErrors())
                 throw batchValidationErrors;
-            List<Map<String, Object>> dataList = new ArrayList<>();
 
             Integer publicationKey = (Integer) pubData.get(0).get(TrialShareQuerySchema.PUBLICATION_KEY_FIELD);
 
             // insert the one-to-many data
-            // conditions
-            addJoinTableData(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey, TrialShareQuerySchema.CONDITION_FIELD, publication.getConditions(), user, container);
             addJoinTableData(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey, TrialShareQuerySchema.STUDY_ID_FIELD, publication.getStudyIds(), user, container);
             addJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, publication.getTherapeuticAreas(), user, container);
 
@@ -273,9 +270,6 @@ public class TrialShareManager
 
             // update the many-to-one data
             // first get rid of the current values for this publication.  Then add the new data
-            schema.getPublicationConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
-            addJoinTableData(schema.getPublicationConditionTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.CONDITION_FIELD, publication.getConditions(), user, container);
-
             schema.getPublicationStudyTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
             addJoinTableData(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.STUDY_ID_FIELD, publication.getStudyIds(), user, container);
 
@@ -316,7 +310,6 @@ public class TrialShareManager
             TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
 
             deleteJoinTableData(schema.getPublicationStudyTableInfo(), "Key", user, container, idFilter);
-            deleteJoinTableData(schema.getPublicationConditionTableInfo(), "Key", user, container, idFilter);
             deleteJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), "Key", user, container, idFilter);
 
             List<Map<String, Object>> pkMaps = new ArrayList<>();
@@ -512,7 +505,6 @@ public class TrialShareManager
         PublicationEditBean publication = new PublicationEditBean(studyPublication);
         SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), id);
         publication.setStudyIds(new TableSelector(schema.getPublicationStudyTableInfo(), Collections.singleton(TrialShareQuerySchema.STUDY_ID_FIELD), filter, null).getArrayList(String.class));
-        publication.setConditions(new TableSelector(schema.getPublicationConditionTableInfo(), Collections.singleton(TrialShareQuerySchema.CONDITION_FIELD), filter, null).getArrayList(String.class));
         publication.setTherapeuticAreas(new TableSelector(schema.getPublicationTherapeuticAreaTableInfo(), Collections.singleton(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD), filter, null).getArrayList(String.class));
         return publication;
     }

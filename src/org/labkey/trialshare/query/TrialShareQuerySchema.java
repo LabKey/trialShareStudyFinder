@@ -58,7 +58,6 @@ public class TrialShareQuerySchema
     static
     {
         _requiredPublicationLists.add(PUBLICATION_TABLE);
-        _requiredPublicationLists.add(PUBLICATION_CONDITION_TABLE);
         _requiredPublicationLists.add(PUBLICATION_STUDY_TABLE);
         _requiredPublicationLists.add(PUBLICATION_THERAPEUTIC_AREA_TABLE);
     }
@@ -68,7 +67,6 @@ public class TrialShareQuerySchema
     static {
         _requiredStudyLists.add(STUDY_ACCESS_TABLE);
         _requiredStudyLists.add(STUDY_TABLE);
-        _requiredStudyLists.add(STUDY_ASSAY_TABLE);
         _requiredStudyLists.add(STUDY_CONDITION_TABLE);
         _requiredStudyLists.add(STUDY_AGE_GROUP_TABLE);
         _requiredStudyLists.add(STUDY_PHASE_TABLE);
@@ -232,7 +230,6 @@ public class TrialShareQuerySchema
         list.add(getStudyPropertiesTableInfo());
         list.add(getStudyAccessTableInfo());
         list.add(getStudyAgeGroupTableInfo());
-        list.add(getStudyAssayTableInfo());
         list.add(getStudyConditionTableInfo());
         list.add(getStudyPhaseTableInfo());
         list.add(getStudyTherapeuticAreaTableInfo());
@@ -242,8 +239,6 @@ public class TrialShareQuerySchema
     public List<TableInfo> getPublicationTables() {
         List<TableInfo> list = new ArrayList<>();
         list.add(getPublicationsTableInfo());
-        list.add(getPublicationAssayTableInfo());
-        list.add(getPublicationConditionTableInfo());
         list.add(getPublicationStudyTableInfo());
         list.add(getPublicationTherapeuticAreaTableInfo());
         return list;

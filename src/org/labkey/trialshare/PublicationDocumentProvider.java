@@ -89,7 +89,6 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                     "psn.StudyShortName,  " +
                     "pta.TherapeuticArea\n " +
                 "FROM ManuscriptsAndAbstracts pub\n  " +
-                    "   LEFT JOIN (SELECT PublicationId, group_concat(Condition) AS Condition FROM PublicationCondition GROUP BY PublicationId) pc on pub.Key = pc.PublicationId\n  " +
                     "   LEFT JOIN (SELECT PublicationId, group_concat(StudyId) AS StudyId FROM\n " +
                     "       (SELECT sp1.StudyId AS StudyId, ps1.PublicationId FROM PublicationStudy ps1 LEFT JOIN StudyProperties sp1 on ps1.StudyId = sp1.StudyId) " +
                     "   GROUP BY PublicationId) psid on pub.Key = psid.PublicationId\n  " +
