@@ -19,15 +19,12 @@ package org.labkey.test.tests.trialshare;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
@@ -37,7 +34,7 @@ import org.labkey.test.components.trialshare.StudySummaryWindow;
 import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.study.ManageParticipantGroupsPage;
 import org.labkey.test.pages.trialshare.DataFinderPage;
-import org.labkey.test.pages.trialshare.PublicationsQueryUpdatePage;
+import org.labkey.test.pages.trialshare.PublicationsListHelper;
 import org.labkey.test.pages.trialshare.StudyPropertiesQueryUpdatePage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
@@ -48,7 +45,6 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ReadOnlyTest;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +52,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -64,54 +59,14 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({Git.class})
-public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadOnlyTest
+public class TrialShareDataFinderTest extends DataFinderTestBase implements ReadOnlyTest
 {
-    private static final String MODULE_NAME = "TrialShare";
-    private static final String WEB_PART_NAME = "TrialShare Data Finder";
-    private static final String OPERATIONAL_STUDY_NAME = "DataFinderTestOperationalStudy";
-    private static final String PUBLIC_STUDY_NAME = "DataFinderTestPublicStudy";
-    private static final String EMAIL_EXTENSION = "@datafinder.test";
-    private static final String PUBLIC_READER_DISPLAY_NAME = "public_reader";
-    private static final String PUBLIC_READER = PUBLIC_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    private static final String CASALE_READER_DISPLAY_NAME = "casale_reader";
-    private static final String CASALE_READER = CASALE_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    private static final String WISPR_READER_DISPLAY_NAME = "wispr_reader";
-    private static final String WISPR_READER = WISPR_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    private static final String CONTROLLER = "trialshare";
-    private static final String ACTION = "dataFinder";
-    private static File listArchive = TestFileUtils.getSampleData("DataFinder.lists.zip");
-
     private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
-
-    private static final Map<String, Set<String>> studySubsets = new HashMap<>();
-    static {
-
-        Set<String> operationalSet = new HashSet<>();
-        studySubsets.put("Operational", operationalSet);
-        operationalSet.add("TILT");
-        operationalSet.add("WISP-R");
-        operationalSet.add("ACCEPTOR");
-        operationalSet.add("FACTOR");
-        operationalSet.add("DIAMOND");
-
-        Set<String> publicSet = new HashSet<>();
-        studySubsets.put("Public", publicSet);
-        publicSet.add("DIAMOND");
-        publicSet.add("Shapiro");
-        publicSet.add("Casale");
-        publicSet.add("Vincenti");
-    };
-
-    private static Set<String> loadedStudies = new HashSet<>();
-    static {
-        loadedStudies.add("DataFinderTestPublicCasale");
-        loadedStudies.add("DataFinderTestOperationalWISP-R");
-    }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
+        super.doCleanup(afterTest);
         _containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, afterTest);
     }
 
@@ -125,21 +80,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     }
 
     @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
-    }
-
-    @Override
     protected String getProjectName()
     {
         return "TrialShareDataFinderTest Project";
-    }
-
-    @Override
-    public List<String> getAssociatedModules()
-    {
-        return Collections.singletonList("TrialShare");
     }
 
     @Override
@@ -156,16 +99,14 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         }
     }
 
-    private void setUpProject()
+    protected void importLists()
     {
-        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-
-        containerHelper.createProject(getProjectName(), "Custom");
-        containerHelper.enableModule(MODULE_NAME);
-        goToProjectHome();
         ListHelper listHelper = new ListHelper(this);
-        listHelper.importListArchive(listArchive);
+        listHelper.importListArchive(dataListArchive);
+    }
 
+    protected void createStudies()
+    {
         log("Creating a study container for each study");
         for (String subset : studySubsets.keySet())
         {
@@ -181,53 +122,13 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
         queryUpdatePage.setStudyContainers();
         goToProjectHome();
-        PublicationsQueryUpdatePage pubUpdatePage = new PublicationsQueryUpdatePage(this);
-        pubUpdatePage.setPermissionsContainer("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
-
-        createUsers();
-
-        List<ModulePropertyValue> propList = new ArrayList<>();
-        // set the site-default value for this so it will work as expected from the Admin Console.
-        propList.add(new ModulePropertyValue("TrialShare", "/", "DataFinderCubeContainer", getProjectName()));
-        setModuleProperties(propList);
-
-        reindexForSearch();
-
-        goToProjectHome();
-        new PortalHelper(this).addWebPart(WEB_PART_NAME);
+        PublicationsListHelper pubUpdatePage = new PublicationsListHelper(this);
+        pubUpdatePage.setPermissionsContainers("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
     }
 
-    @LogMethod
-    private void reindexForSearch()
+    protected void createUsers()
     {
-        log("Reindexing data for full-text search");
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("Data Cube"));
-        clickButton("Reindex", 0);
-        clickButton("OK");
-    }
-
-    private void createStudy(String studyName, Boolean operational)
-    {
-        log("creating study " + studyName);
-        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-        File studyArchive = operational ? TestFileUtils.getSampleData(OPERATIONAL_STUDY_NAME + ".folder.zip") : TestFileUtils.getSampleData(PUBLIC_STUDY_NAME + ".folder.zip");
-        containerHelper.createSubfolder(getProjectName(), studyName, "Study");
-        importStudyFromZip(studyArchive, true, true);
-    }
-
-    private void createStudy(String name)
-    {
-        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-
-        File studyArchive = TestFileUtils.getSampleData(name + ".folder.zip");
-        containerHelper.createSubfolder(getProjectName(), name, "Study");
-        importStudyFromZip(studyArchive, true, true);
-    }
-
-    private void createUsers()
-    {
-        log("Creating users and setting permisisons");
+        log("Creating users and setting permissions");
         goToProjectHome();
 
         _userHelper.createUser(PUBLIC_READER);
@@ -265,20 +166,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
         permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
         permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-    }
-
-    @Before
-    public void preTest()
-    {
-        goToProjectHome();
-        DataFinderPage finder = new DataFinderPage(this, true);
-        finder.clearSearch();
-        try
-        {
-            finder.clearAllFilters();
-        }
-        catch (NoSuchElementException ignore) {}
-        finder.dismissTour();
     }
 
     @Test
@@ -920,18 +807,5 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         Map<DataFinderPage.Dimension, Integer> summaryCounts = finder.getSummaryCounts();
 
         assertEquals("Summary count mismatch", dataCards.size(), summaryCounts.get(dimension).intValue());
-    }
-
-
-    private DataFinderPage goDirectlyToDataFinderPage(String containerPath, boolean testingStudies)
-    {
-        DataFinderPage finder = new DataFinderPage(this, testingStudies);
-        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), finder.getCountSignal(), longWait());
-        sleep(1000);  // HACK!
-        if (!testingStudies)
-        {
-            finder.navigateToPublications();
-        }
-        return finder;
     }
 }

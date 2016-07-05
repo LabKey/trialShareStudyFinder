@@ -67,6 +67,12 @@ public class StudyPublicationBean
     private static final String KEYWORDS_FIELD = "Keywords";
     private static final String PERMISSIONS_CONTAINER_FIELD = "PermissionsContainer";
     private static final String IS_SHOWN_FIELD = "Show";
+    private static final String LINK1_FIELD = "Link1";
+    private static final String DESCRIPTION1_FIELD = "Description1";
+    private static final String LINK2_FIELD = "Link2";
+    private static final String DESCRIPTION2_FIELD = "Description2";
+    private static final String LINK3_FIELD = "Link3";
+    private static final String DESCRIPTION3_FIELD = "Description3";
 
     private static final Pattern PMCID_PATTERN = Pattern.compile("[Pp][Mm][Cc]\\d+");
 
@@ -146,7 +152,6 @@ public class StudyPublicationBean
         if (getAuthor() == null)
             return null;
         String[] authors = getAuthor().split(",");
-        StringBuilder authorAbbrev = new StringBuilder();
         int endVal = AUTHORS_PER_ABBREV;
         String suffix = ", et al.";
         if (authors.length <= AUTHORS_PER_ABBREV)
@@ -297,42 +302,66 @@ public class StudyPublicationBean
         setUrlText(0, description1);
     }
 
-    public String getDescription1() { return getUrlData(0).getLinkText(); }
+    public String getDescription1()
+    {
+        URLData url = getUrlData(0);
+        return url == null ? null : url.getLinkText();
+    }
 
     public void setDescription2(String description2)
     {
         setUrlText(1, description2);
     }
 
-    public String getDescription2() { return getUrlData(1).getLinkText(); }
+    public String getDescription2()
+    {
+        URLData url = getUrlData(1);
+        return url == null ? null : url.getLinkText();
+    }
 
     public void setDescription3(String description3)
     {
         setUrlText(2, description3);
     }
 
-    public String getDescription3() { return getUrlData(2).getLinkText(); }
+    public String getDescription3()
+    {
+        URLData url = getUrlData(2);
+        return url == null ? null : url.getLinkText();
+    }
 
     public void setLink1(String link1)
     {
         setUrlLink(0, link1);
     }
 
-    public String getLink1() { return getUrlData(0).getLink(); }
+    public String getLink1()
+    {
+        URLData url = getUrlData(0);
+        return url == null ? null : url.getLink();
+    }
 
     public void setLink2(String link2)
     {
         setUrlLink(1, link2);
     }
 
-    public String getLink2() { return getUrlData(1).getLink(); }
+    public String getLink2()
+    {
+        URLData url = getUrlData(1);
+        return url == null ? null : url.getLink();
+    }
 
     public void setLink3(String link3)
     {
         setUrlLink(2, link3);
     }
 
-    public String getLink3() { return getUrlData(2).getLink(); }
+    public String getLink3()
+    {
+        URLData url = getUrlData(2);
+        return url == null ? null : url.getLink();
+    }
 
     public String getStatus()
     {
@@ -535,6 +564,25 @@ public class StudyPublicationBean
     public Map<String, Object> getPrimaryFields()
     {
        return _primaryFields;
+    }
+
+    public Map<String, Object> getUrlFields()
+    {
+        Map<String, Object> urlFields = new CaseInsensitiveHashMap<>();
+
+        if (getLink1() != null)
+            urlFields.put(LINK1_FIELD, getLink1());
+        if (getDescription1() != null)
+            urlFields.put(DESCRIPTION1_FIELD, getDescription1());
+        if (getLink2() != null)
+            urlFields.put(LINK2_FIELD, getLink2());
+        if (getDescription2() != null)
+            urlFields.put(DESCRIPTION2_FIELD, getDescription2());
+        if (getLink3() != null)
+            urlFields.put(LINK3_FIELD, getLink3());
+        if (getDescription3() != null)
+            urlFields.put(DESCRIPTION3_FIELD, getDescription3());
+        return urlFields;
     }
 
     protected void setPrimaryFields(Map<String, Object> fields)

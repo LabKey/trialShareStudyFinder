@@ -5,8 +5,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
 
-import java.util.Set;
-
 /**
  * Created by susanh on 2/5/16.
  */
@@ -31,6 +29,20 @@ public class StudyPropertiesQueryUpdatePage extends LabKeyPage
             selectOptionByText(Locators.studyContainerSelect, "/" + projectName + "/DataFinderTest" + (isPublic ? "Public" : "Operational") + name);
             clickButton("Submit");
         }
+    }
+
+    public void setStudyContainer(String studyId, String containerName, Boolean navigateToList)
+    {
+        log("Setting up study container link for studyId " + studyId);
+        if (navigateToList)
+        {
+            clickAndWait(Locator.linkWithText("StudyAccess"));
+        }
+        DataRegionTable table = new DataRegionTable("query", _test);
+        int rowIndex = table.getRow("StudyId", studyId);
+        clickAndWait(table.updateLink(rowIndex));
+        selectOptionByText(Locators.studyContainerSelect, containerName);
+        clickButton("Submit");
     }
 
     private void unlinkStudy(String studyShortName)

@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.labkey.api.action.SpringActionController.ERROR_CONVERSION;
 import static org.labkey.api.action.SpringActionController.ERROR_MSG;
 
 public class TrialShareManager
@@ -221,7 +220,9 @@ public class TrialShareManager
             // insert the primary fields
 
             BatchValidationException batchValidationErrors = new BatchValidationException();
-            List<Map<String, Object>> pubData = schema.getPublicationsTableInfo().getUpdateService().insertRows(user, container, Collections.singletonList(publication.getPrimaryFields()), batchValidationErrors, null, null);
+            Map<String, Object> fields = publication.getPrimaryFields();
+            fields.putAll(publication.getUrlFields());
+            List<Map<String, Object>> pubData = schema.getPublicationsTableInfo().getUpdateService().insertRows(user, container, Collections.singletonList(fields), batchValidationErrors, null, null);
             if (batchValidationErrors.hasErrors())
                 throw batchValidationErrors;
             List<Map<String, Object>> dataList = new ArrayList<>();
@@ -238,7 +239,7 @@ public class TrialShareManager
         }
         catch (Exception e)
         {
-            errors.reject("Publication insert failed", e.getMessage());
+            errors.reject(ERROR_MSG, "Publication insert failed: " + e.getMessage());
         }
     }
 
@@ -260,7 +261,9 @@ public class TrialShareManager
             TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
 
             // update the primary fields
-            schema.getPublicationsTableInfo().getUpdateService().updateRows(user, container, Collections.singletonList(publication.getPrimaryFields()), null, null, null);
+            Map<String, Object> fields = publication.getPrimaryFields();
+            fields.putAll(publication.getUrlFields());
+            schema.getPublicationsTableInfo().getUpdateService().updateRows(user, container, Collections.singletonList(fields), null, null, null);
 
             // update the many-to-one data
             SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), publication.getId());
@@ -279,7 +282,7 @@ public class TrialShareManager
         }
         catch (Exception e)
         {
-            errors.reject("Publication update failed", e.getMessage());
+            errors.reject(ERROR_MSG, "Publication update failed: " + e.getMessage());
         }
 
     }
@@ -296,7 +299,7 @@ public class TrialShareManager
             }
             catch (NumberFormatException e)
             {
-                errors.reject(ERROR_CONVERSION, "Invalid id (expecting integer): " + id);
+                errors.reject(ERROR_MSG, "Invalid id (expecting integer): " + id);
             }
         }
 

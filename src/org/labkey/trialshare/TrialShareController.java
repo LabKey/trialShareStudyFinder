@@ -1030,7 +1030,10 @@ public class TrialShareController extends SpringActionController
         public Object execute(PublicationEditBean form, BindException errors) throws Exception
         {
             TrialShareManager.get().insertPublication(getUser(), getContainer(), form, errors);
-            return success();
+            if (errors.hasErrors())
+                return errors;
+            else
+                return success();
         }
     }
 
