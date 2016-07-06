@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -28,17 +27,14 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
-import org.labkey.test.components.study.StudyOverviewWebPart;
 import org.labkey.test.components.trialshare.PublicationPanel;
 import org.labkey.test.components.trialshare.StudySummaryWindow;
 import org.labkey.test.pages.PermissionsEditor;
-import org.labkey.test.pages.study.ManageParticipantGroupsPage;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
 import org.labkey.test.pages.trialshare.StudiesListHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ReadOnlyTest;
@@ -354,7 +350,6 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Empty", "", 8);
         testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Title", "System", 2);
         testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Multiple Terms", "Tolerant Kidney Transplant", 7);
-        testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Assay Facet", "Array", 2);
     }
 
 
@@ -364,11 +359,11 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         impersonate(PUBLIC_READER);
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
 
-        finder.search("Array");
+        finder.search("transplant");
 
         List<DataFinderPage.DataCard> studyCards = finder.getDataCards();
 
-        assertEquals("Wrong number of studies after search", 1, studyCards.size());
+        assertEquals("Wrong number of studies after search", 2, studyCards.size());
         assertEquals("Wrong study card available", "Shapiro", studyCards.get(0).getStudyShortName());
 
         assertCountsSynced(finder, DataFinderPage.Dimension.STUDIES);
@@ -440,30 +435,6 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     }
 
     @Test
-    @Ignore("Participant counts are not expected to match for this data")
-    public void testStudyParticipantCounts()
-    {
-        Map<String, Integer> finderParticipantCounts = new HashMap<>();
-        Map<String, Integer> studyParticipantCounts = new HashMap<>();
-
-        DataFinderPage finder = new DataFinderPage(this, true);
-        for (String studyShortName : loadedStudies)
-        {
-            finder.search(studyShortName);
-            finderParticipantCounts.put(studyShortName, finder.getSummaryCounts().get(DataFinderPage.Dimension.SUBJECTS));
-        }
-
-        for (String studyShortName : loadedStudies)
-        {
-            clickFolder(studyShortName);
-            StudyOverviewWebPart studyOverview = new StudyOverviewWebPart(this);
-            studyParticipantCounts.put(studyShortName, studyOverview.getParticipantCount());
-        }
-
-        assertEquals("Participant counts in study finder don't match LabKey studies", finderParticipantCounts, studyParticipantCounts);
-    }
-
-    @Test
     public void testGoToStudyMenu()
     {
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
@@ -494,156 +465,6 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         Assert.assertEquals("DIAMOND", card.getStudyShortName());
         card.clickGoToStudy();
         stopImpersonating();
-    }
-
-    @Test
-    @Ignore("Session storage not yet in use")
-    public void testNavigationDoesNotRemoveFinderFilter()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetsGrid = finder.getFacetsGrid();
-        facetsGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        clickTab("Manage");
-        clickTab("Overview");
-        assertEquals("Navigation cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
-    }
-
-    @Test
-    @Ignore("Session storage not yet in use")
-    public void testRefreshDoesNotRemoveFinderFilter()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetsGrid = finder.getFacetsGrid();
-        facetsGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        refresh();
-        assertEquals("'Refresh' cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
-    }
-
-    @Test
-    @Ignore("Session storage not yet in use")
-    public void testBackDoesNotRemoveFinderFilter()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        facetGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        clickTab("Manage");
-        goBack();
-        assertEquals("'Back' cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
-    }
-
-    @Test
-    @Ignore("Session storage not yet in use")
-    public void testFinderWebPartAndActionShareFilter()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        facetGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        goDirectlyToDataFinderPage(getProjectName(), true);
-        assertEquals("WebPart study finder filter didn't get applied", selections, finder.getFacetsGrid().getSelectedMembers());
-    }
-
-
-
-    @Test
-    @Ignore("Not yet implemented")
-    public void testGroupSaveAndLoad()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
-        facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
-
-        finder.clearAllFilters();
-        assertEquals("Group label not as expected", "Unsaved Group", finder.getGroupLabel());
-
-        Map<DataFinderPage.Dimension, List<String>> selections = new HashMap<>();
-        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        facetGrid.toggleFacet(DataFinderPage.Dimension.AGE_GROUP, "Adult");
-        facetGrid.toggleFacet(DataFinderPage.Dimension.CONDITION, "Acute Kidney Injury");
-
-        selections.put(DataFinderPage.Dimension.AGE_GROUP, Collections.singletonList("Adult"));
-        selections.put(DataFinderPage.Dimension.CONDITION, Collections.singletonList("Acute Kidney Injury"));
-
-        Map<DataFinderPage.Dimension, Integer> summaryCounts = finder.getSummaryCounts();
-
-        // click on "Save" menu and assert "Save" is not active then assert "Save as" is active
-        DataFinderPage.GroupMenu saveMenu = finder.getMenu(DataFinderPage.Locators.saveMenu);
-        saveMenu.toggleMenu();
-        Assert.assertEquals("Unexpected number of inactive options", 1, saveMenu.getInactiveOptions().size());
-        Assert.assertTrue("'Save' option is not an inactive menu option but should be", saveMenu.getInactiveOptions().contains("Save"));
-
-        Assert.assertEquals("Unexpected number of active options", 1, saveMenu.getActiveOptions().size());
-        Assert.assertTrue("'Save as' option is not active but should be", saveMenu.getActiveOptions().contains("Save As"));
-
-        String filterName = "testGroupSaveAndLoad" + System.currentTimeMillis();
-        saveMenu.chooseOption("Save As", false);
-        // assert that popup has the proper number of Selected Studies and Subjects
-        DataRegionTable subjectData = new DataRegionTable("demoDataRegion", this);
-        Assert.assertEquals("Subject counts on save group window differ from those on data finder", summaryCounts.get(DataFinderPage.Dimension.SUBJECTS).intValue(), subjectData.getDataRowCount());
-        finder.saveGroup(filterName);
-
-        assertEquals("Group label not as expected", "Saved group: " + filterName, finder.getGroupLabel());
-
-        finder.clearAllFilters();
-        //load group with test name
-        DataFinderPage.GroupMenu loadMenu = finder.getMenu(DataFinderPage.Locators.loadMenu);
-        loadMenu.toggleMenu();
-        Assert.assertTrue("Saved group does not appear in load menu", loadMenu.getActiveOptions().contains(filterName));
-        loadMenu.chooseOption(filterName, false);
-        assertEquals("Group label not as expected", "Saved group: " + filterName, finder.getGroupLabel());
-
-        // assert the selected items are the same and the counts are the same as before.
-        assertEquals("Summary counts not as expected after load", summaryCounts, finder.getSummaryCounts());
-        assertEquals("Selected items not as expected after load", selections, finder.getFacetsGrid().getSelectedMembers());
-        // assert that "Save" is now active in the menu
-        saveMenu = finder.getMenu(DataFinderPage.Locators.saveMenu);
-        saveMenu.toggleMenu();
-        Assert.assertTrue("'Save' option is not an active menu option but should be", saveMenu.getActiveOptions().contains("Save"));
-        saveMenu.toggleMenu(); // close the menu
-
-        // Choose another dimension and save the summary counts
-        log("selecting an Assay filter");
-        facetGrid.toggleFacet(DataFinderPage.Dimension.ASSAY, "FCM");
-        selections.put(DataFinderPage.Dimension.ASSAY, Collections.singletonList("FCM"));
-        summaryCounts = finder.getSummaryCounts();
-        log("Selections is now " + selections);
-        assertEquals("Selected items not as expected after assay selection", selections, finder.getFacetsGrid().getSelectedMembers());
-
-        // Save the filter
-        saveMenu = finder.getMenu(DataFinderPage.Locators.saveMenu);
-        saveMenu.toggleMenu();
-        saveMenu.chooseOption("Save", true);
-        sleep(1000); // Hack!  This seems necessary to give time for saving the filter before loading it again.  Waiting for signals doesn't seem to work...
-
-        finder.clearAllFilters();
-
-        // Load the filter
-        loadMenu = finder.getMenu(DataFinderPage.Locators.loadMenu);
-        loadMenu.toggleMenu();
-        Assert.assertTrue("Saved filter does not appear in menu", loadMenu.getActiveOptions().contains(filterName));
-        loadMenu.chooseOption(filterName, true);
-
-        // assert that the selections are as expected.
-        assertEquals("Summary counts not as expected after load", summaryCounts, finder.getSummaryCounts());
-        assertEquals("Selected items not as expected after load", selections, finder.getFacetsGrid().getSelectedMembers());
-
-        // manage group and delete the group that was created
-        DataFinderPage.GroupMenu manageMenu = finder.getMenu(DataFinderPage.Locators.manageMenu);
-        manageMenu.toggleMenu();
-        manageMenu.chooseOption("Manage Groups", false);
-        waitForText("Manage Participant Groups");
-        ManageParticipantGroupsPage managePage = new ManageParticipantGroupsPage(this);
-        managePage.selectGroup(filterName);
-        Assert.assertTrue("Delete should be enabled for group created through data finder", managePage.isDeleteEnabled());
-        Assert.assertFalse("Edit should not be enabled for group created through data finder", managePage.isEditEnabled());
-        managePage.deleteGroup(filterName);
     }
 
     @Test
