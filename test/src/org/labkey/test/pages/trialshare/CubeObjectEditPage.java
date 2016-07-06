@@ -9,26 +9,18 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by susanh on 6/30/16.
  */
-public class CubeObjectEditPage extends LabKeyPage
+public abstract class CubeObjectEditPage extends LabKeyPage
 {
     public static final String NOT_EMPTY_VALUE = "NOT EMPTY VALUE";
     public static final String EMPTY_VALUE = "EMPTY VALUE";
 
-    public static final Map<String, String> DROPDOWN_FIELD_NAMES = new HashMap<>();
-
-    public static final Map<String, String> MULTI_SELECT_FIELD_NAMES = new HashMap<>();
-
-
-    public static final Set<String> FIELD_NAMES = new HashSet<>();
-
-    public CubeObjectEditPage(WebDriver driver)
+    CubeObjectEditPage(WebDriver driver)
     {
         super(driver);
     }
@@ -40,11 +32,26 @@ public class CubeObjectEditPage extends LabKeyPage
 
     public void setTextFormValue(String key, String value, Boolean waitForSubmit)
     {
+        setTextFormValue(key, value, waitForSubmit, false);
+    }
+
+    public void setTextFormValue(String key, String value, Boolean waitForSubmit, Boolean submitIsDisabled)
+    {
         Locator fieldLocator = Locator.name(key);
         setFormElement(fieldLocator, value);
         if (waitForSubmit)
-            waitForElement(Locators.submitButton);
+        {
+            if (submitIsDisabled)
+                waitForElement(Locators.submitButton);
+            else
+                waitForElement(Locators.disabledSubmitButton);
+        }
+
     }
+
+    public abstract Map<String, String> getDropdownFieldNames();
+    public abstract Map<String, String> getMultiSelectFieldNames();
+    public abstract Set<String> getFieldNames();
 
     public void selectMenuItem(String label, String value)
     {
@@ -54,10 +61,10 @@ public class CubeObjectEditPage extends LabKeyPage
     public void setFormField(String key, Object value)
     {
         log("Setting field " + key + " to " + (value instanceof String[] ? StringUtils.join((String []) value, "; ") : value));
-        if (DROPDOWN_FIELD_NAMES.keySet().contains(key))
-            _ext4Helper.selectComboBoxItem(DROPDOWN_FIELD_NAMES.get(key), (String) value);
-        else if (MULTI_SELECT_FIELD_NAMES.keySet().contains(key))
-            multiSelectComboBoxItem(MULTI_SELECT_FIELD_NAMES.get(key), (String[]) value);
+        if (getDropdownFieldNames().keySet().contains(key))
+            _ext4Helper.selectComboBoxItem(getDropdownFieldNames().get(key), (String) value);
+        else if (getMultiSelectFieldNames().keySet().contains(key))
+            multiSelectComboBoxItem(getMultiSelectFieldNames().get(key), (String[]) value);
         else
             setTextFormValue(key, (String) value);
     }
@@ -92,7 +99,7 @@ public class CubeObjectEditPage extends LabKeyPage
 
     public void setFormFields(Map<String, Object> fieldMap)
     {
-        log("Setting form fields");
+        log("Setting form fields for keys: " + StringUtils.join(fieldMap.keySet(), ", "));
         for (String key : fieldMap.keySet())
         {
             setFormField(key, fieldMap.get(key));
@@ -102,7 +109,7 @@ public class CubeObjectEditPage extends LabKeyPage
     public Map<String, String> getFormValues()
     {
         Map<String, String> formValues = new HashMap<>();
-        for (String field : FIELD_NAMES)
+        for (String field : getFieldNames())
         {
             Locator fieldLocator = Locator.name(field);
             formValues.put(field, getFormElement(fieldLocator));
@@ -152,13 +159,13 @@ public class CubeObjectEditPage extends LabKeyPage
 
     public void cancel()
     {
-        log("Cancelling publication edit");
+        log("Cancelling edit");
         Locators.cancelButton.findElement(getDriver()).click();
     }
 
     public void submit()
     {
-        log("Submitting publication edit form");
+        log("Submitting edit form");
         click(Locators.submitButton);
         waitForElement(Locators.ackSubmit);
         clickAndWait(Locators.ackSubmit, WAIT_FOR_PAGE);

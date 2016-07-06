@@ -48,16 +48,16 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     static final String WEB_PART_NAME = "TrialShare Data Finder";
     static final String OPERATIONAL_STUDY_NAME = "DataFinderTestOperationalStudy";
     static final String PUBLIC_STUDY_NAME = "DataFinderTestPublicStudy";
-    static final String EMAIL_EXTENSION = "@datafinder.test";
-    static final String PUBLIC_READER_DISPLAY_NAME = "public_reader";
+    private static final String EMAIL_EXTENSION = "@datafinder.test";
+    private static final String PUBLIC_READER_DISPLAY_NAME = "public_reader";
     static final String PUBLIC_READER = PUBLIC_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    static final String CASALE_READER_DISPLAY_NAME = "casale_reader";
+    private static final String CASALE_READER_DISPLAY_NAME = "casale_reader";
     static final String CASALE_READER = CASALE_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    static final String WISPR_READER_DISPLAY_NAME = "wispr_reader";
+    private static final String WISPR_READER_DISPLAY_NAME = "wispr_reader";
     static final String WISPR_READER = WISPR_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    static final String CONTROLLER = "trialshare";
-    static final String ACTION = "dataFinder";
-    static File dataListArchive = TestFileUtils.getSampleData("DataFinder.lists.zip");
+    private static final String CONTROLLER = "trialshare";
+    private static final String ACTION = "dataFinder";
+    private static File dataListArchive = TestFileUtils.getSampleData("DataFinder.lists.zip");
 
     public enum CubeObjectType {
 

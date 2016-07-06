@@ -161,7 +161,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         manageData.goToEditRecord("Quality assessments of un-gated flow cytometry FCS files in a clinical trial setting");
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
-        editPage.setTextFormValue("PMCID", "invalid");
+        editPage.setTextFormValue("PMCID", "invalid", true, true);
         Assert.assertFalse("Submit should be disabled when invalid PMCID is input", editPage.isSubmitEnabled());
     }
 

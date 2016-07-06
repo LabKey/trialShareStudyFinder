@@ -2,6 +2,11 @@ package org.labkey.test.pages.trialshare;
 
 import org.openqa.selenium.WebDriver;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Created by susanh on 6/30/16.
  */
@@ -22,11 +27,13 @@ public class StudyEditPage extends CubeObjectEditPage
     public static final String CONDITIONS = "conditions";
     public static final String THERAPEUTIC_AREAS = "therapeuticAreas";
 
+    private static final Map<String, String> DROPDOWN_FIELD_NAMES = new HashMap<>();
     static
     {
         DROPDOWN_FIELD_NAMES.put(STUDY_TYPE, "Study Type:");
     }
 
+    private static final Map<String, String> MULTI_SELECT_FIELD_NAMES = new HashMap<>();
     static
     {
         MULTI_SELECT_FIELD_NAMES.put(AGE_GROUPS, "Age Groups:");
@@ -35,6 +42,7 @@ public class StudyEditPage extends CubeObjectEditPage
         MULTI_SELECT_FIELD_NAMES.put(THERAPEUTIC_AREAS, "Therapeutic Areas:");
     }
 
+    private static final Set<String> FIELD_NAMES = new HashSet<>();
     static
     {
         FIELD_NAMES.add(SHORT_NAME);
@@ -56,5 +64,23 @@ public class StudyEditPage extends CubeObjectEditPage
     public StudyEditPage(WebDriver driver)
     {
         super(driver);
+    }
+
+    @Override
+    public Map<String, String> getDropdownFieldNames()
+    {
+        return DROPDOWN_FIELD_NAMES;
+    }
+
+    @Override
+    public Map<String, String> getMultiSelectFieldNames()
+    {
+        return MULTI_SELECT_FIELD_NAMES;
+    }
+
+    @Override
+    public Set<String> getFieldNames()
+    {
+        return FIELD_NAMES;
     }
 }
