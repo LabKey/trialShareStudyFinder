@@ -288,10 +288,6 @@ public class ManageStudiesTest extends DataFinderTestBase
         // N.B. leaving out external URL description and Description fields because
         // not sure how to attach to the iframe
         updatedFields.put(StudyEditPage.INVESTIGATOR, "investigate updated");
-        updatedFields.put(StudyEditPage.AGE_GROUPS, new String[]{"Adult"});
-        updatedFields.put(StudyEditPage.PHASES, new String[]{"Phase 2"});
-        updatedFields.put(StudyEditPage.CONDITIONS, new String[]{"Asthma"});
-        updatedFields.put(StudyEditPage.THERAPEUTIC_AREAS, new String[]{"Allergy"});
 
 
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
@@ -312,8 +308,8 @@ public class ManageStudiesTest extends DataFinderTestBase
         int count = manageData.getCount();
         Map<String, Object> initialFields = new HashMap<>();
         // add the count so multiple runs of this test have distinct titles
-        initialFields.put(StudyEditPage.SHORT_NAME, "TUS" + count);
-        initialFields.put(StudyEditPage.STUDY_ID, "TUS_ID" + count);
+        initialFields.put(StudyEditPage.SHORT_NAME, "TIAD" + count);
+        initialFields.put(StudyEditPage.STUDY_ID, "TIAD_ID" + count);
         initialFields.put(StudyEditPage.TITLE, "testUpdateStudy_" + count);
         initialFields.put(StudyEditPage.AGE_GROUPS, new String[]{"Adult"});
         initialFields.put(StudyEditPage.PHASES, new String[]{"Phase 2"});
@@ -352,8 +348,8 @@ public class ManageStudiesTest extends DataFinderTestBase
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
-        String shortName = "TUS" + count;
-        String studyId = "TUS_ID" + count;
+        String shortName = "TIAR" + count;
+        String studyId = "TIAR_ID" + count;
         createStudy(shortName, false);
 
         Map<String, Object> initialFields = new HashMap<>();
@@ -375,7 +371,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         studyListHelper.addStudyAccessEntry(shortName,  "/" + PROJECT_NAME + "/" + shortName , "Public", true);
 
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
-        DataFinderPage finder = new DataFinderPage(this, true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), true);
 
         finder.search(studyId);
         List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
@@ -385,7 +381,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         manageData.refreshCube();
 
-        goToProjectHome();
+        doAndWaitForPageSignal(this::goToProjectHome, finder.getCountSignal());
 
         finder.search(studyId);
         dataCards = finder.getDataCards();
