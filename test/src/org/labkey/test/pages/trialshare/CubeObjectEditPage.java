@@ -42,9 +42,9 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         if (waitForSubmit)
         {
             if (submitIsDisabled)
-                waitForElement(Locators.submitButton);
-            else
                 waitForElement(Locators.disabledSubmitButton);
+            else
+                waitForElement(Locators.submitButton);
         }
 
     }
