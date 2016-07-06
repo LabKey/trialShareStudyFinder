@@ -16,6 +16,7 @@
 
 package org.labkey.trialshare;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -132,23 +133,6 @@ public class TrialShareManager
         return idSet;
     }
 
-    public Set<Object> getVisibleStudies(User user, Container container)
-    {
-        Set<Object> studyIdSet = new HashSet<>();
-        TableInfo containerList = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
-        if (containerList != null)
-        {
-            List<StudyAccess> studyAccess = (new TableSelector(containerList, null, null)).getArrayList(StudyAccess.class);
-            for (StudyAccess study : studyAccess)
-            {
-                if (study.hasPermission(user))
-                {
-                    studyIdSet.add(study.getCubeIdentifier());
-                }
-            }
-        }
-        return studyIdSet;
-    }
 
     public Set<String> getVisibleStudies(User user, Container container, String visibility)
     {
@@ -171,28 +155,6 @@ public class TrialShareManager
         return studyIdSet;
     }
 
-    public Set<Object> getVisibleAssays(User user, Container container)
-    {
-        Set<Object> idSet = new HashSet<>();
-
-        Set<String> operationalStudyIds = getVisibleStudies(user, container,  TrialShareQuerySchema.OPERATIONAL_VISIBILITY);
-        TableInfo assayAccess = TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ASSAY_TABLE);
-        if (assayAccess != null)
-        {
-            Map<String, Object> valueMapArray[] = new TableSelector(assayAccess, null, null).getMapArray();
-            for (Map<String, Object> valueMap : valueMapArray)
-            {
-                String visibility = (String) valueMap.get("Visibility");
-                String cubeId = "[Study.AssayVisibility].[" + valueMap.get("StudyId") + "]";
-                if (visibility == null || (visibility.equalsIgnoreCase(TrialShareQuerySchema.PUBLIC_VISIBILITY)))
-                    idSet.add(cubeId);
-                else if (visibility.equalsIgnoreCase(TrialShareQuerySchema.OPERATIONAL_VISIBILITY) && operationalStudyIds.contains(valueMap.get("StudyId")))
-                    idSet.add(cubeId);
-            }
-        }
-        return idSet;
-    }
-
     public Set<Object> getVisiblePublications(User user, Container container)
     {
         Set<Object> publicationIds  = new HashSet<>();
@@ -202,7 +164,7 @@ public class TrialShareManager
             List<StudyPublicationBean> publications = (new TableSelector(publicationsList, null, null)).getArrayList(StudyPublicationBean.class);
             for (StudyPublicationBean publication : publications)
             {
-                if (publication.getShow() != null && publication.getShow() && publication.hasPermission(user))
+                if (BooleanUtils.isTrue(publication.getShow()) && publication.hasPermission(user))
                 {
                     publicationIds.add(publication.getCubeId());
                 }

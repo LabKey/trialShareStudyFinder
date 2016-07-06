@@ -18,6 +18,7 @@ package org.labkey.trialshare;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.action.ApiAction;
@@ -176,7 +177,7 @@ public class TrialShareController extends SpringActionController
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
             setTitle("TrialShare Data Finder");
-            return new JspView("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean(getContainer(), getViewContext().getActionURL().getParameter(OBJECT_NAME_PARAM)));
+            return new JspView<>("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean(getContainer(), getViewContext().getActionURL().getParameter(OBJECT_NAME_PARAM)));
         }
     }
 
@@ -473,7 +474,7 @@ public class TrialShareController extends SpringActionController
 
                     for (StudyPublicationBean pub : publications)
                     {
-                        if (pub.getShow() != null && pub.getShow() && pub.hasPermission(getUser()))
+                        if (BooleanUtils.isTrue(pub.getShow()) && pub.hasPermission(getUser()))
                         {
                             pubCounts.putIfAbsent(pub.getStudyId(), new Pair<>(0, 0));
                             Pair<Integer, Integer> countPair = pubCounts.get(pub.getStudyId());
