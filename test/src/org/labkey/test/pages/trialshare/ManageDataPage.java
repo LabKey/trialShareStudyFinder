@@ -65,11 +65,6 @@ public class ManageDataPage extends LabKeyPage
         doAndWaitForPageToLoad(() -> Locators.managePublicationsLink.findElement(getDriver()).click());
     }
 
-    public boolean itemIsInList(String keyValue)
-    {
-        return _table.getRow(_objectType.getKeyField(), keyValue) >= 0;
-    }
-
     public void goToInsertNew()
     {
         log("Going to insert new " + _objectType);
