@@ -67,6 +67,7 @@ public abstract class CubeObjectEditPage extends LabKeyPage
             multiSelectComboBoxItem(getMultiSelectFieldNames().get(key), (String[]) value);
         else
             setTextFormValue(key, (String) value);
+        log("Field " + key + " new value is " + getFormValue(key));
     }
 
     // the similar method in ext4Helper is looking for a property that does not exist to
@@ -106,13 +107,18 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         }
     }
 
+    public String getFormValue(String field)
+    {
+        Locator fieldLocator = Locator.name(field);
+        return getFormElement(fieldLocator);
+    }
+
     public Map<String, String> getFormValues()
     {
         Map<String, String> formValues = new HashMap<>();
         for (String field : getFieldNames())
         {
-            Locator fieldLocator = Locator.name(field);
-            formValues.put(field, getFormElement(fieldLocator));
+            formValues.put(field, getFormValue(field));
         }
         return formValues;
     }
