@@ -76,11 +76,14 @@ public abstract class CubeObjectEditPage extends LabKeyPage
     {
         Locator.XPathLocator comboBox = Ext4Helper.Locators.formItemWithLabel(label);
         _ext4Helper.openComboList(comboBox);
+        log("Hack-Nap while combo box gets filled. Maybe?");
+        sleep(2000);
 
         try
         {
             for (String selection : selections)
             {
+                log("Selecting " + selection);
                 _ext4Helper.selectItemFromOpenComboList(selection, Ext4Helper.TextMatchTechnique.EXACT);
             }
         }
@@ -88,10 +91,12 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         {
             for (String selection : selections)
             {
+                log("Selecting " + selection);
                 _ext4Helper.selectItemFromOpenComboList(selection, Ext4Helper.TextMatchTechnique.EXACT);
             }
         }
 
+        log("Closing combo box " + label);
         Locator arrowTrigger = comboBox.append("//div[contains(@class,'arrow')]");
         arrowTrigger.findElement(this.getDriver()).click();
     }
