@@ -35,8 +35,7 @@ public class CubeObjectEditPage extends LabKeyPage
 
     public void setTextFormValue(String key, String value)
     {
-        Locator fieldLocator = Locator.name(key);
-        setFormElement(fieldLocator, value);
+        setTextFormValue(key, value, false);
     }
 
     public void setTextFormValue(String key, String value, Boolean waitForSubmit)
