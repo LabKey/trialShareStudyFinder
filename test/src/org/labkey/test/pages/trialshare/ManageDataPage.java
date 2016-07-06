@@ -118,6 +118,7 @@ public class ManageDataPage extends LabKeyPage
     {
         log("Refreshing cube");
         _table.clickHeaderButtonByText("Refresh Cube");
+        sleep(2000); // give time for the refresh to happen
     }
 
     private static class Locators

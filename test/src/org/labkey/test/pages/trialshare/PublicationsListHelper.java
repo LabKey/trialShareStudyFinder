@@ -74,17 +74,6 @@ public class PublicationsListHelper extends LabKeyPage
         return table.getDataRowCount();
     }
 
-    public int getPublicationConditionCount(String title, Boolean navigateToList)
-    {
-        if (navigateToList)
-        {
-            clickAndWait(Locator.linkWithText("PublicationCondition"));
-        }
-        DataRegionTable table = new DataRegionTable("query", _test);
-        table.setFilter("PublicationId", "Equals", title);
-        return table.getDataRowCount();
-    }
-
     public int getPublicationTherapeuticAreaCount(String title, Boolean navigateToList)
     {
         if (navigateToList)

@@ -84,7 +84,6 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                     "pub.Keywords,  " +
                     "pub.PermissionsContainer,  " +
                     "pub.ManuscriptContainer,  " +
-                    "pc.Condition,  " +
                     "psid.StudyId,  " +
                     "psn.StudyShortName,  " +
                     "pta.TherapeuticArea\n " +
@@ -114,7 +113,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
                 StringBuilder keywords = new StringBuilder();
                 // See #26028: identifiers that have punctuation in them (e.g., DOI) are not indexed well as identifiers, so we use keywords instead
-                for (String field : new String[]{"Author", "Year", "Status", "Title", "SubmissionStatus", "PublicationType", "Journal", "TherapeuticArea", "StudyShortName", "Condition", "DOI"})
+                for (String field : new String[]{"Author", "Year", "Status", "Title", "SubmissionStatus", "PublicationType", "Journal", "TherapeuticArea", "StudyShortName", "DOI"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");

@@ -26,15 +26,12 @@ public class TrialShareQuerySchema
 {
     public static final String STUDY_TABLE = "StudyProperties";
     public static final String STUDY_ACCESS_TABLE = "StudyAccess";
-    public static final String STUDY_ASSAY_TABLE = "StudyAssay";
     public static final String STUDY_CONDITION_TABLE = "StudyCondition";
     public static final String STUDY_AGE_GROUP_TABLE = "StudyAgeGroup";
     public static final String STUDY_PHASE_TABLE = "StudyPhase";
     public static final String STUDY_THERAPEUTIC_AREA_TABLE = "StudyTherapeuticArea";
 
     public static final String PUBLICATION_TABLE = "ManuscriptsAndAbstracts";
-    public static final String PUBLICATION_ASSAY_TABLE = "PublicationAssay";
-    public static final String PUBLICATION_CONDITION_TABLE = "PublicationCondition";
     public static final String PUBLICATION_STUDY_TABLE = "PublicationStudy";
     public static final String PUBLICATION_THERAPEUTIC_AREA_TABLE = "PublicationTherapeuticArea";
 
@@ -133,11 +130,6 @@ public class TrialShareQuerySchema
         return _listsSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
     }
 
-    public TableInfo getStudyAssayTableInfo()
-    {
-        return _listsSchema.getTable(TrialShareQuerySchema.STUDY_ASSAY_TABLE);
-    }
-
     public TableInfo getStudyConditionTableInfo()
     {
         return _listsSchema.getTable(TrialShareQuerySchema.STUDY_CONDITION_TABLE);
@@ -161,16 +153,6 @@ public class TrialShareQuerySchema
     public TableInfo getPublicationsTableInfo()
     {
         return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE);
-    }
-
-    public TableInfo getPublicationAssayTableInfo()
-    {
-        return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_ASSAY_TABLE);
-    }
-
-    public TableInfo getPublicationConditionTableInfo()
-    {
-        return _listsSchema.getTable(TrialShareQuerySchema.PUBLICATION_CONDITION_TABLE);
     }
 
     public TableInfo getPublicationStudyTableInfo()

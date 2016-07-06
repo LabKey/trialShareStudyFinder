@@ -68,7 +68,6 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                         "sa.StudyId, "+
                         "sa.StudyContainer, "+
                         "sc.condition, "+
-                        "sas.Assay, "+
                         "sph.Phase,  "+
                         "sag.AgeGroup, "+
                         "sta.TherapeuticArea, "+
@@ -79,7 +78,6 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                         "sp.Investigator "+
                 "FROM StudyAccess sa  "+
                         "   LEFT JOIN StudyProperties sp ON sa.StudyId = sp.StudyId "+
-                        "   LEFT JOIN (SELECT StudyId, group_concat(Assay) AS Assay FROM StudyAssay GROUP BY StudyId) sas on sa.StudyId = sas.StudyId  "+
                         "   LEFT JOIN (SELECT StudyId, group_concat(Condition) As Condition FROM StudyCondition GROUP BY StudyId) sc on sa.StudyId = sc.StudyId "+
                         "   LEFT JOIN (SELECT StudyId, group_concat(AgeGroup) AS AgeGroup FROM StudyAgeGroup GROUP BY StudyId) sag on sa.StudyId = sag.StudyId "+
                         "   LEFT JOIN (SELECT StudyId, group_concat(Phase) AS Phase FROM StudyPhase GROUP BY StudyId) sph on sa.StudyId = sph.StudyId "+
@@ -102,7 +100,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
 
                 StringBuilder keywords = new StringBuilder();
                 // See #26028: we want to avoid stemming of the following fields, so we use keywords instead
-                for (String field : new String[]{"shortName", "StudyId", "Investigator", "AgeGroup", "Assay", "Condition", "Phase", "TherapeuticArea", "StudyType"})
+                for (String field : new String[]{"shortName", "StudyId", "Investigator", "AgeGroup", "Condition", "Phase", "TherapeuticArea", "StudyType"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");

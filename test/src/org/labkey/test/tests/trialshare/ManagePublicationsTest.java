@@ -454,8 +454,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         editPage.submit();
 
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
-        DataFinderPage finder = new DataFinderPage(this, false);
-        finder.navigateToPublications();
+        DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
         finder.search((String) initialFields.get(PublicationEditPage.TITLE));
         List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
 
@@ -465,7 +464,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         manageData.refreshCube();
 
         goToProjectHome();
-        finder.navigateToPublications();
+        finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
         finder.search((String) initialFields.get(PublicationEditPage.TITLE));
         dataCards = finder.getDataCards();
 
