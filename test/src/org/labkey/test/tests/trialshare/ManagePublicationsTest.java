@@ -399,19 +399,11 @@ public class ManagePublicationsTest extends DataFinderTestBase
     public void testInsertAndDelete()
     {
         goToProjectHome();
-        screenshot("testInsertAndDeleteBegin");
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
         studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
-        screenshot("testInsertAndDeleteSetFirstStudyContainer");
-        log("testInsertAndDeleteSetFirstStudyContainer at " + getCurrentRelativeURL());
         studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
-        screenshot("testInsertAndDeleteSetSecondStudyContainer");
-        log("testInsertAndDeleteSetSecondStudyContainer at " + getCurrentRelativeURL());
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
-        screenshot("testInsertAndDeleteNavigateToManageDataPage");
-        log("testInsertAndDeleteNavigateToManageDataPage at " + getCurrentRelativeURL());
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
-
         Map<String, Object> initialFields = new HashMap<>();
         // add the count so multiple runs of this test have distinct titles
         initialFields.put(PublicationEditPage.TITLE, "testInsertAndDelete_" + manageData.getCount());
@@ -420,24 +412,13 @@ public class ManagePublicationsTest extends DataFinderTestBase
         initialFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
         initialFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
         manageData.goToInsertNew();
-        screenshot("testInsertAndDeleteGoToInsertNewFromManageData");
-        log("testInsertAndDeleteGoToInsertNewFromManageData at " + getCurrentRelativeURL());
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
-
         editPage.setFormFields(initialFields, false);
-        screenshot("testInsertAndDeleteSetEditPageFields");
-        log("testInsertAndDeleteSetEditPageFields at " + getCurrentRelativeURL());
         editPage.submit();
-        screenshot("testInsertAndDeleteSubmitEditPageFields");
-        log("testInsertAndDeleteSubmitEditPageFields at " + getCurrentRelativeURL());
         manageData.deleteRecord((String) initialFields.get(PublicationEditPage.TITLE));
-        screenshot("testInsertAndDeleteAfterDeleteRecord");
-        log("testInsertAndDeleteAfterDeleteRecord at " + getCurrentRelativeURL());
         PublicationsListHelper listHelper = new PublicationsListHelper(this);
 
         goToProjectHome();
-        screenshot("testInsertAndDeleteGoToHome");
-        log("testInsertAndDeleteGoToHome at " + getCurrentRelativeURL());
         Assert.assertEquals("Found deleted publication", 0, listHelper.getPublicationCount((String) initialFields.get(PublicationEditPage.TITLE), true));
         goToProjectHome();
         Assert.assertEquals("Found studies for deleted publication", 0, listHelper.getPublicationStudyCount((String) initialFields.get(PublicationEditPage.TITLE), true));
@@ -445,7 +426,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         Assert.assertEquals("Found therapeutic areas for deleted publication", 0, listHelper.getPublicationTherapeuticAreaCount((String) initialFields.get(PublicationEditPage.TITLE), true));
     }
 
-    //@Test
+    @Test
     public void testInsertAndRefresh()
     {
         goToProjectHome();
@@ -484,12 +465,5 @@ public class ManagePublicationsTest extends DataFinderTestBase
         dataCards = finder.getDataCards();
 
         assertEquals("Should find newly inserted publication after reindex", 1, dataCards.size());
-    }
-
-    private void screenshot(String label)
-    {
-        getArtifactCollector().dumpPageSnapshot("ManagePublicationsTestDebug", label+"_step"+_step);
-        log("screenshot "+label+"_step"+_step+" taken at url " + getDriver().getCurrentUrl());
-        _step++;
     }
 }
