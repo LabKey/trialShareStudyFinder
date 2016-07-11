@@ -15,12 +15,12 @@ public class ManageDataPage extends LabKeyPage
 {
     private DataRegionTable _table;
     private DataFinderTestBase.CubeObjectType _objectType;
-
+    private BaseWebDriverTest _test;
 
     public ManageDataPage(BaseWebDriverTest test, DataFinderTestBase.CubeObjectType objectType)
     {
         super(test.getDriver());
-
+        _test = test;
         _table = new DataRegionTable("query", test);
         _objectType = objectType;
     }
@@ -87,11 +87,14 @@ public class ManageDataPage extends LabKeyPage
     public void deleteRecord(String keyValue)
     {
         log("Deleting record with key value '" + keyValue + "'");
+        _test.getArtifactCollector().dumpPageSnapshot("ManagePublicationsTestDebug", "ManageDataPageDeleteRecordBegin");
         Integer rowIndex = getRowIndex(keyValue);
         Assert.assertTrue("Record with key '" + keyValue + "' not found", rowIndex >= 0);
         _table.checkCheckbox(rowIndex);
+        _test.getArtifactCollector().dumpPageSnapshot("ManagePublicationsTestDebug", "ManageDataPageDeleteCheckRow");
         _table.clickHeaderButtonByText("Delete");
-        log("Waiting for delete confirmation to show up");
+        sleep(10000);
+        log("alert present after clicking delete and waiting ten seconds = " + isAlertPresent());
         waitForAlert("Are you sure you want to delete the selected row?", 3000);
     }
 
