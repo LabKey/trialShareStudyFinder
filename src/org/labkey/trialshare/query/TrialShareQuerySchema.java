@@ -206,7 +206,7 @@ public class TrialShareQuerySchema
         sql.append(" LEFT JOIN ");
         sql.append(getPublicationStudyTableInfo(), "ps");
         sql.append(" ON ps.PublicationId = pub.").append(getPublicationsKey());
-        sql.append("WHERE ps.StudyId = ? ");
+        sql.append(" WHERE ps.StudyId = ? ");
         sql.add(studyId);
         if (publicationType != null)
         {
