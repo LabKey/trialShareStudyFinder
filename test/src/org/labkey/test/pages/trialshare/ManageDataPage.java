@@ -92,7 +92,7 @@ public class ManageDataPage extends LabKeyPage
         _table.checkCheckbox(rowIndex);
         _table.clickHeaderButtonByText("Delete");
         log("Waiting for delete confirmation to show up");
-        waitForAlert("Are you sure you want to delete the selected row?", 3000);
+        waitForAlert("Are you sure you want to delete the selected row?", 1000);
     }
 
     public void showDetails(String keyValue)
