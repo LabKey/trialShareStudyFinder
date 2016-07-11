@@ -88,9 +88,11 @@ public class ManageDataPage extends LabKeyPage
     {
         log("Deleting record with key value '" + keyValue + "'");
         Integer rowIndex = getRowIndex(keyValue);
+        Assert.assertTrue("Record with key '" + keyValue + "' not found", rowIndex >= 0);
         _table.checkCheckbox(rowIndex);
         _table.clickHeaderButtonByText("Delete");
-        acceptAlert();
+        log("Waiting for delete confirmation to show up");
+        waitForAlert("Are you sure you want to delete the selected row?", 3000);
     }
 
     public void showDetails(String keyValue)

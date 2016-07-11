@@ -232,10 +232,10 @@ public class TrialShareManager
 
             // update the many-to-one data
             // first get rid of the current values for this publication.  Then add the new data
-            schema.getPublicationStudyTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
+            schema.getPublicationStudyTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationStudyTableInfo(), filter), null, null);
             addJoinTableData(schema.getPublicationStudyTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.STUDY_ID_FIELD, publication.getStudyIds(), user, container);
 
-            schema.getPublicationTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
+            schema.getPublicationTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationTherapeuticAreaTableInfo(), filter), null, null);
             addJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, publication.getTherapeuticAreas(), user, container);
             transaction.commit();
         }
@@ -271,8 +271,8 @@ public class TrialShareManager
         {
             TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
 
-            deleteJoinTableData(schema.getPublicationStudyTableInfo(), "Key", user, container, idFilter);
-            deleteJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), "Key", user, container, idFilter);
+            deleteJoinTableData(schema.getPublicationStudyTableInfo(), user, container, idFilter);
+            deleteJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), user, container, idFilter);
 
             List<Map<String, Object>> pkMaps = new ArrayList<>();
             for (Integer id : integerIds)
@@ -318,16 +318,16 @@ public class TrialShareManager
             SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.STUDY_ID_FIELD), studyId);
 
             // update the many-to-one data.  First get rid of the current values for the study
-            schema.getStudyConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyConditionTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
+            schema.getStudyConditionTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyConditionTableInfo(), filter), null, null);
             addJoinTableData(schema.getStudyConditionTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.CONDITION_FIELD, study.getConditions(), user, container);
 
-            schema.getStudyAgeGroupTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
+            schema.getStudyAgeGroupTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyAgeGroupTableInfo(), filter), null, null);
             addJoinTableData(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.AGE_GROUP_FIELD, study.getAgeGroups(), user, container);
 
-            schema.getStudyPhaseTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
+            schema.getStudyPhaseTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyPhaseTableInfo(), filter), null, null);
             addJoinTableData(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.PHASE_FIELD, study.getPhases(), user, container);
 
-            schema.getStudyTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.KEY_FIELD, filter), null, null);
+            schema.getStudyTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyTherapeuticAreaTableInfo(), filter), null, null);
             addJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, study.getTherapeuticAreas(), user, container);
 
             transaction.commit();
@@ -392,11 +392,11 @@ public class TrialShareManager
         {
             TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
 
-            deleteJoinTableData(schema.getStudyPhaseTableInfo(), "Key", user, container, idFilter);
-            deleteJoinTableData(schema.getStudyAgeGroupTableInfo(), "Key", user, container, idFilter);
-            deleteJoinTableData(schema.getStudyConditionTableInfo(), "Key", user, container, idFilter);
-            deleteJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), "Key", user, container, idFilter);
-            deleteJoinTableData(schema.getStudyAccessTableInfo(), "Key", user, container, idFilter);
+            deleteJoinTableData(schema.getStudyPhaseTableInfo(), user, container, idFilter);
+            deleteJoinTableData(schema.getStudyAgeGroupTableInfo(), user, container, idFilter);
+            deleteJoinTableData(schema.getStudyConditionTableInfo(), user, container, idFilter);
+            deleteJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), user, container, idFilter);
+            deleteJoinTableData(schema.getStudyAccessTableInfo(), user, container, idFilter);
 
             List<Map<String, Object>> pkMaps = new ArrayList<>();
             for (String id : ids)
@@ -418,8 +418,9 @@ public class TrialShareManager
     }
 
 
-    private List<Map<String, Object>> getJoinTableIds(@NotNull TableInfo tableInfo, @NotNull String keyName, SimpleFilter objectIdFilter)
+    private List<Map<String, Object>> getJoinTableIds(@NotNull TableInfo tableInfo, SimpleFilter objectIdFilter)
     {
+        String keyName = tableInfo.getPkColumnNames().get(0);
         // select the keys of the rows that have the object ids selected by the object filter
         List<Integer> keys = new TableSelector(tableInfo, Collections.singleton(keyName), objectIdFilter, null).getArrayList(Integer.class);
 
@@ -434,9 +435,9 @@ public class TrialShareManager
     }
 
 
-    private void deleteJoinTableData(@NotNull TableInfo tableInfo, @NotNull String keyName, @NotNull User user, @NotNull Container container, SimpleFilter objectIdFilter) throws SQLException, QueryUpdateServiceException, BatchValidationException, InvalidKeyException
+    private void deleteJoinTableData(@NotNull TableInfo tableInfo, @NotNull User user, @NotNull Container container, SimpleFilter objectIdFilter) throws SQLException, QueryUpdateServiceException, BatchValidationException, InvalidKeyException
     {
-        tableInfo.getUpdateService().deleteRows(user, container, getJoinTableIds(tableInfo, keyName, objectIdFilter), null, null);
+        tableInfo.getUpdateService().deleteRows(user, container, getJoinTableIds(tableInfo, objectIdFilter), null, null);
     }
 
     private void addJoinTableData(TableInfo tableInfo, String idField, Object id, String dataField, List<String> dataValues, User user, Container container) throws SQLException, QueryUpdateServiceException, BatchValidationException, DuplicateKeyException

@@ -326,6 +326,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         manageData.deleteRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
 
+        log("Finished deleting record " + initialFields.get(StudyEditPage.STUDY_ID) + ". Going home");
         StudiesListHelper listHelper = new StudiesListHelper(this);
 
         goToProjectHome();

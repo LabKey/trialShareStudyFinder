@@ -36,7 +36,6 @@ public class TrialShareQuerySchema
     public static final String PUBLICATION_THERAPEUTIC_AREA_TABLE = "PublicationTherapeuticArea";
 
     public static final String PUBLICATION_KEY_FIELD = "Key"; // this is the name of the key field in the publication table itself
-    public static final String KEY_FIELD = "Key";
     public static final String PUBLICATION_ID_FIELD = "PublicationId";
     public static final String CONDITION_FIELD = "Condition";
     public static final String STUDY_ID_FIELD = "StudyId";
@@ -178,13 +177,24 @@ public class TrialShareQuerySchema
         return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyBean.class);
     }
 
+
+    // This method is necessary because "Key" is reserved in SQLServer but not in Postgres and
+    // quotes around fields are not well handled in Postgres.
+    private String getPublicationsKey()
+    {
+        String keyField = getPublicationsTableInfo().getPkColumnNames().get(0);
+        if (getPublicationsTableInfo().getSqlDialect().isSqlServer())
+            keyField = "\"" + keyField + "\"";
+        return keyField;
+    }
+
     public List<StudyPublicationBean> getStudyPublications()
     {
         SQLFragment sql = new SQLFragment("SELECT pub.*, ps.StudyId FROM " );
         sql.append(getPublicationStudyTableInfo(), "ps");
         sql.append(" LEFT JOIN ");
         sql.append(getPublicationsTableInfo(), "pub");
-        sql.append(" ON ps.PublicationId = pub.Key ");
+        sql.append(" ON ps.PublicationId = pub.").append(getPublicationsKey());
 
         return new SqlSelector(getSchema().getDbSchema(), sql).getArrayList(StudyPublicationBean.class);
     }
@@ -195,8 +205,8 @@ public class TrialShareQuerySchema
         sql.append(getPublicationsTableInfo(), "pub");
         sql.append(" LEFT JOIN ");
         sql.append(getPublicationStudyTableInfo(), "ps");
-        sql.append(" ON ps.PublicationId = pub.Key ");
-        sql.append("WHERE ps.StudyId = ? ");
+        sql.append(" ON ps.PublicationId = pub.").append(getPublicationsKey());
+        sql.append(" WHERE ps.StudyId = ? ");
         sql.add(studyId);
         if (publicationType != null)
         {
