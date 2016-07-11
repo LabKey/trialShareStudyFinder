@@ -132,6 +132,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     }
 
 
+
     @Override
     protected BrowserType bestBrowser()
     {
@@ -208,6 +209,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     @Before
     public void preTest()
     {
+        switchToMainWindow();
         goToProjectHome();
         DataFinderPage finder = new DataFinderPage(this, true);
         finder.clearSearch();
