@@ -61,7 +61,8 @@ public class ManageStudiesTest extends DataFinderTestBase
         switchToWindow(1);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         Assert.assertTrue("No data shown for studies", manageData.getCount() > 0);
-
+        getDriver().close();
+        switchToMainWindow();
         log("Impersonating user without insert permission");
         goToProjectHome();
         impersonate(PUBLIC_READER);
