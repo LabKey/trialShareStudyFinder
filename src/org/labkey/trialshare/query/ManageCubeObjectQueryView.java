@@ -64,9 +64,9 @@ abstract class ManageCubeObjectQueryView extends QueryView
     }
 
     @Override
-    protected void populateButtonBar(DataView view, ButtonBar bar, boolean exportAsWebPage)
+    protected void populateButtonBar(DataView view, ButtonBar bar)
     {
-        super.populateButtonBar(view, bar, exportAsWebPage);
+        super.populateButtonBar(view, bar);
         addRefreshCubeButton(bar);
     }
 

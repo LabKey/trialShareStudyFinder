@@ -103,12 +103,15 @@ public class ManageDataPage extends LabKeyPage
 
     public Locator.XPathLocator detailsLink(int row)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(_table.getHtmlName()) + "]/tbody/tr[" + (row + 5) + "]/td[3]/a");
+        return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 5) + "]/td[3]/a "));
+//        return Locator.xpath("//table[@id=" + Locator.xq(_table.getTableName()) + "]/tbody/tr[" + (row + 5) + "]/td[3]/a");
     }
 
     public Locator.XPathLocator editLink(int row)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(_table.getHtmlName()) + "]/tbody/tr[" + (row + 5) + "]/td[2]/a");
+        return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 5) + "]/td[2]/a "));
+//        return Locator.xpath("//table[contains(@class, 'labkey-data-region')][0]/tbody/tr[" + (row + 5) +"]/td[2]/a");
+//        return Locator.xpath("//table[@id=" + Locator.xq(_table.getTableName()) + "]/tbody/tr[" + (row + 5) + "]/td[2]/a");
     }
 
     public void refreshCube()

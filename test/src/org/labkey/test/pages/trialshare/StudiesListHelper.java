@@ -39,7 +39,7 @@ public class StudiesListHelper extends LabKeyPage
             clickAndWait(Locator.linkWithText("StudyAccess"));
         }
         DataRegionTable table = new DataRegionTable("query", _test);
-        table.clickHeaderButtonByText("Insert New");
+        table.clickHeaderButton("Insert", "Insert New");
         selectOptionByText(Locators.studyContainerSelect, containerName);
         selectOptionByText(Locators.studyVisibility, visibility);
         selectOptionByText(Locators.studyIdSelect, shortName);
@@ -57,19 +57,6 @@ public class StudiesListHelper extends LabKeyPage
         int rowIndex = table.getRow("StudyId", studyId);
         clickAndWait(table.updateLink(rowIndex));
         selectOptionByText(Locators.studyContainerSelect, containerName);
-        clickButton("Submit");
-    }
-
-    private void unlinkStudy(String studyShortName)
-    {
-        clickAndWait(Locator.linkWithText("StudyProperties"));
-        DataRegionTable table = new DataRegionTable("query", _test);
-        int row = table.getRow("Short Name", studyShortName);
-
-        clickAndWait(table.updateLink(row));
-
-        selectOptionByText(Locators.studyContainerSelect, "");
-
         clickButton("Submit");
     }
 

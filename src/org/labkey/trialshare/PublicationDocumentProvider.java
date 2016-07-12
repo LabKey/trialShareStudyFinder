@@ -111,7 +111,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 Map<String, Object> properties = new HashMap<>();
 
                 StringBuilder keywords = new StringBuilder();
-                for (String field : new String[]{"Year", "Status", "Title", "SubmissionStatus", "PublicationType", "Journal", "TherapeuticArea" , "Condition"})
+                for (String field : new String[]{"Year", "Status", "Title", "SubmissionStatus", "PublicationType", "Journal", "TherapeuticArea"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");
