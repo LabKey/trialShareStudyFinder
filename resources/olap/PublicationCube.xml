@@ -29,9 +29,12 @@
                 <Level name="Featured" visible="true"  type="Boolean" column="Featured" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
-            <Hierarchy name="Study" hasAll="true" primaryKey="publicationId">
-                <Table name="publicationStudy" schema="lists"/>
-                <Level name="Study" visible="true" table="publicationStudy" type="String" column="ShortName" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+            <Hierarchy name="Study" hasAll="true" primaryKey="publicationId" schema="lists" primaryKeyTable="publicationStudy">
+                <Join leftKey="StudyId" rightKey="studyId">
+                    <Table name="publicationStudy" schema="lists"/>
+                    <Table name="StudyProperties" schema="lists"/>
+                </Join>
+                <Level name="Study" visible="true" table="StudyProperties" type="String" column="ShortName" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
             <Hierarchy name="Year" hasAll="true" primaryKey="Key">
@@ -44,11 +47,6 @@
             </Hierarchy>
             <Hierarchy name="Status" hasAll="true" primaryKey="Key">
                 <Level name="Status" visible="true" type="String" column="status" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
-                </Level>
-            </Hierarchy>
-            <Hierarchy name="Condition" hasAll="true" primaryKey="publicationId">
-                <Table name="publicationCondition" schema="lists"/>
-                <Level name="Condition" visible="true" table="publicationCondition" type="String" column="Condition" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
                 </Level>
             </Hierarchy>
         </Dimension>

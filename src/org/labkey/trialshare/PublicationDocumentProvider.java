@@ -19,8 +19,6 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
-import org.labkey.api.module.Module;
-import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
 import org.labkey.api.search.SearchService;
@@ -46,8 +44,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
 
     public static Container getDocumentContainer()
     {
-        Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
-        return ((TrialShareModule) trialShareModule).getCubeContainer(null);
+        return TrialShareManager.get().getCubeContainer(null);
     }
 
     public static void reindex()
@@ -82,19 +79,20 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                     "pub.Journal,  " +
                     "pub.Status,  " +
                     "pub.SubmissionStatus, " +
-                    "pub.Study as PrimaryStudy,  " +
-                    "pub.StudyId as PrimaryStudyId,  " +
                     "pub.AbstractText,  " +
                     "pub.Keywords,  " +
                     "pub.PermissionsContainer,  " +
                     "pub.ManuscriptContainer,  " +
-                    "pc.Condition,  " +
-                    "ps.ShortName as StudyShortName,  " +
-                    "ps.StudyId,  " +
-                    "pta.TherapeuticArea  " +
-                "FROM ManuscriptsAndAbstracts pub  " +
-                    "   LEFT JOIN (SELECT PublicationId, group_concat(Condition) AS Condition FROM PublicationCondition GROUP BY PublicationId) pc on pub.Key = pc.PublicationId  " +
-                    "   LEFT JOIN (SELECT PublicationId, ShortName, group_concat(StudyId) AS StudyId FROM PublicationStudy GROUP BY ShortName, PublicationId) ps on pub.Key = ps.PublicationId  " +
+                    "psid.StudyId,  " +
+                    "psn.StudyShortName,  " +
+                    "pta.TherapeuticArea\n " +
+                "FROM ManuscriptsAndAbstracts pub\n  " +
+                    "   LEFT JOIN (SELECT PublicationId, group_concat(StudyId) AS StudyId FROM\n " +
+                    "       (SELECT sp1.StudyId AS StudyId, ps1.PublicationId FROM PublicationStudy ps1 LEFT JOIN StudyProperties sp1 on ps1.StudyId = sp1.StudyId) " +
+                    "   GROUP BY PublicationId) psid on pub.Key = psid.PublicationId\n  " +
+                    "   LEFT JOIN (SELECT PublicationId, group_concat(StudyShortName) as StudyShortName FROM\n " +
+                    "       (SELECT sp2.ShortName AS StudyShortName, ps2.PublicationId FROM PublicationStudy ps2 LEFT JOIN StudyProperties sp2 on ps2.StudyId = sp2.StudyId) " +
+                    "   GROUP BY StudyShortName, PublicationId) psn on pub.Key = psn.PublicationId\n  " +
                     "   LEFT JOIN (SELECT PublicationId, group_concat(TherapeuticArea) AS TherapeuticArea FROM PublicationTherapeuticArea GROUP BY PublicationId) pta on pub.Key = pta.PublicationId  " +
                 "WHERE pub.Show = true ";
 
@@ -113,13 +111,13 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
                 Map<String, Object> properties = new HashMap<>();
 
                 StringBuilder keywords = new StringBuilder();
-                for (String field : new String[]{"Year", "Status", "Title", "PublicationType", "Journal", "TherapeuticArea" , "Condition"})
+                for (String field : new String[]{"Year", "Status", "Title", "SubmissionStatus", "PublicationType", "Journal", "TherapeuticArea" , "Condition"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");
                 }
                 StringBuilder identifiers = new StringBuilder();
-                for (String field : new String[]{"PMID", "PMCID", "StudyId", "PrimaryStudy", "StudyShortName", "PrimaryStudyId", "DOI", "Author"})
+                for (String field : new String[]{"PMID", "PMCID", "StudyId", "StudyShortName", "DOI", "Author"})
                 {
                     if (results.getString(field) != null)
                         identifiers.append(results.getString(field).replaceAll(",", " ")).append(" " );

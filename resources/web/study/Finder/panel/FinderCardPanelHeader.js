@@ -14,8 +14,6 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
 
     cls: 'labkey-finder-card-header',
 
-    showHelpLinks: true,
-
     searchMessage: "",
 
     bubbleEvents: [
@@ -35,18 +33,17 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         if (searchBox)
             this.items.push(searchBox);
         this.items.push(this.getSubsetMenu());
-        if (this.showHelpLinks)
-        {
-            this.items.push({
-                // spacer
-                xtype: 'box',
-                autoEl: {
-                    tag: 'div'
-                },
-                flex: 10
-            });
-            this.items.push(this.getHelpLinks());
-        }
+
+        this.items.push({
+            // spacer
+            xtype: 'box',
+            autoEl: {
+                tag: 'div'
+            },
+            flex: 10
+        });
+        this.addManageDataLink();
+        this.items.push(this.getHelpLinks());
 
         this.subsets.on(
                 'load', function(store) {
@@ -59,8 +56,22 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
                 },
                 this
         );
-
+        
         this.callParent();
+    },
+
+    addManageDataLink: function()
+    {
+        LABKEY.Security.getUserPermissions({
+            containerPath: this.cubeContainerPath,
+            success: function (userPerms, resp) {
+                if (LABKEY.Security.hasPermission(userPerms.container.permissions, LABKEY.Security.permissions.insert))
+                {
+                    this.items.items.push(this.getManageDataLink());
+                }
+            },
+            scope: this
+        });
     },
 
     getSearchBox : function() {
@@ -112,6 +123,25 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
             })
         }
         return this.subsetMenu;
+    },
+
+    getManageDataLink: function() {
+        if (!this.manageDataLink) {
+            this.manageDataLink = Ext4.create("Ext.button.Button", {
+                text: 'manage data',
+                cls: 'labkey-text-link labkey-finder-manage-data',
+                componentCls: 'labkey-finder-manage-data',
+                scope: this,
+                // renderTo: this.objectName + '-manage-data-link',
+                handler: function() {
+                    window.open(LABKEY.ActionURL.buildURL(this.dataModuleName, "manageData.view", null, {
+                        objectName : this.objectName,
+                        'query.viewName' : 'manageData'
+                    }), '_blank');
+                }
+            });
+        }
+        return this.manageDataLink;
     },
 
     getHelpLinks: function() {
