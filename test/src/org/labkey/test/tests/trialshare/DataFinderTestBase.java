@@ -132,6 +132,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     }
 
 
+
     @Override
     protected BrowserType bestBrowser()
     {

@@ -35,6 +35,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
     private static final String PROJECT_NAME = "ManagePublicationTest Project";
     private static final String OPERATIONAL_STUDY_SUBFOLDER_NAME = "/" + PROJECT_NAME + "/" + OPERATIONAL_STUDY_NAME;
     private static final String PUBLIC_STUDY_SUBFOLDER_NAME = "/" + PROJECT_NAME + "/" + PUBLIC_STUDY_NAME;
+    private static int _step = 0;
 
     private static final Map<String, Object> EXISTING_PUB_FIELDS = new HashMap<>();
     static
@@ -71,7 +72,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
         return "ManagePublicationTest Project";
     }
 
-
     @Override
     protected void createStudies()
     {
@@ -104,7 +104,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
         switchToWindow(1);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         Assert.assertTrue("No data shown for publication", manageData.getCount() > 0);
-
+        getDriver().close();
+        switchToMainWindow();
         log("Impersonating user without insert permission");
         goToProjectHome();
         impersonate(PUBLIC_READER);
@@ -401,10 +402,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
         studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
         studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
-
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
-
         Map<String, Object> initialFields = new HashMap<>();
         // add the count so multiple runs of this test have distinct titles
         initialFields.put(PublicationEditPage.TITLE, "testInsertAndDelete_" + manageData.getCount());
@@ -414,12 +413,9 @@ public class ManagePublicationsTest extends DataFinderTestBase
         initialFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
         manageData.goToInsertNew();
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
-
         editPage.setFormFields(initialFields, false);
         editPage.submit();
-
         manageData.deleteRecord((String) initialFields.get(PublicationEditPage.TITLE));
-
         PublicationsListHelper listHelper = new PublicationsListHelper(this);
 
         goToProjectHome();
@@ -469,6 +465,5 @@ public class ManagePublicationsTest extends DataFinderTestBase
         dataCards = finder.getDataCards();
 
         assertEquals("Should find newly inserted publication after reindex", 1, dataCards.size());
-
     }
 }
