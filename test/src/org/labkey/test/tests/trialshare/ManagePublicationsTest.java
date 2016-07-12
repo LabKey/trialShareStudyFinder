@@ -35,7 +35,6 @@ public class ManagePublicationsTest extends DataFinderTestBase
     private static final String PROJECT_NAME = "ManagePublicationTest Project";
     private static final String OPERATIONAL_STUDY_SUBFOLDER_NAME = "/" + PROJECT_NAME + "/" + OPERATIONAL_STUDY_NAME;
     private static final String PUBLIC_STUDY_SUBFOLDER_NAME = "/" + PROJECT_NAME + "/" + PUBLIC_STUDY_NAME;
-    private static int _step = 0;
 
     private static final Map<String, Object> EXISTING_PUB_FIELDS = new HashMap<>();
     static
