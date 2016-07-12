@@ -15,7 +15,10 @@
  */
 package org.labkey.trialshare.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
+import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.reports.Report;
@@ -29,104 +32,119 @@ import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.ViewContext;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
+import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import static org.labkey.api.action.SpringActionController.ERROR_MSG;
+import static org.labkey.api.action.SpringActionController.ERROR_REQUIRED;
 
 public class StudyPublicationBean
 {
-    public static final String FIGURES_CATEGORY_TEXT = "Manuscript Figures";
+    private static final String KEY_FIELD = "Key";
+    private static final String STUDY_ID_FIELD = "StudyId";
+    private static final String TITLE_FIELD = "Title";
+    private static final String AUTHOR_FIELD = "Author";
+    private static final String DOI_FIELD = "DOI";
+    private static final String PMID_FIELD = "PMID";
+    private static final String PMCID_FIELD = "PMCID";
+    private static final String ISSUE_NUMBER_FIELD = "IssueNo";
+    private static final String PAGES_FIELD = "Pages";
+    private static final String PUBLICATION_TYPE_FIELD = "PublicationType";
+    private static final String YEAR_FIELD = "Year";
+    private static final String JOURNAL_FIELD = "Journal";
+    private static final String STATUS_FIELD = "Status";
+    private static final String SUBMISSION_STATUS_FIELD = "SubmissionStatus";
+    private static final String CITATION_FIELD = "Citation";
+    private static final String ABSTRACT_FIELD = "Abstract";
+    private static final String DATA_URL_FIELD = "DataUrl";
+    private static final String IS_HIGHLIGHTED_FIELD = "IsHighlighted";
+    private static final String MANUSCRIPT_CONTAINER_FIELD = "ManuscriptContainer";
+    private static final String KEYWORDS_FIELD = "Keywords";
+    private static final String PERMISSIONS_CONTAINER_FIELD = "PermissionsContainer";
+    private static final String IS_SHOWN_FIELD = "Show";
+    private static final String LINK1_FIELD = "Link1";
+    private static final String DESCRIPTION1_FIELD = "Description1";
+    private static final String LINK2_FIELD = "Link2";
+    private static final String DESCRIPTION2_FIELD = "Description2";
+    private static final String LINK3_FIELD = "Link3";
+    private static final String DESCRIPTION3_FIELD = "Description3";
+
+    private static final Pattern PMCID_PATTERN = Pattern.compile("[Pp][Mm][Cc]\\d+");
+
+    private static final String FIGURES_CATEGORY_TEXT = "Manuscript Figures";
 
     private static final int AUTHORS_PER_ABBREV = 3;
+    private Map<String, Object> _primaryFields = new CaseInsensitiveHashMap<>();
 
-    // common fields
-    private Integer id;
-    private String studyId;
-    private String pmid; // PubMed Id
-    private String pmcid; // PubMed Central reference number
-    private String doi;
-    private String author;
-    private String issue;
-    private String journal;
-    private String pages;
-    private String title;
-    private String year;
-    private String abstractText;
-    private String citation;
-    private String status;
-    private String dataUrl;
     private List<StudyBean> studies;
-    private Boolean isHighlighted = false;
-    private String publicationType;
-    private String permissionsContainer;
     private List<URLData> thumbnails;
-    private String manuscriptContainer;
-    private String keywords;
-    private Boolean show;
     private List<URLData> urls = new ArrayList<>();
-
 
     public Integer getId()
     {
-        return id;
+        return (Integer) _primaryFields.get(KEY_FIELD);
     }
 
     public void setId(Integer id)
     {
-        this.id = id;
+        _primaryFields.put(KEY_FIELD, id);
     }
 
     public void setKey(Integer id)
     {
-        this.id = id;
+        _primaryFields.put(KEY_FIELD, id);
     }
 
-    public void set_Key(Integer id) { this.id = id; } // this is required because for SQLServer we alias "Key" as "_Key" in our query
+    public void set_Key(Integer id) { _primaryFields.put(KEY_FIELD, id); } // this is required because for SQLServer we alias "Key" as "_Key" in our query
 
     public String getStudyId()
     {
-        return studyId;
+        return (String) _primaryFields.get(STUDY_ID_FIELD);
     }
 
     public void setStudyId(String studyId)
     {
-        this.studyId = studyId;
+        _primaryFields.put(STUDY_ID_FIELD, studyId);
     }
 
-    public String getPmid()
+    public String getPMID()
     {
-        return pmid;
+        return (String) _primaryFields.get(PMID_FIELD);
     }
 
-    public void setPmid(String pmid)
+    public void setPMID(String pmid)
     {
-        this.pmid = pmid;
+        _primaryFields.put(PMID_FIELD, pmid);
     }
 
-    public String getPmcid()
+    public String getPMCID()
     {
-        return pmcid;
+        return (String) _primaryFields.get(PMCID_FIELD);
     }
 
-    public void setPmcid(String pmcid)
+    public void setPMCID(String pmcid)
     {
-        this.pmcid = pmcid;
+        _primaryFields.put(PMCID_FIELD, pmcid);
     }
 
-    public String getDoi()
+    public String getDOI()
     {
-        return doi;
+        return (String) _primaryFields.get(DOI_FIELD);
     }
 
-    public void setDoi(String doi)
+    public void setDOI(String doi)
     {
-        this.doi = doi;
+        _primaryFields.put(DOI_FIELD, doi);
     }
 
     public String getAuthor()
     {
-        return author;
+        return (String) _primaryFields.get(AUTHOR_FIELD);
     }
 
     public String getAuthorAbbrev()
@@ -134,7 +152,6 @@ public class StudyPublicationBean
         if (getAuthor() == null)
             return null;
         String[] authors = getAuthor().split(",");
-        StringBuilder authorAbbrev = new StringBuilder();
         int endVal = AUTHORS_PER_ABBREV;
         String suffix = ", et al.";
         if (authors.length <= AUTHORS_PER_ABBREV)
@@ -147,84 +164,78 @@ public class StudyPublicationBean
 
     public void setAuthor(String author)
     {
-        this.author = author;
+        _primaryFields.put(AUTHOR_FIELD, author);
     }
 
-    public String getIssue()
+    public String getIssueNumber()
     {
-        return issue;
+        return (String) _primaryFields.get(ISSUE_NUMBER_FIELD);
     }
 
-    public void setIssue(String issue)
+    public void setIssueNumber(String issue)
     {
-        this.issue = issue;
+        _primaryFields.put(ISSUE_NUMBER_FIELD, issue);
     }
 
     public String getJournal()
     {
-        return journal;
+        return (String) _primaryFields.get(JOURNAL_FIELD);
     }
 
     public void setJournal(String journal)
     {
-        this.journal = journal;
+        _primaryFields.put(JOURNAL_FIELD, journal);
     }
 
     public String getPages()
     {
-        return pages;
+        return (String) _primaryFields.get(PAGES_FIELD);
     }
 
     public void setPages(String pages)
     {
-        this.pages = pages;
+        _primaryFields.put(PAGES_FIELD, pages);
     }
 
     public String getTitle()
     {
-        return title;
+        return (String) _primaryFields.get(TITLE_FIELD);
     }
 
     public void setTitle(String title)
     {
-        this.title = title;
+        _primaryFields.put(TITLE_FIELD, title);
     }
 
-    public String getYear()
+    public Integer getYear()
     {
-        return year;
+       return (Integer) _primaryFields.get(YEAR_FIELD);
     }
 
-    public void setYear(String year)
+    public void setYear(Integer year)
     {
-        this.year = year;
+        _primaryFields.put(YEAR_FIELD, year);
     }
 
     public String getCitation()
     {
-        return citation;
+        return (String) _primaryFields.get(CITATION_FIELD);
     }
 
     public void setCitation(String citation)
     {
-        this.citation = citation;
+        _primaryFields.put(CITATION_FIELD, citation);
     }
 
     public String getAbstractText()
     {
-        return abstractText;
+        return (String) _primaryFields.get(ABSTRACT_FIELD);
     }
 
     public void setAbstractText(String abstractText)
     {
-        this.abstractText = abstractText;
+        _primaryFields.put(ABSTRACT_FIELD, abstractText);
     }
-
-    public void setDescription1(String description1)
-    {
-        setUrlText(0, description1);
-    }
-
 
     public String getUrl() {
         for (URLData urlData : urls)
@@ -285,9 +296,27 @@ public class StudyPublicationBean
         return null;
     }
 
+
+    public void setDescription1(String description1)
+    {
+        setUrlText(0, description1);
+    }
+
+    public String getDescription1()
+    {
+        URLData url = getUrlData(0);
+        return url == null ? null : url.getLinkText();
+    }
+
     public void setDescription2(String description2)
     {
         setUrlText(1, description2);
+    }
+
+    public String getDescription2()
+    {
+        URLData url = getUrlData(1);
+        return url == null ? null : url.getLinkText();
     }
 
     public void setDescription3(String description3)
@@ -295,32 +324,63 @@ public class StudyPublicationBean
         setUrlText(2, description3);
     }
 
+    public String getDescription3()
+    {
+        URLData url = getUrlData(2);
+        return url == null ? null : url.getLinkText();
+    }
 
     public void setLink1(String link1)
     {
         setUrlLink(0, link1);
     }
 
+    public String getLink1()
+    {
+        URLData url = getUrlData(0);
+        return url == null ? null : url.getLink();
+    }
 
     public void setLink2(String link2)
     {
         setUrlLink(1, link2);
     }
 
+    public String getLink2()
+    {
+        URLData url = getUrlData(1);
+        return url == null ? null : url.getLink();
+    }
 
     public void setLink3(String link3)
     {
         setUrlLink(2, link3);
     }
 
+    public String getLink3()
+    {
+        URLData url = getUrlData(2);
+        return url == null ? null : url.getLink();
+    }
+
     public String getStatus()
     {
-        return status;
+        return (String) _primaryFields.get(STATUS_FIELD);
     }
 
     public void setStatus(String status)
     {
-        this.status = status;
+        _primaryFields.put(STATUS_FIELD, status);
+    }
+
+    public String getSubmissionStatus()
+    {
+        return (String) _primaryFields.get(SUBMISSION_STATUS_FIELD);
+    }
+
+    public void setSubmissionStatus(String status)
+    {
+        _primaryFields.put(SUBMISSION_STATUS_FIELD, status);
     }
 
     public List<StudyBean> getStudies()
@@ -335,42 +395,42 @@ public class StudyPublicationBean
 
     public String getDataUrl()
     {
-        return dataUrl;
+        return (String) _primaryFields.get(DATA_URL_FIELD);
     }
 
     public void setDataUrl(String dataUrl)
     {
-        this.dataUrl = dataUrl;
+        _primaryFields.put(DATA_URL_FIELD, dataUrl);
     }
 
     public Boolean getIsHighlighted()
     {
-        return isHighlighted;
+        return (Boolean) _primaryFields.get(IS_HIGHLIGHTED_FIELD);
     }
 
     public void setIsHighlighted(Boolean highlighted)
     {
-        isHighlighted = highlighted;
+        _primaryFields.put(IS_HIGHLIGHTED_FIELD, highlighted);
     }
 
     public String getPublicationType()
     {
-        return publicationType;
+        return (String) _primaryFields.get(PUBLICATION_TYPE_FIELD);
     }
 
     public void setPublicationType(String publicationType)
     {
-        this.publicationType = publicationType;
+        _primaryFields.put(PUBLICATION_TYPE_FIELD, publicationType);
     }
 
     public String getManuscriptContainer()
     {
-        return manuscriptContainer;
+        return (String) _primaryFields.get(MANUSCRIPT_CONTAINER_FIELD);
     }
 
     public void setManuscriptContainer(String manuscriptContainer)
     {
-        this.manuscriptContainer = manuscriptContainer;
+        _primaryFields.put(MANUSCRIPT_CONTAINER_FIELD, manuscriptContainer);
     }
 
     public List<URLData> getThumbnails()
@@ -441,37 +501,37 @@ public class StudyPublicationBean
 
     public String getKeywords()
     {
-        return keywords;
+        return (String) _primaryFields.get(KEYWORDS_FIELD);
     }
 
     public void setKeywords(String keywords)
     {
-        this.keywords = keywords;
+        _primaryFields.put(KEYWORDS_FIELD, keywords);
     }
 
     public String getPermissionsContainer()
     {
-        return permissionsContainer;
+        return (String) _primaryFields.get(PERMISSIONS_CONTAINER_FIELD);
     }
 
     public void setPermissionsContainer(String permissionsContainer)
     {
-        this.permissionsContainer = permissionsContainer;
+        _primaryFields.put(PERMISSIONS_CONTAINER_FIELD, permissionsContainer);
     }
 
     public Boolean getShow()
     {
-        return show;
+        return (Boolean) _primaryFields.get(IS_SHOWN_FIELD);
     }
 
     public void setShow(Boolean show)
     {
-        this.show = show;
+        _primaryFields.put(IS_SHOWN_FIELD, show);
     }
 
     public Boolean inProgress()
     {
-        return getStatus().equalsIgnoreCase(TrialShareQuerySchema.IN_PROGRESS_STATUS);
+        return getStatus() != null && getStatus().equalsIgnoreCase(TrialShareQuerySchema.IN_PROGRESS_STATUS);
     }
 
     public String getCubeId()
@@ -499,4 +559,59 @@ public class StudyPublicationBean
         }
         return false;
     }
+
+    @JsonIgnore
+    public Map<String, Object> getPrimaryFields()
+    {
+       return _primaryFields;
+    }
+
+    public Map<String, Object> getUrlFields()
+    {
+        Map<String, Object> urlFields = new CaseInsensitiveHashMap<>();
+
+        if (getLink1() != null)
+            urlFields.put(LINK1_FIELD, getLink1());
+        if (getDescription1() != null)
+            urlFields.put(DESCRIPTION1_FIELD, getDescription1());
+        if (getLink2() != null)
+            urlFields.put(LINK2_FIELD, getLink2());
+        if (getDescription2() != null)
+            urlFields.put(DESCRIPTION2_FIELD, getDescription2());
+        if (getLink3() != null)
+            urlFields.put(LINK3_FIELD, getLink3());
+        if (getDescription3() != null)
+            urlFields.put(DESCRIPTION3_FIELD, getDescription3());
+        return urlFields;
+    }
+
+    protected void setPrimaryFields(Map<String, Object> fields)
+    {
+       _primaryFields = fields;
+    }
+
+
+    public void validate(Errors errors)
+    {
+        if (getTitle() == null)
+            errors.rejectValue("title", ERROR_REQUIRED, "Title is required");
+        if (getStatus() == null)
+            errors.rejectValue("status", ERROR_REQUIRED, "Status is required");
+        if (getPublicationType() == null)
+            errors.rejectValue("publicationType", ERROR_REQUIRED, "Publication type is required");
+        if (getPMID() != null && !StringUtils.isNumeric(getPMID()))
+        {
+            errors.rejectValue("pmid", ERROR_MSG, "PMID must be an integer");
+        }
+        if (getPMCID() != null && !PMCID_PATTERN.matcher(getPMCID()).matches())
+        {
+            errors.rejectValue("pmcid", ERROR_MSG, "Incorrect format for PMCID.  Expected PMC#");
+        }
+    }
+
+    private boolean isValidUrl(String url)
+    {
+        return new UrlValidator(new String[]{"http","https"}).isValid(url);
+    }
+
 }

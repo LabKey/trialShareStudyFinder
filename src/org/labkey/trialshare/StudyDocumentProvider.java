@@ -17,8 +17,6 @@ package org.labkey.trialshare;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
-import org.labkey.api.module.Module;
-import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
 import org.labkey.api.search.SearchService;
@@ -41,10 +39,10 @@ import java.util.Map;
 public class StudyDocumentProvider implements SearchService.DocumentProvider
 {
     private static final Logger _logger = LoggerFactory.getLogger(StudyDocumentProvider.class);
+
     public static Container getDocumentContainer()
     {
-        Module trialShareModule = ModuleLoader.getInstance().getModule(TrialShareModule.NAME);
-        return ((TrialShareModule) trialShareModule).getCubeContainer(null);
+        return TrialShareManager.get().getCubeContainer(null);
     }
 
     public static void reindex()
@@ -62,12 +60,14 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
 
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(User.getSearchUser(), c);
 
+        if (!listSchema.getTableNames().containsAll(TrialShareQuerySchema.getRequiredStudyLists()))
+            return;
+
         String sql =
                 "SELECT  "+
                         "sa.StudyId, "+
                         "sa.StudyContainer, "+
                         "sc.condition, "+
-                        "sas.Assay, "+
                         "sph.Phase,  "+
                         "sag.AgeGroup, "+
                         "sta.TherapeuticArea, "+
@@ -78,7 +78,6 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                         "sp.Investigator "+
                 "FROM StudyAccess sa  "+
                         "   LEFT JOIN StudyProperties sp ON sa.StudyId = sp.StudyId "+
-                        "   LEFT JOIN (SELECT StudyId, group_concat(Assay) AS Assay FROM StudyAssay GROUP BY StudyId) sas on sa.StudyId = sas.StudyId  "+
                         "   LEFT JOIN (SELECT StudyId, group_concat(Condition) As Condition FROM StudyCondition GROUP BY StudyId) sc on sa.StudyId = sc.StudyId "+
                         "   LEFT JOIN (SELECT StudyId, group_concat(AgeGroup) AS AgeGroup FROM StudyAgeGroup GROUP BY StudyId) sag on sa.StudyId = sag.StudyId "+
                         "   LEFT JOIN (SELECT StudyId, group_concat(Phase) AS Phase FROM StudyPhase GROUP BY StudyId) sph on sa.StudyId = sph.StudyId "+
@@ -101,7 +100,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
 
                 StringBuilder keywords = new StringBuilder();
                 // See #26028: we want to avoid stemming of the following fields, so we use keywords instead
-                for (String field : new String[]{"shortName", "StudyId", "Investigator", "AgeGroup", "Assay", "Condition", "Phase", "TherapeuticArea", "StudyType"})
+                for (String field : new String[]{"shortName", "StudyId", "Investigator", "AgeGroup", "Condition", "Phase", "TherapeuticArea", "StudyType"})
                 {
                     if (results.getString(field) != null)
                         keywords.append(results.getString(field)).append(" ");

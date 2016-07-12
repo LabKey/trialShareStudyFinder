@@ -37,8 +37,6 @@ import java.util.Map;
 
 public class DataFinderPage extends LabKeyPage
 {
-    private static final String CONTROLLER = "trialshare";
-    private static final String ACTION = "dataFinder";
     public static final String STUDY_COUNT_SIGNAL = "dataFinderStudyCountsUpdated";
     public static final String PUBLICATION_COUNT_SIGNAL = "dataFinderPublicationCountsUpdated";
     public static final String STUDY_FACET_SIGNAL = "dataFinderStudyFacetsReady";
@@ -60,6 +58,19 @@ public class DataFinderPage extends LabKeyPage
         {
             finderLocator = Locators.pubFinder;
         }
+    }
+
+    public boolean canManageData()
+    {
+        return this.testingStudies ? isElementPresent(Locators.manageStudyData) : isElementPresent(Locators.managePublicationData);
+    }
+
+    public void goToManageData()
+    {
+        if (this.testingStudies)
+            Locators.manageStudyData.findElement(this.getDriver()).click();
+        else
+            Locators.managePublicationData.findElement(this.getDriver()).click();
     }
 
     public String getCountSignal()
@@ -286,6 +297,8 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.CssLocator saveMenu = Locator.css("#saveMenu");
         public static final Locator.CssLocator loadMenu = Locator.css("#loadMenu");
         public static final Locator.IdLocator manageMenu = Locator.id("manageMenu");
+        public static final Locator.CssLocator managePublicationData = Locator.css(".labkey-publications-panel .labkey-finder-manage-data");
+        public static final Locator.CssLocator manageStudyData = Locator.css(".labkey-studies-panel .labkey-finder-manage-data");
 
         public static final Locator.CssLocator getSearchInput(Locator.CssLocator locator)
         {

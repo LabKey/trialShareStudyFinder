@@ -47,7 +47,7 @@
     Container c = context.getContainer();
     TrialShareController.StudyDetailBean studyDetail = me.getModelBean();
     StudyBean study = studyDetail.getStudy();
-    String descriptionHTML = study.getDescription(c, context.getUser());
+    String descriptionHTML = study.getDescription();
     if (StringUtils.isEmpty(descriptionHTML))
         descriptionHTML = h(study.getBriefDescription());
 
@@ -86,23 +86,23 @@
         }
         %>
 
-        <% if (null != studyUrl || null != study.getExternalUrl())
+        <% if (null != studyUrl || null != study.getExternalURL())
             { %>
         <div class="labkey-study-links">
         <%      if (null != studyUrl) { %>
         <%= textLink("View study " + study.getShortName(), studyUrl, null, null, linkProps)%><br>
         <% } %>
         <%
-                    if (null != study.getExternalUrl())
+                    if (null != study.getExternalURL())
                     {
                         String text = study.getExternalUrlDescription();
                         if (StringUtils.isEmpty(text))
                         {
-                            URL url = new URL(study.getExternalUrl());
+                            URL url = new URL(study.getExternalURL());
                             text = "View study at " + url.getHost();
                         }
         %>
-        <%= textLink(text, study.getExternalUrl(), null, null, linkProps)%><br>
+        <%= textLink(text, study.getExternalURL(), null, null, linkProps)%><br>
         <%          } %>
 
         </div>
@@ -130,9 +130,9 @@
                         %><br/><span class="labkey-publication-author"><%=h(pub.getAuthor())%></span><%
                     }
                 %><%
-                    if (!StringUtils.isEmpty(pub.getPmid()))
+                    if (!StringUtils.isEmpty(pub.getPMID()))
                     {
-                        %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPmid(), null, null, linkProps)%><%
+                        %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPMID(), null, null, linkProps)%><%
                     }
                     for (URLData urlData : pub.getUrls())
                     {
