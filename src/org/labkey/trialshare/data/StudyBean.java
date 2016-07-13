@@ -16,6 +16,7 @@
 package org.labkey.trialshare.data;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerFilter;
 import org.labkey.api.data.ContainerFilterable;
@@ -32,6 +33,7 @@ import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.wiki.WikiRendererType;
 import org.labkey.api.wiki.WikiService;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
+import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,28 +41,35 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.api.action.SpringActionController.ERROR_REQUIRED;
+
 /**
  * Created by susanh on 12/7/15.
  */
 public class StudyBean
 {
-    private String shortName;
-    private String studyId;
-    private String title;
+    private static final String STUDY_TYPE_KEY = "studyType";
+    private static final String SHORT_NAME_FIELD = "shortName";
+    private static final String STUDY_ID_FIELD = "studyId";
+    private static final String TITLE_FIELD = "title";
+    private static final String INVESTIGATOR_FIELD = "investigator";
+    private static final String EXTERNAL_URL_FIELD = "externalUrl";
+    private static final String EXTERNAL_URL_DESCRIPTION_FIELD = "externalUrlDescription";
+    private static final String ICON_URL_FIELD = "iconUrl";
+    private static final String DESCRIPTION_FIELD = "description";
+    private static final String PARTICIPANT_COUNT_FIELD = "participantCount";
+
+    private Map<String, Object> _primaryFields = new CaseInsensitiveHashMap<>();
+
+
     private String url;
-    private String investigator;
-    private String externalUrl;
-    private String externalUrlDescription;
-    private String iconUrl;
     private Boolean isLoaded;
-    private String description;
     private String briefDescription;
     private String studyIdPrefix = null; // common prefix used in labeling studies
     private String availability;
     private Boolean isHighlighted = false;
     private String visibility;
     private Boolean isPublic = false;
-    private Integer participantCount;
     private List<StudyAccess> _studyAccessList = new ArrayList<>();
 
     private List<StudyPersonnelBean> personnel;
@@ -71,42 +80,46 @@ public class StudyBean
 
     public String getStudyId()
     {
-        return studyId;
+        return (String) _primaryFields.get(STUDY_ID_FIELD);
     }
 
     public void setStudyId(String studyId)
     {
-        this.studyId = studyId;
+        _primaryFields.put(STUDY_ID_FIELD, studyId);
     }
+
+    public String getStudyType() { return (String) _primaryFields.get(STUDY_TYPE_KEY); }
+
+    public void setStudyType(String studyType) { _primaryFields.put(STUDY_TYPE_KEY, studyType); }
 
     public String getInvestigator()
     {
-        return investigator;
+        return (String) _primaryFields.get(INVESTIGATOR_FIELD);
     }
 
     public void setInvestigator(String investigator)
     {
-        this.investigator = investigator;
+        _primaryFields.put(INVESTIGATOR_FIELD, investigator);
     }
 
     public String getTitle()
     {
-        return title;
+        return (String) _primaryFields.get(TITLE_FIELD);
     }
 
     public void setTitle(String title)
     {
-        this.title = title;
+        _primaryFields.put(TITLE_FIELD, title);
     }
 
-    public String getExternalUrl()
+    public String getExternalURL()
     {
-        return externalUrl;
+        return (String) _primaryFields.get(EXTERNAL_URL_FIELD);
     }
 
-    public void setExternalUrl(String externalUrl)
+    public void setExternalURL(String externalUrl)
     {
-        this.externalUrl = externalUrl;
+        _primaryFields.put(EXTERNAL_URL_FIELD, externalUrl);
     }
 
     public Boolean getIsLoaded()
@@ -164,16 +177,10 @@ public class StudyBean
         QuerySchema coreSchema = DefaultSchema.get(user, container).getSchema("core");
         QuerySchema listSchema = coreSchema.getSchema("lists");
 
-        SimpleFilter filter = new SimpleFilter();
-        filter.addCondition(FieldKey.fromParts("studyId"), getStudyId());
-        if (publicationType != null)
+        if (listSchema != null)
         {
-            filter.addCondition(FieldKey.fromParts("PublicationType"), publicationType);
-        }
-        if (listSchema != null && listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE) != null)
-        {
-            List<StudyPublicationBean> allPublications = (new TableSelector(listSchema.getTable(TrialShareQuerySchema.PUBLICATION_TABLE), filter, null)).getArrayList(StudyPublicationBean.class);
-            this.publications.clear();
+            TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
+            List<StudyPublicationBean> allPublications = schema.getStudyPublications(getStudyId(), publicationType);
             for (StudyPublicationBean publication : allPublications)
             {
                 if (publication.getShow() && publication.hasPermission(user))
@@ -194,12 +201,12 @@ public class StudyBean
 
     public String getShortName()
     {
-        return shortName;
+        return (String) _primaryFields.get(SHORT_NAME_FIELD);
     }
 
     public void setShortName(String shortName)
     {
-        this.shortName = shortName;
+        _primaryFields.put(SHORT_NAME_FIELD, shortName);
     }
 
     public String getAvailability()
@@ -214,12 +221,12 @@ public class StudyBean
 
     public String getIconUrl()
     {
-        return iconUrl;
+        return (String) _primaryFields.get(ICON_URL_FIELD);
     }
 
     public void setIconUrl(String iconUrl)
     {
-        this.iconUrl = iconUrl;
+        _primaryFields.put(ICON_URL_FIELD, iconUrl);
     }
 
     public Integer getManuscriptCount()
@@ -269,12 +276,12 @@ public class StudyBean
 
     public Integer getParticipantCount()
     {
-        return participantCount;
+        return (Integer) _primaryFields.get(PARTICIPANT_COUNT_FIELD);
     }
 
     public void setParticipantCount(Integer participantCount)
     {
-        this.participantCount = participantCount;
+        _primaryFields.put(PARTICIPANT_COUNT_FIELD, participantCount);
     }
 
     public void setUrl(String url)
@@ -333,9 +340,9 @@ public class StudyBean
         return Collections.emptyList();
     }
 
-    public String getDescription(Container c, User user)
+    public String getDescription()
     {
-        return description;
+        return (String) _primaryFields.get(DESCRIPTION_FIELD);
     }
 
     private String getFormattedHtml(WikiRendererType rendererType, String markup)
@@ -354,18 +361,18 @@ public class StudyBean
 
     public void setDescription(String description)
     {
-        this.description = description;
+        _primaryFields.put(DESCRIPTION_FIELD, description);
     }
 
 
     public String getExternalUrlDescription()
     {
-        return externalUrlDescription;
+        return (String) _primaryFields.get(EXTERNAL_URL_DESCRIPTION_FIELD);
     }
 
     public void setExternalUrlDescription(String externalUrlDescription)
     {
-        this.externalUrlDescription = externalUrlDescription;
+        _primaryFields.put(EXTERNAL_URL_DESCRIPTION_FIELD, externalUrlDescription);
     }
 
     public List<StudyAccess> getStudyAccessList()
@@ -396,6 +403,26 @@ public class StudyBean
                 this._studyAccessList.add(studyAccess);
             }
         }
+    }
+
+    public Map<String, Object> getPrimaryFields()
+    {
+        return _primaryFields;
+    }
+
+    protected void setPrimaryFields(Map<String, Object> primaryFields)
+    {
+        _primaryFields = primaryFields;
+    }
+
+    public void validate(Errors errors)
+    {
+        if (getShortName() == null)
+            errors.rejectValue("shortName", ERROR_REQUIRED, "Short Name is required");
+        if (getStudyId() == null)
+            errors.rejectValue("studyId", ERROR_REQUIRED, "Study Id is required");
+        if (getTitle() == null)
+            errors.rejectValue("title", ERROR_REQUIRED, "Title is required");
     }
 }
 

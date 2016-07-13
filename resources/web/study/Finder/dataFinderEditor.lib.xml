@@ -1,0 +1,27 @@
+<libraries xmlns="http://labkey.org/clientLibrary/xml/">
+    <library compileInProductionMode="true">
+
+        <script path="study/Finder/dataFinder.css"/>
+        <script path="study/Finder/trialShare.css"/>
+
+        <script path="study/Finder/data/AgeGroup.js"/>
+        <script path="study/Finder/data/Condition.js"/>
+        <script path="study/Finder/data/Container.js"/>
+        <script path="study/Finder/data/Phase.js"/>
+        <script path="study/Finder/data/PublicationType.js"/>
+        <script path="study/Finder/data/Status.js"/>
+        <script path="study/Finder/data/StudyType.js"/>
+        <script path="study/Finder/data/SubmissionStatus.js"/>
+        <script path="study/Finder/data/TherapeuticArea.js"/>
+
+        <script path="study/Finder/data/Study.js"/>
+        <script path="study/Finder/data/Publication.js"/>
+        <script path="study/Finder/panel/CubeObjectDetailsFormPanel.js"/>
+        <script path="study/Finder/panel/PublicationDetailsFormPanel.js"/>
+        <script path="study/Finder/panel/StudyDetailsFormPanel.js"/>
+
+    </library>
+    <dependencies>
+        <dependency path="Ext4"/>
+    </dependencies>
+</libraries>

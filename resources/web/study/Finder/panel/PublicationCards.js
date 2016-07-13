@@ -91,7 +91,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '                       <span class="labkey-publication-identifier"><a href="http://dx.doi.org/{doi:htmlEncode}" class="labkey-text-link" target="_blank">DOI {doi:htmlEncode}</a></span>',
         '                   </tpl>',
         '                   </div>',
-        '                   <tpl if="studies">',
+        '                   <tpl if="studies && studies.length">',
         '                   <div class="labkey-publication-studies">',
         '                       <span class="labkey-publication-detail-label">Studies</span>',
         '                       <tpl for="studies">',

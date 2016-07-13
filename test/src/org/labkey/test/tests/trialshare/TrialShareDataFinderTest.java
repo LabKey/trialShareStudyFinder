@@ -19,36 +19,27 @@ package org.labkey.test.tests.trialshare;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
-import org.labkey.test.components.study.StudyOverviewWebPart;
 import org.labkey.test.components.trialshare.PublicationPanel;
 import org.labkey.test.components.trialshare.StudySummaryWindow;
 import org.labkey.test.pages.PermissionsEditor;
-import org.labkey.test.pages.study.ManageParticipantGroupsPage;
 import org.labkey.test.pages.trialshare.DataFinderPage;
-import org.labkey.test.pages.trialshare.PublicationsQueryUpdatePage;
-import org.labkey.test.pages.trialshare.StudyPropertiesQueryUpdatePage;
+import org.labkey.test.pages.trialshare.PublicationsListHelper;
+import org.labkey.test.pages.trialshare.StudiesListHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ReadOnlyTest;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +47,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -64,54 +54,14 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({Git.class})
-public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadOnlyTest
+public class TrialShareDataFinderTest extends DataFinderTestBase implements ReadOnlyTest
 {
-    private static final String MODULE_NAME = "TrialShare";
-    private static final String WEB_PART_NAME = "TrialShare Data Finder";
-    private static final String OPERATIONAL_STUDY_NAME = "DataFinderTestOperationalStudy";
-    private static final String PUBLIC_STUDY_NAME = "DataFinderTestPublicStudy";
-    private static final String EMAIL_EXTENSION = "@datafinder.test";
-    private static final String PUBLIC_READER_DISPLAY_NAME = "public_reader";
-    private static final String PUBLIC_READER = PUBLIC_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    private static final String CASALE_READER_DISPLAY_NAME = "casale_reader";
-    private static final String CASALE_READER = CASALE_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    private static final String WISPR_READER_DISPLAY_NAME = "wispr_reader";
-    private static final String WISPR_READER = WISPR_READER_DISPLAY_NAME + EMAIL_EXTENSION;
-    private static final String CONTROLLER = "trialshare";
-    private static final String ACTION = "dataFinder";
-    private static File listArchive = TestFileUtils.getSampleData("DataFinder.lists.zip");
-
     private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
-
-    private static final Map<String, Set<String>> studySubsets = new HashMap<>();
-    static {
-
-        Set<String> operationalSet = new HashSet<>();
-        studySubsets.put("Operational", operationalSet);
-        operationalSet.add("TILT");
-        operationalSet.add("WISP-R");
-        operationalSet.add("ACCEPTOR");
-        operationalSet.add("FACTOR");
-        operationalSet.add("DIAMOND");
-
-        Set<String> publicSet = new HashSet<>();
-        studySubsets.put("Public", publicSet);
-        publicSet.add("DIAMOND");
-        publicSet.add("Shapiro");
-        publicSet.add("Casale");
-        publicSet.add("Vincenti");
-    };
-
-    private static Set<String> loadedStudies = new HashSet<>();
-    static {
-        loadedStudies.add("DataFinderTestPublicCasale");
-        loadedStudies.add("DataFinderTestOperationalWISP-R");
-    }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
+        super.doCleanup(afterTest);
         _containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, afterTest);
     }
 
@@ -125,21 +75,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     }
 
     @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
-    }
-
-    @Override
     protected String getProjectName()
     {
         return "TrialShareDataFinderTest Project";
-    }
-
-    @Override
-    public List<String> getAssociatedModules()
-    {
-        return Collections.singletonList("TrialShare");
     }
 
     @Override
@@ -156,16 +94,9 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         }
     }
 
-    private void setUpProject()
+    @Override
+    protected void createStudies()
     {
-        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-
-        containerHelper.createProject(getProjectName(), "Custom");
-        containerHelper.enableModule(MODULE_NAME);
-        goToProjectHome();
-        ListHelper listHelper = new ListHelper(this);
-        listHelper.importListArchive(listArchive);
-
         log("Creating a study container for each study");
         for (String subset : studySubsets.keySet())
         {
@@ -178,56 +109,16 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         createStudy(PUBLIC_STUDY_NAME);
         createStudy(OPERATIONAL_STUDY_NAME);
         goToProjectHome();
-        StudyPropertiesQueryUpdatePage queryUpdatePage = new StudyPropertiesQueryUpdatePage(this);
+        StudiesListHelper queryUpdatePage = new StudiesListHelper(this);
         queryUpdatePage.setStudyContainers();
         goToProjectHome();
-        PublicationsQueryUpdatePage pubUpdatePage = new PublicationsQueryUpdatePage(this);
-        pubUpdatePage.setPermissionsContainer("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
-
-        createUsers();
-
-        List<ModulePropertyValue> propList = new ArrayList<>();
-        // set the site-default value for this so it will work as expected from the Admin Console.
-        propList.add(new ModulePropertyValue("TrialShare", "/", "DataFinderCubeContainer", getProjectName()));
-        setModuleProperties(propList);
-
-        reindexForSearch();
-
-        goToProjectHome();
-        new PortalHelper(this).addWebPart(WEB_PART_NAME);
+        PublicationsListHelper pubUpdatePage = new PublicationsListHelper(this);
+        pubUpdatePage.setPermissionsContainers("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
     }
 
-    @LogMethod
-    private void reindexForSearch()
+    protected void createUsers()
     {
-        log("Reindexing data for full-text search");
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("Data Cube"));
-        clickButton("Reindex", 0);
-        clickButton("OK");
-    }
-
-    private void createStudy(String studyName, Boolean operational)
-    {
-        log("creating study " + studyName);
-        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-        File studyArchive = operational ? TestFileUtils.getSampleData(OPERATIONAL_STUDY_NAME + ".folder.zip") : TestFileUtils.getSampleData(PUBLIC_STUDY_NAME + ".folder.zip");
-        containerHelper.createSubfolder(getProjectName(), studyName, "Study");
-        importStudyFromZip(studyArchive, true, true);
-    }
-
-    private void createStudy(String name)
-    {
-        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-
-        File studyArchive = TestFileUtils.getSampleData(name + ".folder.zip");
-        containerHelper.createSubfolder(getProjectName(), name, "Study");
-        importStudyFromZip(studyArchive, true, true);
-    }
-
-    private void createUsers()
-    {
-        log("Creating users and setting permisisons");
+        log("Creating users and setting permissions");
         goToProjectHome();
 
         _userHelper.createUser(PUBLIC_READER);
@@ -265,20 +156,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
         permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
         permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
-    }
-
-    @Before
-    public void preTest()
-    {
-        goToProjectHome();
-        DataFinderPage finder = new DataFinderPage(this, true);
-        finder.clearSearch();
-        try
-        {
-            finder.clearAllFilters();
-        }
-        catch (NoSuchElementException ignore) {}
-        finder.dismissTour();
     }
 
     @Test
@@ -473,7 +350,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Empty", "", 8);
         testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Title", "System", 2);
         testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Multiple Terms", "Tolerant Kidney Transplant", 7);
-        testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Assay Facet", "Array", 2);
     }
 
 
@@ -483,11 +359,11 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         impersonate(PUBLIC_READER);
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
 
-        finder.search("Array");
+        finder.search("transplant");
 
         List<DataFinderPage.DataCard> studyCards = finder.getDataCards();
 
-        assertEquals("Wrong number of studies after search", 1, studyCards.size());
+        assertEquals("Wrong number of studies after search", 2, studyCards.size());
         assertEquals("Wrong study card available", "Shapiro", studyCards.get(0).getStudyShortName());
 
         assertCountsSynced(finder, DataFinderPage.Dimension.STUDIES);
@@ -559,30 +435,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
     }
 
     @Test
-    @Ignore("Participant counts are not expected to match for this data")
-    public void testStudyParticipantCounts()
-    {
-        Map<String, Integer> finderParticipantCounts = new HashMap<>();
-        Map<String, Integer> studyParticipantCounts = new HashMap<>();
-
-        DataFinderPage finder = new DataFinderPage(this, true);
-        for (String studyShortName : loadedStudies)
-        {
-            finder.search(studyShortName);
-            finderParticipantCounts.put(studyShortName, finder.getSummaryCounts().get(DataFinderPage.Dimension.SUBJECTS));
-        }
-
-        for (String studyShortName : loadedStudies)
-        {
-            clickFolder(studyShortName);
-            StudyOverviewWebPart studyOverview = new StudyOverviewWebPart(this);
-            studyParticipantCounts.put(studyShortName, studyOverview.getParticipantCount());
-        }
-
-        assertEquals("Participant counts in study finder don't match LabKey studies", finderParticipantCounts, studyParticipantCounts);
-    }
-
-    @Test
     public void testGoToStudyMenu()
     {
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
@@ -613,156 +465,6 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         Assert.assertEquals("DIAMOND", card.getStudyShortName());
         card.clickGoToStudy();
         stopImpersonating();
-    }
-
-    @Test
-    @Ignore("Session storage not yet in use")
-    public void testNavigationDoesNotRemoveFinderFilter()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetsGrid = finder.getFacetsGrid();
-        facetsGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        clickTab("Manage");
-        clickTab("Overview");
-        assertEquals("Navigation cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
-    }
-
-    @Test
-    @Ignore("Session storage not yet in use")
-    public void testRefreshDoesNotRemoveFinderFilter()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetsGrid = finder.getFacetsGrid();
-        facetsGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        refresh();
-        assertEquals("'Refresh' cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
-    }
-
-    @Test
-    @Ignore("Session storage not yet in use")
-    public void testBackDoesNotRemoveFinderFilter()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        facetGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        clickTab("Manage");
-        goBack();
-        assertEquals("'Back' cleared study finder filter", selections, finder.getFacetsGrid().getSelectedMembers());
-    }
-
-    @Test
-    @Ignore("Session storage not yet in use")
-    public void testFinderWebPartAndActionShareFilter()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        facetGrid.toggleFacet(DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy");
-
-        Map<DataFinderPage.Dimension, List<String>> selections = finder.getFacetsGrid().getSelectedMembers();
-        goDirectlyToDataFinderPage(getProjectName(), true);
-        assertEquals("WebPart study finder filter didn't get applied", selections, finder.getFacetsGrid().getSelectedMembers());
-    }
-
-
-
-    @Test
-    @Ignore("Not yet implemented")
-    public void testGroupSaveAndLoad()
-    {
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facets = finder.getFacetsGrid();
-        facets.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Operational");
-
-        finder.clearAllFilters();
-        assertEquals("Group label not as expected", "Unsaved Group", finder.getGroupLabel());
-
-        Map<DataFinderPage.Dimension, List<String>> selections = new HashMap<>();
-        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        facetGrid.toggleFacet(DataFinderPage.Dimension.AGE_GROUP, "Adult");
-        facetGrid.toggleFacet(DataFinderPage.Dimension.CONDITION, "Acute Kidney Injury");
-
-        selections.put(DataFinderPage.Dimension.AGE_GROUP, Collections.singletonList("Adult"));
-        selections.put(DataFinderPage.Dimension.CONDITION, Collections.singletonList("Acute Kidney Injury"));
-
-        Map<DataFinderPage.Dimension, Integer> summaryCounts = finder.getSummaryCounts();
-
-        // click on "Save" menu and assert "Save" is not active then assert "Save as" is active
-        DataFinderPage.GroupMenu saveMenu = finder.getMenu(DataFinderPage.Locators.saveMenu);
-        saveMenu.toggleMenu();
-        Assert.assertEquals("Unexpected number of inactive options", 1, saveMenu.getInactiveOptions().size());
-        Assert.assertTrue("'Save' option is not an inactive menu option but should be", saveMenu.getInactiveOptions().contains("Save"));
-
-        Assert.assertEquals("Unexpected number of active options", 1, saveMenu.getActiveOptions().size());
-        Assert.assertTrue("'Save as' option is not active but should be", saveMenu.getActiveOptions().contains("Save As"));
-
-        String filterName = "testGroupSaveAndLoad" + System.currentTimeMillis();
-        saveMenu.chooseOption("Save As", false);
-        // assert that popup has the proper number of Selected Studies and Subjects
-        DataRegionTable subjectData = new DataRegionTable("demoDataRegion", this);
-        Assert.assertEquals("Subject counts on save group window differ from those on data finder", summaryCounts.get(DataFinderPage.Dimension.SUBJECTS).intValue(), subjectData.getDataRowCount());
-        finder.saveGroup(filterName);
-
-        assertEquals("Group label not as expected", "Saved group: " + filterName, finder.getGroupLabel());
-
-        finder.clearAllFilters();
-        //load group with test name
-        DataFinderPage.GroupMenu loadMenu = finder.getMenu(DataFinderPage.Locators.loadMenu);
-        loadMenu.toggleMenu();
-        Assert.assertTrue("Saved group does not appear in load menu", loadMenu.getActiveOptions().contains(filterName));
-        loadMenu.chooseOption(filterName, false);
-        assertEquals("Group label not as expected", "Saved group: " + filterName, finder.getGroupLabel());
-
-        // assert the selected items are the same and the counts are the same as before.
-        assertEquals("Summary counts not as expected after load", summaryCounts, finder.getSummaryCounts());
-        assertEquals("Selected items not as expected after load", selections, finder.getFacetsGrid().getSelectedMembers());
-        // assert that "Save" is now active in the menu
-        saveMenu = finder.getMenu(DataFinderPage.Locators.saveMenu);
-        saveMenu.toggleMenu();
-        Assert.assertTrue("'Save' option is not an active menu option but should be", saveMenu.getActiveOptions().contains("Save"));
-        saveMenu.toggleMenu(); // close the menu
-
-        // Choose another dimension and save the summary counts
-        log("selecting an Assay filter");
-        facetGrid.toggleFacet(DataFinderPage.Dimension.ASSAY, "FCM");
-        selections.put(DataFinderPage.Dimension.ASSAY, Collections.singletonList("FCM"));
-        summaryCounts = finder.getSummaryCounts();
-        log("Selections is now " + selections);
-        assertEquals("Selected items not as expected after assay selection", selections, finder.getFacetsGrid().getSelectedMembers());
-
-        // Save the filter
-        saveMenu = finder.getMenu(DataFinderPage.Locators.saveMenu);
-        saveMenu.toggleMenu();
-        saveMenu.chooseOption("Save", true);
-        sleep(1000); // Hack!  This seems necessary to give time for saving the filter before loading it again.  Waiting for signals doesn't seem to work...
-
-        finder.clearAllFilters();
-
-        // Load the filter
-        loadMenu = finder.getMenu(DataFinderPage.Locators.loadMenu);
-        loadMenu.toggleMenu();
-        Assert.assertTrue("Saved filter does not appear in menu", loadMenu.getActiveOptions().contains(filterName));
-        loadMenu.chooseOption(filterName, true);
-
-        // assert that the selections are as expected.
-        assertEquals("Summary counts not as expected after load", summaryCounts, finder.getSummaryCounts());
-        assertEquals("Selected items not as expected after load", selections, finder.getFacetsGrid().getSelectedMembers());
-
-        // manage group and delete the group that was created
-        DataFinderPage.GroupMenu manageMenu = finder.getMenu(DataFinderPage.Locators.manageMenu);
-        manageMenu.toggleMenu();
-        manageMenu.chooseOption("Manage Groups", false);
-        waitForText("Manage Participant Groups");
-        ManageParticipantGroupsPage managePage = new ManageParticipantGroupsPage(this);
-        managePage.selectGroup(filterName);
-        Assert.assertTrue("Delete should be enabled for group created through data finder", managePage.isDeleteEnabled());
-        Assert.assertFalse("Edit should not be enabled for group created through data finder", managePage.isEditEnabled());
-        managePage.deleteGroup(filterName);
     }
 
     @Test
@@ -920,18 +622,5 @@ public class TrialShareDataFinderTest extends BaseWebDriverTest implements ReadO
         Map<DataFinderPage.Dimension, Integer> summaryCounts = finder.getSummaryCounts();
 
         assertEquals("Summary count mismatch", dataCards.size(), summaryCounts.get(dimension).intValue());
-    }
-
-
-    private DataFinderPage goDirectlyToDataFinderPage(String containerPath, boolean testingStudies)
-    {
-        DataFinderPage finder = new DataFinderPage(this, testingStudies);
-        doAndWaitForPageSignal(() -> beginAt(WebTestHelper.buildURL(CONTROLLER, containerPath, ACTION)), finder.getCountSignal(), longWait());
-        sleep(1000);  // HACK!
-        if (!testingStudies)
-        {
-            finder.navigateToPublications();
-        }
-        return finder;
     }
 }
