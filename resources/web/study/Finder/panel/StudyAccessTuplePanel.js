@@ -5,23 +5,25 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
     initComponent: function(){
         var me = this;
         this.studyAccessPanels = [];
-        this.dockedItems = [{
-            xtype: 'toolbar',
-            dock: 'bottom',
-            ui: 'footer',
-            style: 'background-color: transparent;',
-            items: [
-                {
-                    text: 'Add...',
-                    //formBind: true,
-                    handler: function (btn)
+        if (this.mode != "view") {
+            this.dockedItems = [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                style: 'background-color: transparent;',
+                items: [
                     {
-                        me.add(me.getStudyAccessPanel(me.getStudyAccessStore(-1)));
-                        me.doLayout();
+                        text: 'Add...',
+                        //formBind: true,
+                        handler: function (btn)
+                        {
+                            me.add(me.getStudyAccessPanel(me.getStudyAccessStore(-1)));
+                            me.doLayout();
+                        }
                     }
-                }
-            ]
-        }];
+                ]
+            }];
+        }
 
         this.callParent();
 
@@ -53,35 +55,40 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
         }
     },
     getStudyAccessPanel : function(studyAccessStore) {
+        var formItems = [];
+        var buttonId = Ext4.id(), panelId = Ext4.id();
+        if (this.mode != "view") {
+            var deleteButton = {
+                id: buttonId,
+                xtype: 'label',
+                cls: 'studyaccessdeletebutton',
+                html: '<span class="fa fa-lg fa-times" style="color:red;"></span>',
+                listeners: {
+                    click: {
+                        element: 'el', //bind to the underlying el property on the panel
+                        fn: function (a, button)
+                        {
+                            Ext4.getCmp(panelId).destroy();
+                        }
+                    }
+                }
+            };
+            formItems.push(deleteButton);
+        }
+
         var _id = Ext4.id();
         var form = Ext4.create('LABKEY.study.panel.StudyAccessForm', {
             id: _id,
+            mode: this.mode,
             store : studyAccessStore,
             fieldLabel      : 'Container',
             labelWidth      : this.defaultFieldLabelWidth,
             editable        : false,
             width           : this.largeFieldWidth
         });
+        formItems.push(form);
 
-        var buttonId = Ext4.id();
-        var panelId = Ext4.id();
-        var deleteButton = {
-            id: buttonId,
-            xtype:'label',
-            cls: 'studyaccessdeletebutton',
-            html:'<span class="fa fa-lg fa-times" style="color:red;"></span>',
-            listeners: {
-                click: {
-                    element: 'el', //bind to the underlying el property on the panel
-                    fn: function(a, button){
-                        Ext4.getCmp(panelId).destroy();
-                    }
-                }
-            }
-        };
-
-
-        var studyAccessPanel = new Ext4.FormPanel({
+        var studyAccessPanel = new Ext4.Panel({
             id: panelId,
             cls: 'studyaccesspanel',
             layout: {

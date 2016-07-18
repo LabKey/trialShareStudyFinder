@@ -250,7 +250,8 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     },
                         Ext4.create('LABKEY.study.panel.StudyAccessTuplePanel', {
                             studyaccesslist: this.studyaccesslist,
-                            width: this.largeFieldWidth
+                            width: this.largeFieldWidth,
+                            mode: this.mode
                         })
                     ],
                     scope: this

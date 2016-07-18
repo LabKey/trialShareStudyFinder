@@ -44,12 +44,15 @@
 
     String renderId = "study-details-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
     String cubeObjectJson = bean.getCubeObject() == null ? "null" : new JSONObject(bean.getCubeObject()).toString(2);
-    List<StudyAccess> accessList = ((StudyBean) bean.getCubeObject()).getStudyAccessList();
+    List<StudyAccess> accessList = bean.getCubeObject() == null ? null :((StudyBean) bean.getCubeObject()).getStudyAccessList();
 
     JSONArray jsonArray = new JSONArray();
-    for (StudyAccess access : accessList)
+    if (accessList != null)
     {
-        jsonArray.put(new JSONObject(access));
+        for (StudyAccess access : accessList)
+        {
+            jsonArray.put(new JSONObject(access));
+        }
     }
 
     String studyaccesslist = jsonArray.toString(2);
