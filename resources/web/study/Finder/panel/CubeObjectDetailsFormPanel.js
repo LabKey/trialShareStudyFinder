@@ -158,7 +158,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
         this.getForm().getFields().each(function(item)
         {
             var value = item.value;
-            if (value)
+            if (value && !item.isStudyAccess)
             {
                 if (this.stripNewLinesFields.indexOf(item.name) >= 0)
                      value = value.replace(/\n/g, " ");

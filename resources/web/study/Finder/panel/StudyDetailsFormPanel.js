@@ -233,6 +233,31 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                 }
         );
 
+
+        items.push(
+                Ext4.create('Ext4.Panel', {
+                    layout: {
+                        type: 'hbox',
+                        align: 'top'
+                    },
+                    bodyStyle: 'padding: 10px 0;',
+                    border: false,
+                    items: [{
+                        xtype: 'label',
+                        cls: 'studyaccesstuple',
+                        width: this.defaultFieldLabelWidth,
+                        html: '<span>Study Access: </span>'
+                    },
+                        Ext4.create('LABKEY.study.panel.StudyAccessTuplePanel', {
+                            studyaccesslist: this.studyaccesslist,
+                            width: this.largeFieldWidth
+                        })
+                    ],
+                    scope: this
+                })
+        );
+
+        //TODO remove
         if (this.mode != "insert")
         {
             items.push (

@@ -16,6 +16,7 @@
      */
 %>
 <%@ page import="org.json.JSONObject" %>
+<%@ page import="org.json.JSONArray" %>
 <%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
@@ -23,6 +24,9 @@
 <%@ page import="org.labkey.trialshare.TrialShareController" %>
 <%@ page import="org.springframework.web.servlet.ModelAndView" %>
 <%@ page import="java.util.LinkedHashSet" %>
+<%@ page import="org.labkey.trialshare.data.StudyBean" %>
+<%@ page import="org.labkey.trialshare.data.StudyAccess" %>
+<%@ page import="java.util.List" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%@ page extends="org.labkey.api.jsp.JspBase"%>
 <%!
@@ -40,6 +44,15 @@
 
     String renderId = "study-details-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
     String cubeObjectJson = bean.getCubeObject() == null ? "null" : new JSONObject(bean.getCubeObject()).toString(2);
+    List<StudyAccess> accessList = ((StudyBean) bean.getCubeObject()).getStudyAccessList();
+
+    JSONArray jsonArray = new JSONArray();
+    for (StudyAccess access : accessList)
+    {
+        jsonArray.put(new JSONObject(access));
+    }
+
+    String studyaccesslist = jsonArray.toString(2);
 %>
 <labkey:errors/>
 <div id="<%= h(renderId)%>" class="requests-editor"></div>
@@ -52,7 +65,8 @@
             objectName : 'Study',
             renderTo: <%=q(renderId)%>,
             accessListId : <%= bean.getAccessListId() %>,
-            cubeObject : <%= text( cubeObjectJson )%>
+            cubeObject : <%= text( cubeObjectJson )%>,
+            studyaccesslist: <%= text( studyaccesslist )%>
         });
     });
 </script>

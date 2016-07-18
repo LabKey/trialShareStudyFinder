@@ -482,6 +482,7 @@ public class TrialShareManager
         editStudy.setConditions(new TableSelector(schema.getStudyConditionTableInfo(), Collections.singleton(TrialShareQuerySchema.CONDITION_FIELD), filter, null).getArrayList(String.class));
         editStudy.setPhases(new TableSelector(schema.getStudyPhaseTableInfo(), Collections.singleton(TrialShareQuerySchema.PHASE_FIELD), filter, null).getArrayList(String.class));
         editStudy.setTherapeuticAreas(new TableSelector(schema.getStudyTherapeuticAreaTableInfo(), Collections.singleton(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD), filter, null).getArrayList(String.class));
+        editStudy.setStudyAccessList(new TableSelector(TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE), filter, null).getArrayList(StudyAccess.class));
         return editStudy;
     }
 
