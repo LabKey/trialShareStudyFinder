@@ -55,7 +55,7 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
         }
     },
     getStudyAccessPanel : function(studyAccessStore) {
-        var formItems = [];
+        var formItems = [], me = this;
         var buttonId = Ext4.id(), panelId = Ext4.id();
         if (this.mode != "view") {
             var deleteButton = {
@@ -69,6 +69,12 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
                         fn: function (a, button)
                         {
                             Ext4.getCmp(panelId).destroy();
+                            if (Ext4.ComponentQuery.query("#cubedetailsformpanel")[0].getForm().isValid()) {
+                                var submitBtn = Ext4.ComponentQuery.query("#detailsSubmitBtn")[0];
+                                if (submitBtn && submitBtn.isDisabled) {
+                                    submitBtn.enable();
+                                }
+                            }
                         }
                     }
                 }
@@ -80,11 +86,7 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
         var form = Ext4.create('LABKEY.study.panel.StudyAccessForm', {
             id: _id,
             mode: this.mode,
-            store : studyAccessStore,
-            fieldLabel      : 'Container',
-            labelWidth      : this.defaultFieldLabelWidth,
-            editable        : false,
-            width           : this.largeFieldWidth
+            store : studyAccessStore
         });
         formItems.push(form);
 
@@ -96,9 +98,6 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
                 align: 'middle'
             },
             bodyStyle: 'padding: 4px 0;',
-            hideLabel: true,
-            //border: false,
-            frame: false,
             items: [deleteButton, form],
             scope: this
         });
@@ -126,7 +125,7 @@ Ext4.define('LABKEY.study.panel.StudyAccessForm', {
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     allowBlank      : false,
-                    fieldLabel      : 'Visiblility',
+                    fieldLabel      : 'Visiblility *',
                     name            : 'visiblility',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth,
@@ -140,12 +139,13 @@ Ext4.define('LABKEY.study.panel.StudyAccessForm', {
                     disabledCls     : 'labkey-combo-disabled',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
+                    allowBlank      : false,
                     name            : 'studyContainer',
                     store           : {
                         model   : 'LABKEY.study.data.Container',
                         autoLoad: true
                     },
-                    fieldLabel      : 'Study Container',
+                    fieldLabel      : 'Study Container *',
                     labelWidth      : this.defaultFieldLabelWidth,
                     valueField      : 'EntityId',
                     displayField    : 'Path',

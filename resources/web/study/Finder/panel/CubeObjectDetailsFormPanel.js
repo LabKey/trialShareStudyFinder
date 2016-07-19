@@ -10,6 +10,8 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
 
     bodyPadding: 5,
 
+    itemId: 'cubedetailsformpanel',
+
     fieldClsName: 'labkey-field-editor',
     fieldLabelClsName : 'labkey-field-editor-label',
 
@@ -42,6 +44,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                 items: [
                     {
                         text: 'Submit',
+                        itemId: 'detailsSubmitBtn',
                         formBind: true,
                         successURL: this.nextStepUrl || LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
                         handler: function (btn)
