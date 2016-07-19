@@ -14,7 +14,6 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
                 items: [
                     {
                         text: 'Add...',
-                        //formBind: true,
                         handler: function (btn)
                         {
                             me.add(me.getStudyAccessPanel(me.getStudyAccessStore(-1)));
@@ -107,7 +106,7 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
 
 Ext4.define('LABKEY.study.panel.StudyAccessForm', {
     extend: 'Ext.form.Panel',
-    widget: 'study.studyaccessform',
+    itemId: 'studyaccessform',
     defaultFieldLabelWidth: 120,
     smallFieldWidth: 350,
     border: false,
@@ -125,8 +124,8 @@ Ext4.define('LABKEY.study.panel.StudyAccessForm', {
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     allowBlank      : false,
-                    fieldLabel      : 'Visiblility *',
-                    name            : 'visiblility',
+                    fieldLabel      : 'Visibility *',
+                    name            : 'visibility',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth,
                     value           : this.store.data['visibility'],

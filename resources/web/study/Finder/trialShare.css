@@ -40,6 +40,7 @@ div.labkey-study-details h2.labkey-study-accession {
 
 .studyaccessdeletebutton {
     padding-left: 10px;
+    cursor: pointer;
 }
 
 .studyaccesspanel {

@@ -281,5 +281,25 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
         }
         
         return items;
+    },
+    getFieldValues : function()
+    {
+        var studyFields = this.callParent();
+        studyFields.studyAccessList = [];
+        var formCmps = Ext4.ComponentQuery.query("#studyaccessform");
+        Ext4.each(formCmps, function(formCmp){
+            var studyAccessValues = {};
+            formCmp.getForm().getFields().each(function(item)
+            {
+                var value = item.value;
+                if (value && item.isStudyAccess)
+                {
+                    studyAccessValues[item.name] = value;
+                }
+            }, this);
+            studyFields.studyAccessList.push(studyAccessValues);
+        });
+
+        return studyFields;
     }
 });
