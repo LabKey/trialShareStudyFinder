@@ -120,14 +120,26 @@ Ext4.define('LABKEY.study.panel.StudyAccessForm', {
         var items = [];
         items.push(
                 {
-                    xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
+                    xtype           : 'combo',
+                    disabled        : this.mode == "view",
+                    disabledCls     : 'labkey-combo-disabled',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     allowBlank      : false,
-                    fieldLabel      : 'Visibility *',
                     name            : 'visibility',
+                    store           : Ext4.create('Ext.data.Store', {
+                                            fields: ['value'],
+                                            data : [
+                                                {"value":"Operational"},
+                                                {"value":"Public"}
+                                            ]
+                    }),
+                    fieldLabel      : 'Visibility *',
                     labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.smallFieldWidth,
+                    valueField      : 'value',
+                    displayField    : 'value',
+                    editable        : false,
+                    width           : this.value,
                     value           : this.store.data['visibility'],
                     isStudyAccess   : true
                 });
@@ -150,7 +162,7 @@ Ext4.define('LABKEY.study.panel.StudyAccessForm', {
                     displayField    : 'Path',
                     editable        : false,
                     width           : this.mediumLargeFieldWidth,
-                    value           : this.store.data['studyContainerPath'],
+                    value           : this.store.data['studyContainer'],
                     isStudyAccess   : true
                 }
         );

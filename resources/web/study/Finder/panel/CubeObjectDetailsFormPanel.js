@@ -110,10 +110,6 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
             btn.setDisabled(false);
 
             var msg = "Your " + this.objectName.toLowerCase() + " was saved.";
-            if (this.mode == "insert" && this.objectName == "Study")
-            {
-                msg += " Enter study access data to make the study visible in the finder.";
-            }
             Ext4.Msg.alert("Success", msg, function(){
                 window.location = btn.successURL;
             }, this);

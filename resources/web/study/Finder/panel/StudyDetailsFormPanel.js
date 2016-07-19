@@ -12,14 +12,6 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
 
     initComponent: function()
     {
-        if (this.mode == "insert")
-        {
-            this.nextStepUrl = LABKEY.ActionURL.buildURL("list", "grid", LABKEY.ActionURL.getContainer(),
-                    {
-                        listId: this.accessListId,
-                        returnUrl: window.location
-                    });
-        }
         this.callParent();
     },
 
@@ -258,28 +250,6 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                 })
         );
 
-        //TODO remove
-        if (this.mode != "insert")
-        {
-            items.push (
-                    {
-                        tag: 'div',
-                        itemId: 'nextStepEl',
-                        html:LABKEY.Utils.textLink({
-                                href: LABKEY.ActionURL.buildURL("list", "grid", LABKEY.ActionURL.getContainer(),
-                                    {
-                                        listId: this.accessListId,
-                                        'query.StudyId/ShortName~eq' : this.cubeObject.shortName,
-                                        returnUrl: window.location
-                                    }),
-                                text: this.mode + ' Study Access Data'
-                        }),
-                        border: false,
-                        cls: 'labkey-data-finder-editor-message'
-                    }
-            )
-        }
-        
         return items;
     },
     getFieldValues : function()
