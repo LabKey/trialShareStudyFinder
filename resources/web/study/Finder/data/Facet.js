@@ -23,7 +23,8 @@ Ext4.define('LABKEY.study.data.Facet', {
         {name: 'allMemberName'}, // not currently used
         {name: 'ordinal'},
         {name: 'isExpanded', type:'boolean', defaultValue: true},
-        {name: 'displayFacet', type:'boolean', defaultValue: true}
+        {name: 'displayFacet', type:'boolean', defaultValue: true},
+        {name: 'defaultSelectedUniqueNames'}
     ],
 
     associations: [
