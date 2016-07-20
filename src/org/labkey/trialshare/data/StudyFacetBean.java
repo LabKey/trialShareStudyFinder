@@ -142,8 +142,8 @@ public class StudyFacetBean
         return defaultSelectedUniqueNames;
     }
 
-    public void setDefaultSelectedUniqueNames(List<String> defaultExcludedUniqueNames)
+    public void setDefaultSelectedUniqueNames(List<String> defaultSelectedUniqueNames)
     {
-        this.defaultSelectedUniqueNames = defaultExcludedUniqueNames;
+        this.defaultSelectedUniqueNames = defaultSelectedUniqueNames;
     }
 }
