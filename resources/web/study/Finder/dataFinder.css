@@ -730,7 +730,9 @@ div.labkey-study-details h3 {
 
 .labkey-publication-card .labkey-publication-data-link
 {
-    float: right;
+    float: left;
+    position: absolute;
+    bottom: 7px;
 }
 
 
@@ -761,4 +763,32 @@ div.labkey-study-details h3 {
 .labkey-goto-link-icon
 {
     display: none;
+}
+
+.labkey-publication-content
+{
+    /* Firefox */
+    width: -moz-calc(100% - 180px);
+    /* WebKit */
+    width: -webkit-calc(100% - 180px);
+    /* Standard */
+    width: calc(100% - 180px);
+
+    display: inline-block;
+}
+
+.labkey-publication-right {
+    padding-left: 10px;
+    vertical-align: top;
+    display:inline-block;
+    height:100%;
+}
+
+.labkey-publication-type {
+    vertical-align: top;
+}
+
+.labkey-publication-status{
+    color:limegreen;
+    vertical-align: top;
 }
