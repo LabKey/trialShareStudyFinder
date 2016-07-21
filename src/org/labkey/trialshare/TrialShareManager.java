@@ -32,6 +32,7 @@ import org.labkey.api.query.BatchValidationException;
 import org.labkey.api.query.DuplicateKeyException;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.InvalidKeyException;
+import org.labkey.api.query.QueryService;
 import org.labkey.api.query.QueryUpdateServiceException;
 import org.labkey.api.security.User;
 import org.labkey.trialshare.data.PublicationEditBean;
@@ -514,6 +515,16 @@ public class TrialShareManager
         editStudy.setTherapeuticAreas(new TableSelector(schema.getStudyTherapeuticAreaTableInfo(), Collections.singleton(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD), filter, null).getArrayList(String.class));
         editStudy.setStudyAccessList(new TableSelector(TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE), filter, null).getArrayList(StudyAccess.class));
         return editStudy;
+    }
+
+    public void clearCache(BindException errors)
+    {
+        Container _cubeContainer = getCubeContainer(null);
+        if (_cubeContainer == null)
+            errors.reject("Container path is required", "Container path not provided");
+        if (errors.hasErrors())
+            return;
+        QueryService.get().cubeDataChanged(_cubeContainer);
     }
 
 }

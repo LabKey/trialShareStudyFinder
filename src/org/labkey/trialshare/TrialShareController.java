@@ -1061,6 +1061,8 @@ public class TrialShareController extends SpringActionController
         public Object execute(PublicationEditBean form, BindException errors) throws Exception
         {
             TrialShareManager.get().updatePublication(getUser(), getContainer(), form, errors);
+            if (!errors.hasErrors())
+                TrialShareManager.get().clearCache(errors);
             return success();
         }
     }
@@ -1102,6 +1104,8 @@ public class TrialShareController extends SpringActionController
         public Object execute(StudyEditBean form, BindException errors) throws Exception
         {
             TrialShareManager.get().updateStudy(getUser(), getContainer(), form, errors);
+            if (!errors.hasErrors())
+                TrialShareManager.get().clearCache(errors);
             return success();
         }
     }
