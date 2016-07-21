@@ -1136,7 +1136,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public URLHelper getSuccessURL(CubeObjectQueryForm queryForm)
         {
-            return getManageDataUrl(ObjectName.publication);
+            return getManageDataUrl(queryForm.getObjectName());
         }
     }
 
