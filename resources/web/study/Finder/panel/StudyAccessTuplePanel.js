@@ -2,6 +2,7 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
     extend: 'Ext.panel.Panel',
     studyAccessPanels : [],
     border: false,
+    studyAccessPanelIndex: 0,
     initComponent: function(){
         var me = this;
         this.studyAccessPanels = [];
@@ -91,7 +92,7 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
 
         var studyAccessPanel = new Ext4.Panel({
             id: panelId,
-            cls: 'studyaccesspanel',
+            cls: 'studyaccesspanel studyaccesspanelindex' + this.studyAccessPanelIndex++, //add index cls for automated test
             layout: {
                 type: 'hbox',
                 align: 'middle'
