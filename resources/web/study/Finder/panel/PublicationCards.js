@@ -121,7 +121,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '           </tpl>',
             '   </div>',
 
-            '<span class="labkey-publication-right">',
+            '<span class="labkey-publication-annotation">',
                 '<tpl if="publicationType">',
                     '<span class="labkey-publication-type">',
                     '{publicationType:htmlEncode}',

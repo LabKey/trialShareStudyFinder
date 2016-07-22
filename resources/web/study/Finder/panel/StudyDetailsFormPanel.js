@@ -232,11 +232,11 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                         type: 'hbox',
                         align: 'top'
                     },
-                    bodyStyle: 'padding: 10px 0;',
+                    margin: '15 0 0 0',
                     border: false,
                     items: [{
                         xtype: 'label',
-                        cls: 'studyaccesstuple',
+                        cls: 'studyaccesstuplelabel',
                         width: this.defaultFieldLabelWidth,
                         html: '<span>Study Access: </span>'
                     },

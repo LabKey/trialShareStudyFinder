@@ -41,6 +41,7 @@ div.labkey-study-details h2.labkey-study-accession {
 .studyaccessdeletebutton {
     padding-left: 10px;
     cursor: pointer;
+    color: red;
 }
 
 .studyaccesspanel {
@@ -52,6 +53,7 @@ div.labkey-study-details h2.labkey-study-accession {
     border-radius: 10px;
     background-color: #E0E6EA;
     width: 800px !important;
+    padding: 5px 0;
 }
 
 .studyaccessform .x4-panel-body-default{
@@ -59,6 +61,6 @@ div.labkey-study-details h2.labkey-study-accession {
     padding-left: 10px;
 }
 
-.studyaccesstuple {
+.studyaccesstuplelabel {
     padding-left: 5px;
 }
