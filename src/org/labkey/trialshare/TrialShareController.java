@@ -1062,7 +1062,7 @@ public class TrialShareController extends SpringActionController
         {
             TrialShareManager.get().updatePublication(getUser(), getContainer(), form, errors);
             if (!errors.hasErrors())
-                TrialShareManager.get().clearCache(errors);
+                TrialShareManager.get().refreshPublications(errors);
             return success();
         }
     }
@@ -1105,7 +1105,7 @@ public class TrialShareController extends SpringActionController
         {
             TrialShareManager.get().updateStudy(getUser(), getContainer(), form, errors);
             if (!errors.hasErrors())
-                TrialShareManager.get().clearCache(errors);
+                TrialShareManager.get().refreshStudies(errors);
             return success();
         }
     }
@@ -1129,9 +1129,15 @@ public class TrialShareController extends SpringActionController
         {
             Set<String> ids = DataRegionSelection.getSelected(form.getViewContext(), null, true, true);
             if (form.getObjectName() == ObjectName.publication)
+            {
                 TrialShareManager.get().deletePublications(getUser(), getContainer(), ids, errors);
+                TrialShareManager.get().refreshPublications(errors);
+            }
             else if (form.getObjectName() == ObjectName.study)
+            {
                 TrialShareManager.get().deleteStudies(getUser(), getContainer(), ids, errors);
+                TrialShareManager.get().refreshStudies(errors);
+            }
             else
                 errors.reject(ERROR_MSG, "Invalid object name: " + form.getObjectName());
             return !errors.hasErrors();

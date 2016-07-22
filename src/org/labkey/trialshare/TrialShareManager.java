@@ -521,10 +521,25 @@ public class TrialShareManager
     {
         Container _cubeContainer = getCubeContainer(null);
         if (_cubeContainer == null)
-            errors.reject("Container path is required", "Container path not provided");
-        if (errors.hasErrors())
+        {
+            if (errors != null)
+                errors.reject("Container path is required", "Container path not provided");
             return;
+        }
         QueryService.get().cubeDataChanged(_cubeContainer);
+    }
+
+
+    public void refreshPublications(BindException errors)
+    {
+        PublicationDocumentProvider.reindex();
+        clearCache(errors);
+    }
+
+    public void refreshStudies(BindException errors)
+    {
+        StudyDocumentProvider.reindex();
+        clearCache(errors);
     }
 
 }
