@@ -374,6 +374,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     public void testPublicationSearch()
     {
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
+        finder.clearAllFilters();
 
         testSearchTerm(finder, DataFinderPage.Dimension.PUBLICATIONS, "Author", "Asare", 7);
         testSearchTerm(finder, DataFinderPage.Dimension.PUBLICATIONS, "PMID", "21953143", 1);
@@ -488,13 +489,10 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         String cardText;
         Map<String, String> counts;
 
-        log("Go to publications and clear any filters that may have been set.");
+        log("Go to publications and verify the default filtered of 'In Progress' on Status.");
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
-        finder.clearAllFilters();
-
-        log("Filter for 'In Progress' only publications.");
         DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
-        doAndWaitForPageSignal(() -> fg.toggleFacet(DataFinderPage.Dimension.STATUS, "In Progress"), finder.getCountSignal());
+        assertEquals("Finder is not filtered by In Progress by default for internal user", Collections.singletonList(DataFinderPage.Dimension.IN_PROGRESS.getHierarchyName()), fg.getSelectedMembers(DataFinderPage.Dimension.STATUS));
 
         log("Validate that the number, content and style of the cards is as expected.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.IN_PROGRESS);

@@ -460,6 +460,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
 
         goToProjectHome();
         finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        finder.clearAllFilters();
         finder.search((String) initialFields.get(PublicationEditPage.TITLE));
         dataCards = finder.getDataCards();
 

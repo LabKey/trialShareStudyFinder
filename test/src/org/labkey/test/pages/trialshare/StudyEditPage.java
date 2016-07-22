@@ -1,5 +1,6 @@
 package org.labkey.test.pages.trialshare;
 
+import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 
 import java.util.HashMap;
@@ -83,4 +84,20 @@ public class StudyEditPage extends CubeObjectEditPage
     {
         return FIELD_NAMES;
     }
+
+    public Locator.CssLocator getStudyAccessPanelLocator(int i)
+    {
+        return Locator.css(".studyaccesspanelindex" + i);
+    }
+
+    public Locator.CssLocator getStudyAccessPanelRemoveBtn(int i)
+    {
+        return getStudyAccessPanelLocator(i).append(Locator.css(".fa-times"));
+    }
+
+    public void removeStudyAccessPanel(int i)
+    {
+        click(getStudyAccessPanelRemoveBtn(i));
+    }
+
 }

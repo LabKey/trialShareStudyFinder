@@ -231,6 +231,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
         {
             finder.navigateToPublications();
         }
+        sleep(1000);  // HACK! wait so that default filters can be applied
         return finder;
     }
 

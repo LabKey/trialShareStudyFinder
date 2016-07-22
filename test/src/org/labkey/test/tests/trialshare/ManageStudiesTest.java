@@ -102,27 +102,32 @@ public class ManageStudiesTest extends DataFinderTestBase
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
+        editPage.removeStudyAccessPanel(0);
         Assert.assertFalse("Submit button should not be enabled", editPage.isSubmitEnabled());
         editPage.setTextFormValue("title", "testRequiredFields");
         Assert.assertFalse("Submit button should not be enabled with only title", editPage.isSubmitEnabled());
         doAndWaitForPageToLoad(editPage::cancel);
 
         manageData.goToInsertNew();
+        editPage.removeStudyAccessPanel(0);
         editPage.setTextFormValue("shortName", "ShortName");
         Assert.assertFalse("Submit button should not be enabled with only study type", editPage.isSubmitEnabled());
         doAndWaitForPageToLoad(editPage::cancel);
 
         manageData.goToInsertNew();
+        editPage.removeStudyAccessPanel(0);
         editPage.setTextFormValue("studyId", "StudyId");
         Assert.assertFalse("Submit button should not be enabled with only study id", editPage.isSubmitEnabled());
         doAndWaitForPageToLoad(editPage::cancel);
 
         manageData.goToInsertNew();
+        editPage.removeStudyAccessPanel(0);
         editPage.setTextFormValue("title", "testRequiredFields");
         editPage.setTextFormValue("shortName", "ShortName");
         Assert.assertFalse("Submit button should not be enabled with title, short name but no studyId", editPage.isSubmitEnabled());
         editPage.setTextFormValue("studyId", "StudyId", true);
-        Assert.assertTrue("Submit button should be enabled with all required fields", editPage.isSubmitEnabled());
+        Assert.assertTrue("Submit button should be enabled with all required study fields", editPage.isSubmitEnabled());
+        doAndWaitForPageToLoad(editPage::cancel);
     }
 
     @Test
@@ -152,6 +157,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
 
+        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
         editPage.submit();
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
@@ -184,6 +190,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
 
+        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
         editPage.submit();
 
@@ -217,6 +224,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
 
+        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
         editPage.submit();
 
@@ -233,6 +241,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         newFields.put(StudyEditPage.CONDITIONS, new String[]{"Allergy", "Cat Allergy"});
         // this removes "T1DM"
         newFields.put(StudyEditPage.THERAPEUTIC_AREAS, new String[]{"T1DM"});
+        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
         editPage.submit();
 
@@ -274,6 +283,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
 
+        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
         editPage.submit();
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
@@ -292,6 +302,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
 
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
+        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(updatedFields);
         editPage.submit();
 
@@ -320,6 +331,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
 
+        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
         editPage.submit();
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
@@ -364,6 +376,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
 
+        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
         editPage.submit();
 
@@ -374,7 +387,6 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
         DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), true);
-
         finder.search(studyId);
         List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
 
@@ -384,7 +396,8 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.refreshCube();
 
         doAndWaitForPageSignal(this::goToProjectHome, finder.getCountSignal());
-
+        // wait for data to load
+        sleep(1000);
         finder.search(studyId);
         dataCards = finder.getDataCards();
 
