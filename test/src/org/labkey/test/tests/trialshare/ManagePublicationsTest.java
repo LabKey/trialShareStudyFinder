@@ -90,7 +90,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
 
         permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
-        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+        _apiPermissionsHelper.setUserPermissions(PUBLIC_READER, "Reader");
     }
 
     @Test

@@ -27,6 +27,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -58,6 +59,8 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     private static final String CONTROLLER = "trialshare";
     private static final String ACTION = "dataFinder";
     private static File dataListArchive = TestFileUtils.getSampleData("DataFinder.lists.zip");
+
+    public ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
     public enum CubeObjectType {
 

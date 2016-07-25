@@ -140,22 +140,22 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
                 sleep(500); // HACK, but waitForPageLoad doesn't do the trick here.  Perhaps waitForElement would work...
                 if (subset.equalsIgnoreCase("public"))
                 {
-                    permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
-                    permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+                    _apiPermissionsHelper.setUserPermissions(PUBLIC_READER, "Reader");
+                    _apiPermissionsHelper.setUserPermissions(WISPR_READER, "Reader");
                 }
                 if (accession.equalsIgnoreCase("Casale"))
                 {
-                    permissionsEditor.setUserPermissions(CASALE_READER, "Reader");
+                    _apiPermissionsHelper.setUserPermissions(CASALE_READER, "Reader");
                 }
                 else if (accession.equalsIgnoreCase("WISP-R"))
                 {
-                    permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+                    _apiPermissionsHelper.setUserPermissions(WISPR_READER, "Reader");
                 }
             }
         }
         permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
-        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
-        permissionsEditor.setUserPermissions(WISPR_READER, "Reader");
+        _apiPermissionsHelper.setUserPermissions(PUBLIC_READER, "Reader");
+        _apiPermissionsHelper.setUserPermissions(WISPR_READER, "Reader");
     }
 
     @Test
