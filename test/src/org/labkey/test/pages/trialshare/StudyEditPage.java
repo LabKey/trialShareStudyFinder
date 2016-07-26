@@ -85,19 +85,75 @@ public class StudyEditPage extends CubeObjectEditPage
         return FIELD_NAMES;
     }
 
-    public Locator.CssLocator getStudyAccessPanelLocator(int i)
+    public Locator.XPathLocator getStudyAccessPanelLocator(int panelIndex)
     {
-        return Locator.css(".studyaccesspanelindex" + i);
+        Locator.XPathLocator panelLoc = new Locator.XPathLocator("");
+        panelLoc = panelLoc.append(Locator.tagWithClass("div", "studyaccesspanelindex" + panelIndex));
+        return panelLoc;
     }
 
-    public Locator.CssLocator getStudyAccessPanelRemoveBtn(int i)
+    public Locator.XPathLocator getStudyAccessPanelFieldLocator(int panelIndex)
     {
-        return getStudyAccessPanelLocator(i).append(Locator.css(".fa-times"));
+        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithClass("table", "x4-form-item"));
     }
 
-    public void removeStudyAccessPanel(int i)
+    public Locator.XPathLocator getStudyAccessVisibility(int panelIndex)
     {
-        click(getStudyAccessPanelRemoveBtn(i));
+        return getStudyAccessPanelFieldLocator(panelIndex).withDescendant(Locator.tag("label").withText("Visibility *:"));
+    }
+
+    public Locator.XPathLocator getStudyAccessStudyContainer(int panelIndex)
+    {
+        return getStudyAccessPanelFieldLocator(panelIndex).withDescendant(Locator.tag("label").withText("Study Container *:"));
+    }
+
+    public Locator.XPathLocator getStudyAccessDisplayName(int panelIndex)
+    {
+        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithName("input", "displayName"));
+    }
+
+    public Locator.XPathLocator getStudyAccessPanelRemoveBtn(int panelIndex)
+    {
+        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithClass("span", "fa-times"));
+    }
+
+    public void setStudyAccessVisibility(int panelIndex, String value)
+    {
+        Locator.XPathLocator comboLocator = getStudyAccessVisibility(panelIndex);
+        _ext4Helper.selectComboBoxItem(comboLocator, value);
+    }
+
+    public void setStudyAccessStudyContainer(int panelIndex, String value)
+    {
+        Locator.XPathLocator comboLocator = getStudyAccessStudyContainer(panelIndex);
+        _ext4Helper.selectComboBoxItem(comboLocator, value);
+    }
+
+    public void setStudyAccessDisplayName(int panelIndex, String value)
+    {
+        Locator fieldLocator = getStudyAccessDisplayName(panelIndex);
+        setFormElement(fieldLocator, value);
+    }
+
+    public void setStudyAccessFormValues(int panelIndex, String visibility, String studyContainer, String displayName)
+    {
+        setStudyAccessVisibility(panelIndex, visibility);
+        setStudyAccessStudyContainer(panelIndex, studyContainer);
+        if (displayName != null)
+            setStudyAccessDisplayName(panelIndex, displayName);
+    }
+
+    public void removeStudyAccessPanel(int panelIndex)
+    {
+        click(getStudyAccessPanelRemoveBtn(panelIndex));
+    }
+
+    public void addStudyAccessPanel(int panelIndex)
+    {
+        click(Locator.linkWithText("Add..."));
+        waitForElement(getStudyAccessPanelLocator(panelIndex));
+        // wait for combo to load
+        sleep(1000);
     }
 
 }

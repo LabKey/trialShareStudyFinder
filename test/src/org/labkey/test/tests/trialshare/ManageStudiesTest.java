@@ -403,4 +403,66 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         assertEquals("Should find newly inserted study after reindex", 1, dataCards.size());
     }
+
+    @Test
+    public void testStudyAccessPanel()
+    {
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        ManageDataPage manageData = new ManageDataPage(this, _objectType);
+
+        int count = manageData.getCount();
+        String shortName = "TIAR" + count;
+        String studyId = "TIAR_ID" + count;
+        createStudy(shortName, false);
+
+        Map<String, Object> initialFields = new HashMap<>();
+        // add the count so multiple runs of this test have distinct titles
+        initialFields.put(StudyEditPage.SHORT_NAME, shortName);
+        initialFields.put(StudyEditPage.STUDY_ID, studyId);
+        initialFields.put(StudyEditPage.TITLE, "testUpdateStudy_" + count);
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        manageData.goToInsertNew();
+        StudyEditPage editPage = new StudyEditPage(this.getDriver());
+
+        String firstVisibility = "Public";
+        String firstStudyContainer = "/" + PROJECT_NAME + "/" + shortName;
+        String firstDisplayName = shortName + " " + firstVisibility;
+
+        log("Set values for the first study access form");
+        editPage.setStudyAccessFormValues(0, firstVisibility, firstStudyContainer, firstDisplayName);
+
+        String secondVisibility = "Operational";
+        String secondStudyContainer = "/" + PROJECT_NAME + "/" + shortName;
+        String secondDisplayName = shortName + " " + secondVisibility;
+
+        log("Add another study access record");
+        editPage.addStudyAccessPanel(1);
+        log("Set values for the second study access form");
+        editPage.setStudyAccessFormValues(1, secondVisibility, secondStudyContainer, secondDisplayName);
+
+        editPage.setFormFields(initialFields);
+        editPage.submit();
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
+
+        //TODO verify study access fields
+
+        log("Remove the second study access record");
+        editPage.removeStudyAccessPanel(1);
+
+        log("Change study access display name");
+        firstDisplayName = firstDisplayName + "_updated";
+        editPage.setStudyAccessDisplayName(0, firstDisplayName);
+        editPage.submit();
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
+        log("Verify the second study access record is deleted successfully");
+        assertElementNotPresent(editPage.getStudyAccessPanelLocator(1));
+
+        //TODO verify field updated
+
+    }
 }
