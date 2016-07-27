@@ -379,6 +379,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         Map<String, Object> studyAccessFields = new HashMap<>();
         studyAccessFields.put(StudyEditPage.VISIBILITY, "Public");
         studyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + PROJECT_NAME + "/" + shortName);
+        studyAccessFields.put(StudyEditPage.DISPLAY_NAME, shortName);
 
         log("Set values for the first study access form");
         editPage.setStudyAccessFormValues(0, studyAccessFields);
