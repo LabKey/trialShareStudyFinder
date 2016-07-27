@@ -356,7 +356,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     }
 
     @Test
-    public void testInsertAndRefresh()
+    public void testInsertWithoutRefresh()
     {
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
@@ -376,32 +376,23 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
 
-        editPage.removeStudyAccessPanel(0);
+        Map<String, Object> studyAccessFields = new HashMap<>();
+        studyAccessFields.put(StudyEditPage.VISIBILITY, "Public");
+        studyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + PROJECT_NAME + "/" + shortName);
+
+        log("Set values for the first study access form");
+        editPage.setStudyAccessFormValues(0, studyAccessFields);
+
         editPage.setFormFields(initialFields);
         editPage.submit();
 
-        goToProjectHome();
-
-        StudiesListHelper studyListHelper = new StudiesListHelper(this);
-        studyListHelper.addStudyAccessEntry(shortName,  "/" + PROJECT_NAME + "/" + shortName , "Public", true);
-
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
         DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), true);
+        finder.clearAllFilters();
         finder.search(studyId);
         List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
 
-        assertEquals("Should not find newly inserted study without reindex", 0, dataCards.size());
-
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
-        manageData.refreshCube();
-
-        doAndWaitForPageSignal(this::goToProjectHome, finder.getCountSignal());
-        // wait for data to load
-        sleep(1000);
-        finder.search(studyId);
-        dataCards = finder.getDataCards();
-
-        assertEquals("Should find newly inserted study after reindex", 1, dataCards.size());
+        assertEquals("Should find newly inserted study", 1, dataCards.size());
     }
 
     @Test
