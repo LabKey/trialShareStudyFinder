@@ -149,9 +149,11 @@ public class StudyEditPage extends CubeObjectEditPage
         // wait for combo to load
         sleep(1000);
         setStudyAccessVisibility(panelIndex, visibility);
-        setStudyAccessStudyContainer(panelIndex, studyContainer);
         if (displayName != null)
             setStudyAccessDisplayName(panelIndex, displayName);
+        // wait for combo to load
+        sleep(1000);
+        setStudyAccessStudyContainer(panelIndex, studyContainer);
     }
 
     public void removeStudyAccessPanel(int panelIndex)
