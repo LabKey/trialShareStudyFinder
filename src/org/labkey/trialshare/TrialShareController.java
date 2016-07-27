@@ -1041,7 +1041,10 @@ public class TrialShareController extends SpringActionController
             if (errors.hasErrors())
                 return errors;
             else
+            {
+                TrialShareManager.get().refreshPublications(errors);
                 return success();
+            }
         }
     }
 
@@ -1084,6 +1087,8 @@ public class TrialShareController extends SpringActionController
         public Object execute(StudyEditBean form, BindException errors) throws Exception
         {
             TrialShareManager.get().insertStudy(getUser(), getContainer(), form, errors);
+            if (!errors.hasErrors())
+                TrialShareManager.get().refreshStudies(errors);
             return success();
         }
     }
