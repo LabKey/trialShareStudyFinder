@@ -411,12 +411,11 @@ public class ManageStudiesTest extends DataFinderTestBase
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
-        String shortName = "TIAR" + count;
-        String studyId = "TIAR_ID" + count;
+        String shortName = "TSAP" + count;
+        String studyId = "TSAP_ID" + count;
         createStudy(shortName, false);
 
         Map<String, Object> initialFields = new HashMap<>();
-        // add the count so multiple runs of this test have distinct titles
         initialFields.put(StudyEditPage.SHORT_NAME, shortName);
         initialFields.put(StudyEditPage.STUDY_ID, studyId);
         initialFields.put(StudyEditPage.TITLE, "testUpdateStudy_" + count);
