@@ -27,6 +27,9 @@ public class StudyEditPage extends CubeObjectEditPage
     public static final String PHASES = "phases";
     public static final String CONDITIONS = "conditions";
     public static final String THERAPEUTIC_AREAS = "therapeuticAreas";
+    public static final String VISIBILITY = "Visibility *:";
+    public static final String STUDY_CONTAINER = "Study Container *:";
+    public static final String DISPLAY_NAME = "Display Name:";
 
     private static final Map<String, String> DROPDOWN_FIELD_NAMES = new HashMap<>();
     static
@@ -135,8 +138,16 @@ public class StudyEditPage extends CubeObjectEditPage
         setFormElement(fieldLocator, value);
     }
 
+    public String getStudyAccessDisplayNameValue(int panelIndex)
+    {
+        Locator fieldLocator = getStudyAccessDisplayName(panelIndex);
+        return getFormElement(fieldLocator);
+    }
+
     public void setStudyAccessFormValues(int panelIndex, String visibility, String studyContainer, String displayName)
     {
+        // wait for combo to load
+        sleep(1000);
         setStudyAccessVisibility(panelIndex, visibility);
         setStudyAccessStudyContainer(panelIndex, studyContainer);
         if (displayName != null)
@@ -154,6 +165,11 @@ public class StudyEditPage extends CubeObjectEditPage
         waitForElement(getStudyAccessPanelLocator(panelIndex));
         // wait for combo to load
         sleep(1000);
+    }
+
+    public void setStudyAccessFormValues(int i, Map<String, Object> newFields)
+    {
+        setStudyAccessFormValues(i, (String) newFields.get(VISIBILITY), (String) newFields.get(STUDY_CONTAINER), (String) newFields.get(DISPLAY_NAME));
     }
 
 }

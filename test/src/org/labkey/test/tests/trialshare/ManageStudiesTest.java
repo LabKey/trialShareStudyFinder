@@ -424,30 +424,40 @@ public class ManageStudiesTest extends DataFinderTestBase
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
+        editPage.setFormFields(initialFields);
 
         String firstVisibility = "Public";
-        String firstStudyContainer = "/" + PROJECT_NAME + "/" + shortName;
         String firstDisplayName = shortName + " " + firstVisibility;
 
+        Map<String, Object> studyAccessFields = new HashMap<>();
+        studyAccessFields.put(StudyEditPage.VISIBILITY, firstVisibility);
+        studyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + PROJECT_NAME + "/" + shortName);
+        studyAccessFields.put(StudyEditPage.DISPLAY_NAME, firstDisplayName);
+
         log("Set values for the first study access form");
-        editPage.setStudyAccessFormValues(0, firstVisibility, firstStudyContainer, firstDisplayName);
+        editPage.setStudyAccessFormValues(0, studyAccessFields);
 
         String secondVisibility = "Operational";
-        String secondStudyContainer = "/" + PROJECT_NAME + "/" + shortName;
         String secondDisplayName = shortName + " " + secondVisibility;
+
+        Map<String, Object> secondStudyAccessFields = new HashMap<>();
+        secondStudyAccessFields.put(StudyEditPage.VISIBILITY, secondVisibility);
+        secondStudyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + PROJECT_NAME + "/" + shortName);
+        secondStudyAccessFields.put(StudyEditPage.DISPLAY_NAME, secondDisplayName);
 
         log("Add another study access record");
         editPage.addStudyAccessPanel(1);
         log("Set values for the second study access form");
-        editPage.setStudyAccessFormValues(1, secondVisibility, secondStudyContainer, secondDisplayName);
+        editPage.setStudyAccessFormValues(1, secondStudyAccessFields);
 
-        editPage.setFormFields(initialFields);
         editPage.submit();
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
 
-        //TODO verify study access fields
+        //wait for combo store to load
+        assertEquals("Display Name value for the first Study Access record is incorrect", editPage.getStudyAccessDisplayNameValue(0), firstDisplayName);
+        assertEquals("Display Name value for the second Study Access record is incorrect", editPage.getStudyAccessDisplayNameValue(1), secondDisplayName);
 
         log("Remove the second study access record");
         editPage.removeStudyAccessPanel(1);
@@ -462,7 +472,6 @@ public class ManageStudiesTest extends DataFinderTestBase
         log("Verify the second study access record is deleted successfully");
         assertElementNotPresent(editPage.getStudyAccessPanelLocator(1));
 
-        //TODO verify field updated
-
+        assertEquals("Failed to update Display Name field", editPage.getStudyAccessDisplayNameValue(0), firstDisplayName);
     }
 }
