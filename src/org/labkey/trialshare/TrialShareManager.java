@@ -32,6 +32,7 @@ import org.labkey.api.query.BatchValidationException;
 import org.labkey.api.query.DuplicateKeyException;
 import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.InvalidKeyException;
+import org.labkey.api.query.QueryService;
 import org.labkey.api.query.QueryUpdateServiceException;
 import org.labkey.api.security.User;
 import org.labkey.trialshare.data.PublicationEditBean;
@@ -330,6 +331,9 @@ public class TrialShareManager
             schema.getStudyTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyTherapeuticAreaTableInfo(), filter), null, null);
             addJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, study.getTherapeuticAreas(), user, container);
 
+            schema.getStudyAccessTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getStudyAccessTableInfo(), filter), null, null);
+            addStudyAccessData(schema.getStudyAccessTableInfo(), studyId, study.getStudyAccessList(), user, container);
+
             transaction.commit();
         }
         catch (Exception e)
@@ -370,6 +374,7 @@ public class TrialShareManager
             addJoinTableData(schema.getStudyAgeGroupTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.AGE_GROUP_FIELD, study.getAgeGroups(), user, container);
             addJoinTableData(schema.getStudyPhaseTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.PHASE_FIELD, study.getPhases(), user, container);
             addJoinTableData(schema.getStudyTherapeuticAreaTableInfo(), TrialShareQuerySchema.STUDY_ID_FIELD, studyId, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, study.getTherapeuticAreas(), user, container);
+            addStudyAccessData(schema.getStudyAccessTableInfo(), studyId, study.getStudyAccessList(), user, container);
 
             transaction.commit();
         }
@@ -440,9 +445,20 @@ public class TrialShareManager
         tableInfo.getUpdateService().deleteRows(user, container, getJoinTableIds(tableInfo, objectIdFilter), null, null);
     }
 
-    private void addJoinTableData(TableInfo tableInfo, String idField, Object id, String dataField, List<String> dataValues, User user, Container container) throws SQLException, QueryUpdateServiceException, BatchValidationException, DuplicateKeyException
+    private void batchInsertRows(TableInfo tableInfo, User user, Container container, List<Map<String, Object>> dataList) throws SQLException, QueryUpdateServiceException, BatchValidationException, DuplicateKeyException
     {
         BatchValidationException batchValidationErrors = new BatchValidationException();
+        if (!dataList.isEmpty())
+        {
+            tableInfo.getUpdateService().insertRows(user, container, dataList, batchValidationErrors, null, null);
+            if (batchValidationErrors.hasErrors())
+                throw batchValidationErrors;
+            dataList.clear();
+        }
+    }
+
+    private void addJoinTableData(TableInfo tableInfo, String idField, Object id, String dataField, List<String> dataValues, User user, Container container) throws SQLException, QueryUpdateServiceException, BatchValidationException, DuplicateKeyException
+    {
         List<Map<String, Object>> dataList = new ArrayList<>();
         for (String value : dataValues)
         {
@@ -453,10 +469,25 @@ public class TrialShareManager
         }
         if (!dataList.isEmpty())
         {
-            tableInfo.getUpdateService().insertRows(user, container, dataList, batchValidationErrors, null, null);
-            if (batchValidationErrors.hasErrors())
-                throw batchValidationErrors;
-            dataList.clear();
+            batchInsertRows(tableInfo, user, container, dataList);
+        }
+    }
+
+    private void addStudyAccessData(TableInfo tableInfo, String studyId, List<StudyAccess> studyAccesses, User user, Container container) throws SQLException, QueryUpdateServiceException, BatchValidationException, DuplicateKeyException
+    {
+        List<Map<String, Object>> studyAccessList = new ArrayList<>();
+        for (StudyAccess studyAccess : studyAccesses)
+        {
+            Map<String, Object> dataMap = new CaseInsensitiveHashMap<>();
+            dataMap.put("studyId", studyId);
+            dataMap.put("visibility", studyAccess.getVisibility());
+            dataMap.put("studyContainer", studyAccess.getStudyContainer());
+            dataMap.put("displayName", studyAccess.getDisplayName());
+            studyAccessList.add(dataMap);
+        }
+        if (!studyAccessList.isEmpty())
+        {
+            batchInsertRows(tableInfo, user, container, studyAccessList);
         }
     }
 
@@ -482,7 +513,33 @@ public class TrialShareManager
         editStudy.setConditions(new TableSelector(schema.getStudyConditionTableInfo(), Collections.singleton(TrialShareQuerySchema.CONDITION_FIELD), filter, null).getArrayList(String.class));
         editStudy.setPhases(new TableSelector(schema.getStudyPhaseTableInfo(), Collections.singleton(TrialShareQuerySchema.PHASE_FIELD), filter, null).getArrayList(String.class));
         editStudy.setTherapeuticAreas(new TableSelector(schema.getStudyTherapeuticAreaTableInfo(), Collections.singleton(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD), filter, null).getArrayList(String.class));
+        editStudy.setStudyAccessList(new TableSelector(TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE), filter, null).getArrayList(StudyAccess.class));
         return editStudy;
+    }
+
+    public void clearCache(BindException errors)
+    {
+        Container _cubeContainer = getCubeContainer(null);
+        if (_cubeContainer == null)
+        {
+            if (errors != null)
+                errors.reject("Container path is required", "Container path not provided");
+            return;
+        }
+        QueryService.get().cubeDataChanged(_cubeContainer);
+    }
+
+
+    public void refreshPublications(BindException errors)
+    {
+        PublicationDocumentProvider.reindex();
+        clearCache(errors);
+    }
+
+    public void refreshStudies(BindException errors)
+    {
+        StudyDocumentProvider.reindex();
+        clearCache(errors);
     }
 
 }

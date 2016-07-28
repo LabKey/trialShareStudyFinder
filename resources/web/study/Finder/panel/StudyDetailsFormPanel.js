@@ -12,14 +12,6 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
 
     initComponent: function()
     {
-        if (this.mode == "insert")
-        {
-            this.nextStepUrl = LABKEY.ActionURL.buildURL("list", "grid", LABKEY.ActionURL.getContainer(),
-                    {
-                        listId: this.accessListId,
-                        returnUrl: window.location
-                    });
-        }
         this.callParent();
     },
 
@@ -233,27 +225,51 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                 }
         );
 
-        if (this.mode != "insert")
-        {
-            items.push (
-                    {
-                        tag: 'div',
-                        itemId: 'nextStepEl',
-                        html:LABKEY.Utils.textLink({
-                                href: LABKEY.ActionURL.buildURL("list", "grid", LABKEY.ActionURL.getContainer(),
-                                    {
-                                        listId: this.accessListId,
-                                        'query.StudyId/ShortName~eq' : this.cubeObject.shortName,
-                                        returnUrl: window.location
-                                    }),
-                                text: this.mode + ' Study Access Data'
-                        }),
-                        border: false,
-                        cls: 'labkey-data-finder-editor-message'
-                    }
-            )
-        }
-        
+
+        items.push(
+                Ext4.create('Ext4.Panel', {
+                    layout: {
+                        type: 'hbox',
+                        align: 'top'
+                    },
+                    margin: '15 0 0 0',
+                    border: false,
+                    items: [{
+                        xtype: 'label',
+                        cls: 'studyaccesstuplelabel',
+                        width: this.defaultFieldLabelWidth,
+                        html: '<span>Study Access: </span>'
+                    },
+                        Ext4.create('LABKEY.study.panel.StudyAccessTuplePanel', {
+                            studyaccesslist: this.studyaccesslist,
+                            width: this.largeFieldWidth,
+                            mode: this.mode
+                        })
+                    ],
+                    scope: this
+                })
+        );
+
         return items;
+    },
+    getFieldValues : function()
+    {
+        var studyFields = this.callParent();
+        studyFields.studyAccessList = [];
+        var formCmps = Ext4.ComponentQuery.query("#studyaccessform");
+        Ext4.each(formCmps, function(formCmp){
+            var studyAccessValues = {};
+            formCmp.getForm().getFields().each(function(item)
+            {
+                var value = item.value;
+                if (value && item.isStudyAccess)
+                {
+                    studyAccessValues[item.name] = value;
+                }
+            }, this);
+            studyFields.studyAccessList.push(studyAccessValues);
+        });
+
+        return studyFields;
     }
 });

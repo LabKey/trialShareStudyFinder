@@ -10,6 +10,8 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
 
     bodyPadding: 5,
 
+    itemId: 'cubedetailsformpanel',
+
     fieldClsName: 'labkey-field-editor',
     fieldLabelClsName : 'labkey-field-editor-label',
 
@@ -42,6 +44,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                 items: [
                     {
                         text: 'Submit',
+                        itemId: 'detailsSubmitBtn',
                         formBind: true,
                         successURL: this.nextStepUrl || LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
                         handler: function (btn)
@@ -107,10 +110,6 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
             btn.setDisabled(false);
 
             var msg = "Your " + this.objectName.toLowerCase() + " was saved.";
-            if (this.mode == "insert" && this.objectName == "Study")
-            {
-                msg += " Enter study access data to make the study visible in the finder.";
-            }
             Ext4.Msg.alert("Success", msg, function(){
                 window.location = btn.successURL;
             }, this);
@@ -158,7 +157,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
         this.getForm().getFields().each(function(item)
         {
             var value = item.value;
-            if (value)
+            if (value && !item.isStudyAccess)
             {
                 if (this.stripNewLinesFields.indexOf(item.name) >= 0)
                      value = value.replace(/\n/g, " ");

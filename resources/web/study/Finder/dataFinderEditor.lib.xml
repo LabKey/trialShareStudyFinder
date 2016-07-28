@@ -13,12 +13,16 @@
         <script path="study/Finder/data/StudyType.js"/>
         <script path="study/Finder/data/SubmissionStatus.js"/>
         <script path="study/Finder/data/TherapeuticArea.js"/>
+        <script path="study/Finder/data/StudyAccess.js"/>
+        <script path="study/Finder/data/Visibility.js"/>
 
         <script path="study/Finder/data/Study.js"/>
         <script path="study/Finder/data/Publication.js"/>
         <script path="study/Finder/panel/CubeObjectDetailsFormPanel.js"/>
         <script path="study/Finder/panel/PublicationDetailsFormPanel.js"/>
         <script path="study/Finder/panel/StudyDetailsFormPanel.js"/>
+        <script path="study/Finder/panel/StudyAccessForm.js"/>
+        <script path="study/Finder/panel/StudyAccessTuplePanel.js"/>
 
     </library>
     <dependencies>

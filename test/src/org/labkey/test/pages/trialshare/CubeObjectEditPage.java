@@ -130,6 +130,8 @@ public abstract class CubeObjectEditPage extends LabKeyPage
 
     public Map<String, String> compareFormValues(Map<String, Object> expectedValues)
     {
+        log("Hack-Nap while combo box gets filled. Maybe?");
+        sleep(2000);
         Map<String, String> formValues = getFormValues();
         Map<String, String> unexpectedValues = new HashMap<>();
         for (String key : expectedValues.keySet())
