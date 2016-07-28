@@ -72,6 +72,13 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
             )
         }
     ],
+    listeners : {
+        viewready : {
+            fn: function() {this.onViewReady(); },
+            scope: this,
+            single: true
+        }
+    },
 
     statics: {
         hasFilters : function(objectName, facetName) {
@@ -96,6 +103,56 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
                 return false;
             }
         }
+    },
+
+    onViewReady : function() {
+        var facetsSelections = [];
+        if (Ext4.isArray(this.facetStore.data.items) && this.facetStore.data.items.length > 0) {
+            Ext4.each(this.facetStore.data.items, function(item){
+                if (Ext4.isArray(item.data.defaultSelectedUniqueNames)) {
+                    Ext4.each(item.data.defaultSelectedUniqueNames, function(uniqueName){
+                        facetsSelections.push(uniqueName);
+                    });
+                }
+            });
+        }
+        if (facetsSelections.length > 0)
+            this.setDefaultFilters(facetsSelections);
+
+    },
+    setDefaultFilters : function(facetsSelections) {
+        if (!this.rendered) {
+            this.on('render', function() { this.setDefaultFilters(facetsSelections); }, this, {single: true});
+        }
+
+        var store = this.getStore();
+        var records = [],
+                recIdx,
+                recordNotFound = false;
+
+        Ext4.each(facetsSelections, function(val) {
+            recIdx = store.findBy(function(rec){
+                return rec.get('uniqueName') === val;
+            });
+
+            if (recIdx != -1) {
+                records.push(store.getAt(recIdx));
+            }
+            else {
+                if (!Ext4.isEmpty(val)) {
+                    recordNotFound = true;
+                    return false;
+                }
+            }
+        }, this);
+
+        if (recordNotFound) {
+            return;
+        }
+
+        this.getSelectionModel().select(records, false, true);
+        this.getSelectionModel().fireEvent('selectionchange', this.getSelectionModel(), records, true);
+
     },
 
     /**
@@ -181,11 +238,11 @@ Ext4.define("LABKEY.study.panel.FacetsGrid", {
 
         var facetChangeTask = new Ext4.util.DelayedTask(facetSelectionChange, this);
 
-        this.getSelectionModel().on('selectionchange', function(selModel, records){
+        this.getSelectionModel().on('selectionchange', function(selModel, records, fast){
             this.facetStore.clearAllSelectedMembers();
             if (records.length > 0)
                 this.facetStore.selectMembers(records);
-            facetChangeTask.delay(500);
+            facetChangeTask.delay(fast? 100 : 500);
         }, this);
 
         Ext4.getStore(this.cubeConfig.objectName).on("load", this.onObjectStoreLoad, this);

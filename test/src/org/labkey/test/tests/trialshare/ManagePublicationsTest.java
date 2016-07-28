@@ -90,7 +90,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
 
         permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
-        permissionsEditor.setUserPermissions(PUBLIC_READER, "Reader");
+        _apiPermissionsHelper.setUserPermissions(PUBLIC_READER, "Reader");
     }
 
     @Test
@@ -426,7 +426,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
     }
 
     @Test
-    public void testInsertAndRefresh()
+    public void testInsertWithoutRefresh()
     {
         goToProjectHome();
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
@@ -450,19 +450,10 @@ public class ManagePublicationsTest extends DataFinderTestBase
 
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
         DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        finder.clearAllFilters();
         finder.search((String) initialFields.get(PublicationEditPage.TITLE));
         List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
 
-        assertEquals("Should not find newly inserted publication without reindex", 0, dataCards.size());
-
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
-        manageData.refreshCube();
-
-        goToProjectHome();
-        finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
-        finder.search((String) initialFields.get(PublicationEditPage.TITLE));
-        dataCards = finder.getDataCards();
-
-        assertEquals("Should find newly inserted publication after reindex", 1, dataCards.size());
+        assertEquals("Should find newly inserted publication", 1, dataCards.size());
     }
 }

@@ -49,7 +49,7 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '               <span id="morePublicationDetails"><i class="fa fa-plus-square"></i></span>',
         '               <span id="lessPublicationDetails"><i class="fa fa-minus-square"></i></span>',
         '           </span>',
-        '       <div>',
+        '       <div class="labkey-publication-content">',
         '           <div class="labkey-publication-title">{title:htmlEncode}</div>',
         '           <div id="abbreviatedAuthorList" class="labkey-publication-author">{authorAbbrev:htmlEncode}</div>',
         '           <div id="fullAuthorList" class="labkey-publication-author">{author:htmlEncode}</div>',
@@ -60,12 +60,6 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '               <a class="labkey-text-link labkey-goto-link-text" target="_blank" href="{url}">view document</a>',
         '               <a class="labkey-goto-link-icon" target="_blank" href="{url}"><div class="labkey-goto-link-icon"></div></a>',
         '               </div>',
-        '           </tpl>',
-        '           <tpl if="dataUrl">',
-        '                <div class="labkey-publication-data-link">',
-        '                <a class="labkey-text-link labkey-data-link-text" href="{dataUrl:htmlEncode}" target="_blank"><span class="labkey-data-link-text">Clinical and Assay Data</span></a>',
-        '                <a class="labkey-data-link-icon" href="{dataUrl:htmlEncode}" target="_blank"><div class="labkey-data-link-icon"></div></a>',
-        '                </div>',
         '           </tpl>',
         '           </div>',
         '           <tpl if="viewState == &quot;expanded&quot;">',
@@ -124,10 +118,34 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
         '                   </tpl>',
         '               </div>',
         '           </div>',
-        '           </div>',
         '           </tpl>',
+            '   </div>',
+
+            '<span class="labkey-publication-annotation">',
+                '<tpl if="publicationType">',
+                    '<span class="labkey-publication-type">',
+                    '{publicationType:htmlEncode}',
+                    '</span>',
+                '</tpl>',
+                '<tpl if="status == &quot;In Progress&quot;">',
+                    '<span class="labkey-publication-type">: </span>',
+                    '<span class="labkey-publication-status">{status:htmlEncode}</span>',
+                '</tpl>',
+                '<br>',
+                '<span class="labkey-publication-edit-link">',
+                    '<a class="labkey-text-link labkey-goto-link-text" href="{[this.getEditUrl(values.id)]}" target="_blank"><span class="labkey-data-link-text">Edit</span></a>',
+                    '<a class="labkey-goto-link-icon" href="{[this.getEditUrl(values.id)]}" target="_blank"><div class="labkey-data-link-icon"></div></a>',
+                '</span>',
+                '<br>',
+                '<tpl if="dataUrl">',
+                '<span class="labkey-publication-data-link">',
+                    '<a class="labkey-text-link labkey-data-link-text" href="{dataUrl:htmlEncode}" target="_blank"><span class="labkey-data-link-text">Clinical and Assay Data</span></a>',
+                    '<a class="labkey-data-link-icon" href="{dataUrl:htmlEncode}" target="_blank"><div class="labkey-data-link-icon"></div></a>',
+                '</span>',
+                '</tpl>',
+            '</span>',
+
         '       </div>',
-        '   </div>',
         '   </div>',
         '   </tpl>',
         '</div>',
@@ -148,6 +166,14 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
                             html += " labkey-publication-highlight4";
                     html += '">';
                     return html;
+                },
+                getEditUrl: function(publicationId)
+                {
+                    var url = LABKEY.ActionURL.buildURL('trialshare', 'updateData', null, {
+                            "id": publicationId,
+                            "objectName": 'publication'
+                        });
+                    return url;
                 }
             }
     ),

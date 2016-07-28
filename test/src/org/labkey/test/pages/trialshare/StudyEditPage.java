@@ -1,5 +1,6 @@
 package org.labkey.test.pages.trialshare;
 
+import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 
 import java.util.HashMap;
@@ -26,6 +27,9 @@ public class StudyEditPage extends CubeObjectEditPage
     public static final String PHASES = "phases";
     public static final String CONDITIONS = "conditions";
     public static final String THERAPEUTIC_AREAS = "therapeuticAreas";
+    public static final String VISIBILITY = "Visibility *:";
+    public static final String STUDY_CONTAINER = "Study Container *:";
+    public static final String DISPLAY_NAME = "Display Name:";
 
     private static final Map<String, String> DROPDOWN_FIELD_NAMES = new HashMap<>();
     static
@@ -83,4 +87,91 @@ public class StudyEditPage extends CubeObjectEditPage
     {
         return FIELD_NAMES;
     }
+
+    public Locator.XPathLocator getStudyAccessPanelLocator(int panelIndex)
+    {
+        Locator.XPathLocator panelLoc = new Locator.XPathLocator("");
+        panelLoc = panelLoc.append(Locator.tagWithClass("div", "studyaccesspanelindex" + panelIndex));
+        return panelLoc;
+    }
+
+    public Locator.XPathLocator getStudyAccessPanelFieldLocator(int panelIndex)
+    {
+        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithClass("table", "x4-form-item"));
+    }
+
+    public Locator.XPathLocator getStudyAccessVisibility(int panelIndex)
+    {
+        return getStudyAccessPanelFieldLocator(panelIndex).withDescendant(Locator.tag("label").withText("Visibility *:"));
+    }
+
+    public Locator.XPathLocator getStudyAccessStudyContainer(int panelIndex)
+    {
+        return getStudyAccessPanelFieldLocator(panelIndex).withDescendant(Locator.tag("label").withText("Study Container *:"));
+    }
+
+    public Locator.XPathLocator getStudyAccessDisplayName(int panelIndex)
+    {
+        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithName("input", "displayName"));
+    }
+
+    public Locator.XPathLocator getStudyAccessPanelRemoveBtn(int panelIndex)
+    {
+        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithClass("span", "fa-times"));
+    }
+
+    public void setStudyAccessVisibility(int panelIndex, String value)
+    {
+        Locator.XPathLocator comboLocator = getStudyAccessVisibility(panelIndex);
+        _ext4Helper.selectComboBoxItem(comboLocator, value);
+    }
+
+    public void setStudyAccessStudyContainer(int panelIndex, String value)
+    {
+        Locator.XPathLocator comboLocator = getStudyAccessStudyContainer(panelIndex);
+        _ext4Helper.selectComboBoxItem(comboLocator, value);
+    }
+
+    public void setStudyAccessDisplayName(int panelIndex, String value)
+    {
+        Locator fieldLocator = getStudyAccessDisplayName(panelIndex);
+        setFormElement(fieldLocator, value);
+    }
+
+    public String getStudyAccessDisplayNameValue(int panelIndex)
+    {
+        Locator fieldLocator = getStudyAccessDisplayName(panelIndex);
+        return getFormElement(fieldLocator);
+    }
+
+    public void setStudyAccessFormValues(int panelIndex, String visibility, String studyContainer, String displayName)
+    {
+        // wait for combo to load
+        sleep(1000);
+        setStudyAccessVisibility(panelIndex, visibility);
+        if (displayName != null)
+            setStudyAccessDisplayName(panelIndex, displayName);
+        // wait for combo to load
+        sleep(1000);
+        setStudyAccessStudyContainer(panelIndex, studyContainer);
+    }
+
+    public void removeStudyAccessPanel(int panelIndex)
+    {
+        click(getStudyAccessPanelRemoveBtn(panelIndex));
+    }
+
+    public void addStudyAccessPanel(int panelIndex)
+    {
+        click(Locator.linkWithText("Add..."));
+        waitForElement(getStudyAccessPanelLocator(panelIndex));
+        // wait for combo to load
+        sleep(1000);
+    }
+
+    public void setStudyAccessFormValues(int i, Map<String, Object> newFields)
+    {
+        setStudyAccessFormValues(i, (String) newFields.get(VISIBILITY), (String) newFields.get(STUDY_CONTAINER), (String) newFields.get(DISPLAY_NAME));
+    }
+
 }

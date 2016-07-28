@@ -33,6 +33,7 @@ public class StudyFacetBean
     private List<FacetFilter> filterOptions;
     private Integer ordinal;
     private Boolean displayFacet = true;
+    private List<String> defaultSelectedUniqueNames;
 
     public StudyFacetBean() {}
 
@@ -134,5 +135,15 @@ public class StudyFacetBean
     public void setDisplayFacet(Boolean displayFacet)
     {
         this.displayFacet = displayFacet;
+    }
+
+    public List<String> getDefaultSelectedUniqueNames()
+    {
+        return defaultSelectedUniqueNames;
+    }
+
+    public void setDefaultSelectedUniqueNames(List<String> defaultSelectedUniqueNames)
+    {
+        this.defaultSelectedUniqueNames = defaultSelectedUniqueNames;
     }
 }
