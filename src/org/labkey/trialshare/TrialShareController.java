@@ -664,10 +664,7 @@ public class TrialShareController extends SpringActionController
             facets.add(facet);
             facet = new StudyFacetBean("Publication Type", "Publication Types", "Publication.Publication Type", "PublicationType", "[Publication.Publication Type][(All)]", FacetFilter.Type.OR, 3);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
-            if (isInternalUser)
-            {
-                facet.setDefaultSelectedUniqueNames(Arrays.asList("[Publication.Publication Type].[Manuscript]"));
-            }
+            facet.setDefaultSelectedUniqueNames(Arrays.asList("[Publication.Publication Type].[Manuscript]"));
             facets.add(facet);
             facet = new StudyFacetBean("Submission Status", "Submission Statuses", "Publication.Submission Status", "SubmissionStatus", "[Publication.Submission Status][(All)]", FacetFilter.Type.OR, 2);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
