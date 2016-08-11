@@ -39,7 +39,7 @@ public class StudiesListHelper extends LabKeyPage
             clickAndWait(Locator.linkWithText("StudyAccess"));
         }
         DataRegionTable table = new DataRegionTable("query", _test);
-        table.clickHeaderButton("Insert", "Insert New");
+        table.clickHeaderMenu("Insert", "Insert New");
         selectOptionByText(Locators.studyContainerSelect, containerName);
         selectOptionByText(Locators.studyVisibility, visibility);
         selectOptionByText(Locators.studyIdSelect, shortName);
