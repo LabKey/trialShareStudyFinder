@@ -151,6 +151,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'htmleditor',
+                    enableFont      : false,
                     disabled        : this.mode == "view",
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,

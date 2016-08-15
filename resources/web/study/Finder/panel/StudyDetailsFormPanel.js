@@ -105,6 +105,7 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'htmleditor',
+                    enableFont      : false,
                     disabled        : this.mode == "view",
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
@@ -117,6 +118,7 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'htmleditor',
+                    enableFont      : false,
                     disabled        : this.mode == "view",
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
