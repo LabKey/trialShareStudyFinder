@@ -33,6 +33,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
     {
 
         this.manageDataUrl = LABKEY.ActionURL.buildURL('trialShare', 'manageData.view', null, {objectName : this.objectName, 'query.viewName': 'manageData'});
+        this.updateDataUrl = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: LABKEY.ActionURL.getParameter('id'), objectName : this.objectName.toLowerCase()});
 
         if (this.mode != "view")
         {
@@ -74,10 +75,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
             cls: 'labkey-data-finder-editor-message'
         });
         this.add(this.getFormFields());
-        if (this.cubeObject)
-        {
-            this.bindFormFields();
-        }
+        this.bindFormFields();
     },
 
 
@@ -91,15 +89,12 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
     {
         if (this.cubeObject)
         {
-            for (var fieldName in this.cubeObject)
+            Ext4.iterate(this.cubeObject, function(fieldName, value)
             {
-                if (this.cubeObject.hasOwnProperty(fieldName))
-                {
-                    var field = this.getForm().findField(fieldName);
-                    if (field)
-                        field.setValue(this.cubeObject[fieldName]);
-                }
-            }
+                var field = this.getForm().findField(fieldName);
+                if (field)
+                    field.setValue(value);
+            }, this);
         }
     },
 
@@ -111,14 +106,17 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
 
             var msg = "Your " + this.objectName.toLowerCase() + " was saved.";
             Ext4.Msg.alert("Success", msg, function(){
-                window.location = btn.successURL;
+                if(!LABKEY.ActionURL.getParameter('id'))
+                    window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: JSON.parse(response.responseText).data, objectName : this.objectName.toLowerCase()});
+                else
+                    window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: LABKEY.ActionURL.getParameter('id'), objectName : this.objectName.toLowerCase()});
             }, this);
         }
 
         function onError(response, options){
             btn.setDisabled(false);
 
-            obj = Ext4.JSON.decode(response.responseText);
+            var obj = Ext4.decode(response.responseText);
             if (obj.errors[0].field == "form")
             {
                 Ext4.Msg.alert("Error", "There were problems submitting your data. " + obj.errors[0].message);

@@ -3,21 +3,29 @@
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
+
 Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
     extend: 'LABKEY.study.panel.CubeObjectDetailsFormPanel',
     
     dataModuleName: 'TrialShare',
     cubeContainerPath: 'TrialShare',
     stripNewLinesFields: ['Keywords','Author','Citation'],
+
+    store           : {  // used to submit form fields to workbench in ITN
+        model   : 'LABKEY.study.data.FormStore',
+        autoLoad: true
+    },
     
     getFormFields: function()
     {
         var items = [];
+
         items.push(
                 {
                     xtype : 'hidden',
                     name: 'id'
                 });
+
         items.push(
                 {
                     xtype           : 'checkbox',
@@ -28,6 +36,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     name            : 'show',
                     labelWidth      : this.defaultFieldLabelWidth
                 });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
@@ -37,8 +46,24 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     fieldLabel      : 'Title *',
                     name            : 'title',
                     labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.largeFieldWidth
+                    width           : this.largeFieldWidth,
+                    listeners       : {
+                        change: function (field, title)
+                        {
+                            var studyIds = this.up().getForm().getValues().studyIds;
+                            if (studyIds && (studyIds.length !== 0) && title && LABKEY.ActionURL.getParameter('id'))
+                            {
+                                this.up().generateWorkbenchLink(studyIds[0]);
+                            }
+                            else
+                            {
+                                this.up().generateNoWorkbenchLink();
+                            }
+                        }
+                    },
+                    scope           : this
                 });
+
         items.push(
                 {
                     xtype           : 'combo',
@@ -59,6 +84,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                         autoLoad    :   true
                     }
                 });
+
         items.push(
                 {
                     xtype           : 'combo',
@@ -79,6 +105,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                         autoLoad    :   true
                     }
                 });
+
         items.push(
                 {
                     xtype           : 'combo',
@@ -98,6 +125,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                         autoLoad    :   true
                     }
                 });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textarea',
@@ -109,8 +137,8 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
                     height          : 50
-                }
-        );
+                });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textarea',
@@ -122,8 +150,8 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
                     height          : 50
-                }
-        );
+                });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'numberfield',
@@ -134,8 +162,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     fieldLabel      : 'Year',
                     name            : 'year',
                     labelWidth      : this.defaultFieldLabelWidth
-                }
-        );
+                });
 
         items.push(
                 {
@@ -159,8 +186,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
                     height          : 150
-                }
-        );
+                });
 
         items.push(
                 {
@@ -172,7 +198,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth
                 });
-
 
         items.push(
                 {
@@ -212,8 +237,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.mediumFieldWidth,
                     height          : 50
-                }
-        );
+                });
 
         items.push(
                 {
@@ -235,9 +259,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     editable        : false,
                     delimiter       : this.multiSelectDelimiter,
                     width           : this.mediumFieldWidth
-                }
-        );
-
+                });
 
         items.push(
                 {
@@ -272,34 +294,56 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     displayField    : 'shortName',
                     editable        : false,
                     delimiter       : this.multiSelectDelimiter,
-                    width           : this.mediumFieldWidth
-                }
-        );
+                    width           : this.mediumFieldWidth,
+                    listeners       : {
+                        change    : function (combo, studyIds)
+                        {
+                            var title = this.up().getForm().findField('title').getValue();
+                            if(studyIds && (studyIds.length !== 0) && title && LABKEY.ActionURL.getParameter('id'))
+                            {
+                                this.up().generateWorkbenchLink(studyIds[0]);
+                            }
+                            else
+                            {
+                                this.up().generateNoWorkbenchLink();
+                            }
+                        }
+                    },
+                    scope           : this
+                });
 
+        items.push(
+                {
+                    xtype           : 'displayfield',
+                    cls             : this.fieldClsName,
+                    labelCls        : this.fieldLabelClsName,
+                    fieldLabel      : 'Document(s)',
+                    name            : 'workbenchUrl',
+                    labelWidth      : this.defaultFieldLabelWidth,
+                    width           : this.largeFieldWidth
+                });
 
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
-                    fieldLabel      : 'Link 1',
-                    name            : 'link1',
+                    fieldLabel      : 'Document URL',
+                    name            : 'documentUrl',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
-                }
-        );
+                });
 
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
-                    fieldLabel      : 'Description 1',
-                    name            : 'description1',
+                    fieldLabel      : 'Document Description',
+                    name            : 'documentDescription',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
-                }
-        );
+                });
 
         items.push(
                 {
@@ -311,6 +355,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
@@ -321,6 +366,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
@@ -361,8 +407,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     displayField    : 'Path',
                     editable        : false,
                     width           : this.mediumLargeFieldWidth
-                }
-        );
+                });
 
         items.push(
                 {
@@ -382,8 +427,19 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     displayField    : 'Path',
                     editable        : false,
                     width           : this.mediumLargeFieldWidth
-                }
-        );
+                });
+
         return items;
+    },
+
+    generateWorkbenchLink: function (study)
+    {
+        this.getForm().findField('workbenchUrl').setValue(
+                '<a href="' + LABKEY.contextPath + '/project/Studies/' + study + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId='+ LABKEY.ActionURL.getParameter('id'));
+    },
+
+    generateNoWorkbenchLink: function()
+    {
+        this.getForm().findField('workbenchUrl').setValue('Create/Find Manuscript on Workbench');
     }
 });

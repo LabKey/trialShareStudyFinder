@@ -56,8 +56,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
         EXISTING_PUB_FIELDS.put(PublicationEditPage.KEYWORDS, EMPTY_VALUE);
         EXISTING_PUB_FIELDS.put(PublicationEditPage.STUDIES, EMPTY_VALUE);
         EXISTING_PUB_FIELDS.put(PublicationEditPage.THERAPEUTIC_AREAS, "Autoimmune");
-        EXISTING_PUB_FIELDS.put(PublicationEditPage.LINK1, "https://www.immunetolerance.org/sites/files/Specks_NEJM_2013.pdf");
-        EXISTING_PUB_FIELDS.put(PublicationEditPage.DESCRIPTION1, "Paper on immunetolerance.org");
+        EXISTING_PUB_FIELDS.put(PublicationEditPage.DOCUMENT_URL, "https://www.immunetolerance.org/sites/files/Specks_NEJM_2013.pdf");
+        EXISTING_PUB_FIELDS.put(PublicationEditPage.DOCUMENT_DESCRIPTION, "Paper on immunetolerance.org");
         EXISTING_PUB_FIELDS.put(PublicationEditPage.LINK2, "http://www.ncbi.nlm.nih.gov/pubmed/23902481");
         EXISTING_PUB_FIELDS.put(PublicationEditPage.DESCRIPTION2, "PubMed.gov Citation");
         EXISTING_PUB_FIELDS.put(PublicationEditPage.LINK3, EMPTY_VALUE);
@@ -226,8 +226,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
         newFields.put(PublicationEditPage.KEYWORDS, "key words keywords");
         newFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
         newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
-        newFields.put(PublicationEditPage.LINK1, "http://link/to.this");
-        newFields.put(PublicationEditPage.DESCRIPTION1, "Link 1 Description");
+        newFields.put(PublicationEditPage.DOCUMENT_URL, "http://link/to.this");
+        newFields.put(PublicationEditPage.DOCUMENT_DESCRIPTION, "Link 1 Description");
         newFields.put(PublicationEditPage.LINK2, "http://also/link/to.this");
         newFields.put(PublicationEditPage.DESCRIPTION2, "Link 2 Description");
         newFields.put(PublicationEditPage.LINK3, "http://finally/link/to.this");
@@ -347,8 +347,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
         initialFields.put(PublicationEditPage.KEYWORDS, "key words keywords");
         initialFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
         initialFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
-        initialFields.put(PublicationEditPage.LINK1, "http://link/to.this");
-        initialFields.put(PublicationEditPage.DESCRIPTION1, "Link 1 Description");
+        initialFields.put(PublicationEditPage.DOCUMENT_URL, "http://link/to.this");
+        initialFields.put(PublicationEditPage.DOCUMENT_DESCRIPTION, "Link 1 Description");
         initialFields.put(PublicationEditPage.LINK2, "http://also/link/to.this");
         initialFields.put(PublicationEditPage.DESCRIPTION2, "Link 2 Description");
         initialFields.put(PublicationEditPage.LINK3, "http://finally/link/to.this");
@@ -378,8 +378,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
         updatedFields.put(PublicationEditPage.KEYWORDS, "key words keywords updated");
 
         // multi-value fields are tested separately
-        updatedFields.put(PublicationEditPage.LINK1, "http://link/to.this updated");
-        updatedFields.put(PublicationEditPage.DESCRIPTION1, "Link 1 Description updated");
+        updatedFields.put(PublicationEditPage.DOCUMENT_URL, "http://link/to.this updated");
+        updatedFields.put(PublicationEditPage.DOCUMENT_DESCRIPTION, "Link 1 Description updated");
         updatedFields.put(PublicationEditPage.LINK2, "http://also/link/to.this updated");
         updatedFields.put(PublicationEditPage.DESCRIPTION2, "Link 2 Description updated");
         updatedFields.put(PublicationEditPage.LINK3, "http://finally/link/to.this updated");
