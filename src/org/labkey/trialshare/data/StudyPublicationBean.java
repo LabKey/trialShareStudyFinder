@@ -68,8 +68,8 @@ public class StudyPublicationBean
     private static final String PERMISSIONS_CONTAINER_FIELD = "PermissionsContainer";
     private static final String IS_SHOWN_FIELD = "Show";
     private static final String WORKBENCH_URL_FIELD = "Document(s)";
-    private static final String DOCUMENT_URL_FIELD = "Document URL";
-    private static final String DOCUMENT_DESCRIPTION_FIELD = "Document Description";
+    private static final String LINK1_FIELD = "Link1";
+    private static final String DESCRIPTION1_FIELD = "Description1";
     private static final String LINK2_FIELD = "Link2";
     private static final String DESCRIPTION2_FIELD = "Description2";
     private static final String LINK3_FIELD = "Link3";
@@ -298,12 +298,12 @@ public class StudyPublicationBean
     }
 
 
-    public void setDocumentDescription(String documentDescription)
+    public void setDescription1(String description1)
     {
-        setUrlText(0, documentDescription);
+        setUrlText(0, description1);
     }
 
-    public String getDocumentDescription()
+    public String getDescription1()
     {
         URLData url = getUrlData(0);
         return url == null ? null : url.getLinkText();
@@ -331,12 +331,12 @@ public class StudyPublicationBean
         return url == null ? null : url.getLinkText();
     }
 
-    public void setDocumentUrl(String documentUrl)
+    public void setLink1(String link1)
     {
-        setUrlLink(0, documentUrl);
+        setUrlLink(0, link1);
     }
 
-    public String getDocumentUrl()
+    public String getLink1()
     {
         URLData url = getUrlData(0);
         return url == null ? null : url.getLink();
@@ -582,10 +582,10 @@ public class StudyPublicationBean
     {
         Map<String, Object> urlFields = new CaseInsensitiveHashMap<>();
 
-        if (getDocumentUrl() != null)
-            urlFields.put(DOCUMENT_URL_FIELD, getDocumentUrl());
-        if (getDocumentDescription() != null)
-            urlFields.put(DOCUMENT_DESCRIPTION_FIELD, getDocumentDescription());
+        if (getLink1() != null)
+            urlFields.put(LINK1_FIELD, getLink1());
+        if (getDescription1() != null)
+            urlFields.put(DESCRIPTION1_FIELD, getDescription1());
         if (getLink2() != null)
             urlFields.put(LINK2_FIELD, getLink2());
         if (getDescription2() != null)

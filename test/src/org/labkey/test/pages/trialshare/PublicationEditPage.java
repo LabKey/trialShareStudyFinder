@@ -29,8 +29,8 @@ public class PublicationEditPage extends CubeObjectEditPage
     public static final String KEYWORDS ="keywords";
     public static final String STUDIES ="studyIds";
     public static final String THERAPEUTIC_AREAS ="therapeuticAreas";
-    public static final String DOCUMENT_URL ="documentUrl";
-    public static final String DOCUMENT_DESCRIPTION ="documentDescription";
+    public static final String LINK1 ="link1";
+    public static final String DESCRIPTION1 ="description1";
     public static final String LINK2 ="link2";
     public static final String DESCRIPTION2 ="description2";
     public static final String LINK3 ="link3";
@@ -73,8 +73,8 @@ public class PublicationEditPage extends CubeObjectEditPage
         FIELD_NAMES.add(KEYWORDS);
         FIELD_NAMES.add(STUDIES);
         FIELD_NAMES.add(THERAPEUTIC_AREAS);
-        FIELD_NAMES.add(DOCUMENT_URL);
-        FIELD_NAMES.add(DOCUMENT_DESCRIPTION);
+        FIELD_NAMES.add(LINK1);
+        FIELD_NAMES.add(DESCRIPTION1);
         FIELD_NAMES.add(LINK2);
         FIELD_NAMES.add(DESCRIPTION2);
         FIELD_NAMES.add(LINK3);

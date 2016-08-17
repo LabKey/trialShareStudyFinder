@@ -325,7 +325,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Document URL',
-                    name            : 'documentUrl',
+                    name            : 'link1',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
@@ -336,7 +336,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
                     fieldLabel      : 'Document Description',
-                    name            : 'documentDescription',
+                    name            : 'description1',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
