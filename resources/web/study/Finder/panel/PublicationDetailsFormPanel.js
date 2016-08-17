@@ -315,7 +315,8 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     fieldLabel      : 'Document(s)',
                     name            : 'workbenchUrl',
                     labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.largeFieldWidth
+                    width           : this.largeFieldWidth,
+                    value           : 'Create/Find Manuscript on Workbench'
                 });
 
         items.push(
@@ -430,7 +431,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
     generateWorkbenchLink: function (study)
     {
         this.getForm().findField('workbenchUrl').setValue(
-                '<a href="' + LABKEY.contextPath + '/project/Studies/' + study + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId='+ LABKEY.ActionURL.getParameter('id'));
+                '<a href="' + LABKEY.contextPath + '/project/Studies/' + study + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId='+ LABKEY.ActionURL.getParameter('id') + '">Create/Find Manuscript on Workbench</a>');
     },
 
     generateNoWorkbenchLink: function()
