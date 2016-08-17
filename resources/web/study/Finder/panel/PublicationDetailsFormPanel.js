@@ -10,11 +10,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
     dataModuleName: 'TrialShare',
     cubeContainerPath: 'TrialShare',
     stripNewLinesFields: ['Keywords','Author','Citation'],
-
-    store           : {  // used to submit form fields to workbench in ITN
-        model   : 'LABKEY.study.data.FormStore',
-        autoLoad: true
-    },
     
     getFormFields: function()
     {
