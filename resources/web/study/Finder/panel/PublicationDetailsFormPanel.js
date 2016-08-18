@@ -10,6 +10,51 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
     dataModuleName: 'TrialShare',
     cubeContainerPath: 'TrialShare',
     stripNewLinesFields: ['Keywords','Author','Citation'],
+
+    scope: this,
+
+    constructor : function(config) {
+        this.callParent([config]);
+
+        this.addListener('dirtychange', function(cmp, isDirty){
+            this.changeLink(isDirty);
+        }, this);
+    },
+
+    listeners : {
+        afterrender :
+        {
+            // reset wasDirty properties after render so dirtychange listener will work properly (should only trigger on user changes, not initial population)
+            fn: function() {
+                this.changeLink(false);
+                var items = this.getForm().getFields().items,
+                        i = 0,
+                        len = items.length;
+                for(; i < len; i++) {
+                    var c = items[i];
+                    if(c.mixins && c.mixins.field && typeof c.mixins.field['initValue'] == 'function' && c.wasDirty)
+                    {
+                        c.mixins.field.initValue.apply(c);
+                        c.wasDirty = false;
+                    }
+                }
+            }
+        }
+    },
+
+    changeLink: function (isDirty)
+    {
+        var studyIds = this.getForm().getValues().studyIds;
+        var linkText = 'Create/Find Manuscript on Workbench';
+
+        if(!isDirty && studyIds && (studyIds.length !== 0) && LABKEY.ActionURL.getParameter('id')) {
+            this.getForm().findField('workbenchUrl').setValue(
+                    '<a href="' + LABKEY.contextPath + '/project/Studies/' + studyIds[0] + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId='+ LABKEY.ActionURL.getParameter('id') + '">' + linkText + '</a>');
+        }
+        else {
+            this.getForm().findField('workbenchUrl').setValue(linkText);
+        }
+    },
     
     getFormFields: function()
     {
@@ -42,20 +87,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     name            : 'title',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
-                    listeners       : {
-                        change: function (field, title)
-                        {
-                            var studyIds = this.up().getForm().getValues().studyIds;
-                            if (studyIds && (studyIds.length !== 0) && title && LABKEY.ActionURL.getParameter('id'))
-                            {
-                                this.up().generateWorkbenchLink(studyIds[0]);
-                            }
-                            else
-                            {
-                                this.up().generateNoWorkbenchLink();
-                            }
-                        }
-                    },
                     scope           : this
                 });
 
@@ -290,20 +321,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     editable        : false,
                     delimiter       : this.multiSelectDelimiter,
                     width           : this.mediumFieldWidth,
-                    listeners       : {
-                        change    : function (combo, studyIds)
-                        {
-                            var title = this.up().getForm().findField('title').getValue();
-                            if(studyIds && (studyIds.length !== 0) && title && LABKEY.ActionURL.getParameter('id'))
-                            {
-                                this.up().generateWorkbenchLink(studyIds[0]);
-                            }
-                            else
-                            {
-                                this.up().generateNoWorkbenchLink();
-                            }
-                        }
-                    },
                     scope           : this
                 });
 
@@ -426,16 +443,5 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                 });
 
         return items;
-    },
-
-    generateWorkbenchLink: function (study)
-    {
-        this.getForm().findField('workbenchUrl').setValue(
-                '<a href="' + LABKEY.contextPath + '/project/Studies/' + study + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId='+ LABKEY.ActionURL.getParameter('id') + '">Create/Find Manuscript on Workbench</a>');
-    },
-
-    generateNoWorkbenchLink: function()
-    {
-        this.getForm().findField('workbenchUrl').setValue('Create/Find Manuscript on Workbench');
     }
 });
