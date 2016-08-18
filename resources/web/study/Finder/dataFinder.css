@@ -792,3 +792,19 @@ div.labkey-study-details h3 {
     color:limegreen;
     vertical-align: top;
 }
+
+/* ugly hack to overlay arrow background image, see .x4-btn-default-small */
+a.labkey-button-link, a.labkey-button-link:visited {
+    background-image: none;
+    background-image: url(../../_images/arrow_right.png), -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e4e4e4));
+    background-image: url(../../_images/arrow_right.png), -webkit-linear-gradient(top, #ffffff, #e4e4e4);
+    background-image: url(../../_images/arrow_right.png), -moz-linear-gradient(top, #ffffff, #e4e4e4);
+    background-image: url(../../_images/arrow_right.png), -o-linear-gradient(top, #ffffff, #e4e4e4);
+    background-image: url(../../_images/arrow_right.png), linear-gradient(top, #ffffff, #e4e4e4);
+    background-repeat: no-repeat, repeat;
+    background-position: right, 0% 0%;
+    padding: 2px 14px 2px 2px;
+    vertical-align: middle;
+    white-space: nowrap;
+    top: 1px;
+}

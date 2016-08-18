@@ -45,16 +45,14 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
     changeLink: function (isDirty)
     {
         var studyIds = this.getForm().getValues().studyIds;
-        var linkText = 'Create/Find Manuscript on Workbench';
 
         if(!isDirty && studyIds && (studyIds.length !== 0) && LABKEY.ActionURL.getParameter('id'))
         {
-            this.getForm().findField('workbenchUrl').setValue(
-                    '<a href="' + LABKEY.contextPath + '/project/Studies/' + studyIds[0] + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId='+ LABKEY.ActionURL.getParameter('id') + '">' + linkText + '</a>');
+            Ext4.getCmp('workbenchUrl').setDisabled(false);
         }
         else
         {
-            this.getForm().findField('workbenchUrl').setValue(linkText);
+            Ext4.getCmp('workbenchUrl').setDisabled(true);
         }
     },
     

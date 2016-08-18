@@ -74,10 +74,17 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                         }
                     },
                     {
-                        xtype: 'displayfield',
-                        text: 'Create/Find Manuscript on Workbench',
-                        name: 'workbenchUrl',
+                        text: 'Workbench',
+                        cls: 'labkey-button-link',
+                        id: 'workbenchUrl',
                         returnUrl: this.updateDataUrl || LABKEY.ActionURL.getParameter('returnUrl'),
+                        handler: function (btn)
+                        {
+                            var studyIds = this.getForm().getValues().studyIds;
+                            url = LABKEY.contextPath + '/project/Studies/' + studyIds[0] + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId=' + LABKEY.ActionURL.getParameter('id');
+                            window.open(url, '_blank');
+                        },
+                        scope: this
                     }
 
                 ]
