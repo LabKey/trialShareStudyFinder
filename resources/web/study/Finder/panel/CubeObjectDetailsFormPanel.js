@@ -27,12 +27,12 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
     cubeObject : null,
 
     stripNewLinesFields: [],
-    
 
     initComponent : function()
     {
 
         this.manageDataUrl = LABKEY.ActionURL.buildURL('trialShare', 'manageData.view', null, {objectName : this.objectName, 'query.viewName': 'manageData'});
+        // TODO: make sure this works properly
         this.updateDataUrl = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: LABKEY.ActionURL.getParameter('id'), objectName : this.objectName.toLowerCase()});
 
         if (this.mode != "view")
@@ -44,7 +44,18 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                 style: 'background-color: transparent;',
                 items: [
                     {
-                        text: 'Submit',
+                        text: 'Save',
+                        itemId: 'detailsSaveBtn',
+                        formBind: true,
+                        successURL: this.nextStepUrl || LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
+                        handler: function (btn)
+                        {
+                            var panel = btn.up('form');
+                            panel.doSave(btn);
+                        }
+                    },
+                    {
+                        text: 'Save And Close',
                         itemId: 'detailsSubmitBtn',
                         formBind: true,
                         successURL: this.nextStepUrl || LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
@@ -61,7 +72,14 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                         {
                             window.location = btn.returnUrl;
                         }
+                    },
+                    {
+                        xtype: 'displayfield',
+                        text: 'Create/Find Manuscript on Workbench',
+                        name: 'workbenchUrl',
+                        returnUrl: this.updateDataUrl || LABKEY.ActionURL.getParameter('returnUrl'),
                     }
+
                 ]
             }];
         }
@@ -98,7 +116,8 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
         }
     },
 
-    doSubmit: function(btn){
+    // TODO: maybe integrate this better with doSubmit()
+    doSave: function(btn){
         btn.setDisabled(true);
 
         function onSuccess(response, options){
@@ -110,6 +129,51 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                     window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: JSON.parse(response.responseText).data, objectName : this.objectName.toLowerCase()});
                 else
                     window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: LABKEY.ActionURL.getParameter('id'), objectName : this.objectName.toLowerCase()});
+            }, this);
+        }
+
+        function onError(response, options){
+            btn.setDisabled(false);
+
+            var obj = Ext4.decode(response.responseText);
+            if (obj.errors[0].field == "form")
+            {
+                Ext4.Msg.alert("Error", "There were problems submitting your data. " + obj.errors[0].message);
+            }
+            else
+            {
+                for (var i = 0; i < obj.errors.length; i++)
+                {
+                    var field = this.getForm().findField(obj.errors[i].field);
+                    if (field)
+                        field.markInvalid([obj.errors[i].message]);
+                    else
+                        console.log("Unable to find field for invalidation", obj.errors[i]);
+                }
+                Ext4.Msg.alert("Error", "There were problems submitting your data. Please check the form for errors.");
+            }
+        }
+
+        Ext4.Ajax.request({
+            url: LABKEY.ActionURL.buildURL('trialShare', this.mode + this.objectName + ".api"),
+            method: 'POST',
+            jsonData: this.getFieldValues(),
+            success: onSuccess,
+            failure: onError,
+            scope: this
+        });
+
+    },
+
+    doSubmit: function(btn){
+        btn.setDisabled(true);
+
+        function onSuccess(response, options){
+            btn.setDisabled(false);
+
+            var msg = "Your " + this.objectName.toLowerCase() + " was saved.";
+            Ext4.Msg.alert("Success", msg, function(){
+                window.location = btn.successURL;
             }, this);
         }
 

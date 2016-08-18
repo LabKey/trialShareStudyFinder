@@ -67,7 +67,6 @@ public class StudyPublicationBean
     private static final String KEYWORDS_FIELD = "Keywords";
     private static final String PERMISSIONS_CONTAINER_FIELD = "PermissionsContainer";
     private static final String IS_SHOWN_FIELD = "Show";
-    private static final String WORKBENCH_URL_FIELD = "Document(s)";
     private static final String LINK1_FIELD = "Link1";
     private static final String DESCRIPTION1_FIELD = "Description1";
     private static final String LINK2_FIELD = "Link2";

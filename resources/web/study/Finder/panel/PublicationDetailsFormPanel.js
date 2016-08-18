@@ -47,11 +47,13 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
         var studyIds = this.getForm().getValues().studyIds;
         var linkText = 'Create/Find Manuscript on Workbench';
 
-        if(!isDirty && studyIds && (studyIds.length !== 0) && LABKEY.ActionURL.getParameter('id')) {
+        if(!isDirty && studyIds && (studyIds.length !== 0) && LABKEY.ActionURL.getParameter('id'))
+        {
             this.getForm().findField('workbenchUrl').setValue(
                     '<a href="' + LABKEY.contextPath + '/project/Studies/' + studyIds[0] + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId='+ LABKEY.ActionURL.getParameter('id') + '">' + linkText + '</a>');
         }
-        else {
+        else
+        {
             this.getForm().findField('workbenchUrl').setValue(linkText);
         }
     },
@@ -322,18 +324,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     delimiter       : this.multiSelectDelimiter,
                     width           : this.mediumFieldWidth,
                     scope           : this
-                });
-
-        items.push(
-                {
-                    xtype           : 'displayfield',
-                    cls             : this.fieldClsName,
-                    labelCls        : this.fieldLabelClsName,
-                    fieldLabel      : 'Document(s)',
-                    name            : 'workbenchUrl',
-                    labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.largeFieldWidth,
-                    value           : 'Create/Find Manuscript on Workbench'
                 });
 
         items.push(
