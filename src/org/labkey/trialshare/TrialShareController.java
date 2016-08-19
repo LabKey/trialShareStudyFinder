@@ -1041,9 +1041,8 @@ public class TrialShareController extends SpringActionController
             if (publicationId == null)
             {
                 errors.reject(ERROR_MSG, "Publication insert failed.");
-                return errors;
             }
-            else if (errors.hasErrors())
+            if (errors.hasErrors())
             {
                 return errors;
             }
