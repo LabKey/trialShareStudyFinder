@@ -104,7 +104,7 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                 });
         items.push(
                 {
-                    xtype           : 'htmleditor',
+                    xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     enableFont      : false,
                     disabled        : this.mode == "view",
                     cls             : this.fieldClsName,
@@ -112,8 +112,7 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     fieldLabel      : 'External Url Description',
                     name            : 'externalUrlDescription',
                     labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.largeFieldWidth,
-                    height          : 100
+                    width           : this.largeFieldWidth
                 });
         items.push(
                 {
