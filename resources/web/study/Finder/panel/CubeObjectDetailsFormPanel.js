@@ -32,8 +32,6 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
     {
 
         this.manageDataUrl = LABKEY.ActionURL.buildURL('trialShare', 'manageData.view', null, {objectName : this.objectName, 'query.viewName': 'manageData'});
-        // TODO: make sure this works properly
-        this.updateDataUrl = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: LABKEY.ActionURL.getParameter('id'), objectName : this.objectName.toLowerCase()});
 
         if (this.mode != "view")
         {
@@ -47,18 +45,18 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                         text: 'Save',
                         itemId: 'detailsSaveBtn',
                         formBind: true,
-                        successURL: this.nextStepUrl || LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
+                        successURL: this.manageDataUrl,
                         handler: function (btn)
                         {
                             var panel = btn.up('form');
-                            panel.doSave(btn);
+                            panel.doSubmit(btn);
                         }
                     },
                     {
                         text: 'Save And Close',
                         itemId: 'detailsSubmitBtn',
                         formBind: true,
-                        successURL: this.nextStepUrl || LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
+                        successURL: LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
                         handler: function (btn)
                         {
                             var panel = btn.up('form');
@@ -67,7 +65,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                     },
                     {
                         text: 'Cancel',
-                        returnUrl: this.manageDataUrl || LABKEY.ActionURL.getParameter('returnUrl'),
+                        returnUrl: this.manageDataUrl,
                         handler: function (btn, key)
                         {
                             window.location = btn.returnUrl;
@@ -77,11 +75,12 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                         text: 'Workbench',
                         cls: 'labkey-button-link',
                         id: 'workbenchUrl',
-                        returnUrl: this.updateDataUrl || LABKEY.ActionURL.getParameter('returnUrl'),
+                        hidden: LABKEY.ActionURL.getParameter('objectName') !== 'publication',
                         handler: function (btn)
                         {
                             var studyIds = this.getForm().getValues().studyIds;
-                            url = LABKEY.contextPath + '/project/Studies/' + studyIds[0] + 'OPR/Study%20Data/begin.view?pageId=Manuscripts?publicationId=' + LABKEY.ActionURL.getParameter('id');
+                            var url = LABKEY.ActionURL.buildURL('project', 'begin.view', 'Studies/' + studyIds[0] + 'OPR/Study%20Data',
+                                    {pageId: 'Manuscripts', publicationId: LABKEY.ActionURL.getParameter('id')});
                             window.open(url, '_blank');
                         },
                         scope: this
@@ -123,65 +122,21 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
         }
     },
 
-    // TODO: maybe integrate this better with doSubmit()
-    doSave: function(btn){
-        btn.setDisabled(true);
-
-        function onSuccess(response, options){
-            btn.setDisabled(false);
-
-            var msg = "Your " + this.objectName.toLowerCase() + " was saved.";
-            Ext4.Msg.alert("Success", msg, function(){
-                if(!LABKEY.ActionURL.getParameter('id'))
-                    window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: JSON.parse(response.responseText).data, objectName : this.objectName.toLowerCase()});
-                else
-                    window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: LABKEY.ActionURL.getParameter('id'), objectName : this.objectName.toLowerCase()});
-            }, this);
-        }
-
-        function onError(response, options){
-            btn.setDisabled(false);
-
-            var obj = Ext4.decode(response.responseText);
-            if (obj.errors[0].field == "form")
-            {
-                Ext4.Msg.alert("Error", "There were problems submitting your data. " + obj.errors[0].message);
-            }
-            else
-            {
-                for (var i = 0; i < obj.errors.length; i++)
-                {
-                    var field = this.getForm().findField(obj.errors[i].field);
-                    if (field)
-                        field.markInvalid([obj.errors[i].message]);
-                    else
-                        console.log("Unable to find field for invalidation", obj.errors[i]);
-                }
-                Ext4.Msg.alert("Error", "There were problems submitting your data. Please check the form for errors.");
-            }
-        }
-
-        Ext4.Ajax.request({
-            url: LABKEY.ActionURL.buildURL('trialShare', this.mode + this.objectName + ".api"),
-            method: 'POST',
-            jsonData: this.getFieldValues(),
-            success: onSuccess,
-            failure: onError,
-            scope: this
-        });
-
-    },
-
     doSubmit: function(btn){
         btn.setDisabled(true);
 
         function onSuccess(response, options){
             btn.setDisabled(false);
 
-            var msg = "Your " + this.objectName.toLowerCase() + " was saved.";
-            Ext4.Msg.alert("Success", msg, function(){
+            if(btn.getItemId() === 'detailsSaveBtn')
+            {
+                var id = LABKEY.ActionURL.getParameter('id') || JSON.parse(response.responseText).data;
+                window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: id, objectName : this.objectName.toLowerCase()});
+            }
+            else if(btn.getItemId() === 'detailsSubmitBtn')
+            {
                 window.location = btn.successURL;
-            }, this);
+            }
         }
 
         function onError(response, options){

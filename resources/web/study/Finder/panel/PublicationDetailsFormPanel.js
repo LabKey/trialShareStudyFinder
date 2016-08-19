@@ -45,15 +45,10 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
     changeLink: function (isDirty)
     {
         var studyIds = this.getForm().getValues().studyIds;
-
-        if(!isDirty && studyIds && (studyIds.length !== 0) && LABKEY.ActionURL.getParameter('id'))
-        {
-            Ext4.getCmp('workbenchUrl').setDisabled(false);
-        }
-        else
-        {
-            Ext4.getCmp('workbenchUrl').setDisabled(true);
-        }
+        var isEnabled = !isDirty && studyIds && (studyIds.length !== 0) && LABKEY.ActionURL.getParameter('id');
+        var workbenchUrl = Ext4.getCmp('workbenchUrl');
+        if (workbenchUrl)
+            workbenchUrl.setDisabled(!isEnabled);
     },
     
     getFormFields: function()

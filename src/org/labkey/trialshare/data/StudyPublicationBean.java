@@ -363,17 +363,6 @@ public class StudyPublicationBean
         return url == null ? null : url.getLink();
     }
 
-    public void setWorkbenchUrl(String workbenchUrl)
-    {
-        setUrlLink(3, workbenchUrl);
-    }
-
-    public String getWorkbenchUrl()
-    {
-        URLData url = getUrlData(3);
-        return url == null ? null : url.getLink();
-    }
-
     public String getStatus()
     {
         return (String) _primaryFields.get(STATUS_FIELD);
