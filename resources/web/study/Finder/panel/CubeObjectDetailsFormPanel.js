@@ -45,7 +45,6 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                         text: 'Save',
                         itemId: 'detailsSaveBtn',
                         formBind: true,
-                        successURL: this.manageDataUrl,
                         handler: function (btn)
                         {
                             var panel = btn.up('form');
@@ -56,7 +55,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                         text: 'Save And Close',
                         itemId: 'detailsSubmitBtn',
                         formBind: true,
-                        successURL: LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
+                        successURL: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
                         handler: function (btn)
                         {
                             var panel = btn.up('form');
@@ -65,29 +64,31 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                     },
                     {
                         text: 'Cancel',
-                        returnUrl: this.manageDataUrl,
+                        returnUrl: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
                         handler: function (btn, key)
                         {
                             window.location = btn.returnUrl;
                         }
-                    },
-                    {
-                        text: 'Workbench',
-                        cls: 'labkey-button-link',
-                        id: 'workbenchUrl',
-                        hidden: LABKEY.ActionURL.getParameter('objectName') !== 'publication',
-                        handler: function (btn)
-                        {
-                            var studyIds = this.getForm().getValues().studyIds;
-                            var url = LABKEY.ActionURL.buildURL('project', 'begin.view', 'Studies/' + studyIds[0] + 'OPR/Study%20Data',
-                                    {pageId: 'Manuscripts', publicationId: LABKEY.ActionURL.getParameter('id')});
-                            window.open(url, '_blank');
-                        },
-                        scope: this
                     }
-
                 ]
             }];
+
+            if(LABKEY.ActionURL.getParameter('objectName') === 'publication') {
+                this.dockedItems[0].items.push(
+                {
+                    text: 'Workbench',
+                    cls: 'labkey-button-link',
+                    id: 'workbenchUrl',
+                    handler: function (btn)
+                    {
+                        var studyIds = this.getForm().getValues().studyIds;
+                        var url = LABKEY.ActionURL.buildURL('project', 'begin.view', 'Studies/' + studyIds[0] + 'OPR/Study%20Data',
+                                {pageId: 'Manuscripts', publicationId: LABKEY.ActionURL.getParameter('id')});
+                        window.open(url, '_blank');
+                    },
+                    scope: this
+                });
+            }
         }
 
         this.callParent();

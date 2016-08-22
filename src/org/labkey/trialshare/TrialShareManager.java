@@ -210,17 +210,17 @@ public class TrialShareManager
         return null;
     }
 
-    public Integer updatePublication(User user, Container container, PublicationEditBean publication, BindException errors)
+    public void updatePublication(User user, Container container, PublicationEditBean publication, BindException errors)
     {
         if (publication == null)
         {
             errors.reject(ERROR_MSG, "No publication data provided to update");
-            return null;
+            return;
         }
         if (publication.getId() == null)
         {
             errors.reject(ERROR_MSG, "Publication id is null");
-            return null;
+            return;
         }
 
         try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
@@ -243,9 +243,6 @@ public class TrialShareManager
             schema.getPublicationTherapeuticAreaTableInfo().getUpdateService().deleteRows(user, container, getJoinTableIds(schema.getPublicationTherapeuticAreaTableInfo(), filter), null, null);
             addJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publication.getId(), TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, publication.getTherapeuticAreas(), user, container);
             transaction.commit();
-
-            Integer publicationKey = publication.getId();
-            return publicationKey;
         }
         catch (Exception e)
         {
@@ -253,7 +250,7 @@ public class TrialShareManager
             errors.reject(ERROR_MSG, "Publication update failed: " + e.getMessage());
         }
 
-        return null;
+        return;
     }
 
 
