@@ -31,6 +31,7 @@ import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.ViewContext;
+import org.labkey.trialshare.TrialShareManager;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 import org.springframework.validation.Errors;
 
@@ -234,6 +235,7 @@ public class StudyPublicationBean
 
     public void setAbstractText(String abstractText)
     {
+        abstractText = TrialShareManager.trimNullFontFace(abstractText);
         _primaryFields.put(ABSTRACT_FIELD, abstractText);
     }
 

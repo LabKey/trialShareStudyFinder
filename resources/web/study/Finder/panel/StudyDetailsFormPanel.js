@@ -27,7 +27,12 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     fieldLabel      : 'Short Name *',
                     name            : 'shortName',
                     labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.smallFieldWidth
+                    width           : this.smallFieldWidth,
+                    listeners: {
+                        afterrender: function(field) {
+                            field.focus(false, 500);
+                        }
+                    }
                 });
         items.push(
                 {
