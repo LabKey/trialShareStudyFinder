@@ -136,7 +136,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
 
             if(btn.getItemId() === 'detailsSaveBtn')
             {
-                var id = LABKEY.ActionURL.getParameter('id') || JSON.parse(response.responseText).data;
+                var id = LABKEY.ActionURL.getParameter('id') || JSON.parse(response.responseText).data || JSON.parse(response.responseText).message;
                 window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: id, objectName : this.objectName.toLowerCase()});
             }
             else if(btn.getItemId() === 'detailsSubmitBtn')
@@ -149,7 +149,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
             btn.setDisabled(false);
 
             var obj = Ext4.decode(response.responseText);
-            if (obj.errors[0].field == "form")
+            if (obj.errors && obj.errors[0].field == "form")
             {
                 Ext4.Msg.alert("Error", "There were problems submitting your data. " + obj.errors[0].message);
             }

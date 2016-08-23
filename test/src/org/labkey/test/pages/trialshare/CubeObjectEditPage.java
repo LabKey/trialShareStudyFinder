@@ -42,9 +42,9 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         if (waitForSubmit)
         {
             if (submitIsDisabled)
-                waitForElement(Locators.disabledSubmitButton);
+                waitForElement(Locators.disabledSaveAndCloseButton);
             else
-                waitForElement(Locators.submitButton);
+                waitForElement(Locators.saveAndCloseButton);
         }
 
     }
@@ -167,7 +167,12 @@ public abstract class CubeObjectEditPage extends LabKeyPage
 
     public boolean isSubmitEnabled()
     {
-        return !isElementPresent(Locators.disabledSubmitButton);
+        return !isElementPresent(Locators.disabledSaveAndCloseButton);
+    }
+
+    public boolean isWorkbenchEnabled()
+    {
+        return !isElementPresent(Locators.disabledWorkbenchButton);
     }
 
     public void cancel()
@@ -176,21 +181,30 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         Locators.cancelButton.findElement(getDriver()).click();
     }
 
-    public void submit()
+    public void save()
     {
-        log("Submitting edit form");
-        click(Locators.submitButton);
-        waitForElement(Locators.ackSubmit);
-        clickAndWait(Locators.ackSubmit, WAIT_FOR_PAGE);
+        log("Saving edit form");
+        click(Locators.saveButton);
+        waitForElement(Locators.updateTitle);
+    }
+
+    public void saveAndClose()
+    {
+        log("Saving and closing edit form");
+        click(Locators.saveAndCloseButton);
+        waitForElement(Locators.manageTitle);
     }
 
     private static class Locators
     {
         static final Locator showOnDashField = Locator.css(".labkey-field-editor input.x4-form-checkbox");
-        static final Locator disabledSubmitButton = Locator.css("a.x4-disabled").withText("SUBMIT"); // why do we need to have the all caps text here?
-        static final Locator submitButton = Locator.linkWithText("Submit");
+        static final Locator saveButton = Locator.linkWithText("Save");
+        static final Locator saveAndCloseButton = Locator.linkWithText("Save And Close");
+        static final Locator disabledSaveAndCloseButton = Locator.css("a.x4-disabled").withText("SAVE AND CLOSE"); // why do we need to have the all caps text here?
         static final Locator cancelButton = Locator.linkWithText("Cancel");
-        static final Locator ackSubmit = Locator.linkWithText("OK");
+        static final Locator disabledWorkbenchButton = Locator.css("a.x4-disabled").withText("WORKBENCH");
+        static final Locator manageTitle = Locator.css(".labkey-wp-title-text").containing("Manage");
+        static final Locator updateTitle = Locator.css(".labkey-nav-page-header").containing("Update");
     }
 
 }
