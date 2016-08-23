@@ -171,7 +171,6 @@ public class ManageStudiesTest extends DataFinderTestBase
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
         editPage.saveAndClose();
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         manageData.goToEditRecord((String) newFields.get(StudyEditPage.STUDY_ID));
         unexpectedValues = editPage.compareFormValues(newFields);
         Assert.assertTrue("Found unexpected values in edit page of newly inserted study: " + unexpectedValues, unexpectedValues.isEmpty());
@@ -308,7 +307,6 @@ public class ManageStudiesTest extends DataFinderTestBase
         // not sure how to attach to the iframe
         updatedFields.put(StudyEditPage.INVESTIGATOR, "investigate updated");
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
         editPage.setFormFields(updatedFields);
         editPage.save();
