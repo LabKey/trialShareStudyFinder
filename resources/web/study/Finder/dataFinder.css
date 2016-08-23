@@ -803,7 +803,8 @@ a.labkey-button-link, a.labkey-button-link:visited {
     background-image: url(../../_images/arrow_right.png), -o-linear-gradient(top, #ffffff, #e4e4e4);
     background-image: url(../../_images/arrow_right.png), linear-gradient(top, #ffffff, #e4e4e4);
     background-repeat: no-repeat, repeat;
-    background-position: right, 0% 0%;
+    background-position: right;
+    background-position-y: 0;
     padding: 2px 14px 2px 2px;
     vertical-align: middle;
     white-space: nowrap;

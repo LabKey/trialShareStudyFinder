@@ -75,19 +75,24 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
 
             if(LABKEY.ActionURL.getParameter('objectName') === 'publication') {
                 this.dockedItems[0].items.push(
-                {
-                    text: 'Workbench',
-                    cls: 'labkey-button-link',
-                    id: 'workbenchUrl',
-                    handler: function (btn)
                     {
-                        var studyIds = this.getForm().getValues().studyIds;
-                        var url = LABKEY.ActionURL.buildURL('project', 'begin.view', 'Studies/' + studyIds[0] + 'OPR/Study%20Data',
-                                {pageId: 'Manuscripts', publicationId: LABKEY.ActionURL.getParameter('id')});
-                        window.open(url, '_blank');
-                    },
-                    scope: this
-                });
+                        xtype: 'tbspacer',
+                        width: 20
+                    }, // adds horizontal spacing between buttons
+                    {
+                        text: 'Workbench',
+                        cls: 'labkey-button-link',
+                        id: 'workbenchUrl',
+                        handler: function (btn)
+                        {
+                            var studyIds = this.getForm().getValues().studyIds;
+                            var url = LABKEY.ActionURL.buildURL('project', 'begin.view', 'Studies/' + studyIds[0] + 'OPR/Study%20Data',
+                                    {pageId: 'Manuscripts', publicationId: LABKEY.ActionURL.getParameter('id')});
+                            window.open(url, '_blank');
+                        },
+                        scope: this
+                    }
+                );
             }
         }
 
