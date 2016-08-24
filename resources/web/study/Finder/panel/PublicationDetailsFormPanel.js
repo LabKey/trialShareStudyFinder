@@ -50,7 +50,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
         if (workbenchUrl)
             workbenchUrl.setDisabled(!isEnabled);
     },
-    
+
     getFormFields: function()
     {
         var items = [];
@@ -82,6 +82,12 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     name            : 'title',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
+                    listeners: {
+                        afterrender: function (field)
+                        {
+                            field.focus(false, 500);
+                        }
+                    },
                     scope           : this
                 });
 
@@ -199,6 +205,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'htmleditor',
+                    enableFont      : false,
                     disabled        : this.mode == "view",
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
@@ -207,6 +214,18 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
                     height          : 150
+                    // The following could be added to try to remove the bogus <font face="null">, but the setting
+                    // of the value for the field moves the cursor back to the beginning of the field, which causes confusion when
+                    // typing.
+                    // listeners       : {
+                    //     change: function(field, newValue, oldValue)
+                    //     {
+                    //         if (newValue.indexOf(' face="null"') >= 0)
+                    //         {
+                    //             field.setValue(newValue.replace(' face="null"', ""));
+                    //         }
+                    //     }
+                    // }
                 });
 
         items.push(

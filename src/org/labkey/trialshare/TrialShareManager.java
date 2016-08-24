@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static org.labkey.api.action.SpringActionController.ERROR_MSG;
 
@@ -549,6 +550,25 @@ public class TrialShareManager
     {
         StudyDocumentProvider.reindex();
         clearCache(errors);
+    }
+
+    /**
+     * See Issue 27549.  For Ext Htmleditor fields, if the font selection is disabled, some browsers (Chrome, at least)
+     * will sometimes surround the text in the editor with <font face="null"></font>, which causes the browser to use
+     * some unknown font (its default font probably).  We don't want this, so we'll strip off these surrounding tags,
+     * if present.
+     * @param string - the string to be trimmed
+     * @return a new string with with "face="null"" replaced by the empty string
+     */
+    public static String trimNullFontFace(String string)
+    {
+        Pattern NULL_FONT_FACE = Pattern.compile(".*font[^>]*face=\"null\".*");
+
+        if (string != null && NULL_FONT_FACE.matcher(string).matches())
+        {
+            return string.replaceAll("face=\"null\"", "");
+        }
+        return string;
     }
 
 }
