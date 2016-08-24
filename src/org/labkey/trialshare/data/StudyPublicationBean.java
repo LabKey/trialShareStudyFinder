@@ -31,6 +31,7 @@ import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.util.URLHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.ViewContext;
+import org.labkey.trialshare.TrialShareManager;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 import org.springframework.validation.Errors;
 
@@ -60,7 +61,7 @@ public class StudyPublicationBean
     private static final String STATUS_FIELD = "Status";
     private static final String SUBMISSION_STATUS_FIELD = "SubmissionStatus";
     private static final String CITATION_FIELD = "Citation";
-    private static final String ABSTRACT_FIELD = "Abstract";
+    private static final String ABSTRACT_FIELD = "AbstractText";
     private static final String DATA_URL_FIELD = "DataUrl";
     private static final String IS_HIGHLIGHTED_FIELD = "IsHighlighted";
     private static final String MANUSCRIPT_CONTAINER_FIELD = "ManuscriptContainer";
@@ -234,6 +235,7 @@ public class StudyPublicationBean
 
     public void setAbstractText(String abstractText)
     {
+        abstractText = TrialShareManager.trimNullFontFace(abstractText);
         _primaryFields.put(ABSTRACT_FIELD, abstractText);
     }
 
