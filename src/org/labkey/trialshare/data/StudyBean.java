@@ -32,6 +32,7 @@ import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.wiki.WikiRendererType;
 import org.labkey.api.wiki.WikiService;
+import org.labkey.trialshare.TrialShareManager;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 import org.springframework.validation.Errors;
 
@@ -334,6 +335,7 @@ public class StudyBean
 
     public void setDescription(String description)
     {
+        description = TrialShareManager.trimNullFontFace(description);
         _primaryFields.put(DESCRIPTION_FIELD, description);
     }
 

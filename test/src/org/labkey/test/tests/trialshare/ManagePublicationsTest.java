@@ -208,7 +208,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
 
         Map<String, Object> newFields = new HashMap<>();
         // add the count so multiple runs of this test have distinct titles
-        newFields.put(PublicationEditPage.TITLE, "testInsertWithAllFields_" + manageData.getCount());
+        int count = manageData.getCount();
+        newFields.put(PublicationEditPage.TITLE, "testInsertWithAllFields_" + count);
         newFields.put(PublicationEditPage.PUBLICATION_TYPE, "Manuscript");
         newFields.put(PublicationEditPage.STATUS, "In Progress");
         newFields.put(PublicationEditPage.SUBMISSION_STATUS, "Submitted");
@@ -237,10 +238,17 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(newFields, false);
-        editPage.submit();
-
-        manageData.goToEditRecord((String) newFields.get(TITLE));
+        editPage.save();
         Map<String, String> unexpectedValues = editPage.compareFormValues(newFields);
+        Assert.assertTrue("Found unexpected values in edit page of newly inserted publication: " + unexpectedValues, unexpectedValues.isEmpty());
+
+        newFields.put(PublicationEditPage.TITLE, "testInsertWithAllFields_" + count + "saveAndClose");
+        newFields.remove(PublicationEditPage.STUDIES);
+        newFields.remove(PublicationEditPage.THERAPEUTIC_AREAS);
+        editPage.setFormFields(newFields, false);
+        editPage.saveAndClose();
+        manageData.goToEditRecord((String) newFields.get(TITLE));
+        unexpectedValues = editPage.compareFormValues(newFields);
         Assert.assertTrue("Found unexpected values in edit page of newly inserted publication: " + unexpectedValues, unexpectedValues.isEmpty());
     }
 
@@ -268,7 +276,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(newFields, false);
-        editPage.submit();
+        editPage.saveAndClose();
 
         manageData.goToEditRecord((String) newFields.get(TITLE));
         Map<String, String> unexpectedValues = editPage.compareFormValues(newFields);
@@ -299,7 +307,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(initialFields, false);
-        editPage.submit();
+        editPage.saveAndClose();
 
         manageData.goToEditRecord((String) initialFields.get(TITLE));
 
@@ -307,7 +315,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         newFields.put(PublicationEditPage.STUDIES, new String[]{OPERATIONAL_STUDY_ID});
         newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"T1DM"});
         editPage.setFormFields(newFields, false);
-        editPage.submit();
+        editPage.saveAndClose();
 
         manageData.goToEditRecord((String) initialFields.get(TITLE));
         initialFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID, OPERATIONAL_STUDY_ID});
@@ -358,11 +366,12 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(initialFields, false);
-        editPage.submit();
+        editPage.saveAndClose();
 
         Map<String, Object> updatedFields = new HashMap<>();
         // add the count so multiple runs of this test have distinct titles
-        updatedFields.put(PublicationEditPage.TITLE, "testUpdatePublication_" + manageData.getCount() + "_updated");
+        int count = manageData.getCount();
+        updatedFields.put(PublicationEditPage.TITLE, "testUpdatePublication_" + count + "_updated");
         updatedFields.put(PublicationEditPage.PUBLICATION_TYPE, "Abstract");
         updatedFields.put(PublicationEditPage.STATUS, "Complete");
         updatedFields.put(PublicationEditPage.SUBMISSION_STATUS, "Submitted");
@@ -386,10 +395,10 @@ public class ManagePublicationsTest extends DataFinderTestBase
         updatedFields.put(PublicationEditPage.DESCRIPTION3, "Link 3 Description updated");
 
         manageData.goToEditRecord((String) initialFields.get(TITLE));
+        Assert.assertTrue("Workbench button should be enabled if data has not changed", editPage.isWorkbenchEnabled());
         editPage.setFormFields(updatedFields, false);
-        editPage.submit();
-
-        manageData.goToEditRecord((String) updatedFields.get(TITLE));
+        Assert.assertFalse("Workbench button should be disabled if data has changed", editPage.isWorkbenchEnabled());
+        editPage.save();
         Map<String, String> unexpectedValues = editPage.compareFormValues(updatedFields);
         Assert.assertTrue("Found unexpected values in edit page of updated publication: " + unexpectedValues, unexpectedValues.isEmpty());
     }
@@ -413,7 +422,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         manageData.goToInsertNew();
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
         editPage.setFormFields(initialFields, false);
-        editPage.submit();
+        editPage.saveAndClose();
         manageData.deleteRecord((String) initialFields.get(PublicationEditPage.TITLE));
         PublicationsListHelper listHelper = new PublicationsListHelper(this);
 
@@ -446,7 +455,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(initialFields, true);
-        editPage.submit();
+        editPage.saveAndClose();
 
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
         DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);

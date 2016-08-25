@@ -511,8 +511,8 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         assertElementPresent(DataFinderPage.Locators.pubCardBorderHighlight, 1);
         assertElementPresent(DataFinderPage.Locators.pubCardBackgroundHighlight, 1);
 
-        log("Remove the 'In Progress' filter, and apply the 'Complete' filter.");
-        fg.toggleFacet(DataFinderPage.Dimension.STATUS, "In Progress");
+        log("Remove existing filters, and apply the 'Complete' filter.");
+        finder.clearAllFilters();
         fg.toggleFacet(DataFinderPage.Dimension.STATUS, "Complete");
 
         log("Validate counts for 'Complete' publications.");

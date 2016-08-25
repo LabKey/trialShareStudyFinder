@@ -3,21 +3,64 @@
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
+
 Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
     extend: 'LABKEY.study.panel.CubeObjectDetailsFormPanel',
     
     dataModuleName: 'TrialShare',
     cubeContainerPath: 'TrialShare',
     stripNewLinesFields: ['Keywords','Author','Citation'],
-    
+
+    scope: this,
+
+    constructor : function(config) {
+        this.callParent([config]);
+
+        this.addListener('dirtychange', function(cmp, isDirty){
+            this.changeLink(isDirty);
+        }, this);
+    },
+
+    listeners : {
+        afterrender :
+        {
+            // reset wasDirty properties after render so dirtychange listener will work properly (should only trigger on user changes, not initial population)
+            fn: function() {
+                this.changeLink(false);
+                var items = this.getForm().getFields().items,
+                        i = 0,
+                        len = items.length;
+                for(; i < len; i++) {
+                    var c = items[i];
+                    if(c.mixins && c.mixins.field && typeof c.mixins.field['initValue'] == 'function' && c.wasDirty)
+                    {
+                        c.mixins.field.initValue.apply(c);
+                        c.wasDirty = false;
+                    }
+                }
+            }
+        }
+    },
+
+    changeLink: function (isDirty)
+    {
+        var studyIds = this.getForm().getValues().studyIds;
+        var isEnabled = !isDirty && studyIds && (studyIds.length !== 0) && LABKEY.ActionURL.getParameter('id');
+        var workbenchUrl = Ext4.getCmp('workbenchUrl');
+        if (workbenchUrl)
+            workbenchUrl.setDisabled(!isEnabled);
+    },
+
     getFormFields: function()
     {
         var items = [];
+
         items.push(
                 {
                     xtype : 'hidden',
                     name: 'id'
                 });
+
         items.push(
                 {
                     xtype           : 'checkbox',
@@ -28,6 +71,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     name            : 'show',
                     labelWidth      : this.defaultFieldLabelWidth
                 });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
@@ -37,8 +81,16 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     fieldLabel      : 'Title *',
                     name            : 'title',
                     labelWidth      : this.defaultFieldLabelWidth,
-                    width           : this.largeFieldWidth
+                    width           : this.largeFieldWidth,
+                    listeners: {
+                        afterrender: function (field)
+                        {
+                            field.focus(false, 500);
+                        }
+                    },
+                    scope           : this
                 });
+
         items.push(
                 {
                     xtype           : 'combo',
@@ -59,6 +111,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                         autoLoad    :   true
                     }
                 });
+
         items.push(
                 {
                     xtype           : 'combo',
@@ -79,6 +132,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                         autoLoad    :   true
                     }
                 });
+
         items.push(
                 {
                     xtype           : 'combo',
@@ -98,6 +152,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                         autoLoad    :   true
                     }
                 });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textarea',
@@ -109,8 +164,8 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
                     height          : 50
-                }
-        );
+                });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textarea',
@@ -122,8 +177,8 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
                     height          : 50
-                }
-        );
+                });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'numberfield',
@@ -134,8 +189,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     fieldLabel      : 'Year',
                     name            : 'year',
                     labelWidth      : this.defaultFieldLabelWidth
-                }
-        );
+                });
 
         items.push(
                 {
@@ -151,6 +205,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
         items.push(
                 {
                     xtype           : 'htmleditor',
+                    enableFont      : false,
                     disabled        : this.mode == "view",
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
@@ -159,8 +214,19 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth,
                     height          : 150
-                }
-        );
+                    // The following could be added to try to remove the bogus <font face="null">, but the setting
+                    // of the value for the field moves the cursor back to the beginning of the field, which causes confusion when
+                    // typing.
+                    // listeners       : {
+                    //     change: function(field, newValue, oldValue)
+                    //     {
+                    //         if (newValue.indexOf(' face="null"') >= 0)
+                    //         {
+                    //             field.setValue(newValue.replace(' face="null"', ""));
+                    //         }
+                    //     }
+                    // }
+                });
 
         items.push(
                 {
@@ -172,7 +238,6 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.smallFieldWidth
                 });
-
 
         items.push(
                 {
@@ -212,8 +277,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.mediumFieldWidth,
                     height          : 50
-                }
-        );
+                });
 
         items.push(
                 {
@@ -235,9 +299,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     editable        : false,
                     delimiter       : this.multiSelectDelimiter,
                     width           : this.mediumFieldWidth
-                }
-        );
-
+                });
 
         items.push(
                 {
@@ -272,34 +334,31 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     displayField    : 'shortName',
                     editable        : false,
                     delimiter       : this.multiSelectDelimiter,
-                    width           : this.mediumFieldWidth
-                }
-        );
-
+                    width           : this.mediumFieldWidth,
+                    scope           : this
+                });
 
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
-                    fieldLabel      : 'Link 1',
+                    fieldLabel      : 'Document URL',
                     name            : 'link1',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
-                }
-        );
+                });
 
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
                     cls             : this.fieldClsName,
                     labelCls        : this.fieldLabelClsName,
-                    fieldLabel      : 'Description 1',
+                    fieldLabel      : 'Document Description',
                     name            : 'description1',
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
-                }
-        );
+                });
 
         items.push(
                 {
@@ -311,6 +370,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
@@ -321,6 +381,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     labelWidth      : this.defaultFieldLabelWidth,
                     width           : this.largeFieldWidth
                 });
+
         items.push(
                 {
                     xtype           : this.mode == "view" ? 'displayfield' : 'textfield',
@@ -361,8 +422,7 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     displayField    : 'Path',
                     editable        : false,
                     width           : this.mediumLargeFieldWidth
-                }
-        );
+                });
 
         items.push(
                 {
@@ -382,8 +442,8 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     displayField    : 'Path',
                     editable        : false,
                     width           : this.mediumLargeFieldWidth
-                }
-        );
+                });
+
         return items;
     }
 });

@@ -664,6 +664,7 @@ public class TrialShareController extends SpringActionController
             facets.add(facet);
             facet = new StudyFacetBean("Publication Type", "Publication Types", "Publication.Publication Type", "PublicationType", "[Publication.Publication Type][(All)]", FacetFilter.Type.OR, 3);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
+            facet.setDefaultSelectedUniqueNames(Arrays.asList("[Publication.Publication Type].[Manuscript]"));
             facets.add(facet);
             facet = new StudyFacetBean("Submission Status", "Submission Statuses", "Publication.Submission Status", "SubmissionStatus", "[Publication.Submission Status][(All)]", FacetFilter.Type.OR, 2);
             facet.setFilterOptions(getFacetFilters(false, true, FacetFilter.Type.OR));
@@ -1037,13 +1038,19 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(PublicationEditBean form, BindException errors) throws Exception
         {
-            TrialShareManager.get().insertPublication(getUser(), getContainer(), form, errors);
+            Integer publicationId = TrialShareManager.get().insertPublication(getUser(), getContainer(), form, errors);
+            if (publicationId == null)
+            {
+                errors.reject(ERROR_MSG, "Publication insert failed.");
+            }
             if (errors.hasErrors())
+            {
                 return errors;
+            }
             else
             {
                 TrialShareManager.get().refreshPublications(errors);
-                return success();
+                return success(publicationId);
             }
         }
     }
@@ -1086,10 +1093,18 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(StudyEditBean form, BindException errors) throws Exception
         {
-            TrialShareManager.get().insertStudy(getUser(), getContainer(), form, errors);
+            String studyId = TrialShareManager.get().insertStudy(getUser(), getContainer(), form, errors);
+            if (studyId == null)
+            {
+                errors.reject(ERROR_MSG, "Study insert failed.");
+            }
+            if (errors.hasErrors())
+            {
+                return errors;
+            }
             if (!errors.hasErrors())
                 TrialShareManager.get().refreshStudies(errors);
-            return success();
+            return success(studyId);
         }
     }
 
