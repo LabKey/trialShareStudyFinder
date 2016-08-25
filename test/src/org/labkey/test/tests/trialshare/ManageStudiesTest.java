@@ -159,11 +159,20 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
-        editPage.submit();
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
-
-        manageData.goToEditRecord((String) newFields.get(StudyEditPage.STUDY_ID));
+        editPage.save();
         Map<String, String> unexpectedValues = editPage.compareFormValues(newFields);
+        Assert.assertTrue("Found unexpected values in edit page of newly inserted study: " + unexpectedValues, unexpectedValues.isEmpty());
+
+        newFields.put(StudyEditPage.TITLE, "testInsertWithAllFields_" + count + "again");
+        newFields.remove(StudyEditPage.THERAPEUTIC_AREAS);
+        newFields.remove(StudyEditPage.AGE_GROUPS);
+        newFields.remove(StudyEditPage.CONDITIONS);
+        newFields.remove(StudyEditPage.PHASES);
+        editPage.removeStudyAccessPanel(0);
+        editPage.setFormFields(newFields);
+        editPage.saveAndClose();
+        manageData.goToEditRecord((String) newFields.get(StudyEditPage.STUDY_ID));
+        unexpectedValues = editPage.compareFormValues(newFields);
         Assert.assertTrue("Found unexpected values in edit page of newly inserted study: " + unexpectedValues, unexpectedValues.isEmpty());
     }
 
@@ -192,7 +201,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
-        editPage.submit();
+        editPage.saveAndClose();
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
 
@@ -226,7 +235,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
-        editPage.submit();
+        editPage.saveAndClose();
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
 
@@ -243,7 +252,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         newFields.put(StudyEditPage.THERAPEUTIC_AREAS, new String[]{"T1DM"});
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
-        editPage.submit();
+        editPage.saveAndClose();
 
 
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
@@ -285,9 +294,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
-        editPage.submit();
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
-
+        editPage.saveAndClose();
 
         Map<String, Object> updatedFields = new HashMap<>();
         updatedFields.put(StudyEditPage.SHORT_NAME, "TUS" + count + "_U");
@@ -300,13 +307,9 @@ public class ManageStudiesTest extends DataFinderTestBase
         // not sure how to attach to the iframe
         updatedFields.put(StudyEditPage.INVESTIGATOR, "investigate updated");
 
-
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
-        editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(updatedFields);
-        editPage.submit();
-
-        manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
+        editPage.save();
         Map<String, String> unexpectedValues = editPage.compareFormValues(updatedFields);
         Assert.assertTrue("Found unexpected values in edit page of updated study: " + unexpectedValues, unexpectedValues.isEmpty());
     }
@@ -333,7 +336,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
-        editPage.submit();
+        editPage.saveAndClose();
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
 
         manageData.deleteRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
@@ -385,7 +388,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         editPage.setStudyAccessFormValues(0, studyAccessFields);
 
         editPage.setFormFields(initialFields);
-        editPage.submit();
+        editPage.saveAndClose();
 
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
         DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), true);
@@ -441,7 +444,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         log("Set values for the second study access form");
         editPage.setStudyAccessFormValues(1, secondStudyAccessFields);
 
-        editPage.submit();
+        editPage.saveAndClose();
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
@@ -456,7 +459,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         log("Change study access display name");
         firstDisplayName = firstDisplayName + "_updated";
         editPage.setStudyAccessDisplayName(0, firstDisplayName);
-        editPage.submit();
+        editPage.saveAndClose();
 
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));

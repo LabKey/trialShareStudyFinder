@@ -27,7 +27,6 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
     cubeObject : null,
 
     stripNewLinesFields: [],
-    
 
     initComponent : function()
     {
@@ -43,10 +42,20 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                 style: 'background-color: transparent;',
                 items: [
                     {
-                        text: 'Submit',
+                        text: 'Save',
+                        itemId: 'detailsSaveBtn',
+                        formBind: true,
+                        handler: function (btn)
+                        {
+                            var panel = btn.up('form');
+                            panel.doSubmit(btn);
+                        }
+                    },
+                    {
+                        text: 'Save And Close',
                         itemId: 'detailsSubmitBtn',
                         formBind: true,
-                        successURL: this.nextStepUrl || LABKEY.ActionURL.getParameter('returnUrl') ||  this.manageDataUrl,
+                        successURL: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
                         handler: function (btn)
                         {
                             var panel = btn.up('form');
@@ -55,7 +64,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                     },
                     {
                         text: 'Cancel',
-                        returnUrl: this.manageDataUrl || LABKEY.ActionURL.getParameter('returnUrl'),
+                        returnUrl: LABKEY.ActionURL.getParameter('returnUrl') || this.manageDataUrl,
                         handler: function (btn, key)
                         {
                             window.location = btn.returnUrl;
@@ -63,6 +72,28 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
                     }
                 ]
             }];
+
+            if(LABKEY.ActionURL.getParameter('objectName') === 'publication') {
+                this.dockedItems[0].items.push(
+                    {
+                        xtype: 'tbspacer',
+                        width: 20
+                    }, // adds horizontal spacing between buttons
+                    {
+                        text: 'Workbench',
+                        cls: 'labkey-button-link',
+                        id: 'workbenchUrl',
+                        handler: function (btn)
+                        {
+                            var studyIds = this.getForm().getValues().studyIds;
+                            var url = LABKEY.ActionURL.buildURL('project', 'begin.view', 'Studies/' + studyIds[0] + 'OPR/Study%20Data',
+                                    {pageId: 'Manuscripts', publicationId: LABKEY.ActionURL.getParameter('id')});
+                            window.open(url, '_blank');
+                        },
+                        scope: this
+                    }
+                );
+            }
         }
 
         this.callParent();
@@ -74,10 +105,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
             cls: 'labkey-data-finder-editor-message'
         });
         this.add(this.getFormFields());
-        if (this.cubeObject)
-        {
-            this.bindFormFields();
-        }
+        this.bindFormFields();
     },
 
 
@@ -91,15 +119,12 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
     {
         if (this.cubeObject)
         {
-            for (var fieldName in this.cubeObject)
+            Ext4.iterate(this.cubeObject, function(fieldName, value)
             {
-                if (this.cubeObject.hasOwnProperty(fieldName))
-                {
-                    var field = this.getForm().findField(fieldName);
-                    if (field)
-                        field.setValue(this.cubeObject[fieldName]);
-                }
-            }
+                var field = this.getForm().findField(fieldName);
+                if (field)
+                    field.setValue(value);
+            }, this);
         }
     },
 
@@ -109,17 +134,22 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
         function onSuccess(response, options){
             btn.setDisabled(false);
 
-            var msg = "Your " + this.objectName.toLowerCase() + " was saved.";
-            Ext4.Msg.alert("Success", msg, function(){
+            if(btn.getItemId() === 'detailsSaveBtn')
+            {
+                var id = LABKEY.ActionURL.getParameter('id') || JSON.parse(response.responseText).data || JSON.parse(response.responseText).message;
+                window.location = LABKEY.ActionURL.buildURL('trialshare', 'updateData.view', null, {id: id, objectName : this.objectName.toLowerCase()});
+            }
+            else if(btn.getItemId() === 'detailsSubmitBtn')
+            {
                 window.location = btn.successURL;
-            }, this);
+            }
         }
 
         function onError(response, options){
             btn.setDisabled(false);
 
-            obj = Ext4.JSON.decode(response.responseText);
-            if (obj.errors[0].field == "form")
+            var obj = Ext4.decode(response.responseText);
+            if (obj.errors && obj.errors[0].field == "form")
             {
                 Ext4.Msg.alert("Error", "There were problems submitting your data. " + obj.errors[0].message);
             }

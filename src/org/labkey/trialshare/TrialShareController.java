@@ -1038,13 +1038,19 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(PublicationEditBean form, BindException errors) throws Exception
         {
-            TrialShareManager.get().insertPublication(getUser(), getContainer(), form, errors);
+            Integer publicationId = TrialShareManager.get().insertPublication(getUser(), getContainer(), form, errors);
+            if (publicationId == null)
+            {
+                errors.reject(ERROR_MSG, "Publication insert failed.");
+            }
             if (errors.hasErrors())
+            {
                 return errors;
+            }
             else
             {
                 TrialShareManager.get().refreshPublications(errors);
-                return success();
+                return success(publicationId);
             }
         }
     }
@@ -1087,10 +1093,18 @@ public class TrialShareController extends SpringActionController
         @Override
         public Object execute(StudyEditBean form, BindException errors) throws Exception
         {
-            TrialShareManager.get().insertStudy(getUser(), getContainer(), form, errors);
+            String studyId = TrialShareManager.get().insertStudy(getUser(), getContainer(), form, errors);
+            if (studyId == null)
+            {
+                errors.reject(ERROR_MSG, "Study insert failed.");
+            }
+            if (errors.hasErrors())
+            {
+                return errors;
+            }
             if (!errors.hasErrors())
                 TrialShareManager.get().refreshStudies(errors);
-            return success();
+            return success(studyId);
         }
     }
 

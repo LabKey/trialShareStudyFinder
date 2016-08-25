@@ -175,10 +175,10 @@ public class TrialShareManager
         return publicationIds;
     }
 
-    public void insertPublication(User user, Container container, PublicationEditBean publication, BindException errors)
+    public Integer insertPublication(User user, Container container, PublicationEditBean publication, BindException errors)
     {
         if (publication == null)
-            return;
+            return null;
 
         try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
         {
@@ -199,12 +199,16 @@ public class TrialShareManager
             addJoinTableData(schema.getPublicationTherapeuticAreaTableInfo(), TrialShareQuerySchema.PUBLICATION_ID_FIELD, publicationKey, TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD, publication.getTherapeuticAreas(), user, container);
 
             transaction.commit();
+
+            return publicationKey;
         }
         catch (Exception e)
         {
             _logger.error(e);
             errors.reject(ERROR_MSG, "Publication insert failed: " + e.getMessage());
         }
+
+        return null;
     }
 
     public void updatePublication(User user, Container container, PublicationEditBean publication, BindException errors)
@@ -247,6 +251,7 @@ public class TrialShareManager
             errors.reject(ERROR_MSG, "Publication update failed: " + e.getMessage());
         }
 
+        return;
     }
 
 
@@ -345,17 +350,17 @@ public class TrialShareManager
 
     }
 
-    public void insertStudy(@NotNull User user, @NotNull Container container, StudyEditBean study, BindException errors)
+    public String insertStudy(@NotNull User user, @NotNull Container container, StudyEditBean study, BindException errors)
     {
         if (study == null)
         {
             errors.reject(ERROR_MSG, "No study data provided to update");
-            return;
+            return null;
         }
         if (study.getStudyId() == null)
         {
             errors.reject(ERROR_MSG, "No study id provided");
-            return;
+            return null;
         }
 
         try (DbScope.Transaction transaction = TrialShareQuerySchema.getSchema(user, container).getDbSchema().getScope().ensureTransaction())
@@ -378,12 +383,16 @@ public class TrialShareManager
             addStudyAccessData(schema.getStudyAccessTableInfo(), studyId, study.getStudyAccessList(), user, container);
 
             transaction.commit();
+
+            return studyId;
         }
         catch (Exception e)
         {
             _logger.error(e);
             errors.reject(ERROR_MSG, "Problem inserting study " + e.getMessage());
         }
+
+        return null;
     }
 
 
