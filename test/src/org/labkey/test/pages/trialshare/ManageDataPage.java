@@ -68,7 +68,7 @@ public class ManageDataPage extends LabKeyPage
     public void goToInsertNew()
     {
         log("Going to insert new " + _objectType);
-        doAndWaitForPageToLoad(() -> _table.clickHeaderButtonByText("Insert New"));
+        doAndWaitForPageToLoad(() -> _table.clickHeaderButtonByText("Insert New Row"));
     }
 
     public int getRowIndex(String value)
