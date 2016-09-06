@@ -149,7 +149,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         if (!this.insertNewLink) {
             this.insertNewLink = Ext4.create("Ext.button.Button", {
                 text: 'Insert New',
-                cls: 'labkey-text-link labkey-finder-manage-data',
+                cls: 'labkey-text-link labkey-finder-insert-new',
                 componentCls: 'labkey-finder-insert-new',
                 scope: this,
                 handler: function() {
