@@ -94,6 +94,24 @@ public class ManagePublicationsTest extends DataFinderTestBase
     }
 
     @Test
+    public void testInsertNewDataLinkPermissions()
+    {
+        log("Checking for insert new data link");
+        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        Assert.assertTrue("Insert New link is not available", dataFinder.canInsertNewData());
+        dataFinder.goToInsertNewData();
+        switchToWindow(1);
+        assertTextPresent("Insert Publication");
+        getDriver().close();
+        switchToMainWindow();
+        log("Impersonating user without insert permission");
+        goToProjectHome();
+        impersonate(PUBLIC_READER);
+        goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        Assert.assertFalse("Insert New link should not be available", dataFinder.canManageData());
+    }
+
+    @Test
     public void testManageDataLinkPermissions()
     {
         log("Checking for manage data link");

@@ -67,6 +67,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
             success: function (userPerms, resp) {
                 if (LABKEY.Security.hasPermission(userPerms.container.permissions, LABKEY.Security.permissions.insert))
                 {
+                    this.items.items.push(this.getInsertNewLink());
                     this.items.items.push(this.getManageDataLink());
                 }
             },
@@ -142,6 +143,24 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
             });
         }
         return this.manageDataLink;
+    },
+
+    getInsertNewLink: function() {
+        if (!this.insertNewLink) {
+            this.insertNewLink = Ext4.create("Ext.button.Button", {
+                text: 'Insert New',
+                cls: 'labkey-text-link labkey-finder-manage-data',
+                componentCls: 'labkey-finder-insert-new',
+                scope: this,
+                handler: function() {
+                    window.open(LABKEY.ActionURL.buildURL(this.dataModuleName, "insertDataForm.view", null, {
+                        objectName : this.objectName,
+                        'query.viewName' : 'manageData'
+                    }), '_blank');
+                }
+            });
+        }
+        return this.insertNewLink;
     },
 
     getHelpLinks: function() {
