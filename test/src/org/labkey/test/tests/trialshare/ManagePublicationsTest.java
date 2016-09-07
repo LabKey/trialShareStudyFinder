@@ -417,6 +417,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         editPage.setFormFields(updatedFields, false);
         Assert.assertFalse("Workbench button should be disabled if data has changed", editPage.isWorkbenchEnabled());
         editPage.save();
+        sleep(500); // HACK!  Tests on Windows need a break here.
         Map<String, String> unexpectedValues = editPage.compareFormValues(updatedFields);
         Assert.assertTrue("Found unexpected values in edit page of updated publication: " + unexpectedValues, unexpectedValues.isEmpty());
     }
