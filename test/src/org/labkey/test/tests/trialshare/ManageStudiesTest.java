@@ -59,7 +59,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         Assert.assertTrue("Insert New link is not available", dataFinder.canInsertNewData());
         dataFinder.goToInsertNewData();
         switchToWindow(1);
-        assertTextPresent("Insert Study");
+        waitForText("Insert Study");
         getDriver().close();
         switchToMainWindow();
         log("Impersonating user without insert permission");

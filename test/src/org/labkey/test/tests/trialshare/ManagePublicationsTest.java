@@ -101,7 +101,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         Assert.assertTrue("Insert New link is not available", dataFinder.canInsertNewData());
         dataFinder.goToInsertNewData();
         switchToWindow(1);
-        assertTextPresent("Insert Publication");
+        waitForText("Insert Publication");
         getDriver().close();
         switchToMainWindow();
         log("Impersonating user without insert permission");
