@@ -94,6 +94,24 @@ public class ManagePublicationsTest extends DataFinderTestBase
     }
 
     @Test
+    public void testInsertNewDataLinkPermissions()
+    {
+        log("Checking for insert new data link");
+        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        Assert.assertTrue("Insert New link is not available", dataFinder.canInsertNewData());
+        dataFinder.goToInsertNewData();
+        switchToWindow(1);
+        waitForText("Insert Publication");
+        getDriver().close();
+        switchToMainWindow();
+        log("Impersonating user without insert permission");
+        goToProjectHome();
+        impersonate(PUBLIC_READER);
+        goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        Assert.assertFalse("Insert New link should not be available", dataFinder.canManageData());
+    }
+
+    @Test
     public void testManageDataLinkPermissions()
     {
         log("Checking for manage data link");
@@ -399,6 +417,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         editPage.setFormFields(updatedFields, false);
         Assert.assertFalse("Workbench button should be disabled if data has changed", editPage.isWorkbenchEnabled());
         editPage.save();
+        sleep(500); // HACK!  Tests on Windows need a break here.
         Map<String, String> unexpectedValues = editPage.compareFormValues(updatedFields);
         Assert.assertTrue("Found unexpected values in edit page of updated publication: " + unexpectedValues, unexpectedValues.isEmpty());
     }
