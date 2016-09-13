@@ -65,6 +65,19 @@ public class DataFinderPage extends LabKeyPage
         return this.testingStudies ? isElementPresent(Locators.manageStudyData) : isElementPresent(Locators.managePublicationData);
     }
 
+    public boolean canInsertNewData()
+    {
+        return this.testingStudies ? isElementPresent(Locators.insertNewStudy) : isElementPresent(Locators.insertNewPublication);
+    }
+
+    public void goToInsertNewData()
+    {
+        if (this.testingStudies)
+            Locators.insertNewStudy.findElement(this.getDriver()).click();
+        else
+            Locators.insertNewPublication.findElement(this.getDriver()).click();
+    }
+
     public void goToManageData()
     {
         if (this.testingStudies)
@@ -299,6 +312,8 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.IdLocator manageMenu = Locator.id("manageMenu");
         public static final Locator.CssLocator managePublicationData = Locator.css(".labkey-publications-panel .labkey-finder-manage-data");
         public static final Locator.CssLocator manageStudyData = Locator.css(".labkey-studies-panel .labkey-finder-manage-data");
+        public static final Locator.CssLocator insertNewStudy = Locator.css(".labkey-studies-panel .labkey-finder-insert-new");
+        public static final Locator.CssLocator insertNewPublication = Locator.css(".labkey-publications-panel .labkey-finder-insert-new");
 
         public static final Locator.CssLocator getSearchInput(Locator.CssLocator locator)
         {
