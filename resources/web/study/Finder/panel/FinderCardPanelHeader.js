@@ -67,7 +67,8 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
             success: function (userPerms, resp) {
                 if (LABKEY.Security.hasPermission(userPerms.container.permissions, LABKEY.Security.permissions.insert))
                 {
-                    this.items.items.push(this.getInsertNewLink());
+                    if (this.objectName == "Publication")
+                        this.items.items.push(this.getInsertNewLink());
                     this.items.items.push(this.getManageDataLink());
                 }
             },
