@@ -36,8 +36,6 @@ import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.DataRegionSelection;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
-import org.labkey.api.exp.list.ListDefinition;
-import org.labkey.api.exp.list.ListService;
 import org.labkey.api.query.QueryForm;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
@@ -1256,8 +1254,6 @@ public class TrialShareController extends SpringActionController
             }
             else
             {
-                ListDefinition def = ListService.get().getList(getContainer(), TrialShareQuerySchema.STUDY_ACCESS_TABLE);
-                bean.setAccessListId(def.getListId());
                 JspView<CubeObjectNameForm> view = new JspView("/org/labkey/trialshare/view/studyDetails.jsp", bean);
 
                 if (bean.getId() != null)
