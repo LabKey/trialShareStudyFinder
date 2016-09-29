@@ -136,7 +136,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
                 scope: this,
                 // renderTo: this.objectName + '-manage-data-link',
                 handler: function() {
-                    window.open(LABKEY.ActionURL.buildURL(this.dataModuleName, "manageData.view", null, {
+                    window.open(LABKEY.ActionURL.buildURL(this.dataModuleName, "manageData.view", this.cubeContainerPath, {
                         objectName : this.objectName,
                         'query.viewName' : 'manageData'
                     }), '_blank');
@@ -154,7 +154,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
                 componentCls: 'labkey-finder-insert-new',
                 scope: this,
                 handler: function() {
-                    window.open(LABKEY.ActionURL.buildURL(this.dataModuleName, "insertDataForm.view", null, {
+                    window.open(LABKEY.ActionURL.buildURL(this.dataModuleName, "insertDataForm.view", this.cubeContainerPath, {
                         objectName : this.objectName,
                         'query.viewName' : 'manageData'
                     }), '_blank');
