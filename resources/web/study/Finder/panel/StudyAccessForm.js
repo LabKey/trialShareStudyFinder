@@ -12,6 +12,7 @@ Ext4.define('LABKEY.study.panel.StudyAccessForm', {
     },
     getFormFields: function()
     {
+        var me = this;
         var items = [];
         items.push(
                 {
@@ -23,8 +24,9 @@ Ext4.define('LABKEY.study.panel.StudyAccessForm', {
                     allowBlank      : false,
                     name            : 'visibility',
                     store           : {
-                        model   : 'LABKEY.study.data.Visibility',
-                        autoLoad: true
+                        model       : 'LABKEY.study.data.Visibility',
+                        autoLoad    : true,
+                        proxy       : LABKEY.study.util.CubeObjectHelper.getModelProxy('visibility', me.cubeContainerPath)
                     },
                     fieldLabel      : 'Visibility *',
                     labelWidth      : this.defaultFieldLabelWidth,
