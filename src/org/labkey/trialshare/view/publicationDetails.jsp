@@ -51,7 +51,8 @@
             mode: "<%=h(bean.getMode())%>",
             objectName : 'Publication',
             renderTo: <%=q(renderId)%>,
-            cubeObject : <%= text( cubeObjectJson )%>
+            cubeObject : <%= text( cubeObjectJson )%>,
+            cubeContainerPath: "<%=h(bean.getCubeContainerPath())%>"
         });
     });
 </script>

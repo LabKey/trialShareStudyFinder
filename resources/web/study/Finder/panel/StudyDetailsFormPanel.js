@@ -17,6 +17,7 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
 
     getFormFields: function()
     {
+        var me = this;
         var items = [];
         items.push(
                 {
@@ -84,7 +85,8 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     editable        : false,
                     store           : {
                         model       : 'LABKEY.study.data.StudyType',
-                        autoLoad    :   true
+                        autoLoad    :   true,
+                        proxy       : LABKEY.study.util.CubeObjectHelper.getModelProxy('studyType', me.cubeContainerPath)
                     }
                 });
         items.push(
@@ -161,7 +163,8 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     editable        : false,
                     store           : {
                         model       : 'LABKEY.study.data.AgeGroup',
-                        autoLoad    :   true
+                        autoLoad    :   true,
+                        proxy       : LABKEY.study.util.CubeObjectHelper.getModelProxy('ageGroup', me.cubeContainerPath)
                     }
                 });
         items.push(
@@ -182,7 +185,8 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     editable        : false,
                     store           : {
                         model       : 'LABKEY.study.data.Phase',
-                        autoLoad    :   true
+                        autoLoad    :   true,
+                        proxy       : LABKEY.study.util.CubeObjectHelper.getModelProxy('Phase', me.cubeContainerPath)
                     }
                 });
         items.push(
@@ -196,8 +200,9 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     labelCls        : this.fieldLabelClsName,
                     name            : 'conditions',
                     store : {
-                        model   : 'LABKEY.study.data.Condition',
-                        autoLoad: true
+                        model       : 'LABKEY.study.data.Condition',
+                        autoLoad    : true,
+                        proxy       : LABKEY.study.util.CubeObjectHelper.getModelProxy('condition', me.cubeContainerPath)
                     },
                     fieldLabel      : 'Conditions',
                     labelWidth      : this.defaultFieldLabelWidth,
@@ -219,8 +224,9 @@ Ext4.define('LABKEY.study.panel.StudyDetailsFormPanel', {
                     labelCls        : this.fieldLabelClsName,
                     name            : 'therapeuticAreas',
                     store : {
-                        model   : 'LABKEY.study.data.TherapeuticArea',
-                        autoLoad: true
+                        model       : 'LABKEY.study.data.TherapeuticArea',
+                        autoLoad    : true,
+                        proxy       : LABKEY.study.util.CubeObjectHelper.getModelProxy('therapeuticArea', me.cubeContainerPath)
                     },
                     fieldLabel      : 'Therapeutic Areas',
                     labelWidth      : this.defaultFieldLabelWidth,
