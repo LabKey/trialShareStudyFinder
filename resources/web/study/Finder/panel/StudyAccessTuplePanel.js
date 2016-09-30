@@ -82,7 +82,8 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
 
         var form = Ext4.create('LABKEY.study.panel.StudyAccessForm', {
             mode: this.mode,
-            store : studyAccessStore
+            store : studyAccessStore,
+            cubeContainerPath: this.cubeContainerPath
         });
         formItems.push(form);
 
