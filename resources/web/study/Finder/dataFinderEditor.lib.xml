@@ -4,6 +4,8 @@
         <script path="study/Finder/dataFinder.css"/>
         <script path="study/Finder/trialShare.css"/>
 
+        <script path="study/Finder/util/CubeObjectHelper.js"/>
+
         <script path="study/Finder/data/AgeGroup.js"/>
         <script path="study/Finder/data/Condition.js"/>
         <script path="study/Finder/data/Container.js"/>

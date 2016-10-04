@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.FormHandlerAction;
 import org.labkey.api.action.FormViewAction;
@@ -1246,6 +1247,7 @@ public class TrialShareController extends SpringActionController
         {
             setTitle(StringUtils.capitalize(getMode()) + bean.getObjectName().getDisplayName());
             bean.setMode(getMode());
+            bean.setCubeContainer(TrialShareManager.get().getCubeContainer(getContainer()));
             if (bean.getObjectName() == ObjectName.publication)
             {
                 if (bean.getId() != null)
@@ -1281,6 +1283,8 @@ public class TrialShareController extends SpringActionController
         private Integer _accessListId; // identifier of the list that containes access parameters (used only for studies currently)
         private String _mode;
         private Object _id;
+        private String _cubeContainerPath;
+        private String _cubeContainerId;
 
         public CubeObjectDetailForm()
         {
@@ -1327,6 +1331,35 @@ public class TrialShareController extends SpringActionController
                 return "Key";
             else
                 return "StudyId";
+        }
+
+        public void setCubeContainer(@Nullable Container cubeContainer)
+        {
+            if (cubeContainer != null)
+            {
+                _cubeContainerId = cubeContainer.getId();
+                _cubeContainerPath = cubeContainer.getPath();
+            }
+        }
+
+        public String getCubeContainerId()
+        {
+            return _cubeContainerId;
+        }
+
+        public void setCubeContainerId(String cubeContainerId)
+        {
+            _cubeContainerId = cubeContainerId;
+        }
+
+        public String getCubeContainerPath()
+        {
+            return _cubeContainerPath;
+        }
+
+        public void setCubeContainerPath(String cubeContainerPath)
+        {
+            _cubeContainerPath = cubeContainerPath;
         }
 
     }

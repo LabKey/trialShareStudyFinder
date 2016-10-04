@@ -65,7 +65,8 @@
             renderTo: <%=q(renderId)%>,
             accessListId : <%= bean.getAccessListId() %>,
             cubeObject : <%= text( cubeObjectJson )%>,
-            studyaccesslist: <%= text( studyaccesslist )%>
+            studyaccesslist: <%= text( studyaccesslist )%>,
+            cubeContainerPath: "<%=h(bean.getCubeContainerPath())%>"
         });
     });
 </script>

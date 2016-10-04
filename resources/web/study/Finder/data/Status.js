@@ -3,19 +3,6 @@ Ext4.define('LABKEY.study.data.Status', {
 
     idProperty: 'status',
 
-    proxy : {
-        type : 'ajax',
-        url    : LABKEY.ActionURL.buildURL('query', 'selectRows.api'),
-        extraParams : {
-            schemaName  : 'lists',
-            queryName   : 'status'
-        },
-        reader : {
-            type : 'json',
-            root : 'rows'
-        }
-    },
-    
     fields: [
         {name: 'status'}
     ]

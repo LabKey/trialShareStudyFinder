@@ -168,7 +168,7 @@ Ext4.define('LABKEY.study.panel.CubeObjectDetailsFormPanel', {
         }
 
         Ext4.Ajax.request({
-            url: LABKEY.ActionURL.buildURL('trialShare', this.mode + this.objectName + ".api"),
+            url: LABKEY.ActionURL.buildURL('trialShare', this.mode + this.objectName + ".api", this.cubeContainerPath),
             method: 'POST',
             jsonData: this.getFieldValues(),
             success: onSuccess,
