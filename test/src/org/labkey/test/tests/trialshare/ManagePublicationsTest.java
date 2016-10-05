@@ -13,6 +13,9 @@ import org.labkey.test.pages.trialshare.PublicationEditPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
 import org.labkey.test.pages.trialshare.StudiesListHelper;
 
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -414,6 +417,31 @@ public class ManagePublicationsTest extends DataFinderTestBase
 
         manageData.goToEditRecord((String) initialFields.get(TITLE));
         Assert.assertTrue("Workbench button should be enabled if data has not changed", editPage.isWorkbenchEnabled());
+
+        try
+        {
+            int winCount = getDriver().getWindowHandles().size();
+            clickButton("Workbench", 0);
+
+            // Wait for the window to show up.
+            while(getDriver().getWindowHandles().size() == winCount)
+                sleep(500);
+
+            switchToWindow(1);
+            String url = getDriver().getCurrentUrl();
+            String decodedUrl = URLDecoder.decode(url, "UTF-8");
+            Assert.assertEquals("Decoded url pointed to by the 'Workbench' button doesn't look right. Is it double encoded? '" + url + "'", decodedUrl, URLDecoder.decode(decodedUrl, "UTF-8"));
+        }
+        catch(java.io.UnsupportedEncodingException uee)
+        {
+            log("Got a UnsupportedEncodingException, going skip the encoding test.");
+        }
+        finally
+        {
+            getDriver().close();
+            switchToMainWindow();
+        }
+
         editPage.setFormFields(updatedFields, false);
         Assert.assertFalse("Workbench button should be disabled if data has changed", editPage.isWorkbenchEnabled());
         editPage.save();
