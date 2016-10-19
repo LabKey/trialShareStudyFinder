@@ -13,8 +13,6 @@ import org.labkey.test.pages.trialshare.PublicationEditPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
 import org.labkey.test.pages.trialshare.StudiesListHelper;
 
-import java.net.URI;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
@@ -271,6 +269,87 @@ public class ManagePublicationsTest extends DataFinderTestBase
         manageData.goToEditRecord((String) newFields.get(TITLE));
         unexpectedValues = editPage.compareFormValues(newFields);
         Assert.assertTrue("Found unexpected values in edit page of newly inserted publication: " + unexpectedValues, unexpectedValues.isEmpty());
+    }
+
+    @Test
+    public void testCountsAfterInsertAndEdit()
+    {
+        goToProjectHome();
+        StudiesListHelper studiesListHelper = new StudiesListHelper(this);
+        studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
+        studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
+        goToProjectHome();
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
+        DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
+        finder.clearAllFilters();
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> beforeCounts = fg.getAllMemberCounts();
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        ManageDataPage manageData = new ManageDataPage(this, _objectType);
+
+        Map<String, Object> newFields = new HashMap<>();
+        // add the count so multiple runs of this test have distinct titles
+        int count = manageData.getCount();
+        newFields.put(PublicationEditPage.TITLE, "testCountsAfterInsertAndEdit_" + count);
+        newFields.put(PublicationEditPage.STATUS, "In Progress");
+        newFields.put(PublicationEditPage.SUBMISSION_STATUS, "Submitted");
+        newFields.put(PublicationEditPage.PUBLICATION_TYPE, "Manuscript");
+        newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
+        newFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
+        newFields.put(PublicationEditPage.YEAR, "2016");
+
+        newFields.put(PublicationEditPage.MANUSCRIPT_CONTAINER, PUBLIC_STUDY_SUBFOLDER_NAME);
+        newFields.put(PublicationEditPage.PERMISSIONS_CONTAINER, OPERATIONAL_STUDY_SUBFOLDER_NAME);
+
+        manageData.goToInsertNew();
+        PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
+
+        editPage.setFormFields(newFields, true);
+        editPage.saveAndClose();
+
+        goToProjectHome();
+        goDirectlyToDataFinderPage(getProjectName(), false);
+        finder.clearAllFilters();
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> afterInsertCounts = fg.getAllMemberCounts();
+        assertEquals("Count for 'In Progress' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.STATUS, "In Progress")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.STATUS, "In Progress"));
+        assertEquals("Count for 'Submitted' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted"));
+        assertEquals("Count for 'Manuscript' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript"));
+        assertEquals("Count for 'Autoimmune' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Autoimmune")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Autoimmune"));
+        assertEquals("Count for '" + PUBLIC_STUDY_NAME + "' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUB_STUDY, PUBLIC_STUDY_ID)+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PUB_STUDY, PUBLIC_STUDY_ID));
+        assertEquals("Count for '2016' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.YEAR, "2016")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.YEAR, "2016"));
+
+
+        // Now edit the above fields to have different values and check counts again.
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        manageData.goToEditRecord((String) newFields.get(TITLE));
+        newFields.remove(PublicationEditPage.TITLE);
+        newFields.put(PublicationEditPage.STATUS, "Complete");
+        newFields.put(PublicationEditPage.SUBMISSION_STATUS, "Draft");
+        newFields.put(PublicationEditPage.PUBLICATION_TYPE, "Abstract");
+        // for these two multi-select fields, the items that are selected will be deselected and ones not selected will be selected
+        newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune", "Allergy"});
+        newFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID, OPERATIONAL_STUDY_ID});
+        newFields.put(PublicationEditPage.YEAR, "2014");
+
+        editPage.setFormFields(newFields, false);
+        editPage.saveAndClose();
+        goToProjectHome();
+        goDirectlyToDataFinderPage(getProjectName(), false);
+        finder.clearAllFilters();
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> afterEditCounts = fg.getAllMemberCounts();
+        assertEquals("Count for 'In Progress' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.STATUS, "In Progress"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.STATUS, "In Progress"));
+        assertEquals("Count for 'Complete' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.STATUS, "Complete")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.STATUS, "Complete"));
+        assertEquals("Count for 'Submitted' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted"));
+        assertEquals("Count for 'Draft' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Draft")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Draft"));
+        assertEquals("Count for 'Manuscript' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript"));
+        assertEquals("Count for 'Abstract' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Abstract")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Abstract"));
+        assertEquals("Count for 'Autoimmune' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Autoimmune"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Autoimmune"));
+        assertEquals("Count for 'Allergy' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy"));
+        assertEquals("Count for '" + PUBLIC_STUDY_ID + "' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUB_STUDY, PUBLIC_STUDY_ID), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUB_STUDY, PUBLIC_STUDY_ID));
+        assertEquals("Count for '" + OPERATIONAL_STUDY_ID + "' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PUB_STUDY, OPERATIONAL_STUDY_ID)+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUB_STUDY, OPERATIONAL_STUDY_ID));
+        assertEquals("Count for '2016' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.YEAR, "2016"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.YEAR, "2016"));
+        assertEquals("Count for '2014' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.YEAR, "2014")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.YEAR, "2014"));
     }
 
     @Test
