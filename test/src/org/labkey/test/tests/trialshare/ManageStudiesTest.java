@@ -185,6 +185,84 @@ public class ManageStudiesTest extends DataFinderTestBase
     }
 
     @Test
+    public void testCountsAfterInsertAndEdit()
+    {
+        goToProjectHome();
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
+        DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
+        finder.clearAllFilters();
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> beforeCounts = fg.getAllMemberCounts();
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        ManageDataPage manageData = new ManageDataPage(this, _objectType);
+
+        int count = manageData.getCount();
+        Map<String, Object> newFields = new HashMap<>();
+        // add the count so multiple runs of this test have distinct titles
+        newFields.put(StudyEditPage.SHORT_NAME, "TCAIAE" + count);
+        newFields.put(StudyEditPage.STUDY_ID, "TCAIAE_ID" + count);
+        newFields.put(StudyEditPage.TITLE, "testCountsAfterInsertAndEdit_" + count);
+
+        newFields.put(StudyEditPage.THERAPEUTIC_AREAS, new String[]{"T1DM"});
+        newFields.put(StudyEditPage.STUDY_TYPE, "Interventional");
+        newFields.put(StudyEditPage.AGE_GROUPS, new String[]{"Child"});
+        newFields.put(StudyEditPage.PHASES, new String[]{"Phase 0"});
+        newFields.put(StudyEditPage.CONDITIONS, new String[]{"Eczema"});
+
+        manageData.goToInsertNew();
+        StudyEditPage editPage = new StudyEditPage(this.getDriver());
+
+        editPage.setFormFields(newFields);
+
+        Map<String, Object> studyAccessFields = new HashMap<>();
+        studyAccessFields.put(StudyEditPage.VISIBILITY, "Public");
+        studyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/home");
+
+        log("Set values for the first study access form");
+        editPage.setStudyAccessFormValues(0, studyAccessFields);
+        editPage.saveAndClose();
+
+        goToProjectHome();
+        goDirectlyToDataFinderPage(getProjectName(), true);
+
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> afterInsertCounts = fg.getAllMemberCounts();
+        assertEquals("Count for 'T1DM' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "TIDM")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "T1DM"));
+        assertEquals("Count for 'Interventional' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.STUDY_TYPE, "Interventional")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.STUDY_TYPE, "Interventional"));
+        assertEquals("Count for 'Child' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.AGE_GROUP, "Child")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.AGE_GROUP, "Child"));
+        assertEquals("Count for 'Phase 0' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PHASE, "Phase 0")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PHASE, "Phase 0"));
+        assertEquals("Count for 'Eczema' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.CONDITION, "Eczema")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.CONDITION, "Eczema"));
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        manageData.goToEditRecord((String) newFields.get(StudyEditPage.STUDY_ID));
+        newFields.put(StudyEditPage.THERAPEUTIC_AREAS, new String[]{"Transplant"}); // add transplant and leave T1DM
+        newFields.put(StudyEditPage.STUDY_TYPE, "Expanded Access");
+        newFields.put(StudyEditPage.AGE_GROUPS, new String[]{"Senior"}); // add senior and leave child
+        newFields.put(StudyEditPage.PHASES, new String[]{"Phase 0", "Phase 1"}); // remove Phase 0 and add Phase 1
+        newFields.put(StudyEditPage.CONDITIONS, new String[]{"Eczema", "Allergy", "Cat Allergy"}); // remove Eczema and add two allergies
+        newFields.remove(StudyEditPage.SHORT_NAME);
+        newFields.remove(StudyEditPage.STUDY_ID);
+        newFields.remove(StudyEditPage.TITLE);
+
+        editPage.setFormFields(newFields);
+        editPage.saveAndClose();
+        goToProjectHome();
+        goDirectlyToDataFinderPage(getProjectName(), true);
+        finder.clearAllFilters();
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> afterEditCounts = fg.getAllMemberCounts();
+        assertEquals("Count for 'T1DM' updated when it should not have been", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "T1DM"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "T1DM"));
+        assertEquals("Count for 'Transplant' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Transplant") + 1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Transplant"));
+        assertEquals("Count for 'Interventional' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.STUDY_TYPE, "Interventional"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.STUDY_TYPE, "Intervetnional"));
+        assertEquals("Count for 'Expanded Access' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.STUDY_TYPE, "Expanded Access") + 1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.STUDY_TYPE, "Expanded Access"));
+        assertEquals("Count for 'Child' updated when it should not have been", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.AGE_GROUP, "Child"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.AGE_GROUP, "Child"));
+        assertEquals("Count for 'Senior' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.AGE_GROUP, "Senior") + 1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.AGE_GROUP, "Senior"));
+        assertEquals("Count for 'Phase 0' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PHASE, "Phase 0"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PHASE, "Phase 0"));
+        assertEquals("Count for 'Phase 1' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PHASE, "Phase 1") + 1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PHASE, "Phase 1"));
+        assertEquals("Count for 'Eczema' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.CONDITION, "Eczema"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.CONDITION, "Eczema"));
+        assertEquals("Count for 'Allergy' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.CONDITION, "Allergy") + 1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.CONDITION, "Allergy"));
+        assertEquals("Count for 'Cat Allergy' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.CONDITION, "Cat Allergy") + 1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.CONDITION, "Cat Allergy"));
+    }
+
+    @Test
     public void testInsertMultiValuedFields()
     {
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
@@ -373,8 +451,8 @@ public class ManageStudiesTest extends DataFinderTestBase
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
-        String shortName = "TIAR" + count;
-        String studyId = "TIAR_ID" + count;
+        String shortName = "TIWR" + count;
+        String studyId = "TIWR_ID" + count;
         createStudy(shortName, false);
 
         Map<String, Object> initialFields = new HashMap<>();
