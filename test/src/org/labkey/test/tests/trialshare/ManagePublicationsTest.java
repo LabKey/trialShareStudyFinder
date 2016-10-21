@@ -324,7 +324,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         manageData.goToEditRecord((String) newFields.get(TITLE));
         newFields.remove(PublicationEditPage.TITLE);
-        newFields.put(PublicationEditPage.STATUS, "Complete");
+        // Don't update Status because we will be left with nothing in progress and then the status and submission status facets disappear
         newFields.put(PublicationEditPage.SUBMISSION_STATUS, "Draft");
         newFields.put(PublicationEditPage.PUBLICATION_TYPE, "Abstract");
         // for these two multi-select fields, the items that are selected will be deselected and ones not selected will be selected
@@ -338,8 +338,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         goDirectlyToDataFinderPage(getProjectName(), false);
         finder.clearAllFilters();
         Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> afterEditCounts = fg.getAllMemberCounts();
-        assertEquals("Count for 'In Progress' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.STATUS, "In Progress"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.STATUS, "In Progress"));
-        assertEquals("Count for 'Complete' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.STATUS, "Complete")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.STATUS, "Complete"));
+        assertEquals("Count for 'In Progress' updated when it should not have been", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.STATUS, "In Progress"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.STATUS, "In Progress"));
         assertEquals("Count for 'Submitted' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted"));
         assertEquals("Count for 'Draft' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Draft")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Draft"));
         assertEquals("Count for 'Manuscript' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript"));
