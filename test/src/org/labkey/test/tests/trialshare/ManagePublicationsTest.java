@@ -225,7 +225,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         switchToWindow(1);
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
         editPage.saveAndClose("Data Finder");
-        sleep(1000);
+        sleep(1000); // yes, it's a hack.  But everyone needs sleep at some point.
         // we should go back to the finder page and have the publication tab active
         Assert.assertTrue("Publications tab on finder should be active after save and close", finder.isFinderObjectSelected("Publications"));
     }
@@ -584,11 +584,11 @@ public class ManagePublicationsTest extends DataFinderTestBase
         manageData.deleteRecord((String) initialFields.get(PublicationEditPage.TITLE));
         PublicationsListHelper listHelper = new PublicationsListHelper(this);
 
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found deleted publication", 0, listHelper.getPublicationCount((String) initialFields.get(PublicationEditPage.TITLE), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found studies for deleted publication", 0, listHelper.getPublicationStudyCount((String) initialFields.get(PublicationEditPage.TITLE), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found therapeutic areas for deleted publication", 0, listHelper.getPublicationTherapeuticAreaCount((String) initialFields.get(PublicationEditPage.TITLE), true));
     }
 

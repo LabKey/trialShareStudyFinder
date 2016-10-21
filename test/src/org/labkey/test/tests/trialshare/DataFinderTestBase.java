@@ -167,7 +167,6 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
 
         containerHelper.deleteProject(getDataProjectName(), false);
         containerHelper.createProject(getDataProjectName(), "Custom");
-        containerHelper.addCreatedProject(getDataProjectName());
         containerHelper.enableModule(MODULE_NAME);
         goToProjectHome(getDataProjectName());
         importLists();

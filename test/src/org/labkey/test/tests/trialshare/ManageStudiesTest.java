@@ -425,17 +425,17 @@ public class ManageStudiesTest extends DataFinderTestBase
         log("Finished deleting record " + initialFields.get(StudyEditPage.STUDY_ID) + ". Going home");
         StudiesListHelper listHelper = new StudiesListHelper(this);
 
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found deleted study", 0, listHelper.getStudyCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found age group(s) for deleted study", 0, listHelper.getStudyAgeGroupCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found condition(s) for deleted study", 0, listHelper.getStudyConditionCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found therapeutic area(s) for deleted study", 0, listHelper.getStudyTherapeuticAreaCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found phase(s) for deleted study", 0, listHelper.getStudyPhaseCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found study access data for deleted study", 0, listHelper.getStudyAccessCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
     }
 
