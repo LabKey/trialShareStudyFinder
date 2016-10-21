@@ -23,7 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
@@ -33,15 +32,11 @@ import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
 import org.labkey.test.pages.trialshare.StudiesListHelper;
-import org.labkey.test.util.APIContainerHelper;
-import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ReadOnlyTest;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,7 +90,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     }
 
     @Override
-    protected void createStudies()
+    protected void createStudies(String parentProjectName)
     {
         log("Creating a study container for each study");
         for (String subset : studySubsets.keySet())
@@ -103,23 +98,23 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
             for (String accession : studySubsets.get(subset))
             {
                 String name = "DataFinderTest" + subset + accession;
-                createStudy(name, subset.equalsIgnoreCase("operational"));
+                createStudy(getDataProjectName(), name, subset.equalsIgnoreCase("operational"));
             }
         }
-        createStudy(PUBLIC_STUDY_NAME);
-        createStudy(OPERATIONAL_STUDY_NAME);
-        goToProjectHome();
+        createStudy(parentProjectName, PUBLIC_STUDY_NAME);
+        createStudy(parentProjectName, OPERATIONAL_STUDY_NAME);
+        goToProjectHome(getDataProjectName());
         StudiesListHelper queryUpdatePage = new StudiesListHelper(this);
         queryUpdatePage.setStudyContainers();
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         PublicationsListHelper pubUpdatePage = new PublicationsListHelper(this);
-        pubUpdatePage.setPermissionsContainers("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+        pubUpdatePage.setPermissionsContainers("/" + getDataProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getDataProjectName() + "/" + OPERATIONAL_STUDY_NAME);
     }
 
     protected void createUsers()
     {
         log("Creating users and setting permissions");
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
 
         _userHelper.createUser(PUBLIC_READER);
         _userHelper.createUser(CASALE_READER);
@@ -127,7 +122,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
 
         PermissionsEditor permissionsEditor = new PermissionsEditor(this);
 
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         clickAdminMenuItem("Folder", "Permissions");
         permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
 
@@ -218,7 +213,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("Number of studies not as expected", studySubsets.get("Public").size(), cards.size());
         stopImpersonating();
-        doAndWaitForPageSignal(() -> goToProjectHome(), finder.getCountSignal());
+        doAndWaitForPageSignal(this::goToProjectHome, finder.getCountSignal());
 
         sleep(1000);
         Assert.assertTrue("Admin user should see visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
@@ -242,30 +237,6 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("User with access to only WISP-R study should see only that study", 1, cards.size());
         stopImpersonating();
-    }
-
-
-    @Test
-    public void testDataFinderRelocation()
-    {
-        log("Test that we can put the data finder in a project other than the one with the cube definition and lists");
-        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-        containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, false);
-        containerHelper.createProject(RELOCATED_DATA_FINDER_PROJECT, "Custom");
-        containerHelper.addCreatedProject(RELOCATED_DATA_FINDER_PROJECT);
-        containerHelper.enableModule(MODULE_NAME);
-        List<ModulePropertyValue> propList = new ArrayList<>();
-        propList.add(new ModulePropertyValue("TrialShare", "/" + RELOCATED_DATA_FINDER_PROJECT, "DataFinderCubeContainer", getProjectName()));
-        setModuleProperties(propList);
-
-        goToProjectHome(RELOCATED_DATA_FINDER_PROJECT);
-        new PortalHelper(this).addWebPart(WEB_PART_NAME);
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        Assert.assertTrue("Should see the visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
-        facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
-        Assert.assertEquals("Should see all the public data cards", 4, finder.getDataCards().size());
-        goToProjectHome();
     }
 
     @Test
@@ -448,7 +419,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         DataFinderPage.DataCard card = dataCards.get(0);
         Assert.assertEquals("DIAMOND", card.getStudyShortName());
         log("Go to operational study");
-        card.clickGoToStudy("/" + getProjectName() + "/DataFinderTestOperationalDIAMOND");
+        card.clickGoToStudy("/" + getDataProjectName() + "/DataFinderTestOperationalDIAMOND");
     }
 
     @Test
