@@ -84,6 +84,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         createStudy(parentProjectName, OPERATIONAL_STUDY_NAME);
     }
 
+
     @Override
     protected void createUsers()
     {
@@ -232,6 +233,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
         sleep(1000); // yes, it's a hack.  But everyone needs sleep at some point.
         // we should go back to the finder page and have the publication tab active
         Assert.assertTrue("Publications tab on finder should be active after save and close", finder.isFinderObjectSelected("Publications"));
+        getDriver().close();
+        switchToMainWindow();
     }
 
     @Test
@@ -249,6 +252,8 @@ public class ManagePublicationsTest extends DataFinderTestBase
         sleep(500);
         // we should go back to the finder page and have the publication tab active
         Assert.assertTrue("Publications tab on finder should be active after cancel", finder.isFinderObjectSelected("Publications"));
+        getDriver().close();
+        switchToMainWindow();
     }
 
     @Test

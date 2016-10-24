@@ -130,8 +130,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
-        for (String project : _containerHelper.getCreatedProjects())
-            _containerHelper.deleteProject(project, afterTest);
+        _containerHelper.deleteProject(getDataProjectName(), afterTest);
     }
 
     @BeforeClass
@@ -146,7 +145,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     @Override
     protected BrowserType bestBrowser()
     {
-        return BrowserType.CHROME;
+        return BrowserType.FIREFOX;
     }
 
     @Override
