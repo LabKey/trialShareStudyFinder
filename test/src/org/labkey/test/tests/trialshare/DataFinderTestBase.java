@@ -46,7 +46,6 @@ import java.util.Set;
 
 public abstract class DataFinderTestBase extends BaseWebDriverTest
 {
-    static final String DATA_PROJECT_NAME = "TrialShareDataFinderTestData Project";
     static final String MODULE_NAME = "TrialShare";
     static final String WEB_PART_NAME = "TrialShare Data Finder";
     static final String OPERATIONAL_STUDY_NAME = "DataFinderTestOperationalStudy";
@@ -156,10 +155,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
         return Collections.singletonList("TrialShare");
     }
 
-    public String getDataProjectName()
-    {
-        return DATA_PROJECT_NAME;
-    }
+    public abstract String getDataProjectName();
 
     protected void setUpDataProject()
     {

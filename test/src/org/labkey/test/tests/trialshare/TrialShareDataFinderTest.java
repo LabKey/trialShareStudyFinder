@@ -53,6 +53,9 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
 {
     private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
 
+    private static final String PROJECT_NAME = "TrialShareDataFinderTest Project";
+    private static final String DATA_PROJECT_NAME = "TrialShareDataFinderTestData Project";
+
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -72,8 +75,11 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     @Override
     protected String getProjectName()
     {
-        return "TrialShareDataFinderTest Project";
+        return PROJECT_NAME;
     }
+
+    @Override
+    public String getDataProjectName() { return DATA_PROJECT_NAME; }
 
     @Override
     public boolean needsSetup()

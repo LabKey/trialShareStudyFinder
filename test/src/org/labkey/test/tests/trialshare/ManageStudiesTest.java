@@ -25,6 +25,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     CubeObjectType _objectType = CubeObjectType.study;
 
     private static final String PROJECT_NAME = "ManageStudiesTest Project";
+    private static final String DATA_PROJECT_NAME = "ManageStudiesTestData Project";
 
     @Nullable
     @Override
@@ -32,6 +33,9 @@ public class ManageStudiesTest extends DataFinderTestBase
     {
         return PROJECT_NAME;
     }
+
+    @Override
+    public String getDataProjectName() { return DATA_PROJECT_NAME; }
 
     @Override
     protected void createStudies(String parentProjectName)

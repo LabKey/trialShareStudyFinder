@@ -35,6 +35,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
     private static final String PUBLIC_STUDY_ID = "Casale";
     private static final String OPERATIONAL_STUDY_ID = "WISP-R";
     private static final String PROJECT_NAME = "ManagePublicationTest Project";
+    private static final String DATA_PROJECT_NAME = "ManagePublicationsTestData Project";
     private static final String OPERATIONAL_STUDY_SUBFOLDER_NAME = "/" + DATA_PROJECT_NAME + "/" + OPERATIONAL_STUDY_NAME;
     private static final String PUBLIC_STUDY_SUBFOLDER_NAME = "/" + DATA_PROJECT_NAME + "/" + PUBLIC_STUDY_NAME;
 
@@ -72,6 +73,9 @@ public class ManagePublicationsTest extends DataFinderTestBase
     {
         return PROJECT_NAME;
     }
+
+    @Override
+    public String getDataProjectName() { return DATA_PROJECT_NAME; }
 
     @Override
     protected void createStudies(String parentProjectName)
