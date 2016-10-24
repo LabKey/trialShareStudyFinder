@@ -163,6 +163,7 @@ public class DataFinderPage extends LabKeyPage
 
     public void selectDataFinderObject(String text)
     {
+        _ext4Helper.waitForMaskToDisappear();
         Locators.finderObjectTab(text).findElement(getDriver()).click();
     }
 
