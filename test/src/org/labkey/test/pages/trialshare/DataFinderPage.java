@@ -144,33 +144,6 @@ public class DataFinderPage extends LabKeyPage
             search("");
     }
 
-    public void saveGroup(String name)
-    {
-        setFormElement(DataFinderPage.Locators.groupLabelInput, name);
-        clickButtonContainingText("Save", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-        waitForGroupUpdate();
-    }
-
-    public String getGroupLabel()
-    {
-        return DataFinderPage.Locators.groupLabel.findElement(getDriver()).getText().trim();
-    }
-
-    public GroupMenu getMenu(Locator locator)
-    {
-        return new GroupMenu(locator.findElement(getDriver()));
-    }
-
-    public boolean menuIsDisabled(Locator.CssLocator locator)
-    {
-        return isElementPresent(locator.append(" .labkey-disabled-text-link"));
-    }
-
-    public void openMenu(Locator locator)
-    {
-        locator.findElement(getDriver()).click();
-    }
-
     public void navigateToStudies()
     {
         selectDataFinderObject("Studies");
@@ -183,8 +156,14 @@ public class DataFinderPage extends LabKeyPage
         assertElementVisible(DataFinderPage.Locators.pubFinder);
     }
 
+    public boolean isFinderObjectSelected(String text)
+    {
+        return text.equals(Locators.activeFinderObject.findElement(getDriver()).getText());
+    }
+
     public void selectDataFinderObject(String text)
     {
+        _ext4Helper.waitForMaskToDisappear();
         Locators.finderObjectTab(text).findElement(getDriver()).click();
     }
 
@@ -317,6 +296,7 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.CssLocator manageStudyData = Locator.css(".labkey-studies-panel .labkey-finder-manage-data");
         public static final Locator.CssLocator insertNewStudy = Locator.css(".labkey-studies-panel .labkey-finder-insert-new");
         public static final Locator.CssLocator insertNewPublication = Locator.css(".labkey-publications-panel .labkey-finder-insert-new");
+        public static final Locator.CssLocator activeFinderObject = Locator.css(".x4-tab.x4-tab-active");
 
         public static Locator.CssLocator getSearchInput(Locator.CssLocator locator)
         {

@@ -138,7 +138,8 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
                 handler: function() {
                     window.open(LABKEY.ActionURL.buildURL(this.dataModuleName, "manageData.view", this.cubeContainerPath, {
                         objectName : this.objectName,
-                        'query.viewName' : 'manageData'
+                        'query.viewName' : 'manageData',
+                        returnUrl : window.location
                     }), '_blank');
                 }
             });

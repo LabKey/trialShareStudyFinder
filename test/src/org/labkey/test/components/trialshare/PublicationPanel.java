@@ -20,7 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class PublicationPanel extends Component
 {
@@ -95,6 +94,11 @@ public class PublicationPanel extends Component
         return getTextOfElement(Locators.studyShortName);
     }
 
+    public void clickEditLink()
+    {
+        Locators.editLink.findElement(_test.getDriver()).click();
+    }
+
     @LogMethod(quiet = true)
     private String getTextOfElement(Locator el)
     {
@@ -120,6 +124,7 @@ public class PublicationPanel extends Component
         private static Locator.XPathLocator PMCID = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')]//a[contains(text(), 'PMCID')]");
         private static Locator.XPathLocator DOI = Locator.xpath("//div[contains(@class, 'labkey-publication-detail')]//span[contains(@class, 'labkey-publication-identifier')]//a[contains(text(), 'DOI')]");
         private static Locator.CssLocator studyShortName = Locator.css(".labkey-study-short-name");
+        private static Locator.XPathLocator editLink = Locator.linkWithText("Edit");
     }
 
 }

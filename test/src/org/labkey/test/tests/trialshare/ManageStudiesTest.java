@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.Git;
-import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.pages.trialshare.ManageDataPage;
 import org.labkey.test.pages.trialshare.StudiesListHelper;
@@ -26,6 +25,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     CubeObjectType _objectType = CubeObjectType.study;
 
     private static final String PROJECT_NAME = "ManageStudiesTest Project";
+    private static final String DATA_PROJECT_NAME = "ManageStudiesTestData Project";
 
     @Nullable
     @Override
@@ -35,7 +35,10 @@ public class ManageStudiesTest extends DataFinderTestBase
     }
 
     @Override
-    protected void createStudies()
+    public String getDataProjectName() { return DATA_PROJECT_NAME; }
+
+    @Override
+    protected void createStudies(String parentProjectName)
     {
     }
 
@@ -44,18 +47,14 @@ public class ManageStudiesTest extends DataFinderTestBase
     {
         _userHelper.createUser(PUBLIC_READER);
 
-        PermissionsEditor permissionsEditor = new PermissionsEditor(this);
-
-        goToProjectHome();
-        clickAdminMenuItem("Folder", "Permissions");
-        permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
+        makeProjectReadable(getDataProjectName());
     }
 
     @Test
     public void testInsertNewDataLinkPermissions()
     {
         log("Checking for absence of insert new data link");
-        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getCurrentContainerPath(), true);
+        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getProjectName(), true);
         Assert.assertFalse("Insert New link is shown for studies", dataFinder.canInsertNewData());
     }
 
@@ -63,7 +62,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     public void testManageDataLinkPermissions()
     {
         log("Checking for manage data link");
-        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getCurrentContainerPath(), true);
+        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getProjectName(), true);
         Assert.assertTrue("Manage Data link is not available", dataFinder.canManageData());
         dataFinder.goToManageData();
         switchToWindow(1);
@@ -74,16 +73,16 @@ public class ManageStudiesTest extends DataFinderTestBase
         log("Impersonating user without insert permission");
         goToProjectHome();
         impersonate(PUBLIC_READER);
-        goDirectlyToDataFinderPage(getCurrentContainerPath(), true);
+        goDirectlyToDataFinderPage(getProjectName(), true);
         Assert.assertFalse("Manage Data link should not be available", dataFinder.canManageData());
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         assertTextPresent("User does not have permission");
     }
 
     @Test
     public void testSwitchToPublications()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         Assert.assertTrue("Should see a link to manage publications", manageData.hasManagePublicationsLink());
         manageData.goToManagePublications();
@@ -94,19 +93,19 @@ public class ManageStudiesTest extends DataFinderTestBase
     @Test
     public void testGoToInsertNewAndCancel()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
         Assert.assertFalse("Submit button should not be enabled", editPage.isSubmitEnabled());
-        doAndWaitForPageToLoad(() -> editPage.cancel());
+        doAndWaitForPageToLoad(editPage::cancel);
         Assert.assertTrue("Should be manage studies view", manageData.isManageDataView());
     }
 
     @Test
     public void testRequiredFields()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
@@ -141,7 +140,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     @Test
     public void testInsertWithAllFields()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
@@ -178,7 +177,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         newFields.remove(StudyEditPage.PHASES);
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
         manageData.goToEditRecord((String) newFields.get(StudyEditPage.STUDY_ID));
         unexpectedValues = editPage.compareFormValues(newFields);
         Assert.assertTrue("Found unexpected values in edit page of newly inserted study: " + unexpectedValues, unexpectedValues.isEmpty());
@@ -193,7 +192,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         finder.clearAllFilters();
         Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> beforeCounts = fg.getAllMemberCounts();
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
@@ -220,7 +219,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         log("Set values for the first study access form");
         editPage.setStudyAccessFormValues(0, studyAccessFields);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
         goToProjectHome();
         goDirectlyToDataFinderPage(getProjectName(), true);
@@ -232,7 +231,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         assertEquals("Count for 'Phase 0' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PHASE, "Phase 0")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PHASE, "Phase 0"));
         assertEquals("Count for 'Eczema' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.CONDITION, "Eczema")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.CONDITION, "Eczema"));
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         manageData.goToEditRecord((String) newFields.get(StudyEditPage.STUDY_ID));
         newFields.put(StudyEditPage.THERAPEUTIC_AREAS, new String[]{"Transplant"}); // add transplant and leave T1DM
         newFields.put(StudyEditPage.STUDY_TYPE, "Expanded Access");
@@ -244,7 +243,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         newFields.remove(StudyEditPage.TITLE);
 
         editPage.setFormFields(newFields);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
         goToProjectHome();
         goDirectlyToDataFinderPage(getProjectName(), true);
         finder.clearAllFilters();
@@ -265,7 +264,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     @Test
     public void testInsertMultiValuedFields()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
@@ -287,9 +286,9 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
 
         manageData.goToEditRecord((String) newFields.get(StudyEditPage.STUDY_ID));
         Map<String, String> unexpectedValues = editPage.compareFormValues(newFields);
@@ -299,7 +298,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     @Test
     public void testEditMultiValuedFields()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
@@ -321,9 +320,9 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
 
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
 
@@ -338,7 +337,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         newFields.put(StudyEditPage.THERAPEUTIC_AREAS, new String[]{"T1DM"});
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(newFields);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
 
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
@@ -354,7 +353,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     @Test
     public void testUpdateStudy()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
@@ -380,7 +379,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
         Map<String, Object> updatedFields = new HashMap<>();
         updatedFields.put(StudyEditPage.SHORT_NAME, "TUS" + count + "_U");
@@ -403,7 +402,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     @Test
     public void testInsertAndDelete()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
@@ -422,38 +421,38 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         editPage.removeStudyAccessPanel(0);
         editPage.setFormFields(initialFields);
-        editPage.saveAndClose();
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        editPage.saveAndClose("Manage");
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
 
         manageData.deleteRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
 
         log("Finished deleting record " + initialFields.get(StudyEditPage.STUDY_ID) + ". Going home");
         StudiesListHelper listHelper = new StudiesListHelper(this);
 
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found deleted study", 0, listHelper.getStudyCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found age group(s) for deleted study", 0, listHelper.getStudyAgeGroupCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found condition(s) for deleted study", 0, listHelper.getStudyConditionCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found therapeutic area(s) for deleted study", 0, listHelper.getStudyTherapeuticAreaCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found phase(s) for deleted study", 0, listHelper.getStudyPhaseCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found study access data for deleted study", 0, listHelper.getStudyAccessCount((String) initialFields.get(StudyEditPage.STUDY_ID), true));
     }
 
     @Test
     public void testInsertWithoutRefresh()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
         String shortName = "TIWR" + count;
         String studyId = "TIWR_ID" + count;
-        createStudy(shortName, false);
+        createStudy(getDataProjectName(), shortName, false);
 
         Map<String, Object> initialFields = new HashMap<>();
         // add the count so multiple runs of this test have distinct titles
@@ -461,23 +460,23 @@ public class ManageStudiesTest extends DataFinderTestBase
         initialFields.put(StudyEditPage.STUDY_ID, studyId);
         initialFields.put(StudyEditPage.TITLE, "testUpdateStudy_" + count);
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
 
         Map<String, Object> studyAccessFields = new HashMap<>();
         studyAccessFields.put(StudyEditPage.VISIBILITY, "Public");
-        studyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + PROJECT_NAME + "/" + shortName);
+        studyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + DATA_PROJECT_NAME + "/" + shortName);
         studyAccessFields.put(StudyEditPage.DISPLAY_NAME, shortName);
 
         log("Set values for the first study access form");
         editPage.setStudyAccessFormValues(0, studyAccessFields);
 
         editPage.setFormFields(initialFields);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
-        DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), true);
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
         finder.clearAllFilters();
         finder.search(studyId);
         List<DataFinderPage.DataCard> dataCards = finder.getDataCards();
@@ -488,20 +487,20 @@ public class ManageStudiesTest extends DataFinderTestBase
     @Test
     public void testStudyAccessPanel()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
 
         int count = manageData.getCount();
         String shortName = "TSAP" + count;
         String studyId = "TSAP_ID" + count;
-        createStudy(shortName, false);
+        createStudy(getDataProjectName(), shortName, false);
 
         Map<String, Object> initialFields = new HashMap<>();
         initialFields.put(StudyEditPage.SHORT_NAME, shortName);
         initialFields.put(StudyEditPage.STUDY_ID, studyId);
         initialFields.put(StudyEditPage.TITLE, "testUpdateStudy_" + count);
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         manageData.goToInsertNew();
         StudyEditPage editPage = new StudyEditPage(this.getDriver());
         editPage.setFormFields(initialFields);
@@ -511,7 +510,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         Map<String, Object> studyAccessFields = new HashMap<>();
         studyAccessFields.put(StudyEditPage.VISIBILITY, firstVisibility);
-        studyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + PROJECT_NAME + "/" + shortName);
+        studyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + DATA_PROJECT_NAME + "/" + shortName);
         studyAccessFields.put(StudyEditPage.DISPLAY_NAME, firstDisplayName);
 
         log("Set values for the first study access form");
@@ -522,7 +521,7 @@ public class ManageStudiesTest extends DataFinderTestBase
 
         Map<String, Object> secondStudyAccessFields = new HashMap<>();
         secondStudyAccessFields.put(StudyEditPage.VISIBILITY, secondVisibility);
-        secondStudyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + PROJECT_NAME + "/" + shortName);
+        secondStudyAccessFields.put(StudyEditPage.STUDY_CONTAINER, "/" + DATA_PROJECT_NAME + "/" + shortName);
         secondStudyAccessFields.put(StudyEditPage.DISPLAY_NAME, secondDisplayName);
 
         log("Add another study access record");
@@ -530,9 +529,9 @@ public class ManageStudiesTest extends DataFinderTestBase
         log("Set values for the second study access form");
         editPage.setStudyAccessFormValues(1, secondStudyAccessFields);
 
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
 
         //wait for combo store to load
@@ -545,9 +544,9 @@ public class ManageStudiesTest extends DataFinderTestBase
         log("Change study access display name");
         firstDisplayName = firstDisplayName + "_updated";
         editPage.setStudyAccessDisplayName(0, firstDisplayName);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
         log("Verify the second study access record is deleted successfully");
         assertElementNotPresent(editPage.getStudyAccessPanelLocator(1));
