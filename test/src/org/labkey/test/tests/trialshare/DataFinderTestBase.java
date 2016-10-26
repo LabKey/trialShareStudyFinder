@@ -24,6 +24,7 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
@@ -62,7 +63,8 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
 
     public ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
-    public enum CubeObjectType {
+    public enum CubeObjectType
+    {
 
         study("StudyId", "Manage Studies", new String[]{"Study Id", "Short Name", "Title"}),
         publication("Title", "Manage Publications", new String[]{"Key", "Title", "Status", "Publication Type"});
@@ -96,7 +98,9 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     }
 
     static final Map<String, Set<String>> studySubsets = new HashMap<>();
-    static {
+
+    static
+    {
 
         Set<String> operationalSet = new HashSet<>();
         studySubsets.put("Operational", operationalSet);
@@ -112,10 +116,12 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
         publicSet.add("Shapiro");
         publicSet.add("Casale");
         publicSet.add("Vincenti");
-    };
+    }
 
     protected static Set<String> loadedStudies = new HashSet<>();
-    static {
+
+    static
+    {
         loadedStudies.add("DataFinderTestPublicCasale");
         loadedStudies.add("DataFinderTestOperationalWISP-R");
     }
@@ -124,22 +130,22 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getDataProjectName(), afterTest);
     }
 
     @BeforeClass
     public static void initTest()
     {
-        DataFinderTestBase init = (DataFinderTestBase)getCurrentTest();
+        DataFinderTestBase init = (DataFinderTestBase) getCurrentTest();
 
         init.setUpProject();
     }
 
 
-
     @Override
     protected BrowserType bestBrowser()
     {
-        return BrowserType.CHROME;
+        return BrowserType.FIREFOX;
     }
 
     @Override
@@ -148,24 +154,38 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
         return Collections.singletonList("TrialShare");
     }
 
+    public abstract String getDataProjectName();
 
-    protected void setUpProject()
+    protected void setUpDataProject()
     {
         AbstractContainerHelper containerHelper = new APIContainerHelper(this);
 
-        containerHelper.createProject(getProjectName(), "Custom");
+        containerHelper.deleteProject(getDataProjectName(), false);
+        containerHelper.createProject(getDataProjectName(), "Custom");
         containerHelper.enableModule(MODULE_NAME);
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         importLists();
-        createStudies();
+        createStudies(getDataProjectName());
         createUsers();
 
         List<ModulePropertyValue> propList = new ArrayList<>();
         // set the site-default value for this so it will work as expected from the Admin Console.
-        propList.add(new ModulePropertyValue("TrialShare", "/", "DataFinderCubeContainer", getProjectName()));
+        propList.add(new ModulePropertyValue("TrialShare", "/", "DataFinderCubeContainer", getDataProjectName()));
         setModuleProperties(propList);
 
         reindexForSearch();
+
+    }
+
+    protected void setUpProject()
+    {
+        setUpDataProject();
+
+        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
+
+        containerHelper.createProject(getProjectName(), "Custom");
+        containerHelper.enableModule(MODULE_NAME);
+        makeProjectReadable(getProjectName());
 
         goToProjectHome();
         new PortalHelper(this).addWebPart(WEB_PART_NAME);
@@ -177,9 +197,18 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
         listHelper.importListArchive(dataListArchive);
     }
 
-    protected abstract void createStudies();
+    protected abstract void createStudies(String parentProjectName);
 
     protected abstract void createUsers();
+
+    protected void makeProjectReadable(String projectName)
+    {
+        PermissionsEditor permissionsEditor = new PermissionsEditor(this);
+
+        goToProjectHome(projectName);
+        clickAdminMenuItem("Folder", "Permissions");
+        permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
+    }
 
     @LogMethod
     protected void reindexForSearch()
@@ -191,21 +220,21 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
         clickButton("OK");
     }
 
-    void createStudy(String studyName, Boolean operational)
+    void createStudy(String parentProjectName, String studyName, Boolean operational)
     {
         log("creating study " + studyName);
         AbstractContainerHelper containerHelper = new APIContainerHelper(this);
         File studyArchive = operational ? TestFileUtils.getSampleData(OPERATIONAL_STUDY_NAME + ".folder.zip") : TestFileUtils.getSampleData(PUBLIC_STUDY_NAME + ".folder.zip");
-        containerHelper.createSubfolder(getProjectName(), studyName, "Study");
+        containerHelper.createSubfolder(parentProjectName, studyName, "Study");
         importStudyFromZip(studyArchive, true, true);
     }
 
-    void createStudy(String name)
+    void createStudy(String parentProjectName, String name)
     {
         AbstractContainerHelper containerHelper = new APIContainerHelper(this);
 
         File studyArchive = TestFileUtils.getSampleData(name + ".folder.zip");
-        containerHelper.createSubfolder(getProjectName(), name, "Study");
+        containerHelper.createSubfolder(parentProjectName, name, "Study");
         importStudyFromZip(studyArchive, true, true);
     }
 

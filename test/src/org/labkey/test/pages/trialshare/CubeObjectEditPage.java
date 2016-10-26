@@ -188,11 +188,11 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         waitForElement(Locators.updateTitle);
     }
 
-    public void saveAndClose()
+    public void saveAndClose(String returnToHeader)
     {
         log("Saving and closing edit form");
         click(Locators.saveAndCloseButton);
-        waitForElement(Locators.manageTitle);
+        waitForElement(Locators.getTitleTextLocator(returnToHeader));
     }
 
     private static class Locators
@@ -203,8 +203,12 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         static final Locator disabledSaveAndCloseButton = Locator.css("a.x4-disabled").withText("SAVE AND CLOSE"); // why do we need to have the all caps text here?
         static final Locator cancelButton = Locator.linkWithText("Cancel");
         static final Locator disabledWorkbenchButton = Locator.css("a.x4-disabled").withText("WORKBENCH");
-        static final Locator manageTitle = Locator.css(".labkey-wp-title-text").containing("Manage");
         static final Locator updateTitle = Locator.css(".labkey-nav-page-header").containing("Update");
+
+        static Locator getTitleTextLocator(String text)
+        {
+            return Locator.css(".labkey-wp-title-text").containing(text);
+        }
     }
 
 }

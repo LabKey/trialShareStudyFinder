@@ -44,6 +44,7 @@ public class DataFinderPage extends LabKeyPage
     private static final String GROUP_UPDATED_SIGNAL = "participantGroupUpdated";
     private static final String PUBLICATION_DETAILS_SIGNAL = "publicationDetailsLoaded";
     private boolean testingStudies = true;
+    private ObjectType objectType = null;
     private Locator.CssLocator finderLocator = null;
 
     public DataFinderPage(BaseWebDriverTest test, boolean testingStudies)
@@ -52,10 +53,12 @@ public class DataFinderPage extends LabKeyPage
         this.testingStudies = testingStudies;
         if (testingStudies)
         {
+            objectType = ObjectType.study;
             finderLocator = Locators.studyFinder;
         }
         else
         {
+            objectType = ObjectType.publication;
             finderLocator = Locators.pubFinder;
         }
     }
@@ -141,33 +144,6 @@ public class DataFinderPage extends LabKeyPage
             search("");
     }
 
-    public void saveGroup(String name)
-    {
-        setFormElement(DataFinderPage.Locators.groupLabelInput, name);
-        clickButtonContainingText("Save", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-        waitForGroupUpdate();
-    }
-
-    public String getGroupLabel()
-    {
-        return DataFinderPage.Locators.groupLabel.findElement(getDriver()).getText().trim();
-    }
-
-    public GroupMenu getMenu(Locator locator)
-    {
-        return new GroupMenu(locator.findElement(getDriver()));
-    }
-
-    public boolean menuIsDisabled(Locator.CssLocator locator)
-    {
-        return isElementPresent(locator.append(" .labkey-disabled-text-link"));
-    }
-
-    public void openMenu(Locator locator)
-    {
-        locator.findElement(getDriver()).click();
-    }
-
     public void navigateToStudies()
     {
         selectDataFinderObject("Studies");
@@ -180,8 +156,14 @@ public class DataFinderPage extends LabKeyPage
         assertElementVisible(DataFinderPage.Locators.pubFinder);
     }
 
+    public boolean isFinderObjectSelected(String text)
+    {
+        return text.equals(Locators.activeFinderObject.findElement(getDriver()).getText());
+    }
+
     public void selectDataFinderObject(String text)
     {
+        _ext4Helper.waitForMaskToDisappear();
         Locators.finderObjectTab(text).findElement(getDriver()).click();
     }
 
@@ -228,7 +210,7 @@ public class DataFinderPage extends LabKeyPage
 
     public FacetGrid getFacetsGrid()
     {
-        if(testingStudies)
+        if (testingStudies)
             return new FacetGrid(DataFinderPage.Locators.studyFacetPanel.findElement(getDriver()));
         else
             return new FacetGrid(DataFinderPage.Locators.pubFacetPanel.findElement(getDriver()));
@@ -314,8 +296,9 @@ public class DataFinderPage extends LabKeyPage
         public static final Locator.CssLocator manageStudyData = Locator.css(".labkey-studies-panel .labkey-finder-manage-data");
         public static final Locator.CssLocator insertNewStudy = Locator.css(".labkey-studies-panel .labkey-finder-insert-new");
         public static final Locator.CssLocator insertNewPublication = Locator.css(".labkey-publications-panel .labkey-finder-insert-new");
+        public static final Locator.CssLocator activeFinderObject = Locator.css(".x4-tab.x4-tab-active");
 
-        public static final Locator.CssLocator getSearchInput(Locator.CssLocator locator)
+        public static Locator.CssLocator getSearchInput(Locator.CssLocator locator)
         {
             return locator.append(" input.labkey-search-box");
         }
@@ -337,42 +320,46 @@ public class DataFinderPage extends LabKeyPage
 
     }
 
+    public enum ObjectType
+    {
+        all, study, publication
+    }
+
     public enum Dimension
     {
         // Common
-        STUDIES("studies", null),
+        SUMMARY_STUDIES("studies", null, ObjectType.all),
 
         // Study focused.
-        SUBJECTS("subjects", null),
-        VISIBILITY("visibility","Study.Visibility"),
-        THERAPEUTIC_AREA("therapeutic area", "Study.Therapeutic Area"),
-        STUDY_TYPE("study type", "Study.Study Type"),
-        ASSAY("assay", "Study.Assay"),
-        AGE_GROUP("age group", "Study.AgeGroup"),
-        PHASE("phase", "Study.Phase"),
-        CONDITION("condition", "Study.Condition"),
+        SUBJECTS("subjects", null, ObjectType.study),
+        VISIBILITY("visibility","Study.Visibility", ObjectType.study),
+        THERAPEUTIC_AREA("therapeutic area", "Study.Therapeutic Area", ObjectType.study),
+        STUDY_TYPE("study type", "Study.Study Type", ObjectType.study),
+        ASSAY("assay", "Study.Assay", ObjectType.study),
+        AGE_GROUP("age group", "Study.AgeGroup", ObjectType.study),
+        PHASE("phase", "Study.Phase", ObjectType.study),
+        CONDITION("condition", "Study.Condition", ObjectType.study),
 
         // Publication focused.
-        PUBLICATIONS("publications", null),
-        STATUS("status", "Publication.Status"),
-        COMPLETE("complete", "Complete"),
-        IN_PROGRESS("in progress", "In Progress"),
-        PUBLICATION_TYPE("publication type", "Publication.Publication Type"),
-        PUB_THERAPEUTIC_AREA("therapeutic area", "Publication.Therapeutic Area"),
-        YEAR("year", "Publication.Year"),
-        PUBLICATION_JOURNAL("journal", "Publication.Journal"),
-        PUB_STUDY("study", "Publication.Study"),
-        PUB_ASSAY("assay", "Publication.Assay"),
-        PUB_CONDITION("condition", "Publication.Condition");
-
+        PUBLICATIONS("publications", null, ObjectType.publication),
+        STATUS("status", "Publication.Status", ObjectType.publication),
+        COMPLETE("complete", "Complete", ObjectType.publication),
+        IN_PROGRESS("in progress", "In Progress", ObjectType.publication),
+        PUBLICATION_TYPE("publication type", "Publication.Publication Type", ObjectType.publication),
+        PUB_THERAPEUTIC_AREA("therapeutic area", "Publication.Therapeutic Area", ObjectType.publication),
+        SUBMISISON_STATUS("submission status", "Publication.Submission Status", ObjectType.publication),
+        YEAR("year", "Publication.Year", ObjectType.publication),
+        PUB_STUDY("study", "Publication.Study", ObjectType.publication),;
 
         private String caption;
         private String hierarchyName;
+        private ObjectType objectType;
 
-        Dimension(String caption, String hierarchyName)
+        Dimension(String caption, String hierarchyName, ObjectType objectType)
         {
             this.caption = caption;
             this.hierarchyName = hierarchyName;
+            this.objectType = objectType;
         }
 
         public String getCaption()
@@ -383,6 +370,11 @@ public class DataFinderPage extends LabKeyPage
         public String getHierarchyName()
         {
             return hierarchyName;
+        }
+
+        public ObjectType getObjectType()
+        {
+            return objectType;
         }
 
         public static Dimension fromString(String value)
@@ -468,6 +460,39 @@ public class DataFinderPage extends LabKeyPage
     public class FacetGrid extends Component
     {
 
+        public class MemberCount
+        {
+            private Integer selectedCount;
+            private Integer totalCount;
+
+            public MemberCount(String countString)
+            {
+                String[] values = countString.split("/");
+                selectedCount = Integer.valueOf(values[0].trim());
+                totalCount = Integer.valueOf(values[1].trim());
+            }
+
+            public int getSelectedCount()
+            {
+                return selectedCount;
+            }
+
+            public void setSelectedCount(Integer selectedCount)
+            {
+                this.selectedCount = selectedCount;
+            }
+
+            public int getTotalCount()
+            {
+                return totalCount;
+            }
+
+            public void setTotalCount(Integer totalCount)
+            {
+                this.totalCount = totalCount;
+            }
+
+        }
         private WebElement grid;
         private Locators locators;
 
@@ -530,18 +555,41 @@ public class DataFinderPage extends LabKeyPage
             return selectedNames;
         }
 
-        public Map<String, String> getMemberCounts(Dimension dimension)
+        public Map<String, MemberCount> getMemberCounts(Dimension dimension)
         {
             List<WebElement> memberElements = locators.facetMembers(dimension).findElements(getDriver());
-            Map<String, String> countMap = new HashMap<>();
+            Map<String, MemberCount> countMap = new HashMap<>();
             for (WebElement member : memberElements)
             {
                 String name = locators.memberName.findElement(member).getText();
                 String count = locators.memberCount.findElement(member).getText();
-                countMap.put(name, count);
+                MemberCount memberCount = new MemberCount(count);
+                countMap.put(name, memberCount);
             }
             return countMap;
 
+        }
+
+        public Map<String, Map<String, MemberCount>> getAllMemberCounts()
+        {
+            Map<String, Map<String, MemberCount>> counts = new HashMap<>();
+            for (Dimension dimension : Dimension.values())
+            {
+                if (dimension.getObjectType() == objectType)
+                    counts.put(dimension.getCaption(), getMemberCounts(dimension));
+            }
+            return counts;
+        }
+
+        public int getSelectedCount(Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> counts, DataFinderPage.Dimension dimension, String member)
+        {
+            Map<String, DataFinderPage.FacetGrid.MemberCount> dimCount = counts.get(dimension.getCaption());
+            if (dimCount == null)
+                return 0;
+            DataFinderPage.FacetGrid.MemberCount memberCount = dimCount.get(member);
+            if (memberCount == null)
+                return 0;
+            return memberCount.getSelectedCount();
         }
 
         private class Locators

@@ -6,6 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.Git;
+import org.labkey.test.components.trialshare.PublicationPanel;
 import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.pages.trialshare.ManageDataPage;
@@ -13,8 +14,6 @@ import org.labkey.test.pages.trialshare.PublicationEditPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
 import org.labkey.test.pages.trialshare.StudiesListHelper;
 
-import java.net.URI;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
@@ -36,8 +35,9 @@ public class ManagePublicationsTest extends DataFinderTestBase
     private static final String PUBLIC_STUDY_ID = "Casale";
     private static final String OPERATIONAL_STUDY_ID = "WISP-R";
     private static final String PROJECT_NAME = "ManagePublicationTest Project";
-    private static final String OPERATIONAL_STUDY_SUBFOLDER_NAME = "/" + PROJECT_NAME + "/" + OPERATIONAL_STUDY_NAME;
-    private static final String PUBLIC_STUDY_SUBFOLDER_NAME = "/" + PROJECT_NAME + "/" + PUBLIC_STUDY_NAME;
+    private static final String DATA_PROJECT_NAME = "ManagePublicationsTestData Project";
+    private static final String OPERATIONAL_STUDY_SUBFOLDER_NAME = "/" + DATA_PROJECT_NAME + "/" + OPERATIONAL_STUDY_NAME;
+    private static final String PUBLIC_STUDY_SUBFOLDER_NAME = "/" + DATA_PROJECT_NAME + "/" + PUBLIC_STUDY_NAME;
 
     private static final Map<String, Object> EXISTING_PUB_FIELDS = new HashMap<>();
     static
@@ -71,26 +71,28 @@ public class ManagePublicationsTest extends DataFinderTestBase
     @Override
     protected String getProjectName()
     {
-        return "ManagePublicationTest Project";
+        return PROJECT_NAME;
     }
 
     @Override
-    protected void createStudies()
+    public String getDataProjectName() { return DATA_PROJECT_NAME; }
+
+    @Override
+    protected void createStudies(String parentProjectName)
     {
-        createStudy(PUBLIC_STUDY_NAME);
-        createStudy(OPERATIONAL_STUDY_NAME);
+        createStudy(parentProjectName, PUBLIC_STUDY_NAME);
+        createStudy(parentProjectName, OPERATIONAL_STUDY_NAME);
     }
+
 
     @Override
     protected void createUsers()
     {
         _userHelper.createUser(PUBLIC_READER);
 
-        PermissionsEditor permissionsEditor = new PermissionsEditor(this);
+        makeProjectReadable(getDataProjectName());
 
-        goToProjectHome();
-        clickAdminMenuItem("Folder", "Permissions");
-        permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
+        PermissionsEditor permissionsEditor = new PermissionsEditor(this);
 
         permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
         _apiPermissionsHelper.setUserPermissions(PUBLIC_READER, "Reader");
@@ -100,7 +102,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
     public void testInsertNewDataLinkPermissions()
     {
         log("Checking for insert new data link");
-        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getProjectName(), false);
         Assert.assertTrue("Insert New link is not available", dataFinder.canInsertNewData());
         dataFinder.goToInsertNewData();
         switchToWindow(1);
@@ -110,7 +112,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         log("Impersonating user without insert permission");
         goToProjectHome();
         impersonate(PUBLIC_READER);
-        goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        goDirectlyToDataFinderPage(getProjectName(), false);
         Assert.assertFalse("Insert New link should not be available", dataFinder.canManageData());
     }
 
@@ -118,7 +120,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
     public void testManageDataLinkPermissions()
     {
         log("Checking for manage data link");
-        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        DataFinderPage dataFinder = goDirectlyToDataFinderPage(getProjectName(), false);
         Assert.assertTrue("Manage Data link is not available", dataFinder.canManageData());
         dataFinder.goToManageData();
         switchToWindow(1);
@@ -129,7 +131,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         log("Impersonating user without insert permission");
         goToProjectHome();
         impersonate(PUBLIC_READER);
-        goDirectlyToDataFinderPage(getCurrentContainerPath(), false);
+        goDirectlyToDataFinderPage(getProjectName(), false);
         Assert.assertFalse("Manage Data link should not be available", dataFinder.canManageData());
         goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
         assertTextPresent("User does not have permission");
@@ -138,7 +140,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
     @Test
     public void testSwitchToStudies()
     {
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         Assert.assertTrue("Should see a link to manage studies", manageData.hasManageStudiesLink());
         manageData.goToManageStudies();
@@ -154,7 +156,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         manageData.goToInsertNew();
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
         Assert.assertFalse("Submit button should not be enabled", editPage.isSubmitEnabled());
-        doAndWaitForPageToLoad(() -> editPage.cancel());
+        doAndWaitForPageToLoad(editPage::cancel);
         Assert.assertTrue("Should be manage publications view", manageData.isManageDataView());
     }
 
@@ -217,9 +219,47 @@ public class ManagePublicationsTest extends DataFinderTestBase
     }
 
     @Test
-    public void testInsertWithAllFields()
+    public void testSaveAndCloseReturnUrl()
     {
         goToProjectHome();
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
+        finder.clearAllFilters();
+        DataFinderPage.DataCard card = finder.getDataCards().get(0);
+        PublicationPanel publicationPanel = card.viewDetail();
+        publicationPanel.clickEditLink();
+        switchToWindow(1);
+        PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
+        editPage.saveAndClose("Data Finder");
+        sleep(1000); // yes, it's a hack.  But everyone needs sleep at some point.
+        // we should go back to the finder page and have the publication tab active
+        Assert.assertTrue("Publications tab on finder should be active after save and close", finder.isFinderObjectSelected("Publications"));
+        getDriver().close();
+        switchToMainWindow();
+    }
+
+    @Test
+    public void testCancelReturnUrl()
+    {
+        goToProjectHome();
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
+        finder.clearAllFilters();
+        DataFinderPage.DataCard card = finder.getDataCards().get(0);
+        PublicationPanel publicationPanel = card.viewDetail();
+        publicationPanel.clickEditLink();
+        switchToWindow(1);
+        PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
+        doAndWaitForPageToLoad(editPage::cancel);
+        sleep(500);
+        // we should go back to the finder page and have the publication tab active
+        Assert.assertTrue("Publications tab on finder should be active after cancel", finder.isFinderObjectSelected("Publications"));
+        getDriver().close();
+        switchToMainWindow();
+    }
+
+    @Test
+    public void testInsertWithAllFields()
+    {
+        goToProjectHome(getDataProjectName());
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
         studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
         studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
@@ -267,16 +307,96 @@ public class ManagePublicationsTest extends DataFinderTestBase
         newFields.remove(PublicationEditPage.STUDIES);
         newFields.remove(PublicationEditPage.THERAPEUTIC_AREAS);
         editPage.setFormFields(newFields, false);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
         manageData.goToEditRecord((String) newFields.get(TITLE));
         unexpectedValues = editPage.compareFormValues(newFields);
         Assert.assertTrue("Found unexpected values in edit page of newly inserted publication: " + unexpectedValues, unexpectedValues.isEmpty());
     }
 
     @Test
+    public void testCountsAfterInsertAndEdit()
+    {
+        goToProjectHome(getDataProjectName());
+        StudiesListHelper studiesListHelper = new StudiesListHelper(this);
+        studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
+        studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
+        goToProjectHome();
+        DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
+        DataFinderPage.FacetGrid fg = finder.getFacetsGrid();
+        finder.clearAllFilters();
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> beforeCounts = fg.getAllMemberCounts();
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        ManageDataPage manageData = new ManageDataPage(this, _objectType);
+
+        Map<String, Object> newFields = new HashMap<>();
+        // add the count so multiple runs of this test have distinct titles
+        int count = manageData.getCount();
+        newFields.put(PublicationEditPage.TITLE, "testCountsAfterInsertAndEdit_" + count);
+        newFields.put(PublicationEditPage.STATUS, "In Progress");
+        newFields.put(PublicationEditPage.SUBMISSION_STATUS, "Submitted");
+        newFields.put(PublicationEditPage.PUBLICATION_TYPE, "Manuscript");
+        newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune"});
+        newFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID});
+        newFields.put(PublicationEditPage.YEAR, "2016");
+
+        newFields.put(PublicationEditPage.MANUSCRIPT_CONTAINER, PUBLIC_STUDY_SUBFOLDER_NAME);
+        newFields.put(PublicationEditPage.PERMISSIONS_CONTAINER, OPERATIONAL_STUDY_SUBFOLDER_NAME);
+
+        manageData.goToInsertNew();
+        PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
+
+        editPage.setFormFields(newFields, true);
+        editPage.saveAndClose("Manage");
+
+        goToProjectHome();
+        goDirectlyToDataFinderPage(getProjectName(), false);
+        finder.clearAllFilters();
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> afterInsertCounts = fg.getAllMemberCounts();
+        assertEquals("Count for 'In Progress' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.STATUS, "In Progress")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.STATUS, "In Progress"));
+        assertEquals("Count for 'Submitted' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted"));
+        assertEquals("Count for 'Manuscript' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript"));
+        assertEquals("Count for 'Autoimmune' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Autoimmune")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Autoimmune"));
+        assertEquals("Count for '" + PUBLIC_STUDY_NAME + "' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUB_STUDY, PUBLIC_STUDY_ID)+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PUB_STUDY, PUBLIC_STUDY_ID));
+        assertEquals("Count for '2016' not updated", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.YEAR, "2016")+1, fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.YEAR, "2016"));
+
+
+        // Now edit the above fields to have different values and check counts again.
+
+        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        manageData.goToEditRecord((String) newFields.get(TITLE));
+        newFields.remove(PublicationEditPage.TITLE);
+        // not updating status since the default data has no other in-progress publications and making them all "complete" removes status and submission status
+        newFields.put(PublicationEditPage.SUBMISSION_STATUS, "Draft");
+        newFields.put(PublicationEditPage.PUBLICATION_TYPE, "Abstract");
+        // for these two multi-select fields, the items that are selected will be deselected and ones not selected will be selected
+        newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"Autoimmune", "Allergy"});
+        newFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID, OPERATIONAL_STUDY_ID});
+        newFields.put(PublicationEditPage.YEAR, "2014");
+
+        editPage.setFormFields(newFields, false);
+        editPage.saveAndClose("Manage");
+        goToProjectHome();
+        finder.selectDataFinderObject("Publications");
+        finder.clearAllFilters();
+        Map<String, Map<String, DataFinderPage.FacetGrid.MemberCount>> afterEditCounts = fg.getAllMemberCounts();
+        assertEquals("Count for 'In Progress' updated but should not have been", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.STATUS, "In Progress"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.STATUS, "In Progress"));
+        assertEquals("Count for 'Submitted' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Submitted"));
+        assertEquals("Count for 'Draft' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Draft")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.SUBMISISON_STATUS, "Draft"));
+        assertEquals("Count for 'Manuscript' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript"));
+        assertEquals("Count for 'Abstract' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Abstract")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUBLICATION_TYPE, "Abstract"));
+        assertEquals("Count for 'Autoimmune' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Autoimmune"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Autoimmune"));
+        assertEquals("Count for 'Allergy' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.THERAPEUTIC_AREA, "Allergy"));
+        assertEquals("Count for '" + PUBLIC_STUDY_ID + "' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.PUB_STUDY, PUBLIC_STUDY_ID), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUB_STUDY, PUBLIC_STUDY_ID));
+        assertEquals("Count for '" + OPERATIONAL_STUDY_ID + "' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.PUB_STUDY, OPERATIONAL_STUDY_ID)+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.PUB_STUDY, OPERATIONAL_STUDY_ID));
+        assertEquals("Count for '2016' not updated to original value", fg.getSelectedCount(beforeCounts, DataFinderPage.Dimension.YEAR, "2016"), fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.YEAR, "2016"));
+        assertEquals("Count for '2014' not updated", fg.getSelectedCount(afterInsertCounts, DataFinderPage.Dimension.YEAR, "2014")+1, fg.getSelectedCount(afterEditCounts, DataFinderPage.Dimension.YEAR, "2014"));
+    }
+
+    @Test
     public void testInsertMultiValuedFields()
     {
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
         studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
         studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
@@ -297,7 +417,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(newFields, false);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
         manageData.goToEditRecord((String) newFields.get(TITLE));
         Map<String, String> unexpectedValues = editPage.compareFormValues(newFields);
@@ -307,7 +427,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
     @Test
     public void testEditMultiValuedFields()
     {
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
         studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
         studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
@@ -328,7 +448,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(initialFields, false);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
         manageData.goToEditRecord((String) initialFields.get(TITLE));
 
@@ -336,7 +456,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         newFields.put(PublicationEditPage.STUDIES, new String[]{OPERATIONAL_STUDY_ID});
         newFields.put(PublicationEditPage.THERAPEUTIC_AREAS, new String[]{"T1DM"});
         editPage.setFormFields(newFields, false);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
         manageData.goToEditRecord((String) initialFields.get(TITLE));
         initialFields.put(PublicationEditPage.STUDIES, new String[]{PUBLIC_STUDY_ID, OPERATIONAL_STUDY_ID});
@@ -349,7 +469,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
     @Test
     public void testUpdatePublication()
     {
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
         studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
         studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
@@ -387,7 +507,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(initialFields, false);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
         Map<String, Object> updatedFields = new HashMap<>();
         // add the count so multiple runs of this test have distinct titles
@@ -453,11 +573,11 @@ public class ManagePublicationsTest extends DataFinderTestBase
     @Test
     public void testInsertAndDelete()
     {
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
         studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
         studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
-        goDirectlyToManageDataPage(getCurrentContainerPath(), _objectType);
+        goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         Map<String, Object> initialFields = new HashMap<>();
         // add the count so multiple runs of this test have distinct titles
@@ -469,22 +589,22 @@ public class ManagePublicationsTest extends DataFinderTestBase
         manageData.goToInsertNew();
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
         editPage.setFormFields(initialFields, false);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
         manageData.deleteRecord((String) initialFields.get(PublicationEditPage.TITLE));
         PublicationsListHelper listHelper = new PublicationsListHelper(this);
 
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found deleted publication", 0, listHelper.getPublicationCount((String) initialFields.get(PublicationEditPage.TITLE), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found studies for deleted publication", 0, listHelper.getPublicationStudyCount((String) initialFields.get(PublicationEditPage.TITLE), true));
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         Assert.assertEquals("Found therapeutic areas for deleted publication", 0, listHelper.getPublicationTherapeuticAreaCount((String) initialFields.get(PublicationEditPage.TITLE), true));
     }
 
     @Test
     public void testInsertWithoutRefresh()
     {
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         StudiesListHelper studiesListHelper = new StudiesListHelper(this);
         studiesListHelper.setStudyContainer(PUBLIC_STUDY_ID, PUBLIC_STUDY_SUBFOLDER_NAME, true);
         studiesListHelper.setStudyContainer(OPERATIONAL_STUDY_ID, OPERATIONAL_STUDY_SUBFOLDER_NAME, false);
@@ -502,7 +622,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
 
         editPage.setFormFields(initialFields, true);
-        editPage.saveAndClose();
+        editPage.saveAndClose("Manage");
 
         goToProjectHome(); // there should be no error alert after inserting but before refreshing
         DataFinderPage finder = goDirectlyToDataFinderPage(getCurrentContainerPath(), false);

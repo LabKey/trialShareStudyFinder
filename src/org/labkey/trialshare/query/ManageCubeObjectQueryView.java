@@ -119,6 +119,7 @@ abstract class ManageCubeObjectQueryView extends QueryView
                 String id = String.valueOf(ctx.get(keyFieldKey));
                 ActionURL actionUrl = new ActionURL(TrialShareController.UpdateDataAction.class, cubeContainer).addParameter("id", id);
                 actionUrl.addParameter("objectName", getCubeObjectName().toString());
+                actionUrl.addReturnURL(getViewContext().getActionURL());
                 out.write(PageFlowUtil.textLink("Edit", actionUrl));
             }
         };

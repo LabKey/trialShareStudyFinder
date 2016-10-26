@@ -23,7 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
@@ -33,15 +32,11 @@ import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
 import org.labkey.test.pages.trialshare.StudiesListHelper;
-import org.labkey.test.util.APIContainerHelper;
-import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ReadOnlyTest;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,6 +52,9 @@ import static org.junit.Assert.assertTrue;
 public class TrialShareDataFinderTest extends DataFinderTestBase implements ReadOnlyTest
 {
     private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
+
+    private static final String PROJECT_NAME = "TrialShareDataFinderTest Project";
+    private static final String DATA_PROJECT_NAME = "TrialShareDataFinderTestData Project";
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -77,8 +75,11 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     @Override
     protected String getProjectName()
     {
-        return "TrialShareDataFinderTest Project";
+        return PROJECT_NAME;
     }
+
+    @Override
+    public String getDataProjectName() { return DATA_PROJECT_NAME; }
 
     @Override
     public boolean needsSetup()
@@ -95,7 +96,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     }
 
     @Override
-    protected void createStudies()
+    protected void createStudies(String parentProjectName)
     {
         log("Creating a study container for each study");
         for (String subset : studySubsets.keySet())
@@ -103,23 +104,23 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
             for (String accession : studySubsets.get(subset))
             {
                 String name = "DataFinderTest" + subset + accession;
-                createStudy(name, subset.equalsIgnoreCase("operational"));
+                createStudy(getDataProjectName(), name, subset.equalsIgnoreCase("operational"));
             }
         }
-        createStudy(PUBLIC_STUDY_NAME);
-        createStudy(OPERATIONAL_STUDY_NAME);
-        goToProjectHome();
+        createStudy(parentProjectName, PUBLIC_STUDY_NAME);
+        createStudy(parentProjectName, OPERATIONAL_STUDY_NAME);
+        goToProjectHome(getDataProjectName());
         StudiesListHelper queryUpdatePage = new StudiesListHelper(this);
         queryUpdatePage.setStudyContainers();
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         PublicationsListHelper pubUpdatePage = new PublicationsListHelper(this);
-        pubUpdatePage.setPermissionsContainers("/" + getProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getProjectName() + "/" + OPERATIONAL_STUDY_NAME);
+        pubUpdatePage.setPermissionsContainers("/" + getDataProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getDataProjectName() + "/" + OPERATIONAL_STUDY_NAME);
     }
 
     protected void createUsers()
     {
         log("Creating users and setting permissions");
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
 
         _userHelper.createUser(PUBLIC_READER);
         _userHelper.createUser(CASALE_READER);
@@ -127,7 +128,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
 
         PermissionsEditor permissionsEditor = new PermissionsEditor(this);
 
-        goToProjectHome();
+        goToProjectHome(getDataProjectName());
         clickAdminMenuItem("Folder", "Permissions");
         permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
 
@@ -162,7 +163,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     public void testCounts()
     {
         DataFinderPage finder = new DataFinderPage(this, true);
-        assertCountsSynced(finder, DataFinderPage.Dimension.STUDIES);
+        assertCountsSynced(finder, DataFinderPage.Dimension.SUMMARY_STUDIES);
 
         Map<DataFinderPage.Dimension, Integer> studyCounts = finder.getSummaryCounts();
 
@@ -218,7 +219,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         List<DataFinderPage.DataCard> cards = finder.getDataCards();
         Assert.assertEquals("Number of studies not as expected", studySubsets.get("Public").size(), cards.size());
         stopImpersonating();
-        doAndWaitForPageSignal(() -> goToProjectHome(), finder.getCountSignal());
+        doAndWaitForPageSignal(this::goToProjectHome, finder.getCountSignal());
 
         sleep(1000);
         Assert.assertTrue("Admin user should see visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
@@ -244,30 +245,6 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         stopImpersonating();
     }
 
-
-    @Test
-    public void testDataFinderRelocation()
-    {
-        log("Test that we can put the data finder in a project other than the one with the cube definition and lists");
-        AbstractContainerHelper containerHelper = new APIContainerHelper(this);
-        containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, false);
-        containerHelper.createProject(RELOCATED_DATA_FINDER_PROJECT, "Custom");
-        containerHelper.addCreatedProject(RELOCATED_DATA_FINDER_PROJECT);
-        containerHelper.enableModule(MODULE_NAME);
-        List<ModulePropertyValue> propList = new ArrayList<>();
-        propList.add(new ModulePropertyValue("TrialShare", "/" + RELOCATED_DATA_FINDER_PROJECT, "DataFinderCubeContainer", getProjectName()));
-        setModuleProperties(propList);
-
-        goToProjectHome(RELOCATED_DATA_FINDER_PROJECT);
-        new PortalHelper(this).addWebPart(WEB_PART_NAME);
-        DataFinderPage finder = new DataFinderPage(this, true);
-        DataFinderPage.FacetGrid facetGrid = finder.getFacetsGrid();
-        Assert.assertTrue("Should see the visibility facet", facetGrid.facetIsPresent(DataFinderPage.Dimension.VISIBILITY));
-        facetGrid.toggleFacet(DataFinderPage.Dimension.VISIBILITY, "Public");
-        Assert.assertEquals("Should see all the public data cards", 4, finder.getDataCards().size());
-        goToProjectHome();
-    }
-
     @Test
     public void testSelection()
     {
@@ -278,7 +255,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         facets.toggleFacet(DataFinderPage.Dimension.AGE_GROUP, "Adult");
         facets.toggleFacet(DataFinderPage.Dimension.PHASE, "Phase 1");
 
-        assertCountsSynced(finder, DataFinderPage.Dimension.STUDIES);
+        assertCountsSynced(finder, DataFinderPage.Dimension.SUMMARY_STUDIES);
 
         facets.clearFilter(DataFinderPage.Dimension.PHASE);
 
@@ -294,14 +271,14 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         finder.clearAllFilters();
         assertEquals("Clearing all filters didn't clear selection", Collections.emptyList(), facets.getSelectedMembers(DataFinderPage.Dimension.PHASE));
 
-        assertCountsSynced(finder, DataFinderPage.Dimension.STUDIES);
+        assertCountsSynced(finder, DataFinderPage.Dimension.SUMMARY_STUDIES);
     }
 
     @Test
     public void testSelectingEmptyMeasure()
     {
         Map<DataFinderPage.Dimension, Integer> expectedCounts = new HashMap<>();
-        expectedCounts.put(DataFinderPage.Dimension.STUDIES, 0);
+        expectedCounts.put(DataFinderPage.Dimension.SUMMARY_STUDIES, 0);
         expectedCounts.put(DataFinderPage.Dimension.SUBJECTS, 0);
 
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), true);
@@ -320,10 +297,10 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         {
             if (dimension.getHierarchyName() != null)
             {
-                Map<String, String> memberCounts = facets.getMemberCounts(dimension);
-                for (Map.Entry<String,String> memberCount : memberCounts.entrySet())
+                Map<String, DataFinderPage.FacetGrid.MemberCount> memberCounts = facets.getMemberCounts(dimension);
+                for (Map.Entry<String,DataFinderPage.FacetGrid.MemberCount> memberCount : memberCounts.entrySet())
                 {
-                    assertTrue("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure: " + memberCount.getValue(), memberCount.getValue().matches("0 / \\d+"));
+                    assertEquals("Wrong counts for member " + memberCount.getKey() + " of dimension " + dimension + " after selecting empty measure", 0, memberCount.getValue().getSelectedCount());
                 }
             }
         }
@@ -341,15 +318,15 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         List<DataFinderPage.DataCard> studyCards = finder.getDataCards();
         String searchString = studyCards.get(0).getStudyAccession();
 
-        testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Study Accession", searchString, 1);
+        testSearchTerm(finder, DataFinderPage.Dimension.SUMMARY_STUDIES, "Study Accession", searchString, 1);
         finder.clearSearch();
         assertTrue("Clear all should still be active after clearing search with facet selected", finder.clearAllActive());
         finder.clearAllFilters();
         assertTrue("Clear All should no longer be active", !finder.clearAllActive());
-        testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Study Short Name and Investigator", "Casale", 1);
-        testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Empty", "", 8);
-        testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Title", "System", 2);
-        testSearchTerm(finder, DataFinderPage.Dimension.STUDIES, "Multiple Terms", "Tolerant Kidney Transplant", 7);
+        testSearchTerm(finder, DataFinderPage.Dimension.SUMMARY_STUDIES, "Study Short Name and Investigator", "Casale", 1);
+        testSearchTerm(finder, DataFinderPage.Dimension.SUMMARY_STUDIES, "Empty", "", 8);
+        testSearchTerm(finder, DataFinderPage.Dimension.SUMMARY_STUDIES, "Title", "System", 2);
+        testSearchTerm(finder, DataFinderPage.Dimension.SUMMARY_STUDIES, "Multiple Terms", "Tolerant Kidney Transplant", 7);
     }
 
 
@@ -366,7 +343,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         assertEquals("Wrong number of studies after search", 2, studyCards.size());
         assertEquals("Wrong study card available", "Shapiro", studyCards.get(0).getStudyShortName());
 
-        assertCountsSynced(finder, DataFinderPage.Dimension.STUDIES);
+        assertCountsSynced(finder, DataFinderPage.Dimension.SUMMARY_STUDIES);
         stopImpersonating();
     }
 
@@ -448,7 +425,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         DataFinderPage.DataCard card = dataCards.get(0);
         Assert.assertEquals("DIAMOND", card.getStudyShortName());
         log("Go to operational study");
-        card.clickGoToStudy("/" + getProjectName() + "/DataFinderTestOperationalDIAMOND");
+        card.clickGoToStudy("/" + getDataProjectName() + "/DataFinderTestOperationalDIAMOND");
     }
 
     @Test
@@ -487,7 +464,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         String cardTitle = "Circulating markers of vascular injury";
         String cardAuthors = "Monach PA, Tomasson G, Specks U, et al.";
         String cardText;
-        Map<String, String> counts;
+        Map<String, DataFinderPage.FacetGrid.MemberCount> counts;
 
         log("Go to publications and verify the default filtered of 'In Progress' on Status.");
         DataFinderPage finder = goDirectlyToDataFinderPage(getProjectName(), false);
@@ -496,7 +473,8 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
 
         log("Validate that the number, content and style of the cards is as expected.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.IN_PROGRESS);
-        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", "1 / 1", counts.get("In Progress"));
+        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", 1, counts.get("In Progress").getSelectedCount());
+        assertEquals("Expected count after filtering for 'In Progress' was not as expected.", 1, counts.get("In Progress").getTotalCount());
 
         // I have no idea why assertTextPresent returned false for these strings. The below tests appear to be more reliable.
         scrollIntoView(DataFinderPage.Locators.pubCardBorderHighlight);
@@ -518,7 +496,8 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         log("Validate counts for 'Complete' publications.");
         counts = fg.getMemberCounts(DataFinderPage.Dimension.COMPLETE);
         // one is "in progress" and one is set to not show
-        assertEquals("Expected count after filtering for 'Complete' was not as expected.", "15 / 15", counts.get("Complete"));
+        assertEquals("Expected count after filtering for 'Complete' was not as expected.", 15, counts.get("Complete").getSelectedCount());
+        assertEquals("Expected count after filtering for 'Complete' was not as expected.", 15, counts.get("Complete").getTotalCount());
 
         log("Validate that there are no 'In Progress' cards visible.");
         assertElementNotPresent("There is a card with the 'In Progress' style, there should not be.", DataFinderPage.Locators.pubCardBorderHighlight);
@@ -594,7 +573,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         fg.toggleFacet(DataFinderPage.Dimension.PUBLICATION_TYPE, "Manuscript");
 
         summaryCount = finder.getSummaryCounts();
-        assertEquals("Number of studies count not as expected.", 2, summaryCount.get(DataFinderPage.Dimension.STUDIES).intValue());
+        assertEquals("Number of studies count not as expected.", 2, summaryCount.get(DataFinderPage.Dimension.SUMMARY_STUDIES).intValue());
 
         log("Show details, this time validate that the missing values are rendered as expected.");
         card = finder.getDataCards().get(0);

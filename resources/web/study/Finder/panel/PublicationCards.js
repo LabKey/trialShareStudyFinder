@@ -171,7 +171,8 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
                 {
                     var url = LABKEY.ActionURL.buildURL('trialshare', 'updateData', null, {
                             "id": publicationId,
-                            "objectName": 'publication'
+                            "objectName": 'publication',
+                            "returnUrl" : window.location + (Object.keys(LABKEY.ActionURL.getParameters()).length ? "&" : "?") + "object=publication"
                         });
                     return url;
                 }
