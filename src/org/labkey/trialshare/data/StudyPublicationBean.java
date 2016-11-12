@@ -457,7 +457,7 @@ public class StudyPublicationBean
 
         for (Report report : ReportService.get().getReports(user, container))
         {
-            ViewCategory category = report.getDescriptor().getCategory();
+            ViewCategory category = report.getDescriptor().getCategory(container);
 
             if (figureCategories.contains(category))
             {
@@ -481,7 +481,7 @@ public class StudyPublicationBean
 
         for (Report report : ReportService.get().getReports(user, container))
         {
-            ViewCategory category = report.getDescriptor().getCategory();
+            ViewCategory category = report.getDescriptor().getCategory(container);
 
             if (category != null && category.getLabel().contains(FIGURES_CATEGORY_TEXT))
             {
