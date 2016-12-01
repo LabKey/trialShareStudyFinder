@@ -324,12 +324,9 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                                 root: 'data'
                             }
                         },
-                        sorters : [
-                            {
-                                property: 'shortName',
-                                direction: 'ASC'
-                            }
-                        ],
+                        sorters: [{
+                            sorterFn: LABKEY.study.util.CubeObjectHelper.studyShortNameNaturalSortFn
+                        }],
                         autoLoad    : true
                     },
                     fieldLabel      : 'Studies',
