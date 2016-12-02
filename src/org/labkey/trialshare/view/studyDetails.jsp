@@ -20,22 +20,17 @@
 <%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
-<%@ page import="org.labkey.api.view.template.ClientDependency" %>
 <%@ page import="org.labkey.trialshare.TrialShareController" %>
-<%@ page import="org.springframework.web.servlet.ModelAndView" %>
-<%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="org.labkey.trialshare.data.StudyBean" %>
 <%@ page import="org.labkey.trialshare.data.StudyAccess" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.labkey.api.view.template.ClientDependencies" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%@ page extends="org.labkey.api.jsp.JspBase"%>
 <%!
-    public LinkedHashSet<ClientDependency> getClientDependencies()
+    public void addClientDependencies(ClientDependencies dependencies)
     {
-        LinkedHashSet<ClientDependency> resources = new LinkedHashSet<>();
-        resources.add(ClientDependency.fromPath("study/Finder/dataFinderEditor"));
-
-        return resources;
+        dependencies.add("study/Finder/dataFinderEditor");
     }
 %>
 <%
