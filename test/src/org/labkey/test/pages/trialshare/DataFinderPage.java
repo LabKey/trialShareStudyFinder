@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.Locators.pageSignal;
+
 public class DataFinderPage extends LabKeyPage
 {
     public static final String STUDY_COUNT_SIGNAL = "dataFinderStudyCountsUpdated";
@@ -102,12 +104,12 @@ public class DataFinderPage extends LabKeyPage
     @Override
     protected void waitForPage()
     {
-        waitForElement(LabKeyPage.Locators.pageSignal(getCountSignal()));
+        waitForElement(pageSignal(getCountSignal()));
     }
 
     protected void waitForGroupUpdate()
     {
-        waitForElement(LabKeyPage.Locators.pageSignal(GROUP_UPDATED_SIGNAL));
+        waitForElement(pageSignal(GROUP_UPDATED_SIGNAL));
     }
 
 
