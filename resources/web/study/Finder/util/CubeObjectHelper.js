@@ -29,20 +29,15 @@ Ext4.define('LABKEY.study.util.CubeObjectHelper', {
         return LABKEY.study.util.CubeObjectHelper.naturalSortFn(o1.get('shortName'), o2.get('shortName'));
     },
 
-    naturalSortFn: function (aso, bso)
+    naturalSortFn: function (aObj, bObj)
     {
         // http://stackoverflow.com/questions/19247495/alphanumeric-sorting-an-array-in-javascript
         var a, b, a1, b1, i = 0, n, L,
                 rx = /(\.\d+)|(\d+(\.\d+)?)|([^\d.]+)|(\.\D+)|(\.$)/g;
 
-        if (aso === bso) return 0;
-        a = aso.toLowerCase().match(rx);
-        b = bso.toLowerCase().match(rx);
-
-        //var _empty = LABKEY.app.model.Filter.sorters.handleEmptySort(a, b);
-        //if (_empty !== undefined) {
-        //    return _empty;
-        //}
+        if (aObj === bObj) return 0;
+        a = aObj.toLowerCase().match(rx);
+        b = bObj.toLowerCase().match(rx);
 
         L = a.length;
         while (i < L)
