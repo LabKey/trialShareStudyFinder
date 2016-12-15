@@ -3,6 +3,7 @@
 
         <script path="study/Finder/dataFinder.css"/>
         <script path="study/Finder/trialShare.css"/>
+        <script path="study/Finder/util/CubeObjectHelper.js"/>
         <script path="study/Finder/data/CubeConfig.js"/>
         <script path="study/Finder/data/CubeObjects.js"/>
         <script path="study/Finder/data/Facet.js"/>
