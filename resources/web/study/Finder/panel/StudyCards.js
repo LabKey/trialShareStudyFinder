@@ -29,8 +29,7 @@ Ext4.define("LABKEY.study.panel.StudyCards", {
         searchSelectedMembers : null, // initially we have no search terms so everything is selected
         selectedSubset : null,
         sorters: [{
-            property: 'shortName',
-            direction: 'ASC'
+            sorterFn: LABKEY.study.util.CubeObjectHelper.studyShortNameNaturalSortFn
         }]
     }),
 
