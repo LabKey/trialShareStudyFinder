@@ -17,6 +17,7 @@
         <ant antfile="${basedir}/distributions/community.xml" target="gather_modules" />
         <copy todir="${dist.modules.dir}">
             <filelist dir="${staging.modules.dir}">
+                <file name="fileTransfer.module" />
                 <file name="timeline.module" />
                 <file name="trialShare.module" />
             </filelist>
