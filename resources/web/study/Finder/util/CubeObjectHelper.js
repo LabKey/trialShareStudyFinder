@@ -23,7 +23,7 @@ Ext4.define('LABKEY.study.util.CubeObjectHelper', {
         return modelProxy;
     },
 
-    studyShortNameNaturalSortFn: function(o1, o2)
+    naturalSortOnFieldFn: function(o1, o2, fieldName)
     {
         if (o1 == null && o2 == null)
             return 0;
@@ -31,7 +31,7 @@ Ext4.define('LABKEY.study.util.CubeObjectHelper', {
             return -1;
         else if (o2 == null)
             return 1;
-        return LABKEY.study.util.CubeObjectHelper.naturalSortFn(o1.get('shortName'), o2.get('shortName'));
+        return LABKEY.study.util.CubeObjectHelper.naturalSortFn(o1.get(fieldName), o2.get(fieldName));
     },
 
     naturalSortFn: function (aObj, bObj)
@@ -58,6 +58,16 @@ Ext4.define('LABKEY.study.util.CubeObjectHelper', {
             }
         }
         return b[i] ? -1 : 0;
+    },
+
+    studyShortNameNaturalSortFn: function(o1, o2)
+    {
+        return LABKEY.study.util.CubeObjectHelper.naturalSortOnFieldFn(o1, o2, 'shortName');
+    },
+
+    containerPathNaturalSortFn: function(o1, o2)
+    {
+        return LABKEY.study.util.CubeObjectHelper.naturalSortOnFieldFn(o1, o2, 'Path');
     }
 
 });

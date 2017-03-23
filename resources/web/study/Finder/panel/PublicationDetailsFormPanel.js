@@ -415,7 +415,10 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     name            : 'manuscriptContainer',
                     store           : {
                         model   : 'LABKEY.study.data.Container',
-                        autoLoad: true
+                        autoLoad: true,
+                        sorters: [{
+                            sorterFn: LABKEY.study.util.CubeObjectHelper.containerPathNaturalSortFn
+                        }]
                     },
                     fieldLabel      : 'Manuscript Container',
                     labelWidth      : this.defaultFieldLabelWidth,
@@ -435,7 +438,10 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                     name            : 'permissionsContainer',
                     store           : {
                         model   : 'LABKEY.study.data.Container',
-                        autoLoad: true
+                        autoLoad: true,
+                        sorters: [{
+                            sorterFn: LABKEY.study.util.CubeObjectHelper.containerPathNaturalSortFn
+                        }]
                     },
                     fieldLabel      : 'Permissions Container',
                     labelWidth      : this.defaultFieldLabelWidth,

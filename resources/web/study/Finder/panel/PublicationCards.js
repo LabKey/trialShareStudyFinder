@@ -169,12 +169,25 @@ Ext4.define("LABKEY.study.panel.PublicationCards", {
                 },
                 getEditUrl: function(publicationId)
                 {
-                    var url = LABKEY.ActionURL.buildURL('trialshare', 'updateData', null, {
-                            "id": publicationId,
-                            "objectName": 'publication',
-                            "returnUrl" : window.location + (Object.keys(LABKEY.ActionURL.getParameters()).length ? "&" : "?") + "object=publication"
-                        });
-                    return url;
+                    var returnUrl = window.location;
+                    if (LABKEY.ActionURL.getParameter('object') === undefined)
+                    {
+                        var hasParam = Object.keys(LABKEY.ActionURL.getParameters()).length > 0;
+                        var op = hasParam ? '&' : '';
+                        var currentLoc = window.location.toString();
+                        if (!hasParam && currentLoc.indexOf('?', currentLoc.length - 1) === -1) // not endWith ?
+                        {
+                            op = '?'
+                        }
+                        returnUrl += op;
+                        returnUrl += 'object=publication';
+                    }
+
+                    return LABKEY.ActionURL.buildURL('trialshare', 'updateData', null, {
+                        "id": publicationId,
+                        "objectName": 'publication',
+                        "returnUrl": returnUrl
+                    });
                 }
             }
     ),
