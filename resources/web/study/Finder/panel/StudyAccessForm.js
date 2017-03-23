@@ -48,7 +48,10 @@ Ext4.define('LABKEY.study.panel.StudyAccessForm', {
                     name            : 'studyContainer',
                     store           : {
                         model   : 'LABKEY.study.data.Container',
-                        autoLoad: true
+                        autoLoad: true,
+                        sorters: [{
+                            sorterFn: LABKEY.study.util.CubeObjectHelper.containerPathNaturalSortFn
+                        }]
                     },
                     fieldLabel      : 'Study Container *',
                     labelWidth      : this.defaultFieldLabelWidth,
