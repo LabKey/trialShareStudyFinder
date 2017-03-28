@@ -441,13 +441,23 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                         autoLoad: true,
                         sorters: [{
                             sorterFn: LABKEY.study.util.CubeObjectHelper.containerPathNaturalSortFn
-                        }]
+                        }],
+                        listeners: {
+                            load: function(store, records) {
+                                store.insert(0, [{
+                                    DisplayName: '[None]',
+                                    Path: '[None]',
+                                    EntityId: null
+                                }]);
+                            }
+                        }
                     },
                     fieldLabel      : 'Permissions Container',
                     labelWidth      : this.defaultFieldLabelWidth,
                     valueField      : 'EntityId',
                     displayField    : 'Path',
                     editable        : false,
+                    emptyText       : '[None]',
                     width           : this.mediumLargeFieldWidth
                 });
 
