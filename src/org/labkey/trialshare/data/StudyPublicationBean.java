@@ -595,17 +595,17 @@ public class StudyPublicationBean
 
     public void validate(Errors errors)
     {
-        if (getTitle() == null)
+        if (StringUtils.isEmpty(getTitle()))
             errors.rejectValue("title", ERROR_REQUIRED, "Title is required");
-        if (getStatus() == null)
+        if (StringUtils.isEmpty(getStatus()))
             errors.rejectValue("status", ERROR_REQUIRED, "Status is required");
-        if (getPublicationType() == null)
+        if (StringUtils.isEmpty(getPublicationType()))
             errors.rejectValue("publicationType", ERROR_REQUIRED, "Publication type is required");
         if (getPMID() != null && !StringUtils.isNumeric(getPMID()))
         {
             errors.rejectValue("pmid", ERROR_MSG, "PMID must be an integer");
         }
-        if (getPMCID() != null && !PMCID_PATTERN.matcher(getPMCID()).matches())
+        if (!StringUtils.isEmpty(getPMCID())&& !PMCID_PATTERN.matcher(getPMCID()).matches())
         {
             errors.rejectValue("pmcid", ERROR_MSG, "Incorrect format for PMCID.  Expected PMC#");
         }
