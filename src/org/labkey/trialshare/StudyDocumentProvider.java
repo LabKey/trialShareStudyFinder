@@ -24,7 +24,6 @@ import org.labkey.api.search.SearchService;
 import org.labkey.api.security.User;
 import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.util.Path;
-import org.labkey.api.util.StringUtilsLabKey;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.webdav.SimpleDocumentResource;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
@@ -125,7 +124,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
                                 "trialShare:study:" + containerId + ":" + results.getString("StudyId"),
                                 containerId,
                                 "text/html",
-                                body.toString().getBytes(StringUtilsLabKey.DEFAULT_CHARSET),
+                                body.toString(),
                                 url,
                                 properties
                         );
