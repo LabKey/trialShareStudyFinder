@@ -45,7 +45,7 @@ public class StudyDocumentProvider implements SearchService.DocumentProvider
     public static void reindex()
     {
         StudyDocumentProvider dp = new StudyDocumentProvider();
-        SearchService ss = ServiceRegistry.get(SearchService.class);
+        SearchService ss = SearchService.get();
         ss.deleteResourcesForPrefix("trialShare:study:");
         dp.enumerateDocuments(ss.defaultTask(), getDocumentContainer(), null);
     }

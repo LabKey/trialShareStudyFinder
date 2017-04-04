@@ -49,7 +49,7 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
     public static void reindex()
     {
         PublicationDocumentProvider dp = new PublicationDocumentProvider();
-        SearchService ss = ServiceRegistry.get(SearchService.class);
+        SearchService ss = SearchService.get();
         ss.deleteResourcesForPrefix("trialShare:publication:");
         dp.enumerateDocuments(ss.defaultTask(), getDocumentContainer(), null);
     }
