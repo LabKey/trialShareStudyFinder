@@ -26,7 +26,6 @@ import org.labkey.api.module.FolderTypeManager;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.module.ModuleProperty;
 import org.labkey.api.search.SearchService;
-import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.settings.AdminConsole;
 import org.labkey.api.view.SimpleWebPartFactory;
 import org.labkey.api.view.WebPartFactory;
@@ -81,7 +80,7 @@ public class TrialShareModule extends CodeOnlyModule
         FolderTypeManager.get().registerFolderType(this, new StudyITNFolderType(this));
 
         AdminConsole.addLink(AdminConsole.SettingsLinkType.Management, "Data Cube", TrialShareController.getCubeAdminURL());
-        SearchService ss = ServiceRegistry.get().getService(SearchService.class);
+        SearchService ss = SearchService.get();
         if (null != ss)
         {
             ss.addDocumentProvider(new StudyDocumentProvider());
