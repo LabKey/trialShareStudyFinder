@@ -82,7 +82,8 @@ public class TrialShareModule extends CodeOnlyModule
         FolderTypeManager.get().registerFolderType(this, new StudyITNFolderType(this));
 
         AdminConsole.addLink(AdminConsole.SettingsLinkType.Management, "Data Cube", TrialShareController.getCubeAdminURL(), AdminPermission.class);
-        SearchService ss = ServiceRegistry.get().getService(SearchService.class);
+
+        SearchService ss = SearchService.get();
         if (null != ss)
         {
             ss.addDocumentProvider(new StudyDocumentProvider());
