@@ -23,6 +23,7 @@ import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
 import org.labkey.api.search.SearchService;
 import org.labkey.api.security.User;
+import org.labkey.api.util.ConfigurationException;
 import org.labkey.api.util.Path;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.webdav.SimpleDocumentResource;
@@ -57,6 +58,17 @@ public class PublicationDocumentProvider implements SearchService.DocumentProvid
     @Override
     public void enumerateDocuments(SearchService.IndexTask task, @NotNull Container c, Date since)
     {
+        try
+        {
+            Container cubeContainer = TrialShareManager.get().getCubeContainer(c);
+            if (c != cubeContainer) // nothing to enumerate if we aren't in the cubeContainer
+                return;
+        }
+        catch (ConfigurationException e) // if the cubeContainer has not been configured, there's nothing to enumerate
+        {
+            return;
+
+        }
 
         QuerySchema listSchema = TrialShareQuerySchema.getSchema(User.getSearchUser(), c);
 
