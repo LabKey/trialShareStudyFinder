@@ -8,6 +8,7 @@ apply plugin: 'org.labkey.distribution'
 Distribution.inheritDependencies(project, ":server:distributions:community")
 
 BuildUtils.addModuleDistributionDependencies(project, [":server:modules:timeline",
+                                                       ":server:optionalModules:fileTransfer",
                                                        ":server:optionalModules:trialShare"])
 
 project.task(
