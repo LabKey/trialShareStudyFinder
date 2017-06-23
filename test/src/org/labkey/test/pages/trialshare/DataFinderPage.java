@@ -608,7 +608,7 @@ public class DataFinderPage extends LabKeyPage
 
             public Locator.XPathLocator facetGroup(Dimension dimension)
             {
-                return new Locator.XPathLocator("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]");
+                return Locator.xpath("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]");
             }
 
             public Locator.XPathLocator facetGroupTitle(Dimension dimension)
@@ -619,7 +619,7 @@ public class DataFinderPage extends LabKeyPage
 
             public Locator.XPathLocator facetClear(Dimension dimension)
             {
-                return new Locator.XPathLocator("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]//span[contains(@class,'labkey-clear-filter')]");
+                return Locator.xpath("//tr[contains(@data-recordid,'" + dimension.getHierarchyName() + "')]//span[contains(@class,'labkey-clear-filter')]");
             }
 
             public Locator.XPathLocator facetMemberSelected(Dimension dimension)

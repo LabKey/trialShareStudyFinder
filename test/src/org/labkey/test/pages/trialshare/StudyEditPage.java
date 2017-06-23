@@ -105,9 +105,7 @@ public class StudyEditPage extends CubeObjectEditPage
 
     public Locator.XPathLocator getStudyAccessPanelLocator(int panelIndex)
     {
-        Locator.XPathLocator panelLoc = new Locator.XPathLocator("");
-        panelLoc = panelLoc.append(Locator.tagWithClass("div", "studyaccesspanelindex" + panelIndex));
-        return panelLoc;
+        return Locator.tagWithClass("div", "studyaccesspanelindex" + panelIndex);
     }
 
     public Locator.XPathLocator getStudyAccessPanelFieldLocator(int panelIndex)
