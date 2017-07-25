@@ -113,12 +113,12 @@ public class ManageDataPage extends LabKeyPage
 
     public Locator.XPathLocator detailsLink(int row)
     {
-        return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 5) + "]/td[3]/a "));
+        return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 3) + "]/td[3]/a "));
     }
 
     public Locator.XPathLocator editLink(int row)
     {
-        return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 5) + "]/td[2]/a "));
+        return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 3) + "]/td[2]/a "));
     }
 
     public void refreshCube()
