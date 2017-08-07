@@ -13,7 +13,8 @@ Ext4.define('LABKEY.study.util.CubeObjectHelper', {
             url    : LABKEY.ActionURL.buildURL('query', 'selectRows.api', cubeContainerPath),
             extraParams : {
                 schemaName  : schemaName ? schemaName : 'lists',
-                queryName   : queryName
+                queryName   : queryName,
+                limit       : -1
             },
             reader : {
                 type : 'json',
