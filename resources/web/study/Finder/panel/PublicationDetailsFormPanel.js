@@ -322,6 +322,9 @@ Ext4.define('LABKEY.study.panel.PublicationDetailsFormPanel', {
                             reader: {
                                 type: 'json',
                                 root: 'data'
+                            },
+                            extraParams : {
+                                limit       : -1
                             }
                         },
                         sorters: [{
