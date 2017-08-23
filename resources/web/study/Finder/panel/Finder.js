@@ -16,6 +16,10 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
     border: false,
 
+    autoResize: {
+        skipHeight: false
+    },
+
     searchTerms : '',
 
     initComponent : function()
@@ -26,8 +30,10 @@ Ext4.define('LABKEY.study.panel.Finder', {
 
         this.callParent();
 
-        this._initResize();
-        
+        if (!LABKEY.experimental.useExperimentalCoreUI) {
+            this._initResize();
+        }
+
         this.on({
             finderObjectChanged: this.updateFinderObject,
             render : this.mask

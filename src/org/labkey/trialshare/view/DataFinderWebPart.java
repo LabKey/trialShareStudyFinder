@@ -23,18 +23,6 @@ import org.labkey.trialshare.TrialShareController;
 
 public class DataFinderWebPart extends JspView
 {
-    boolean isAutoResize = false;
-
-    public boolean isAutoResize()
-    {
-        return isAutoResize;
-    }
-
-    public void setIsAutoResize(boolean isAutoResize)
-    {
-        this.isAutoResize = isAutoResize;
-    }
-
     public DataFinderWebPart(Container c)
     {
         super("/org/labkey/trialshare/view/dataFinder.jsp");
@@ -49,10 +37,4 @@ public class DataFinderWebPart extends JspView
         this(v.getContainer());
     }
 
-
-    @Override
-    public void setIsOnlyWebPartOnPage(boolean b)
-    {
-        setIsAutoResize(b);
-    }
 }

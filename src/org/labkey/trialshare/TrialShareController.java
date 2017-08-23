@@ -442,9 +442,7 @@ public class TrialShareController extends SpringActionController
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
             setTitle("Data Finder");
-            DataFinderWebPart wp = new DataFinderWebPart(getContainer());
-            wp.setIsAutoResize(true);
-            return wp;
+            return new DataFinderWebPart(getContainer());
         }
 
         public NavTree appendNavTrail(NavTree root)
