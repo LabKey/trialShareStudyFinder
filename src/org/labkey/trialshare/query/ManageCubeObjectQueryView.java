@@ -19,17 +19,13 @@ import org.labkey.api.data.ActionButton;
 import org.labkey.api.data.ButtonBar;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.DataRegion;
-import org.labkey.api.data.DisplayColumn;
-import org.labkey.api.data.RenderContext;
-import org.labkey.api.data.SimpleDisplayColumn;
 import org.labkey.api.data.TableInfo;
-import org.labkey.api.query.FieldKey;
+import org.labkey.api.query.DetailsURL;
 import org.labkey.api.query.QueryAction;
 import org.labkey.api.query.QueryView;
 import org.labkey.api.security.User;
 import org.labkey.api.security.permissions.DeletePermission;
 import org.labkey.api.security.permissions.InsertPermission;
-import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.DataView;
 import org.labkey.api.view.ViewContext;
@@ -37,9 +33,7 @@ import org.labkey.trialshare.TrialShareController;
 import org.labkey.trialshare.TrialShareManager;
 import org.springframework.validation.BindException;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.List;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -47,17 +41,24 @@ import java.util.Set;
  */
 abstract class ManageCubeObjectQueryView extends QueryView
 {
-    private Container _cubeContainer = null;
-
     ManageCubeObjectQueryView(ViewContext context, BindException errors)
     {
         super(TrialShareQuerySchema.getUserSchema(context.getUser(), context.getContainer()));
-        _cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
+        Container _cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
+
         setShowInsertNewButton(true);
         setShowImportDataButton(false);
         setShowExportButtons(false);
         setShowDetailsColumn(true);
-        setShowUpdateColumn(_cubeContainer.hasPermission(getUser(), InsertPermission.class));
+        Boolean showUpdate = _cubeContainer != null && _cubeContainer.hasPermission(getUser(), InsertPermission.class);
+        if (showUpdate)
+        {
+            setShowDetailsColumn(true);
+            setDetailsURL(DetailsURL.fromString("/trialshare/viewData.view?id=${" + getKeyField() + "}&objectName=" + getCubeObjectName().toString()).toString());
+
+            setShowUpdateColumn(true);
+            setUpdateURL(DetailsURL.fromString("/trialshare/updateData.view?id=${" + getKeyField() + "}&objectName=" + getCubeObjectName().toString()).toString());
+        }
     }
 
     protected abstract TrialShareController.ObjectName getCubeObjectName();
@@ -98,53 +99,12 @@ abstract class ManageCubeObjectQueryView extends QueryView
         bar.add(refreshButton);
     }
 
-    @Override
-    protected void addDetailsAndUpdateColumns(List<DisplayColumn> ret, TableInfo table)
-    {
-
-        SimpleDisplayColumn detailsColumn = new SimpleDisplayColumn()
-        {
-            @Override
-            public void renderGridCellContents(RenderContext ctx, Writer out) throws IOException
-            {
-                Container cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
-                if (cubeContainer == null || !cubeContainer.hasPermission(getUser(), InsertPermission.class))
-                    return;
-
-                FieldKey keyFieldKey = FieldKey.fromParts(getKeyField());
-                String id = String.valueOf(ctx.get(keyFieldKey));
-                ActionURL actionUrl = new ActionURL(TrialShareController.ViewDataAction.class, cubeContainer);
-                actionUrl.addParameter("id", id);
-                actionUrl.addParameter("objectName", getCubeObjectName().toString());
-                out.write(PageFlowUtil.textLink("Details", actionUrl));
-            }
-        };
-        ret.add(detailsColumn);
-
-        SimpleDisplayColumn updateColumn = new SimpleDisplayColumn()
-        {
-            @Override
-            public void renderGridCellContents(RenderContext ctx, Writer out) throws IOException
-            {
-                Container cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
-                if (cubeContainer == null || !cubeContainer.hasPermission(getUser(), InsertPermission.class))
-                    return;
-
-                FieldKey keyFieldKey = FieldKey.fromParts(getKeyField());
-                String id = String.valueOf(ctx.get(keyFieldKey));
-                ActionURL actionUrl = new ActionURL(TrialShareController.UpdateDataAction.class, cubeContainer).addParameter("id", id);
-                actionUrl.addParameter("objectName", getCubeObjectName().toString());
-                actionUrl.addReturnURL(getViewContext().getActionURL());
-                out.write(PageFlowUtil.textLink("Edit", actionUrl));
-            }
-        };
-        ret.add(0, updateColumn);
-    }
-
     protected abstract String getKeyField();
 
-    protected abstract Set<String> getDefaultColumns();
-
+    protected Set<String> getDefaultColumns()
+    {
+        return Collections.emptySet();
+    }
 
     @Override
     protected ActionURL urlFor(QueryAction action)
