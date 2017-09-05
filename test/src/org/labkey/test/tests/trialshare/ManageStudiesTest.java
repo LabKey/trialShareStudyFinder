@@ -37,10 +37,16 @@ import static org.junit.Assert.assertEquals;
 @Category({Git.class})
 public class ManageStudiesTest extends DataFinderTestBase
 {
+    {setIsBootstrapWhitelisted(true);}
     CubeObjectType _objectType = CubeObjectType.study;
 
     private static final String PROJECT_NAME = "ManageStudiesTest Project";
     private static final String DATA_PROJECT_NAME = "ManageStudiesTestData Project";
+
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     @Nullable
     @Override
@@ -171,6 +177,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         // N.B. leaving out external URL description and Description fields because
         // not sure how to attach to the iframe
         newFields.put(StudyEditPage.INVESTIGATOR, "investigate");
+
         newFields.put(StudyEditPage.AGE_GROUPS, new String[]{"Child"});
         newFields.put(StudyEditPage.PHASES, new String[]{"Phase 0"});
         newFields.put(StudyEditPage.CONDITIONS, new String[]{"Eczema"});
@@ -406,7 +413,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         // N.B. leaving out external URL description and Description fields because
         // not sure how to attach to the iframe
         updatedFields.put(StudyEditPage.INVESTIGATOR, "investigate updated");
-
+        sleep(500);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
         editPage.setFormFields(updatedFields);
         editPage.save();

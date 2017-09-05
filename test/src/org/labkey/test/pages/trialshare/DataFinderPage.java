@@ -167,6 +167,7 @@ public class DataFinderPage extends LabKeyPage
     {
         _ext4Helper.waitForMaskToDisappear();
         Locators.finderObjectTab(text).findElement(getDriver()).click();
+        sleep(500);
     }
 
     public Map<Dimension, Integer> getSummaryCounts()
@@ -239,6 +240,7 @@ public class DataFinderPage extends LabKeyPage
                 doAndWaitForPageSignal(clearAll::click, getCountSignal());
             }
         }
+        assertElementNotPresent(activeClearAllLocator);
     }
 
     public void dismissTour()

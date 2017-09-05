@@ -52,7 +52,7 @@ public class ManageDataPage extends LabKeyPage
 
     public boolean hasExpectedColumns()
     {
-        for (String header : _table.getColumnHeaders())
+        for (String header : _table.getColumnLabels())
         {
             if (!StringUtils.isEmpty(header) && !header.trim().isEmpty() && !_objectType.getManageDataHeaders().contains(header))
                 return false;
@@ -83,7 +83,7 @@ public class ManageDataPage extends LabKeyPage
     public void goToInsertNew()
     {
         log("Going to insert new " + _objectType);
-        doAndWaitForPageToLoad(() -> _table.clickInsertNewRowButton());
+        doAndWaitForPageToLoad(() -> _table.clickInsertNewRow());
     }
 
     public int getRowIndex(String value)
@@ -96,7 +96,7 @@ public class ManageDataPage extends LabKeyPage
     public void goToEditRecord(String keyValue)
     {
         Integer rowIndex = getRowIndex(keyValue);
-        doAndWaitForPageToLoad(() -> editLink(rowIndex).findElement(getDriver()).click());
+        doAndWaitForPageToLoad(() -> editLink(rowIndex));//.findElement(getDriver()).click());
     }
 
     public void deleteRecord(String keyValue)
@@ -105,8 +105,7 @@ public class ManageDataPage extends LabKeyPage
         Integer rowIndex = getRowIndex(keyValue);
         Assert.assertTrue("Record with key '" + keyValue + "' not found", rowIndex >= 0);
         _table.checkCheckbox(rowIndex);
-        _table.clickHeaderButtonByText("Delete");
-
+        click(Locator.tagWithAttribute("a","data-original-title","Delete"));
         log("Waiting for delete confirmation to show up");
         waitForAlert("Are you sure you want to delete the selected row?", 1000);
     }
@@ -116,15 +115,16 @@ public class ManageDataPage extends LabKeyPage
         return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 3) + "]/td[3]/a "));
     }
 
-    public Locator.XPathLocator editLink(int row)
+    public void editLink(int row)
     {
-        return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 3) + "]/td[2]/a "));
+        new DataRegionTable("query",getDriver()).clickEditRow(row);
+
     }
 
     public void refreshCube()
     {
         log("Refreshing cube");
-        _table.clickHeaderButtonByText("Refresh Cube");
+        _table.clickHeaderButton("Refresh Cube");
         sleep(2000); // give time for the refresh to happen
     }
 
