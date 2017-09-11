@@ -51,6 +51,9 @@ import static org.junit.Assert.assertTrue;
 @Category({Git.class})
 public class TrialShareDataFinderTest extends DataFinderTestBase implements ReadOnlyTest
 {
+
+    {setIsBootstrapWhitelisted(true);}
+
     private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
 
     private static final String PROJECT_NAME = "TrialShareDataFinderTest Project";

@@ -32,7 +32,9 @@ public class StudySummaryWindow extends StudySummaryPanel
 
     public void closeWindow()
     {
-        elements().closeButton.findElement(_window).click();
+        // There is a small region at the edges of the window that the user can click to resize the window.
+        // This region overlaps with the default position too click on the close button.
+        _test.clickAt(elements().closeButton.findElement(_window), 0, 13, 0);
         _test.shortWait().until(ExpectedConditions.stalenessOf(_window));
     }
 
