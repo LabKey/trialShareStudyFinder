@@ -51,9 +51,7 @@ import static org.junit.Assert.assertTrue;
 @Category({Git.class})
 public class TrialShareDataFinderTest extends DataFinderTestBase implements ReadOnlyTest
 {
-
     {setIsBootstrapWhitelisted(true);}
-
     private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
 
     private static final String PROJECT_NAME = "TrialShareDataFinderTest Project";
@@ -80,7 +78,11 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     {
         return PROJECT_NAME;
     }
-
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
     @Override
     public String getDataProjectName() { return DATA_PROJECT_NAME; }
 
