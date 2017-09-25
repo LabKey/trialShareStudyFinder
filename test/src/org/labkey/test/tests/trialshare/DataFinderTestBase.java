@@ -214,7 +214,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     protected void reindexForSearch()
     {
         log("Reindexing data for full-text search");
-        goToAdminConsole();
+        goToAdminConsole().goToAdminConsoleLinksSection();
         clickAndWait(Locator.linkWithText("Data Cube"));
         clickButton("Reindex", 0);
         clickButton("OK");
