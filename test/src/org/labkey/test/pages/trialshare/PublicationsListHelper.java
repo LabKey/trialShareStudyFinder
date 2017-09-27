@@ -20,9 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
 
-/**
- * Created by susanh on 2/5/16.
- */
 public class PublicationsListHelper extends LabKeyPage
 {
     public PublicationsListHelper(BaseWebDriverTest test)
@@ -34,11 +31,11 @@ public class PublicationsListHelper extends LabKeyPage
     {
         log("Setting up permissions container for publications");
         clickAndWait(Locator.linkWithText("ManuscriptsAndAbstracts"));
-        DataRegionTable table = new DataRegionTable("query", _test);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
 
         for (int i = 0; i < table.getDataRowCount(); i++)
         {
-            clickAndWait(table.updateLink(i));
+            table.clickEditRow(i);
             String status = Locators.statusValue.findElement(getDriver()).getAttribute("value");
             if ("Complete".equalsIgnoreCase(status))
                 selectOptionByText(Locators.permissionsContainerSelect,publicStudyName );
@@ -55,10 +52,10 @@ public class PublicationsListHelper extends LabKeyPage
         {
             clickAndWait(Locator.linkWithText("ManuscriptsAndAbstracts"));
         }
-        DataRegionTable table = new DataRegionTable("query", _test);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
 
-        int rowIndex = table.getRow("Title", title);
-        clickAndWait(table.updateLink(rowIndex));
+        int rowIndex = table.getRowIndex("Title", title);
+        table.clickEditRow(rowIndex);
         selectOptionByText(Locators.permissionsContainerSelect, containerName);
         clickButton("Submit");
     }
@@ -70,10 +67,10 @@ public class PublicationsListHelper extends LabKeyPage
         {
             clickAndWait(Locator.linkWithText("ManuscriptsAndAbstracts"));
         }
-        DataRegionTable table = new DataRegionTable("query", _test);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
 
-        int rowIndex = table.getRow("Title", title);
-        clickAndWait(table.updateLink(rowIndex));
+        int rowIndex = table.getRowIndex("Title", title);
+        table.clickEditRow(rowIndex);
         selectOptionByText(Locators.manuscriptContainerSelect, containerName);
         clickButton("Submit");
     }
@@ -84,7 +81,7 @@ public class PublicationsListHelper extends LabKeyPage
         {
             clickAndWait(Locator.linkWithText("ManuscriptsAndAbstracts"));
         }
-        DataRegionTable table = new DataRegionTable("query", _test);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         table.setFilter("Title", "Equals", title);
         return table.getDataRowCount();
     }
@@ -95,7 +92,7 @@ public class PublicationsListHelper extends LabKeyPage
         {
             clickAndWait(Locator.linkWithText("PublicationTherapeuticArea"));
         }
-        DataRegionTable table = new DataRegionTable("query", _test);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         table.setFilter("PublicationId", "Equals", title);
         return table.getDataRowCount();
     }
@@ -107,7 +104,7 @@ public class PublicationsListHelper extends LabKeyPage
         {
             clickAndWait(Locator.linkWithText("PublicationStudy"));
         }
-        DataRegionTable table = new DataRegionTable("query", _test);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         table.setFilter("PublicationId", "Equals", title);
         return table.getDataRowCount();
     }
