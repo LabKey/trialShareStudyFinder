@@ -89,12 +89,11 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     @Override
     public boolean needsSetup()
     {
-
         try
         {
-            return HttpStatus.SC_NOT_FOUND == WebTestHelper.getHttpGetResponse(WebTestHelper.buildURL("project", getProjectName(), "begin"));
+            return HttpStatus.SC_NOT_FOUND == WebTestHelper.getHttpResponse(WebTestHelper.buildURL("project", getProjectName(), "begin")).getResponseCode();
         }
-        catch (IOException fail)
+        catch (RuntimeException fail)
         {
             return true;
         }
