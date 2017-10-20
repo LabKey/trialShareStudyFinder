@@ -54,7 +54,7 @@ public class StudiesListHelper extends LabKeyPage
             clickAndWait(Locator.linkWithText("StudyAccess"));
         }
         DataRegionTable table = new DataRegionTable("query", _test);
-        table.clickInsertNewRowDropdown();
+        table.clickInsertNewRow();
         selectOptionByText(Locators.studyContainerSelect, containerName);
         selectOptionByText(Locators.studyVisibility, visibility);
         selectOptionByText(Locators.studyIdSelect, shortName);
@@ -111,7 +111,7 @@ public class StudiesListHelper extends LabKeyPage
         {
             clickAndWait(Locator.linkWithText(listName));
         }
-        DataRegionTable table = new DataRegionTable("query", _test);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         table.setFilter("StudyId", "Equals", studyId);
         return table.getDataRowCount();
     }
