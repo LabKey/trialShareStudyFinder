@@ -124,12 +124,7 @@ public class PublicationEditPage extends CubeObjectEditPage
         setFormFields(fieldMap);
         if (showOnDashboard)
         {
-            checkShowOnDashboard();
+            elementCache().showOnDashField.check();
         }
-    }
-
-    private void checkShowOnDashboard()
-    {
-        _ext4Helper.checkCheckbox("Show on Dashboard:");
     }
 }

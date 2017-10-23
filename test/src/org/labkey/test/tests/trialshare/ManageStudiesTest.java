@@ -31,9 +31,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by susanh on 6/29/16.
- */
 @Category({Git.class})
 public class ManageStudiesTest extends DataFinderTestBase
 {
@@ -155,7 +152,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         Assert.assertFalse("Submit button should not be enabled with title, short name but no studyId", editPage.isSubmitEnabled());
         editPage.setTextFormValue("studyId", "StudyId", true);
         Assert.assertTrue("Submit button should be enabled with all required study fields", editPage.isSubmitEnabled());
-        doAndWaitForPageToLoad(editPage::cancel);
+        editPage.cancel();
     }
 
     @Test

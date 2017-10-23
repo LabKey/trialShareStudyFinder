@@ -39,9 +39,6 @@ import static org.labkey.test.pages.trialshare.PublicationEditPage.EMPTY_VALUE;
 import static org.labkey.test.pages.trialshare.PublicationEditPage.NOT_EMPTY_VALUE;
 import static org.labkey.test.pages.trialshare.PublicationEditPage.TITLE;
 
-/**
- * Created by susanh on 6/29/16.
- */
 @Category({Git.class})
 public class ManagePublicationsTest extends DataFinderTestBase
 {
@@ -206,7 +203,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         ManageDataPage manageData = new ManageDataPage(this, _objectType);
         manageData.goToEditRecord("Quality assessments of un-gated flow cytometry FCS files in a clinical trial setting");
         PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
-        editPage.setTextFormValue("PMCID", "invalid", true, true);
+        editPage.setTextFormValue("PMCID", "invalid", false);
         Assert.assertFalse("Submit should be disabled when invalid PMCID is input", editPage.isSubmitEnabled());
     }
 

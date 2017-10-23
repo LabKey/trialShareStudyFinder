@@ -16,23 +16,22 @@
 package org.labkey.test.pages.trialshare;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by susanh on 6/30/16.
- */
+import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
+
 public abstract class CubeObjectEditPage extends LabKeyPage
 {
     public static final String NOT_EMPTY_VALUE = "NOT EMPTY VALUE";
@@ -41,30 +40,28 @@ public abstract class CubeObjectEditPage extends LabKeyPage
     CubeObjectEditPage(WebDriver driver)
     {
         super(driver);
+        addPageLoadListener(new PageLoadListener()
+        {
+            @Override
+            public void afterPageLoad()
+            {
+                clearCache();
+            }
+        });
     }
 
     public void setTextFormValue(String key, String value)
     {
-        setTextFormValue(key, value, false);
+        setTextFormValue(key, value, null);
     }
 
-    public void setTextFormValue(String key, String value, Boolean waitForSubmit)
-    {
-        setTextFormValue(key, value, waitForSubmit, false);
-    }
-
-    public void setTextFormValue(String key, String value, Boolean waitForSubmit, Boolean submitIsDisabled)
+    public void setTextFormValue(String key, String value, @Nullable Boolean expectSubmitEnabled)
     {
         Locator fieldLocator = Locator.name(key);
         setFormElement(fieldLocator, value);
-        if (waitForSubmit)
+        if (expectSubmitEnabled != null)
         {
-            elementCache().saveAndCloseButton.isDisplayed(); // Make sure it exists
-            ExpectedCondition<Boolean> saveIsDisabled = elementCache().disabledButtonCondition(elementCache().saveAndCloseButton);
-            if (submitIsDisabled)
-                shortWait().until(saveIsDisabled);
-            else
-                shortWait().until(ExpectedConditions.not(saveIsDisabled));
+            waitFor(() -> expectSubmitEnabled == isSubmitEnabled(), WAIT_FOR_JAVASCRIPT);
         }
     }
 
@@ -185,14 +182,12 @@ public abstract class CubeObjectEditPage extends LabKeyPage
 
     public boolean isSubmitEnabled()
     {
-        Boolean result = elementCache().disabledButtonCondition(elementCache().saveAndCloseButton).apply(null);
-        return result != null && result;
+        return !elementCache().saveAndCloseButton.getAttribute("class").contains("disabled");
     }
 
     public boolean isWorkbenchEnabled()
     {
-        Boolean result = elementCache().disabledButtonCondition(elementCache().workbenchButton).apply(null);
-        return result != null && result;
+        return !elementCache().workbenchButton.getAttribute("class").contains("disabled");
     }
 
     public void cancel()
@@ -226,17 +221,14 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         return new ElementCache();
     }
 
-    private class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage.ElementCache
     {
-        final WebElement showOnDashField = Locator.css(".labkey-field-editor input.x4-form-checkbox").findWhenNeeded(this);
-        final WebElement saveButton = Locator.linkWithText("Save").findWhenNeeded(this);
-        final WebElement saveAndCloseButton = Locator.linkWithText("Save And Close").findWhenNeeded(this);
-        final WebElement cancelButton = Locator.linkWithText("Cancel").findWhenNeeded(this);
-        final WebElement workbenchButton = Locator.linkWithText("Workbench").findWhenNeeded(this);
+        final Checkbox showOnDashField = Ext4Checkbox().withLabel("Show on Dashboard:").findWhenNeeded(this);
 
-        ExpectedCondition<Boolean> disabledButtonCondition(WebElement buttonEl)
-        {
-            return ExpectedConditions.attributeContains(elementCache().saveAndCloseButton, "class", "disabled");
-        }
+        // Buttons become stale when becoming enabled or disabled so refindWhenNeeded
+        final WebElement saveButton = Locator.linkWithText("Save").refindWhenNeeded(this);
+        final WebElement saveAndCloseButton = Locator.linkWithText("Save And Close").refindWhenNeeded(this);
+        final WebElement cancelButton = Locator.linkWithText("Cancel").refindWhenNeeded(this);
+        final WebElement workbenchButton = Locator.linkWithText("Workbench").refindWhenNeeded(this);
     }
 }
