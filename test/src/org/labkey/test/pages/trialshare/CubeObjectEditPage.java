@@ -22,6 +22,9 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,12 +59,13 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         setFormElement(fieldLocator, value);
         if (waitForSubmit)
         {
+            elementCache().saveAndCloseButton.isDisplayed(); // Make sure it exists
+            ExpectedCondition<Boolean> saveIsDisabled = elementCache().disabledButtonCondition(elementCache().saveAndCloseButton);
             if (submitIsDisabled)
-                waitForElement(Locators.disabledSaveAndCloseButton);
+                shortWait().until(saveIsDisabled);
             else
-                waitForElement(Locators.saveAndCloseButton);
+                shortWait().until(ExpectedConditions.not(saveIsDisabled));
         }
-
     }
 
     public abstract Map<String, String> getDropdownFieldNames();
@@ -115,8 +119,6 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         Locator arrowTrigger = comboBox.append("//div[contains(@class,'arrow')]");
         arrowTrigger.findElement(this.getDriver()).click();
     }
-
-
 
     public void setFormFields(Map<String, Object> fieldMap)
     {
@@ -183,47 +185,58 @@ public abstract class CubeObjectEditPage extends LabKeyPage
 
     public boolean isSubmitEnabled()
     {
-        return !isElementPresent(Locators.disabledSaveAndCloseButton);
+        Boolean result = elementCache().disabledButtonCondition(elementCache().saveAndCloseButton).apply(null);
+        return result != null && result;
     }
 
     public boolean isWorkbenchEnabled()
     {
-        return !isElementPresent(Locators.disabledWorkbenchButton);
+        Boolean result = elementCache().disabledButtonCondition(elementCache().workbenchButton).apply(null);
+        return result != null && result;
     }
 
     public void cancel()
     {
         log("Cancelling edit");
-        Locators.cancelButton.findElement(getDriver()).click();
+        clickAndWait(elementCache().cancelButton);
     }
 
     public void save()
     {
         log("Saving edit form");
-        click(Locators.saveButton);
-   //     waitForElement(Locator.tagContainingText("h3","Update publication"));
+        elementCache().saveButton.click();
     }
 
     public void saveAndClose(String returnToHeader)
     {
         log("Saving and closing edit form");
-        click(Locators.saveAndCloseButton);
-        waitForElement(Locators.getTitleTextLocator(returnToHeader));
+        clickAndWait(elementCache().saveAndCloseButton);
+        waitForElement(Locator.css(".labkey-wp-title-text").containing(returnToHeader));
     }
 
-    private static class Locators
+    @Override
+    protected ElementCache elementCache()
     {
-        static final Locator showOnDashField = Locator.css(".labkey-field-editor input.x4-form-checkbox");
-        static final Locator saveButton = Locator.linkWithText("Save");
-        static final Locator saveAndCloseButton = Locator.linkWithText("Save And Close");
-        static final Locator disabledSaveAndCloseButton = Locator.css("a.x4-disabled").withText("SAVE AND CLOSE"); // why do we need to have the all caps text here?
-        static final Locator cancelButton = Locator.linkWithText("Cancel");
-        static final Locator disabledWorkbenchButton = Locator.css("a.x4-disabled").withText("WORKBENCH");
+        return (ElementCache) super.elementCache();
+    }
 
-        static Locator getTitleTextLocator(String text)
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    private class ElementCache extends LabKeyPage.ElementCache
+    {
+        final WebElement showOnDashField = Locator.css(".labkey-field-editor input.x4-form-checkbox").findWhenNeeded(this);
+        final WebElement saveButton = Locator.linkWithText("Save").findWhenNeeded(this);
+        final WebElement saveAndCloseButton = Locator.linkWithText("Save And Close").findWhenNeeded(this);
+        final WebElement cancelButton = Locator.linkWithText("Cancel").findWhenNeeded(this);
+        final WebElement workbenchButton = Locator.linkWithText("Workbench").findWhenNeeded(this);
+
+        ExpectedCondition<Boolean> disabledButtonCondition(WebElement buttonEl)
         {
-            return Locator.css(".labkey-wp-title-text").containing(text);
+            return ExpectedConditions.attributeContains(elementCache().saveAndCloseButton, "class", "disabled");
         }
     }
-
 }
