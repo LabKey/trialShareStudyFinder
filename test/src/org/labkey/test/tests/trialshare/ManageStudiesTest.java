@@ -554,8 +554,8 @@ public class ManageStudiesTest extends DataFinderTestBase
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
 
         //wait for combo store to load
-        assertEquals("Display Name value for the first Study Access record is incorrect", editPage.getStudyAccessDisplayNameValue(0), firstDisplayName);
-        assertEquals("Display Name value for the second Study Access record is incorrect", editPage.getStudyAccessDisplayNameValue(1), secondDisplayName);
+        assertEquals("Display Name value for the first Study Access record is incorrect", firstDisplayName, editPage.getStudyAccessDisplayNameValue(0));
+        assertEquals("Display Name value for the second Study Access record is incorrect", secondDisplayName, editPage.getStudyAccessDisplayNameValue(1));
 
         log("Remove the second study access record");
         editPage.removeStudyAccessPanel(1);
@@ -570,6 +570,6 @@ public class ManageStudiesTest extends DataFinderTestBase
         log("Verify the second study access record is deleted successfully");
         assertElementNotPresent(editPage.getStudyAccessPanelLocator(1));
 
-        assertEquals("Failed to update Display Name field", editPage.getStudyAccessDisplayNameValue(0), firstDisplayName);
+        assertEquals("Failed to update Display Name field", firstDisplayName, editPage.getStudyAccessDisplayNameValue(0));
     }
 }
