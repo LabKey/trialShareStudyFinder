@@ -42,7 +42,6 @@ import static org.labkey.test.pages.trialshare.PublicationEditPage.TITLE;
 @Category({Git.class})
 public class ManagePublicationsTest extends DataFinderTestBase
 {
-    {setIsBootstrapWhitelisted(true);}
     private CubeObjectType _objectType = CubeObjectType.publication;
 
     private static final String PUBLIC_STUDY_ID = "Casale";

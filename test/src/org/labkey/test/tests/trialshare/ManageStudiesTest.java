@@ -34,7 +34,6 @@ import static org.junit.Assert.assertEquals;
 @Category({Git.class})
 public class ManageStudiesTest extends DataFinderTestBase
 {
-    {setIsBootstrapWhitelisted(true);}
     CubeObjectType _objectType = CubeObjectType.study;
 
     private static final String PROJECT_NAME = "ManageStudiesTest Project";

@@ -36,7 +36,6 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.ReadOnlyTest;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,7 +50,6 @@ import static org.junit.Assert.assertTrue;
 @Category({Git.class})
 public class TrialShareDataFinderTest extends DataFinderTestBase implements ReadOnlyTest
 {
-    {setIsBootstrapWhitelisted(true);}
     private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
 
     private static final String PROJECT_NAME = "TrialShareDataFinderTest Project";
