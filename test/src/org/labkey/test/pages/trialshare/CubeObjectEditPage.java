@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public abstract class CubeObjectEditPage extends LabKeyPage
@@ -57,11 +58,14 @@ public abstract class CubeObjectEditPage extends LabKeyPage
 
     public void setTextFormValue(String key, String value, @Nullable Boolean expectSubmitEnabled)
     {
-        Locator fieldLocator = Locator.name(key);
-        setFormElement(fieldLocator, value);
+        WebElement field = Locator.name(key).findElement(getDriver());
+        setFormElement(field, value);
+        fireEvent(field, SeleniumEvent.blur);
+        waitFor(() -> !field.getAttribute("class").contains("x4-field-focus"), 1000);
         if (expectSubmitEnabled != null)
         {
-            waitFor(() -> expectSubmitEnabled == isSubmitEnabled(), WAIT_FOR_JAVASCRIPT);
+            if (!waitFor(() -> expectSubmitEnabled == isSubmitEnabled(), WAIT_FOR_JAVASCRIPT))
+                assertEquals("Submit button state not enabled as expected", expectSubmitEnabled, isSubmitEnabled());
         }
     }
 
