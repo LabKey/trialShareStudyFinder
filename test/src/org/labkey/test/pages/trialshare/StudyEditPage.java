@@ -147,8 +147,10 @@ public class StudyEditPage extends CubeObjectEditPage
 
     public void setStudyAccessDisplayName(int panelIndex, String value)
     {
+        log("Setting study access display name to " + value);
         Locator fieldLocator = getStudyAccessDisplayName(panelIndex);
         setFormElement(fieldLocator, value);
+        sleep(1500); // we need to wait for the updated value to propagate through the Javascript store
     }
 
     public String getStudyAccessDisplayNameValue(int panelIndex)
