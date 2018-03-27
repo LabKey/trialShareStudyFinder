@@ -62,7 +62,7 @@ public abstract class CubeObjectEditPage extends LabKeyPage
 
     public void setTextFormValue(String fieldName, String value, @Nullable Boolean expectSubmitEnabled)
     {
-        WebElement field = Locator.name(fieldName).findElement(getDriver());
+        WebElement field = Locator.name(fieldName).findElement(elementCache());
         setFormElement(field, value);
         fireEvent(field, SeleniumEvent.blur);
         waitFor(() -> !field.getAttribute("class").contains("x4-field-focus"), 1000);
@@ -100,7 +100,7 @@ public abstract class CubeObjectEditPage extends LabKeyPage
             else
                 log(String.format("Updating field %s: currently \"%s\", toggling [%s]", fieldName, formValue, String.join(", ", options)));
 
-            ComboBox comboBox = findComboBox(fieldName);
+            ComboBox comboBox = elementCache().findComboBox(fieldName);
             comboBox.toggleComboBoxItems(options);
         }
         else
@@ -109,7 +109,7 @@ public abstract class CubeObjectEditPage extends LabKeyPage
             log("Setting field " + fieldName + " to " + expectedValue);
             if (getDropdownFieldNames().keySet().contains(fieldName))
             {
-                ComboBox comboBox = findComboBox(fieldName);
+                ComboBox comboBox = elementCache().findComboBox(fieldName);
                 comboBox.selectComboBoxItem(expectedValue);
             }
             else
@@ -119,28 +119,6 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         }
         assertEquals(expectedValue, getFormValue(fieldName));
         log("Field " + fieldName + " new value is " + getFormValue(fieldName));
-    }
-
-    private ComboBox findComboBox(String fieldName)
-    {
-        String label;
-        boolean isMultiSelect;
-        if (getDropdownFieldNames().keySet().contains(fieldName))
-        {
-            label = getDropdownFieldNames().get(fieldName);
-            isMultiSelect = false;
-        }
-        else if (getMultiSelectFieldNames().keySet().contains(fieldName))
-        {
-            label = getMultiSelectFieldNames().get(fieldName);
-            isMultiSelect = true;
-        }
-        else
-        {
-            throw new IllegalArgumentException("No combo-box specified for '" + fieldName + "' in " + this.getClass().getSimpleName());
-        }
-
-        return new ComboBox.ComboBoxFinder(getDriver()).withLabel(label).find(getDriver()).setMultiSelect(isMultiSelect);
     }
 
     public void setFormFields(Map<String, Object> fieldMap)
@@ -239,6 +217,8 @@ public abstract class CubeObjectEditPage extends LabKeyPage
     @Override
     protected ElementCache newElementCache()
     {
+        // Wait for form to set initial focus
+        waitFor(() -> "text".equals(executeScript("return document.activeElement.type;")), 10000);
         return new ElementCache();
     }
 
@@ -251,5 +231,27 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         final WebElement saveAndCloseButton = Locator.linkWithText("Save And Close").refindWhenNeeded(this).withTimeout(10000);
         final WebElement cancelButton = Locator.linkWithText("Cancel").refindWhenNeeded(this).withTimeout(10000);
         final WebElement workbenchButton = Locator.linkWithText("Workbench").refindWhenNeeded(this).withTimeout(10000);
+
+        private ComboBox findComboBox(String fieldName)
+        {
+            String label;
+            boolean isMultiSelect;
+            if (getDropdownFieldNames().keySet().contains(fieldName))
+            {
+                label = getDropdownFieldNames().get(fieldName);
+                isMultiSelect = false;
+            }
+            else if (getMultiSelectFieldNames().keySet().contains(fieldName))
+            {
+                label = getMultiSelectFieldNames().get(fieldName);
+                isMultiSelect = true;
+            }
+            else
+            {
+                throw new IllegalArgumentException("No combo-box specified for '" + fieldName + "' in " + this.getClass().getSimpleName());
+            }
+
+            return new ComboBox.ComboBoxFinder(getDriver()).withLabel(label).find(this).setMultiSelect(isMultiSelect);
+        }
     }
 }
