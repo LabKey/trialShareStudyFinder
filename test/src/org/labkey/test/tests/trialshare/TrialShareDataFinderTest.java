@@ -17,14 +17,10 @@
 package org.labkey.test.tests.trialshare;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
 import org.labkey.test.components.trialshare.PublicationPanel;
 import org.labkey.test.components.trialshare.StudySummaryWindow;
@@ -50,26 +46,8 @@ import static org.junit.Assert.assertTrue;
 @Category({Git.class})
 public class TrialShareDataFinderTest extends DataFinderTestBase implements ReadOnlyTest
 {
-    private static final String RELOCATED_DATA_FINDER_PROJECT = "RelocatedDataFinder";
-
     private static final String PROJECT_NAME = "TrialShareDataFinderTest Project";
     private static final String DATA_PROJECT_NAME = "TrialShareDataFinderTestData Project";
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-        _containerHelper.deleteProject(RELOCATED_DATA_FINDER_PROJECT, afterTest);
-    }
-
-    @BeforeClass
-    public static void initTest()
-    {
-        TrialShareDataFinderTest init = (TrialShareDataFinderTest)getCurrentTest();
-
-        if (init.needsSetup())
-            init.setUpProject();
-    }
 
     @Override
     protected String getProjectName()
@@ -85,16 +63,20 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
     public String getDataProjectName() { return DATA_PROJECT_NAME; }
 
     @Override
+    protected void setUpProject()
+    {
+        if (needsSetup())
+            super.setUpProject();
+    }
+
+    @Override
     public boolean needsSetup()
     {
-        try
-        {
-            return HttpStatus.SC_NOT_FOUND == WebTestHelper.getHttpResponse(WebTestHelper.buildURL("project", getProjectName(), "begin")).getResponseCode();
-        }
-        catch (RuntimeException fail)
-        {
+        if (!_studyHelper.doesStudyExist(getDataProjectName() + "/" + PUBLIC_STUDY_NAME))
             return true;
-        }
+        if (!_studyHelper.doesStudyExist(getDataProjectName() + "/" + OPERATIONAL_STUDY_NAME))
+            return true;
+        return !_containerHelper.doesContainerExist(getProjectName());
     }
 
     @Override
