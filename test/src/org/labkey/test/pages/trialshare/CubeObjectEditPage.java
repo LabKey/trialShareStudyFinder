@@ -17,6 +17,7 @@ package org.labkey.test.pages.trialshare;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.ComboBox;
@@ -217,12 +218,14 @@ public abstract class CubeObjectEditPage extends LabKeyPage
     public void save()
     {
         log("Saving edit form");
+        Assert.assertTrue("Save buttons are disabled", isSubmitEnabled());
         clickAndWait(elementCache().saveButton);
     }
 
     public void saveAndClose(String returnToHeader)
     {
         log("Saving and closing edit form");
+        Assert.assertTrue("Save buttons are disabled", isSubmitEnabled());
         clickAndWait(elementCache().saveAndCloseButton);
         waitForElement(Locator.css(".labkey-wp-title-text").containing(returnToHeader));
     }
