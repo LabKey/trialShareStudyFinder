@@ -77,6 +77,10 @@ Ext4.define('LABKEY.study.panel.StudyAccessTuplePanel', {
                                 if (submitBtn && submitBtn.isDisabled) {
                                     submitBtn.enable();
                                 }
+                                var saveBtn = Ext4.ComponentQuery.query("#detailsSaveBtn")[0];
+                                if (saveBtn && saveBtn.isDisabled) {
+                                    saveBtn.enable();
+                                }
                             }
                         }
                     }

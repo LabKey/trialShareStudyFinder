@@ -20,16 +20,17 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
 import org.labkey.test.components.trialshare.PublicationPanel;
-import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.pages.trialshare.ManageDataPage;
 import org.labkey.test.pages.trialshare.PublicationEditPage;
 import org.labkey.test.pages.trialshare.PublicationsListHelper;
 import org.labkey.test.pages.trialshare.StudiesListHelper;
+import org.labkey.test.util.Maps;
 
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,17 +103,13 @@ public class ManagePublicationsTest extends DataFinderTestBase
         return BrowserType.CHROME;
     }
 
-
     @Override
     protected void createUsers()
     {
         _userHelper.createUser(PUBLIC_READER);
 
         makeProjectReadable(getDataProjectName());
-
-        PermissionsEditor permissionsEditor = new PermissionsEditor(this);
-
-        permissionsEditor.selectFolder(PUBLIC_STUDY_NAME);
+        clickFolder(PUBLIC_STUDY_NAME);
         _apiPermissionsHelper.setUserPermissions(PUBLIC_READER, "Reader");
     }
 
@@ -216,23 +213,23 @@ public class ManagePublicationsTest extends DataFinderTestBase
         Assert.assertFalse("Submit button should not be enabled", editPage.isSubmitEnabled());
         editPage.setTextFormValue("title", "testRequiredFields");
         Assert.assertFalse("Submit button should not be enabled with only title", editPage.isSubmitEnabled());
-        doAndWaitForPageToLoad(editPage::cancel);
+        editPage.cancel();
 
         manageData.goToInsertNew();
-        editPage.selectMenuItem("Publication Type *:", "Manuscript");
+        editPage.setFormField(PublicationEditPage.PUBLICATION_TYPE, "Manuscript");
         Assert.assertFalse("Submit button should not be enabled with only publication type", editPage.isSubmitEnabled());
-        doAndWaitForPageToLoad(editPage::cancel);
+        editPage.cancel();
 
         manageData.goToInsertNew();
-        editPage.selectMenuItem("Status *:", "Complete");
+        editPage.setFormField(PublicationEditPage.STATUS, "Complete");
         Assert.assertFalse("Submit button should not be enabled with only status", editPage.isSubmitEnabled());
-        doAndWaitForPageToLoad(editPage::cancel);
+        editPage.cancel();
 
         manageData.goToInsertNew();
         editPage.setTextFormValue("title", "testRequiredFields");
-        editPage.selectMenuItem("Publication Type *:", "Manuscript");
+        editPage.setFormField(PublicationEditPage.PUBLICATION_TYPE, "Manuscript");
         Assert.assertFalse("Submit button should not be enabled with title, publication type but no status", editPage.isSubmitEnabled());
-        editPage.selectMenuItem("Status *:", "Complete");
+        editPage.setFormField(PublicationEditPage.STATUS, "Complete");
         Assert.assertTrue("Submit button should be enabled with all required fields", editPage.isSubmitEnabled());
     }
 
@@ -250,7 +247,7 @@ public class ManagePublicationsTest extends DataFinderTestBase
         editPage.saveAndClose("Data Finder");
         sleep(1000); // yes, it's a hack.  But everyone needs sleep at some point.
         // we should go back to the finder page and have the publication tab active
-        Assert.assertTrue("Publications tab on finder should be active after save and close", finder.isFinderObjectSelected("Publications"));
+        Assert.assertEquals("Wrong tab on finder active after save and close", "Publications",  finder.getSelectedFinderObject());
         getDriver().close();
         switchToMainWindow();
     }
@@ -265,12 +262,13 @@ public class ManagePublicationsTest extends DataFinderTestBase
         PublicationPanel publicationPanel = card.viewDetail();
         publicationPanel.clickEditLink();
         switchToWindow(1);
-        PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
-        doAndWaitForPageToLoad(editPage::cancel);
-        sleep(500);
-        // we should go back to the finder page and have the publication tab active
-        Assert.assertTrue("Publications tab on finder should be active after cancel", finder.isFinderObjectSelected("Publications"));
-        getDriver().close();
+        {
+            PublicationEditPage editPage = new PublicationEditPage(this.getDriver());
+            editPage.cancel();
+            // we should go back to the finder page and have the publication tab active
+            Assert.assertEquals("Wrong tab on finder active after cancel", "Publications", new DataFinderPage(this, false).getSelectedFinderObject());
+            getDriver().close();
+        }
         switchToMainWindow();
     }
 
@@ -555,30 +553,23 @@ public class ManagePublicationsTest extends DataFinderTestBase
 
         manageData.goToEditRecord((String) initialFields.get(TITLE));
         Assert.assertTrue("Workbench button should be enabled if data has not changed", editPage.isWorkbenchEnabled());
+        // Use JavaScript. WebElement.getAttribute("value") returns the display value rather than the value attribute
+        String studyId = (String) executeScript("return arguments[0].getAttribute('value');", Locator.name("studyIds").findElement(getDriver()));
+        String publicationId = getUrlParam("id");
+        String workbenchContainer = "Studies/" + studyId + "OPR/Study Data";
 
-        try
+        clickButton("Workbench", 0);
+
+        switchToWindow(1);
         {
-            int winCount = getDriver().getWindowHandles().size();
-            clickButton("Workbench", 0);
-
-            // Wait for the window to show up.
-            while(getDriver().getWindowHandles().size() == winCount)
-                sleep(500);
-
-            switchToWindow(1);
             String url = getDriver().getCurrentUrl();
-            String decodedUrl = URLDecoder.decode(url, "UTF-8");
-            Assert.assertEquals("Decoded url pointed to by the 'Workbench' button doesn't look right. Is it double encoded? '" + url + "'", decodedUrl, URLDecoder.decode(decodedUrl, "UTF-8"));
-        }
-        catch(java.io.UnsupportedEncodingException uee)
-        {
-            log("Got a UnsupportedEncodingException, going skip the encoding test.");
-        }
-        finally
-        {
+            // From workbench button handler in CubeObjectDetailsFormPanel.js
+            String expectedWorkbenchUrl = WebTestHelper.buildURL("project", workbenchContainer, "begin", Maps.of("pageId", "Manuscripts", "publicationId", publicationId));
+
+            Assert.assertEquals("Wrong url pointed to by the 'Workbench' button.", expectedWorkbenchUrl, url);
             getDriver().close();
-            switchToMainWindow();
         }
+        switchToMainWindow();
 
         editPage.setFormFields(updatedFields, false);
         Assert.assertFalse("Workbench button should be disabled if data has changed", editPage.isWorkbenchEnabled());

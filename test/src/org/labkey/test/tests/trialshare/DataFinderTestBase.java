@@ -24,7 +24,6 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.trialshare.DataFinderPage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
@@ -65,10 +64,8 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
 
     public enum CubeObjectType
     {
-
         study("StudyId", "Manage Studies", new String[]{"Study Id", "Short Name", "Title"}),
         publication("Title", "Manage Publications", new String[]{"Key", "Title", "Status", "Publication Type"});
-
 
         private String _keyField;
         private String _manageDataTitle;
@@ -98,10 +95,8 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     }
 
     static final Map<String, Set<String>> studySubsets = new HashMap<>();
-
     static
     {
-
         Set<String> operationalSet = new HashSet<>();
         studySubsets.put("Operational", operationalSet);
         operationalSet.add("TILT");
@@ -140,7 +135,6 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
 
         init.setUpProject();
     }
-
 
     @Override
     protected BrowserType bestBrowser()
@@ -187,7 +181,6 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
         containerHelper.enableModule(MODULE_NAME);
         makeProjectReadable(getProjectName());
 
-        goToProjectHome();
         new PortalHelper(this).addWebPart(WEB_PART_NAME);
     }
 
@@ -203,11 +196,8 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
 
     protected void makeProjectReadable(String projectName)
     {
-        PermissionsEditor permissionsEditor = new PermissionsEditor(this);
-
         goToProjectHome(projectName);
-        clickAdminMenuItem("Folder", "Permissions");
-        permissionsEditor.setSiteGroupPermissions("All Site Users", "Reader");
+        _apiPermissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
     }
 
     @LogMethod

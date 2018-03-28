@@ -88,7 +88,7 @@ public class ManageDataPage extends LabKeyPage
 
     public int getRowIndex(String value)
     {
-        Integer rowIndex = _table.getRow(_objectType.getKeyField(), value);
+        Integer rowIndex = _table.getRowIndex(_objectType.getKeyField(), value);
         Assert.assertTrue("Did not find row with " + _objectType.getKeyField() + " '" + value + "'", rowIndex >= 0);
         return rowIndex;
     }
@@ -96,7 +96,7 @@ public class ManageDataPage extends LabKeyPage
     public void goToEditRecord(String keyValue)
     {
         Integer rowIndex = getRowIndex(keyValue);
-        doAndWaitForPageToLoad(() -> editLink(rowIndex));//.findElement(getDriver()).click());
+        _table.clickEditRow(rowIndex);
     }
 
     public void deleteRecord(String keyValue)
@@ -115,16 +115,10 @@ public class ManageDataPage extends LabKeyPage
         return Locator.tagWithClass("table", "labkey-data-region").append(Locator.xpath("/tbody/tr[" + (row + 3) + "]/td[3]/a "));
     }
 
-    public void editLink(int row)
-    {
-        new DataRegionTable("query",getDriver()).clickEditRow(row);
-
-    }
-
     public void refreshCube()
     {
         log("Refreshing cube");
-        _table.clickHeaderButton("Refresh Cube");
+        _table.clickHeaderButtonAndWait("Refresh Cube");
         sleep(2000); // give time for the refresh to happen
     }
 

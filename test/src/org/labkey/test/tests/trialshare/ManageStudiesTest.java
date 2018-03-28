@@ -412,6 +412,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         sleep(500);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
         editPage.setFormFields(updatedFields);
+        editPage.removeStudyAccessPanel(0);
         editPage.save();
         Map<String, String> unexpectedValues = editPage.compareFormValues(updatedFields);
         Assert.assertTrue("Found unexpected values in edit page of updated study: " + unexpectedValues, unexpectedValues.isEmpty());

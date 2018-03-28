@@ -17,16 +17,20 @@ package org.labkey.test.pages.trialshare;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +40,7 @@ import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 public abstract class CubeObjectEditPage extends LabKeyPage
 {
     public static final String NOT_EMPTY_VALUE = "NOT EMPTY VALUE";
-    public static final String EMPTY_VALUE = "EMPTY VALUE";
+    public static final String EMPTY_VALUE = "";
 
     CubeObjectEditPage(WebDriver driver)
     {
@@ -51,14 +55,14 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         });
     }
 
-    public void setTextFormValue(String key, String value)
+    public void setTextFormValue(String fieldName, String value)
     {
-        setTextFormValue(key, value, null);
+        setTextFormValue(fieldName, value, null);
     }
 
-    public void setTextFormValue(String key, String value, @Nullable Boolean expectSubmitEnabled)
+    public void setTextFormValue(String fieldName, String value, @Nullable Boolean expectSubmitEnabled)
     {
-        WebElement field = Locator.name(key).findElement(getDriver());
+        WebElement field = Locator.name(fieldName).findElement(elementCache());
         setFormElement(field, value);
         fireEvent(field, SeleniumEvent.blur);
         waitFor(() -> !field.getAttribute("class").contains("x4-field-focus"), 1000);
@@ -73,68 +77,63 @@ public abstract class CubeObjectEditPage extends LabKeyPage
     public abstract Map<String, String> getMultiSelectFieldNames();
     public abstract Set<String> getFieldNames();
 
-    public void selectMenuItem(String label, String value)
+    @LogMethod
+    public void setFormField(@LoggedParam String fieldName, @LoggedParam Object value)
     {
-        _ext4Helper.selectComboBoxItem(label, value);
-    }
+        String expectedValue;
+        if (getMultiSelectFieldNames().keySet().contains(fieldName))
+        {
+            String[] options = (String[]) value;
+            String formValue = getFormValue(fieldName);
+            List<String> selection = new ArrayList<>(Arrays.asList(formValue.split(";\\s*")));
+            for (String option : options)
+            {
+                if (selection.contains(option))
+                    selection.remove(option);
+                else
+                    selection.add(option);
+            }
+            selection.remove("");
+            expectedValue = String.join("; ", selection);
+            if (formValue.isEmpty())
+                log("Setting field " + fieldName + " to " + expectedValue);
+            else
+                log(String.format("Updating field %s: currently \"%s\", toggling [%s]", fieldName, formValue, String.join(", ", options)));
 
-    public void setFormField(String key, Object value)
-    {
-        log("Setting field " + key + " to " + (value instanceof String[] ? StringUtils.join((String []) value, "; ") : value));
-        if (getDropdownFieldNames().keySet().contains(key))
-            _ext4Helper.selectComboBoxItem(getDropdownFieldNames().get(key), (String) value);
-        else if (getMultiSelectFieldNames().keySet().contains(key))
-            multiSelectComboBoxItem(getMultiSelectFieldNames().get(key), (String[]) value);
+            ComboBox comboBox = elementCache().findComboBox(fieldName);
+            comboBox.toggleComboBoxItems(options);
+        }
         else
-            setTextFormValue(key, (String) value);
-        log("Field " + key + " new value is " + getFormValue(key));
-    }
-
-    // the similar method in ext4Helper is looking for a property that does not exist to
-    // decide if this is a multi-select box or not.
-    public void multiSelectComboBoxItem(String label, @LoggedParam String... selections)
-    {
-        Locator.XPathLocator comboBox = Ext4Helper.Locators.formItemWithLabel(label);
-        _ext4Helper.openComboList(comboBox);
-        log("Hack-Nap while combo box gets filled. Maybe?");
-        sleep(2000);
-
-        try
         {
-            for (String selection : selections)
+            expectedValue = (String) value;
+            log("Setting field " + fieldName + " to " + expectedValue);
+            if (getDropdownFieldNames().keySet().contains(fieldName))
             {
-                log("Selecting " + selection);
-                _ext4Helper.selectItemFromOpenComboList(selection, Ext4Helper.TextMatchTechnique.EXACT);
+                ComboBox comboBox = elementCache().findComboBox(fieldName);
+                comboBox.selectComboBoxItem(expectedValue);
+            }
+            else
+            {
+                setTextFormValue(fieldName, expectedValue);
             }
         }
-        catch (StaleElementReferenceException retry) // Combo-box might still be loading previous selection (no good way to detect)
-        {
-            for (String selection : selections)
-            {
-                log("Selecting " + selection);
-                _ext4Helper.selectItemFromOpenComboList(selection, Ext4Helper.TextMatchTechnique.EXACT);
-            }
-        }
-
-        log("Closing combo box " + label);
-        Locator arrowTrigger = comboBox.append("//div[contains(@class,'arrow')]");
-        arrowTrigger.findElement(this.getDriver()).click();
+        assertEquals(expectedValue, getFormValue(fieldName));
+        log("Field " + fieldName + " new value is " + getFormValue(fieldName));
     }
 
     public void setFormFields(Map<String, Object> fieldMap)
     {
-        log("Setting form fields for keys: " + StringUtils.join(fieldMap.keySet(), ", "));
-        for (String key : fieldMap.keySet())
+        for (String fieldName : fieldMap.keySet())
         {
-            setFormField(key, fieldMap.get(key));
-            sleep(1000);
+            setFormField(fieldName, fieldMap.get(fieldName));
         }
     }
 
     public String getFormValue(String field)
     {
+        elementCache().cancelButton.isDisplayed();
         Locator fieldLocator = Locator.name(field);
-        return getFormElement(fieldLocator);
+        return StringUtils.trimToEmpty(getFormElement(fieldLocator));
     }
 
     public Map<String, String> getFormValues()
@@ -149,36 +148,30 @@ public abstract class CubeObjectEditPage extends LabKeyPage
 
     public Map<String, String> compareFormValues(Map<String, Object> expectedValues)
     {
-        log("Hack-Nap while combo box gets filled. Maybe?");
-        sleep(2000);
+        elementCache().cancelButton.isDisplayed(); // Make sure
         Map<String, String> formValues = getFormValues();
         Map<String, String> unexpectedValues = new HashMap<>();
-        for (String key : expectedValues.keySet())
+        for (String fieldName : expectedValues.keySet())
         {
             String expectedValue;
-            if (expectedValues.get(key) instanceof String)
+            if (expectedValues.get(fieldName) instanceof String)
             {
-                expectedValue = (String) expectedValues.get(key);
+                expectedValue = (String) expectedValues.get(fieldName);
             }
             else // should be an array of Strings
             {
-                expectedValue = StringUtils.join((String[]) expectedValues.get(key), "; ");
+                expectedValue = StringUtils.join((String[]) expectedValues.get(fieldName), "; ");
             }
-            String formValue = formValues.get(key);
-            log("Comparing field values for " + key + " expecting " + expectedValue + " actual " + formValue);
-            if (expectedValue.equals(EMPTY_VALUE))
+            String formValue = StringUtils.trimToEmpty(formValues.get(fieldName));
+            log("Comparing field values for " + fieldName + " expecting " + expectedValue + " actual " + formValue);
+            if (expectedValue.equals(NOT_EMPTY_VALUE))
             {
-                if (formValue != null && !formValue.trim().isEmpty())
-                    unexpectedValues.put(key, "expected: " + expectedValue + " actual: " + formValue);
-            }
-            else if (expectedValue.equals(NOT_EMPTY_VALUE))
-            {
-                if (formValue == null || formValue.trim().isEmpty())
-                    unexpectedValues.put(key, "expected: " + expectedValue + " actual: " + formValue);
+                if (formValue.isEmpty())
+                    unexpectedValues.put(fieldName, "expected: " + expectedValue + " actual: " + formValue);
             }
             else if (!expectedValue.equals(formValue))
             {
-                unexpectedValues.put(key, "expected: " + expectedValue + " actual: " + formValue);
+                unexpectedValues.put(fieldName, " expected: \"" + expectedValue + "\" but was: \"" + formValue + "\"");
             }
         }
         return unexpectedValues;
@@ -203,12 +196,14 @@ public abstract class CubeObjectEditPage extends LabKeyPage
     public void save()
     {
         log("Saving edit form");
-        elementCache().saveButton.click();
+        Assert.assertTrue("Save buttons are disabled", isSubmitEnabled());
+        clickAndWait(elementCache().saveButton);
     }
 
     public void saveAndClose(String returnToHeader)
     {
         log("Saving and closing edit form");
+        Assert.assertTrue("Save buttons are disabled", isSubmitEnabled());
         clickAndWait(elementCache().saveAndCloseButton);
         waitForElement(Locator.css(".labkey-wp-title-text").containing(returnToHeader));
     }
@@ -222,6 +217,8 @@ public abstract class CubeObjectEditPage extends LabKeyPage
     @Override
     protected ElementCache newElementCache()
     {
+        // Wait for form to set initial focus
+        waitFor(() -> "text".equals(executeScript("return document.activeElement.type;")), 10000);
         return new ElementCache();
     }
 
@@ -230,9 +227,31 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         final Checkbox showOnDashField = Ext4Checkbox().withLabel("Show on Dashboard:").findWhenNeeded(this);
 
         // Buttons become stale when becoming enabled or disabled so refindWhenNeeded
-        final WebElement saveButton = Locator.linkWithText("Save").refindWhenNeeded(this);
-        final WebElement saveAndCloseButton = Locator.linkWithText("Save And Close").refindWhenNeeded(this);
-        final WebElement cancelButton = Locator.linkWithText("Cancel").refindWhenNeeded(this);
-        final WebElement workbenchButton = Locator.linkWithText("Workbench").refindWhenNeeded(this);
+        final WebElement saveButton = Locator.linkWithText("Save").refindWhenNeeded(this).withTimeout(10000);
+        final WebElement saveAndCloseButton = Locator.linkWithText("Save And Close").refindWhenNeeded(this).withTimeout(10000);
+        final WebElement cancelButton = Locator.linkWithText("Cancel").refindWhenNeeded(this).withTimeout(10000);
+        final WebElement workbenchButton = Locator.linkWithText("Workbench").refindWhenNeeded(this).withTimeout(10000);
+
+        private ComboBox findComboBox(String fieldName)
+        {
+            String label;
+            boolean isMultiSelect;
+            if (getDropdownFieldNames().keySet().contains(fieldName))
+            {
+                label = getDropdownFieldNames().get(fieldName);
+                isMultiSelect = false;
+            }
+            else if (getMultiSelectFieldNames().keySet().contains(fieldName))
+            {
+                label = getMultiSelectFieldNames().get(fieldName);
+                isMultiSelect = true;
+            }
+            else
+            {
+                throw new IllegalArgumentException("No combo-box specified for '" + fieldName + "' in " + this.getClass().getSimpleName());
+            }
+
+            return new ComboBox.ComboBoxFinder(getDriver()).withLabel(label).find(this).setMultiSelect(isMultiSelect);
+        }
     }
 }

@@ -158,9 +158,9 @@ public class DataFinderPage extends LabKeyPage
         assertElementVisible(DataFinderPage.Locators.pubFinder);
     }
 
-    public boolean isFinderObjectSelected(String text)
+    public String getSelectedFinderObject()
     {
-        return text.equals(Locators.activeFinderObject.findElement(getDriver()).getText());
+        return Locators.activeFinderObject.findElement(getDriver()).getText();
     }
 
     public void selectDataFinderObject(String text)
