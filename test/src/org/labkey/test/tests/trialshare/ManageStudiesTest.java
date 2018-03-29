@@ -544,7 +544,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         secondStudyAccessFields.put(StudyEditPage.DISPLAY_NAME, secondDisplayName);
 
         log("Add another study access record");
-        editPage.addStudyAccessPanel(1);
+        editPage.addStudyAccessPanel();
         log("Set values for the second study access form");
         editPage.setStudyAccessFormValues(1, secondStudyAccessFields);
 
@@ -568,7 +568,7 @@ public class ManageStudiesTest extends DataFinderTestBase
         goDirectlyToManageDataPage(getDataProjectName(), _objectType);
         manageData.goToEditRecord((String) initialFields.get(StudyEditPage.STUDY_ID));
         log("Verify the second study access record is deleted successfully");
-        assertElementNotPresent(editPage.getStudyAccessPanelLocator(1));
+        assertEquals(1, editPage.getStudyAccessCount());
 
         assertEquals("Failed to update Display Name field", firstDisplayName, editPage.getStudyAccessDisplayNameValue(0));
     }

@@ -214,16 +214,22 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         return (ElementCache) super.elementCache();
     }
 
+    protected abstract String initialFocus();
+
     @Override
     protected ElementCache newElementCache()
     {
-        // Wait for form to set initial focus
-        waitFor(() -> "text".equals(executeScript("return document.activeElement.type;")), 10000);
         return new ElementCache();
     }
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
+        public ElementCache()
+        {
+            // Wait for form to set initial focus
+            waitFor(() -> initialFocus().equals(executeScript("return document.activeElement.type;")), 2000);
+        }
+
         final Checkbox showOnDashField = Ext4Checkbox().withLabel("Show on Dashboard:").findWhenNeeded(this);
 
         // Buttons become stale when becoming enabled or disabled so refindWhenNeeded

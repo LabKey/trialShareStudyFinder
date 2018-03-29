@@ -16,10 +16,14 @@
 package org.labkey.test.pages.trialshare;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.ComboBox;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -103,60 +107,33 @@ public class StudyEditPage extends CubeObjectEditPage
         return FIELD_NAMES;
     }
 
-    public Locator.XPathLocator getStudyAccessPanelLocator(int panelIndex)
-    {
-        return Locator.tagWithClass("div", "studyaccesspanelindex" + panelIndex);
-    }
-
-    public Locator.XPathLocator getStudyAccessPanelFieldLocator(int panelIndex)
-    {
-        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithClass("table", "x4-form-item"));
-    }
-
-    public Locator.XPathLocator getStudyAccessVisibility(int panelIndex)
-    {
-        return getStudyAccessPanelFieldLocator(panelIndex).withDescendant(Locator.tag("label").withText("Visibility *:"));
-    }
-
-    public Locator.XPathLocator getStudyAccessStudyContainer(int panelIndex)
-    {
-        return getStudyAccessPanelFieldLocator(panelIndex).withDescendant(Locator.tag("label").withText("Study Container *:"));
-    }
-
-    public Locator.XPathLocator getStudyAccessDisplayName(int panelIndex)
-    {
-        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithName("input", "displayName"));
-    }
-
-    public Locator.XPathLocator getStudyAccessPanelRemoveBtn(int panelIndex)
-    {
-        return getStudyAccessPanelLocator(panelIndex).append(Locator.tagWithClass("span", "fa-times"));
-    }
-
     public void setStudyAccessVisibility(int panelIndex, String value)
     {
-        Locator.XPathLocator comboLocator = getStudyAccessVisibility(panelIndex);
-        _ext4Helper.selectComboBoxItem(comboLocator, value);
+        elementCache().findStudyAccessVisibility(panelIndex).selectComboBoxItem(value);
     }
 
     public void setStudyAccessStudyContainer(int panelIndex, String value)
     {
-        Locator.XPathLocator comboLocator = getStudyAccessStudyContainer(panelIndex);
-        _ext4Helper.selectComboBoxItem(comboLocator, value);
+        elementCache().findStudyAccessStudyContainer(panelIndex).selectComboBoxItem(value);
     }
 
     public void setStudyAccessDisplayName(int panelIndex, String value)
     {
         log("Setting study access display name to " + value);
-        Locator fieldLocator = getStudyAccessDisplayName(panelIndex);
-        setFormElement(fieldLocator, value);
+        WebElement studyAccessDisplayName = elementCache().findStudyAccessDisplayName(panelIndex);
+        setFormElement(studyAccessDisplayName, value);
+        fireEvent(studyAccessDisplayName, SeleniumEvent.blur);
         sleep(1500); // we need to wait for the updated value to propagate through the Javascript store
     }
 
     public String getStudyAccessDisplayNameValue(int panelIndex)
     {
-        Locator fieldLocator = getStudyAccessDisplayName(panelIndex);
-        return getFormElement(fieldLocator);
+        return getFormElement(elementCache().findStudyAccessDisplayName(panelIndex));
+    }
+
+    public int getStudyAccessCount()
+    {
+        return elementCache().findStudyAccessPanels().size();
     }
 
     public void setStudyAccessFormValues(int panelIndex, String visibility, String studyContainer, String displayName)
@@ -173,15 +150,16 @@ public class StudyEditPage extends CubeObjectEditPage
 
     public void removeStudyAccessPanel(int panelIndex)
     {
-        click(getStudyAccessPanelRemoveBtn(panelIndex));
+        WebElement studyAccessPanelRemoveBtn = elementCache().getStudyAccessPanelRemoveBtn(panelIndex);
+        studyAccessPanelRemoveBtn.click();
+        shortWait().until(ExpectedConditions.stalenessOf(studyAccessPanelRemoveBtn));
     }
 
-    public void addStudyAccessPanel(int panelIndex)
+    public void addStudyAccessPanel()
     {
-        click(Locator.linkWithText("Add..."));
-        waitForElement(getStudyAccessPanelLocator(panelIndex));
-        // wait for combo to load
-        sleep(1000);
+        int initialCount = elementCache().findStudyAccessPanels().size();
+        elementCache().addStudyAccessButton.click();
+        elementCache().findStudyAccessPanel(initialCount);
     }
 
     public void setStudyAccessFormValues(int i, Map<String, Object> newFields)
@@ -189,4 +167,56 @@ public class StudyEditPage extends CubeObjectEditPage
         setStudyAccessFormValues(i, (String) newFields.get(VISIBILITY), (String) newFields.get(STUDY_CONTAINER), (String) newFields.get(DISPLAY_NAME));
     }
 
+    @Override
+    protected String initialFocus()
+    {
+        return "shortName";
+    }
+
+    @Override
+    protected ElementCache elementCache()
+    {
+        return (ElementCache) super.elementCache();
+    }
+
+    @Override
+    protected CubeObjectEditPage.ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends CubeObjectEditPage.ElementCache
+    {
+        protected List<WebElement> findStudyAccessPanels()
+        {
+            return Locator.tagWithClass("div", "studyaccesspanel").findElements(this);
+        }
+
+        protected WebElement findStudyAccessPanel(int panelIndex)
+        {
+            return Locator.tagWithClass("div", "studyaccesspanelindex" + panelIndex).waitForElement(this, 10000);
+        }
+
+        public ComboBox findStudyAccessVisibility(int panelIndex)
+        {
+            return ComboBox.ComboBox(getDriver()).withLabel("Visibility *:").find(findStudyAccessPanel(panelIndex));
+        }
+
+        public ComboBox findStudyAccessStudyContainer(int panelIndex)
+        {
+            return ComboBox.ComboBox(getDriver()).withLabel("Study Container *:").find(findStudyAccessPanel(panelIndex));
+        }
+
+        public WebElement findStudyAccessDisplayName(int panelIndex)
+        {
+            return Locator.tagWithName("input", "displayName").findElement(findStudyAccessPanel(panelIndex));
+        }
+
+        public WebElement getStudyAccessPanelRemoveBtn(int panelIndex)
+        {
+            return Locator.tagWithClass("span", "fa-times").findElement(findStudyAccessPanel(panelIndex));
+        }
+
+        protected WebElement addStudyAccessButton = Locator.linkWithText("Add...").findWhenNeeded(this);
+    }
 }

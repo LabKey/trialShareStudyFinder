@@ -127,4 +127,10 @@ public class PublicationEditPage extends CubeObjectEditPage
             elementCache().showOnDashField.check();
         }
     }
+
+    @Override
+    protected String initialFocus()
+    {
+        return "title";
+    }
 }
