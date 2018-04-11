@@ -321,7 +321,7 @@ public class StudyBean
 
     private String getFormattedHtml(WikiRendererType rendererType, String markup)
     {
-        WikiService wikiService = ServiceRegistry.get().getService(WikiService.class);
+        WikiService wikiService = WikiService.get();
 
         if (null == wikiService)
             return null;
