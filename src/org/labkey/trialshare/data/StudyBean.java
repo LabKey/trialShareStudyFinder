@@ -357,7 +357,7 @@ public class StudyBean
 
     public void setStudyAccessList(List<StudyAccess> studyAccessList)
     {
-        this._studyAccessList = studyAccessList;
+        _studyAccessList = studyAccessList;
     }
 
     public void setStudyAccessList(User user, Container currentContainer)
@@ -369,13 +369,13 @@ public class StudyBean
 
         TableInfo studyAccessTable = listSchema.getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE);
         List<StudyAccess> studyAccessList = (new TableSelector(studyAccessTable, filter, null)).getArrayList(StudyAccess.class);
-        this._studyAccessList.clear();
+        _studyAccessList.clear();
         for (StudyAccess studyAccess : studyAccessList)
         {
             Container container = ContainerManager.getForId(studyAccess.getStudyContainer());
             if (container != null && container.hasPermission(user, ReadPermission.class))
             {
-                this._studyAccessList.add(studyAccess);
+                _studyAccessList.add(studyAccess);
             }
         }
     }

@@ -52,7 +52,7 @@ public class StudyEditBean extends StudyBean
 
     public void setConditions(List<String> conditions)
     {
-        this._conditions = conditions;
+        _conditions = conditions;
     }
 
     public List<String> getTherapeuticAreas()
@@ -62,7 +62,7 @@ public class StudyEditBean extends StudyBean
 
     public void setTherapeuticAreas(List<String> therapeuticAreas)
     {
-        this._therapeuticAreas = therapeuticAreas;
+        _therapeuticAreas = therapeuticAreas;
     }
 
     public List<String> getPhases()
@@ -74,6 +74,4 @@ public class StudyEditBean extends StudyBean
     {
         _phases = phases;
     }
-
-
 }

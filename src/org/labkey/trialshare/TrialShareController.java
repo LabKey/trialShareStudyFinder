@@ -415,7 +415,7 @@ public class TrialShareController extends SpringActionController
 
         public void setCubeConfigs(List<CubeConfigBean> cubeConfigs)
         {
-            this._cubeConfigs = cubeConfigs;
+            _cubeConfigs = cubeConfigs;
         }
 
         public void addCubeConfig(CubeConfigBean cubeConfig)
@@ -907,12 +907,12 @@ public class TrialShareController extends SpringActionController
         public void setObjectName(String name)
         {
             if (name == null)
-                this._objectName = null;
+                _objectName = null;
             else
             {
                 try
                 {
-                    this._objectName = ObjectName.valueOf(name.toLowerCase());
+                    _objectName = ObjectName.valueOf(name.toLowerCase());
                 }
                 catch (IllegalArgumentException e)
                 {
@@ -1179,12 +1179,12 @@ public class TrialShareController extends SpringActionController
         public void setObjectName(String name)
         {
             if (name == null)
-                this._objectName = null;
+                _objectName = null;
             else
             {
                 try
                 {
-                    this._objectName = ObjectName.valueOf(name.toLowerCase());
+                    _objectName = ObjectName.valueOf(name.toLowerCase());
                 }
                 catch (IllegalArgumentException ignore)
                 {
