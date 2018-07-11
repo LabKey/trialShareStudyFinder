@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages.trialshare;
 
-import com.google.common.base.Predicate;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -34,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.labkey.test.Locators.pageSignal;
 
@@ -245,10 +245,10 @@ public class DataFinderPage extends LabKeyPage
 
     public void dismissTour()
     {
-        shortWait().until(new Predicate<WebDriver>()
+        shortWait().until(new Function<WebDriver, Boolean>()
         {
             @Override
-            public boolean apply(WebDriver webDriver)
+            public Boolean apply(WebDriver webDriver)
             {
                 try
                 {
