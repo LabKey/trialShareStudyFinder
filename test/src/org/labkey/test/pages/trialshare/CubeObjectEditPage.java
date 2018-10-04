@@ -24,6 +24,8 @@ import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -227,7 +229,19 @@ public abstract class CubeObjectEditPage extends LabKeyPage
         public ElementCache()
         {
             // Wait for form to set initial focus
-            waitFor(() -> initialFocus().equals(executeScript("return document.activeElement.type;")), 2000);
+            boolean focused = waitFor(() -> {
+                try
+                {
+                    return initialFocus().equals(executeScript("return document.activeElement.type;"));
+                }
+                catch (JavascriptException ignore)
+                {
+                    return false;
+                }
+            }, 2000);
+
+            if (!focused)
+                TestLogger.warn("Expected element did not receive focus. Continuing.");
         }
 
         final Checkbox showOnDashField = Ext4Checkbox().withLabel("Show on Dashboard:").findWhenNeeded(this);
