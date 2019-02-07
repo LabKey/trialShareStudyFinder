@@ -1285,9 +1285,13 @@ public class TrialShareController extends SpringActionController
             String name = getViewContext().getActionURL().getParameter("objectName");
             if (name != null)
             {
-                ObjectName objectName = ObjectName.valueOf(name.toLowerCase());
-                root.addChild("Manage " + objectName.getPluralName(), getManageDataUrl(objectName));
-                root.addChild(StringUtils.capitalize(getMode()) + " " + objectName.getDisplayName());
+                try
+                {
+                    ObjectName objectName = ObjectName.valueOf(name.toLowerCase());
+                    root.addChild("Manage " + objectName.getPluralName(), getManageDataUrl(objectName));
+                    root.addChild(StringUtils.capitalize(getMode()) + " " + objectName.getDisplayName());
+                }
+                catch (IllegalArgumentException ignore) {} // Don't throw because of bad user input
             }
             return root;
         }
