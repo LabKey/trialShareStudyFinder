@@ -29,6 +29,7 @@ import org.labkey.api.action.HasValidator;
 import org.labkey.api.action.Marshal;
 import org.labkey.api.action.Marshaller;
 import org.labkey.api.action.ReturnUrlForm;
+import org.labkey.api.action.SimpleErrorView;
 import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
@@ -990,6 +991,9 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(CubeObjectNameForm form, BindException errors) throws Exception
         {
+            if (errors.hasErrors())
+                return new SimpleErrorView(errors);
+
             Container cubeContainer = TrialShareManager.get().getCubeContainer(getContainer());
             if (cubeContainer == null)
                 throw new Exception("Invalid configuration.  No cube container defined");
@@ -1234,8 +1238,18 @@ public class TrialShareController extends SpringActionController
         @Override
         public void validate(CubeObjectDetailForm form, BindException errors)
         {
-            if (form.getObjectName() == null)
-                errors.reject("Object name is required");
+            form.validate(errors);
+            if (form.getObjectName() == ObjectName.publication && form.getId() != null)
+            {
+                try
+                {
+                    Integer.valueOf((String) form.getId());
+                }
+                catch (NumberFormatException ignore)
+                {
+                    errors.reject("Invalid publication id: " + form.getId());
+                }
+            }
         }
 
         protected abstract String getMode();
@@ -1243,6 +1257,9 @@ public class TrialShareController extends SpringActionController
         @Override
         public ModelAndView getView(CubeObjectDetailForm bean, BindException errors) throws Exception
         {
+            if (errors.hasErrors())
+                return new SimpleErrorView(errors);
+
             setTitle(StringUtils.capitalize(getMode()) + bean.getObjectName().getDisplayName());
             bean.setMode(getMode());
             bean.setCubeContainer(TrialShareManager.get().getCubeContainer(getContainer()));
@@ -1250,11 +1267,11 @@ public class TrialShareController extends SpringActionController
             {
                 if (bean.getId() != null)
                     bean.setCubeObject(TrialShareManager.get().getPublication(Integer.valueOf((String) bean.getId()), getUser(), getContainer()));
-                return new JspView("/org/labkey/trialshare/view/publicationDetails.jsp", bean);
+                return new JspView<>("/org/labkey/trialshare/view/publicationDetails.jsp", bean);
             }
             else
             {
-                JspView<CubeObjectNameForm> view = new JspView("/org/labkey/trialshare/view/studyDetails.jsp", bean);
+                JspView<CubeObjectNameForm> view = new JspView<>("/org/labkey/trialshare/view/studyDetails.jsp", bean);
 
                 if (bean.getId() != null)
                     bean.setCubeObject(TrialShareManager.get().getStudy((String) bean.getId(), getUser(), getContainer()));
