@@ -22,12 +22,13 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.FormHandlerAction;
 import org.labkey.api.action.FormViewAction;
 import org.labkey.api.action.HasValidator;
 import org.labkey.api.action.Marshal;
 import org.labkey.api.action.Marshaller;
+import org.labkey.api.action.MutatingApiAction;
+import org.labkey.api.action.ReadOnlyApiAction;
 import org.labkey.api.action.ReturnUrlForm;
 import org.labkey.api.action.SimpleErrorView;
 import org.labkey.api.action.SimpleResponse;
@@ -426,7 +427,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(AdminPermission.class)
-    public class ReindexAction extends ApiAction
+    public class ReindexAction extends MutatingApiAction
     {
         @Override
         public Object execute(Object o, BindException errors) throws Exception
@@ -453,7 +454,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class StudiesAction extends ApiAction
+    public class StudiesAction extends ReadOnlyApiAction
     {
         @Override
         public Object execute(Object form, BindException errors) throws Exception
@@ -556,7 +557,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class PublicationsAction extends ApiAction
+    public class PublicationsAction extends ReadOnlyApiAction
     {
 
         @Override
@@ -588,7 +589,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class FacetsAction extends ApiAction<CubeObjectNameForm>
+    public class FacetsAction extends ReadOnlyApiAction<CubeObjectNameForm>
     {
         @Override
         public void validateForm(CubeObjectNameForm form, Errors errors)
@@ -802,7 +803,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class StudyDetailsAction extends ApiAction<StudyIdForm>
+    public class StudyDetailsAction extends ReadOnlyApiAction<StudyIdForm>
     {
         String _id;
 
@@ -829,7 +830,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class PublicationDetailsAction extends ApiAction<PublicationIdForm>
+    public class PublicationDetailsAction extends ReadOnlyApiAction<PublicationIdForm>
     {
         Integer _id;
 
@@ -887,7 +888,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class SubsetsAction extends ApiAction<CubeObjectNameForm>
+    public class SubsetsAction extends ReadOnlyApiAction<CubeObjectNameForm>
     {
         @Override
         public Object execute(CubeObjectNameForm form, BindException errors) throws Exception
@@ -945,7 +946,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class AccessibleMembersAction extends ApiAction<CubeObjectNameForm>
+    public class AccessibleMembersAction extends ReadOnlyApiAction<CubeObjectNameForm>
     {
         @Override
         public void validateForm(CubeObjectNameForm form, Errors errors)
@@ -1384,7 +1385,7 @@ public class TrialShareController extends SpringActionController
     }
 
 
-    private abstract class CaseInsensitiveApiAction<FORM> extends ApiAction<FORM>
+    private abstract class CaseInsensitiveApiAction<FORM> extends MutatingApiAction<FORM>
     {
         @Override
         protected ObjectReader getObjectReader(Class c)
