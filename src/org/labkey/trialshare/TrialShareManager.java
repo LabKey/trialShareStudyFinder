@@ -506,10 +506,18 @@ public class TrialShareManager
         TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
 
         StudyPublicationBean studyPublication = new TableSelector(schema.getPublicationsTableInfo()).getObject(id, StudyPublicationBean.class);
-        PublicationEditBean publication = new PublicationEditBean(studyPublication);
-        SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), id);
-        publication.setStudyIds(new TableSelector(schema.getPublicationStudyTableInfo(), Collections.singleton(TrialShareQuerySchema.STUDY_ID_FIELD), filter, null).getArrayList(String.class));
-        publication.setTherapeuticAreas(new TableSelector(schema.getPublicationTherapeuticAreaTableInfo(), Collections.singleton(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD), filter, null).getArrayList(String.class));
+        PublicationEditBean publication;
+        if (studyPublication != null)
+        {
+            publication = new PublicationEditBean(studyPublication);
+            SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.PUBLICATION_ID_FIELD), id);
+            publication.setStudyIds(new TableSelector(schema.getPublicationStudyTableInfo(), Collections.singleton(TrialShareQuerySchema.STUDY_ID_FIELD), filter, null).getArrayList(String.class));
+            publication.setTherapeuticAreas(new TableSelector(schema.getPublicationTherapeuticAreaTableInfo(), Collections.singleton(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD), filter, null).getArrayList(String.class));
+        }
+        else
+        {
+            publication = null;
+        }
         return publication;
     }
 
@@ -517,13 +525,21 @@ public class TrialShareManager
     {
         TrialShareQuerySchema schema = new TrialShareQuerySchema(user, container);
         StudyBean study = new TableSelector(schema.getStudyPropertiesTableInfo()).getObject(id, StudyBean.class);
-        StudyEditBean editStudy = new StudyEditBean(study);
-        SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.STUDY_ID_FIELD), id);
-        editStudy.setAgeGroups(new TableSelector(schema.getStudyAgeGroupTableInfo(), Collections.singleton(TrialShareQuerySchema.AGE_GROUP_FIELD), filter, null).getArrayList(String.class));
-        editStudy.setConditions(new TableSelector(schema.getStudyConditionTableInfo(), Collections.singleton(TrialShareQuerySchema.CONDITION_FIELD), filter, null).getArrayList(String.class));
-        editStudy.setPhases(new TableSelector(schema.getStudyPhaseTableInfo(), Collections.singleton(TrialShareQuerySchema.PHASE_FIELD), filter, null).getArrayList(String.class));
-        editStudy.setTherapeuticAreas(new TableSelector(schema.getStudyTherapeuticAreaTableInfo(), Collections.singleton(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD), filter, null).getArrayList(String.class));
-        editStudy.setStudyAccessList(new TableSelector(TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE), filter, null).getArrayList(StudyAccess.class));
+        StudyEditBean editStudy;
+        if (study != null)
+        {
+            editStudy = new StudyEditBean(study);
+            SimpleFilter filter = new SimpleFilter(FieldKey.fromParts(TrialShareQuerySchema.STUDY_ID_FIELD), id);
+            editStudy.setAgeGroups(new TableSelector(schema.getStudyAgeGroupTableInfo(), Collections.singleton(TrialShareQuerySchema.AGE_GROUP_FIELD), filter, null).getArrayList(String.class));
+            editStudy.setConditions(new TableSelector(schema.getStudyConditionTableInfo(), Collections.singleton(TrialShareQuerySchema.CONDITION_FIELD), filter, null).getArrayList(String.class));
+            editStudy.setPhases(new TableSelector(schema.getStudyPhaseTableInfo(), Collections.singleton(TrialShareQuerySchema.PHASE_FIELD), filter, null).getArrayList(String.class));
+            editStudy.setTherapeuticAreas(new TableSelector(schema.getStudyTherapeuticAreaTableInfo(), Collections.singleton(TrialShareQuerySchema.THERAPEUTIC_AREA_FIELD), filter, null).getArrayList(String.class));
+            editStudy.setStudyAccessList(new TableSelector(TrialShareQuerySchema.getSchema(user, container).getTable(TrialShareQuerySchema.STUDY_ACCESS_TABLE), filter, null).getArrayList(StudyAccess.class));
+        }
+        else
+        {
+            editStudy = null;
+        }
         return editStudy;
     }
 
