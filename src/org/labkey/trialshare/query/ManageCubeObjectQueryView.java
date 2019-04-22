@@ -88,7 +88,7 @@ abstract class ManageCubeObjectQueryView extends QueryView
 
     private void addRefreshCubeButton(ButtonBar bar)
     {
-        ActionButton refreshButton = new ActionButton(TrialShareController.CubeAdminAction.class, "Refresh Cube", DataRegion.MODE_GRID, ActionButton.Action.POST);
+        ActionButton refreshButton = new ActionButton(TrialShareController.CubeAdminAction.class, "Refresh Cube", ActionButton.Action.POST);
         refreshButton.setDisplayPermission(InsertPermission.class);
         ActionURL refreshURL = new ActionURL(TrialShareController.CubeAdminAction.class, getViewContext().getContainer());
         refreshURL.addParameter("method", "reindex,clearCache");
