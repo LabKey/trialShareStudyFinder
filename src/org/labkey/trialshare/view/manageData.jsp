@@ -15,8 +15,6 @@
      * limitations under the License.
      */
 %>
-<%@ page import="org.labkey.api.util.PageFlowUtil" %>
-<%@ page import="org.labkey.api.view.ActionURL" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.trialshare.TrialShareController" %>
@@ -41,9 +39,9 @@
     {
         if (objectName != thisObjectName)
         {
-            out.println(PageFlowUtil.textLink(" Manage " + objectName.getPluralName(), new ActionURL(TrialShareController.ManageDataAction.class, this.getContainer())
-                    .addParameter("objectName", objectName.toString())
-                    .addParameter("query.viewName", "manageData")));
+            out.println(link(" Manage " + objectName.getPluralName(), urlFor(TrialShareController.ManageDataAction.class)
+                .addParameter("objectName", objectName.toString())
+                .addParameter("query.viewName", "manageData")));
         }
     }
 %>
