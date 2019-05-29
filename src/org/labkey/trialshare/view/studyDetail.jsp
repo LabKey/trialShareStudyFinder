@@ -16,10 +16,9 @@
  */
 %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
-<%@ page import="org.labkey.api.data.Container" %>
+<%@ page import="org.labkey.api.util.HtmlString" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
-<%@ page import="org.labkey.api.view.ViewContext" %>
 <%@ page import="org.labkey.api.view.template.ClientDependencies" %>
 <%@ page import="org.labkey.trialshare.TrialShareController" %>
 <%@ page import="org.labkey.trialshare.data.StudyBean" %>
@@ -41,15 +40,16 @@
 <%
     JspView<TrialShareController.StudyDetailBean> me = (JspView) HttpView.currentView();
 
-    ViewContext context = HttpView.currentContext();
-    Container c = context.getContainer();
     TrialShareController.StudyDetailBean studyDetail = me.getModelBean();
     StudyBean study = studyDetail.getStudy();
-    String descriptionHTML = study.getDescription();
-    if (StringUtils.isEmpty(descriptionHTML))
+    String description = study.getDescription();
+    final HtmlString descriptionHTML;
+    if (StringUtils.isEmpty(description))
         descriptionHTML = h(study.getBriefDescription());
+    else
+        descriptionHTML = HtmlString.unsafe(description);
 
-    String studyUrl = study.getUrl(context.getUser());
+    String studyUrl = study.getUrl(getUser());
 
     Map<String, String> linkProps = new HashMap<>();
     linkProps.put("target", "_blank");
@@ -79,7 +79,7 @@
         %><%
         if (studyDetail.getDetailType() == TrialShareController.DetailType.study)
         {
-        %><div class="labkey-study-description"><%=text(descriptionHTML)%></div>
+        %><div class="labkey-study-description"><%=descriptionHTML%></div>
         <%
         }
         %>
@@ -88,7 +88,7 @@
             { %>
         <div class="labkey-study-links">
         <%      if (null != studyUrl) { %>
-        <%= textLink("View study " + study.getShortName(), studyUrl, null, null, linkProps)%><br>
+        <%=link("View study " + study.getShortName()).href(studyUrl).attributes(linkProps)%><br>
         <% } %>
         <%
                     if (null != study.getExternalURL())
@@ -100,7 +100,7 @@
                             text = "View study at " + url.getHost();
                         }
         %>
-        <%= textLink(text, study.getExternalURL(), null, null, linkProps)%><br>
+        <%=link(text).href(study.getExternalURL()).attributes(linkProps)%><br>
         <%          } %>
 
         </div>
@@ -130,13 +130,13 @@
                 %><%
                     if (!StringUtils.isEmpty(pub.getPMID()))
                     {
-                        %><br/><%=textLink("PubMed","http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPMID(), null, null, linkProps)%><%
+                        %><br/><%=link("PubMed").href("http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPMID()).attributes(linkProps)%><%
                     }
                     for (URLData urlData : pub.getUrls())
                     {
                         if (urlData != null && !StringUtils.isEmpty(urlData.getLink()))
                         {
-                        %><br/><%=textLink(h(urlData.getLinkText()), urlData.getLink(), null, null, linkProps)%><%
+                        %><br/><%=link(urlData.getLinkText()).href(urlData.getLink()).attributes(linkProps)%><%
                         }
                     }
                 %></p><%

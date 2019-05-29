@@ -64,7 +64,7 @@ Cube definitions are managed per container.  The following listing shows the def
         </tr>
         <tr>
             <td><%= button("Clear Cache").onClick("confirmClear(" + qh(path) + ")") %>&nbsp;<%= button("Reindex").onClick("confirmReindex(" + qh(path) + ")")%></td>
-            <td><%=textLink(path, ContainerManager.getForPath(path).getStartURL(getUser()))%></td>
+            <td><%=link(path, ContainerManager.getForPath(path).getStartURL(getUser()))%></td>
             <td><%= h(StringUtils.join(definitionIds, ", ")) %></td>
         </tr>
 <%
