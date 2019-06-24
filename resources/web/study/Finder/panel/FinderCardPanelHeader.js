@@ -194,7 +194,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
 
     startTutorial: function() {
         this.registerTutorial();
-        LABKEY.help.Tour.show("LABKEY.tour.dataFinder." + this.objectName);
+        LABKEY.help.Tour.show("LABKEY-tour-dataFinder-" + this.objectName);
         return false;
     },
 
@@ -203,13 +203,13 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
         var $=$||jQuery;
 
         LABKEY.help.Tour.register({
-            id: "LABKEY.tour.dataFinder." + this.objectName,
+            id: "LABKEY-tour-dataFinder-" + this.objectName,
             steps: [
                 {
-                    target: $('.labkey-wp-body')[0],
+                    target: $('.x4-tab-bar')[0],
                     title: "Data Finder",
                     content: "Welcome to the Data Finder. A tool for searching, accessing and combining data across studies.",
-                    placement: "top",
+                    placement: "bottom",
                     showNextButton: true
                 },{
                     target: this.objectName.toLowerCase() + "panel",
@@ -234,7 +234,7 @@ Ext4.define("LABKEY.study.panel.FinderCardPanelHeader", {
                     showPrevButton: true
                 },
                 {
-                    target: "searchTerms",
+                    target: ".labkey-search-box",
                     title: "Quick Search",
                     content: "Enter terms of interest to search study and data descriptions. This will find matches within the selection of filtered studies/datasets.",
                     placement: "right",
