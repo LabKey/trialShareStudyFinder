@@ -1248,7 +1248,7 @@ public class TrialShareController extends SpringActionController
                 }
                 catch (NumberFormatException ignore)
                 {
-                    errors.reject("Invalid publication id: " + form.getId());
+                    errors.reject(ERROR_MSG, "Invalid publication id: " + form.getId());
                 }
             }
         }
