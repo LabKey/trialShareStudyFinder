@@ -31,7 +31,7 @@ public class ITNSpecimenRequestCustomizer implements SpecimenService.SpecimenReq
     }
 
     @Override
-    public boolean onlyShowPrimaryReportOptions()
+    public boolean omitTypeGroupingsWhenReporting()
     {
         return true;
     }
