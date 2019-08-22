@@ -28,6 +28,7 @@ import org.labkey.api.search.SearchService;
 import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.settings.AdminConsole;
+import org.labkey.api.study.SpecimenService;
 import org.labkey.api.util.ConfigurationException;
 import org.labkey.api.view.SimpleWebPartFactory;
 import org.labkey.api.view.WebPartFactory;
@@ -91,6 +92,8 @@ public class TrialShareModule extends CodeOnlyModule
             ss.addSearchCategory(searchCategoryStudy);
             ss.addSearchCategory(searchCategoryPublication);
         }
+
+        SpecimenService.get().registerRequestCustomizer(new ITNSpecimenRequestCustomizer());
     }
 
     @Override

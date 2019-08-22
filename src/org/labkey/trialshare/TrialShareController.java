@@ -20,8 +20,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.action.ApiResponse;
+import org.labkey.api.action.ApiSimpleResponse;
 import org.labkey.api.action.FormHandlerAction;
 import org.labkey.api.action.FormViewAction;
 import org.labkey.api.action.HasValidator;
@@ -34,14 +37,22 @@ import org.labkey.api.action.SimpleErrorView;
 import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
+import org.labkey.api.admin.FolderExportContext;
+import org.labkey.api.admin.FolderWriterImpl;
+import org.labkey.api.admin.StaticLoggerGetter;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.DataRegionSelection;
+import org.labkey.api.data.PHI;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.data.TableSelector;
+import org.labkey.api.pipeline.PipeRoot;
+import org.labkey.api.pipeline.PipelineService;
+import org.labkey.api.pipeline.PipelineUrls;
 import org.labkey.api.query.QueryForm;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.query.QueryService;
+import org.labkey.api.security.IgnoresTermsOfUse;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.DeletePermission;
@@ -55,9 +66,11 @@ import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
+import org.labkey.api.view.NotFoundException;
 import org.labkey.api.view.UnauthorizedException;
 import org.labkey.api.view.VBox;
 import org.labkey.api.view.WebPartView;
+import org.labkey.api.writer.FileSystemFile;
 import org.labkey.trialshare.data.CubeConfigBean;
 import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.PublicationEditBean;
@@ -74,9 +87,11 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -182,6 +197,448 @@ public class TrialShareController extends SpringActionController
             return new JspView<>("/org/labkey/trialshare/view/dataFinder.jsp", getFinderBean(getContainer(), getViewContext().getActionURL().getParameter(OBJECT_NAME_PARAM)));
         }
     }
+
+    /*
+        TrialShare: simple study export action:
+
+        example usage (via LabKey Remote Java API):
+
+        PostCommand pc = new PostCommand("pipeline","TrialShareExport");
+        JSONObject jo = new JSONObject();
+        pc.setJsonObject(jo);
+        CommandResponse cr = pc.execute(cn, "/Studies/ITN027AIOPR/Study Data/");
+        System.out.println(cr.getText());
+     */
+
+    public static class TrialShareExportForm
+    {
+        private Boolean missingValueIndicators;
+        private Boolean study;
+        private Boolean assayDatasets;
+        private Boolean assaySchedule;
+        private Boolean categories;
+        private Boolean cohortSettings;
+        private Boolean crfDatasets;
+        private Boolean customParticipantView;
+        private Boolean datasetData;
+        private Boolean participantCommentSettings;
+        private Boolean participantGroups;
+        private Boolean protocolDocuments;
+        private Boolean qcStateSettings;
+        private Boolean specimenSettings;
+        private Boolean specimens;
+        private Boolean treatmentData;
+        private Boolean visitMap;
+        private Boolean folderTypeAndActiveModules;
+        private Boolean fullTextSearchSettings;
+        private Boolean webpartPropertiesAndLayout;
+        private Boolean containerSpecificModuleProperties;
+        private Boolean roleAssignmentsForUsersAndGroups;
+        private Boolean lists;
+        private Boolean queries;
+        private Boolean gridViews;
+        private Boolean reportsAndCharts;
+        private Boolean externalSchemaDefinitions;
+        private Boolean wikisAndTheirAttachments;
+        private Boolean notificationSettings;
+
+        public Boolean getMissingValueIndicators()
+        {
+            return missingValueIndicators;
+        }
+
+        public void setMissingValueIndicators(Boolean missingValueIndicators)
+        {
+            this.missingValueIndicators = missingValueIndicators;
+        }
+
+        public Boolean getStudy()
+        {
+            return study;
+        }
+
+        public void setStudy(Boolean study)
+        {
+            this.study = study;
+        }
+
+        public Boolean getAssayDatasets()
+        {
+            return assayDatasets;
+        }
+
+        public void setAssayDatasets(Boolean assayDatasets)
+        {
+            this.assayDatasets = assayDatasets;
+        }
+
+        public Boolean getAssaySchedule()
+        {
+            return assaySchedule;
+        }
+
+        public void setAssaySchedule(Boolean assaySchedule)
+        {
+            this.assaySchedule = assaySchedule;
+        }
+
+        public Boolean getCategories()
+        {
+            return categories;
+        }
+
+        public void setCategories(Boolean categories)
+        {
+            this.categories = categories;
+        }
+
+        public Boolean getCohortSettings()
+        {
+            return cohortSettings;
+        }
+
+        public void setCohortSettings(Boolean cohortSettings)
+        {
+            this.cohortSettings = cohortSettings;
+        }
+
+        public Boolean getCrfDatasets()
+        {
+            return crfDatasets;
+        }
+
+        public void setCrfDatasets(Boolean crfDatasets)
+        {
+            this.crfDatasets = crfDatasets;
+        }
+
+        public Boolean getCustomParticipantView()
+        {
+            return customParticipantView;
+        }
+
+        public void setCustomParticipantView(Boolean customParticipantView)
+        {
+            this.customParticipantView = customParticipantView;
+        }
+
+        public Boolean getDatasetData()
+        {
+            return datasetData;
+        }
+
+        public void setDatasetData(Boolean datasetData)
+        {
+            this.datasetData = datasetData;
+        }
+
+        public Boolean getParticipantCommentSettings()
+        {
+            return participantCommentSettings;
+        }
+
+        public void setParticipantCommentSettings(Boolean participantCommentSettings)
+        {
+            this.participantCommentSettings = participantCommentSettings;
+        }
+
+        public Boolean getParticipantGroups()
+        {
+            return participantGroups;
+        }
+
+        public void setParticipantGroups(Boolean participantGroups)
+        {
+            this.participantGroups = participantGroups;
+        }
+
+        public Boolean getProtocolDocuments()
+        {
+            return protocolDocuments;
+        }
+
+        public void setProtocolDocuments(Boolean protocolDocuments)
+        {
+            this.protocolDocuments = protocolDocuments;
+        }
+
+        public Boolean getQcStateSettings()
+        {
+            return qcStateSettings;
+        }
+
+        public void setQcStateSettings(Boolean qcStateSettings)
+        {
+            this.qcStateSettings = qcStateSettings;
+        }
+
+        public Boolean getSpecimenSettings()
+        {
+            return specimenSettings;
+        }
+
+        public void setSpecimenSettings(Boolean specimenSettings)
+        {
+            this.specimenSettings = specimenSettings;
+        }
+
+        public Boolean getSpecimens()
+        {
+            return specimens;
+        }
+
+        public void setSpecimens(Boolean specimens)
+        {
+            this.specimens = specimens;
+        }
+
+        public Boolean getTreatmentData()
+        {
+            return treatmentData;
+        }
+
+        public void setTreatmentData(Boolean treatmentData)
+        {
+            this.treatmentData = treatmentData;
+        }
+
+        public Boolean getVisitMap()
+        {
+            return visitMap;
+        }
+
+        public void setVisitMap(Boolean visitMap)
+        {
+            this.visitMap = visitMap;
+        }
+
+        public Boolean getFolderTypeAndActiveModules()
+        {
+            return folderTypeAndActiveModules;
+        }
+
+        public void setFolderTypeAndActiveModules(Boolean folderTypeAndActiveModules)
+        {
+            this.folderTypeAndActiveModules = folderTypeAndActiveModules;
+        }
+
+        public Boolean getFullTextSearchSettings()
+        {
+            return fullTextSearchSettings;
+        }
+
+        public void setFullTextSearchSettings(Boolean fullTextSearchSettings)
+        {
+            this.fullTextSearchSettings = fullTextSearchSettings;
+        }
+
+        public Boolean getWebpartPropertiesAndLayout()
+        {
+            return webpartPropertiesAndLayout;
+        }
+
+        public void setWebpartPropertiesAndLayout(Boolean webpartPropertiesAndLayout)
+        {
+            this.webpartPropertiesAndLayout = webpartPropertiesAndLayout;
+        }
+
+        public Boolean getContainerSpecificModuleProperties()
+        {
+            return containerSpecificModuleProperties;
+        }
+
+        public void setContainerSpecificModuleProperties(Boolean containerSpecificModuleProperties)
+        {
+            this.containerSpecificModuleProperties = containerSpecificModuleProperties;
+        }
+
+        public Boolean getRoleAssignmentsForUsersAndGroups()
+        {
+            return roleAssignmentsForUsersAndGroups;
+        }
+
+        public void setRoleAssignmentsForUsersAndGroups(Boolean roleAssignmentsForUsersAndGroups)
+        {
+            this.roleAssignmentsForUsersAndGroups = roleAssignmentsForUsersAndGroups;
+        }
+
+        public Boolean getLists()
+        {
+            return lists;
+        }
+
+        public void setLists(Boolean lists)
+        {
+            this.lists = lists;
+        }
+
+        public Boolean getQueries()
+        {
+            return queries;
+        }
+
+        public void setQueries(Boolean queries)
+        {
+            this.queries = queries;
+        }
+
+        public Boolean getGridViews()
+        {
+            return gridViews;
+        }
+
+        public void setGridViews(Boolean gridViews)
+        {
+            this.gridViews = gridViews;
+        }
+
+        public Boolean getReportsAndCharts()
+        {
+            return reportsAndCharts;
+        }
+
+        public void setReportsAndCharts(Boolean reportsAndCharts)
+        {
+            this.reportsAndCharts = reportsAndCharts;
+        }
+
+        public Boolean getExternalSchemaDefinitions()
+        {
+            return externalSchemaDefinitions;
+        }
+
+        public void setExternalSchemaDefinitions(Boolean externalSchemaDefinitions)
+        {
+            this.externalSchemaDefinitions = externalSchemaDefinitions;
+        }
+
+        public Boolean getWikisAndTheirAttachments()
+        {
+            return wikisAndTheirAttachments;
+        }
+
+        public void setWikisAndTheirAttachments(Boolean wikisAndTheirAttachments)
+        {
+            this.wikisAndTheirAttachments = wikisAndTheirAttachments;
+        }
+
+        public Boolean getNotificationSettings()
+        {
+            return notificationSettings;
+        }
+
+        public void setNotificationSettings(Boolean notificationSettings)
+        {
+            this.notificationSettings = notificationSettings;
+        }
+    }
+
+    /*
+        todo: explain who uses this and why
+     */
+    @RequiresPermission(AdminPermission.class)
+    @IgnoresTermsOfUse
+    public class TrialShareExportAction extends MutatingApiAction<TrialShareExportForm>
+    {
+        private ActionURL _successURL;
+
+        public ApiResponse execute(TrialShareExportForm form, BindException errors) throws Exception
+        {
+            // JSONObject json = form.getJsonObject();
+            ApiSimpleResponse response = new ApiSimpleResponse();
+
+            Container container = getContainer();
+            if (container.isRoot())
+            {
+                throw new NotFoundException();
+            }
+
+            FolderWriterImpl writer = new FolderWriterImpl();
+
+            String[] typesArray;
+            Set<String> types = new HashSet<>();
+
+            //DW: there's almost certainly a better way to do this but oh well....
+            if(form.getMissingValueIndicators())types.add("Missing value indicators");
+            if(form.getStudy())types.add("Study");
+            if(form.getAssayDatasets())types.add("Assay Datasets");
+            if(form.getAssaySchedule())types.add("Assay Schedule");
+            if(form.getCategories())types.add("Categories");
+            if(form.getCohortSettings())types.add("Cohort Settings");
+            if(form.getCrfDatasets())types.add("CRF Datasets");
+            if(form.getCustomParticipantView())types.add("Custom Participant View");
+            if(form.getDatasetData())types.add("Dataset Data");
+            if(form.getParticipantCommentSettings())types.add("Participant Comment Settings");
+            if(form.getParticipantGroups())types.add("Participant Groups");
+            if(form.getProtocolDocuments())types.add("Protocol Documents");
+            if(form.getQcStateSettings())types.add("QC State Settings");
+            if(form.getSpecimenSettings())types.add("Specimen Settings");
+            if(form.getSpecimens())types.add("Specimens");
+            if(form.getTreatmentData())types.add("Treatment Data");
+            if(form.getVisitMap())types.add("Visit Map");
+            if(form.getFolderTypeAndActiveModules())types.add("Folder type and active modules");
+            if(form.getFullTextSearchSettings())types.add("Full-text search settings");
+            if(form.getWebpartPropertiesAndLayout())types.add("Webpart properties and layout");
+            if(form.getContainerSpecificModuleProperties())types.add("Container specific module properties");
+            if(form.getRoleAssignmentsForUsersAndGroups())types.add("Role assignments for users and groups");
+            if(form.getLists())types.add("Lists");
+            if(form.getQueries())types.add("Queries");
+            if(form.getGridViews())types.add("Grid Views");
+            if(form.getReportsAndCharts())types.add("Reports and Charts");
+            if(form.getExternalSchemaDefinitions())types.add("External schema definitions");
+            if(form.getWikisAndTheirAttachments())types.add("Wikis and their attachments");
+            if(form.getNotificationSettings())types.add("Notification settings");
+
+            if(types.size() < 1)
+            {
+                typesArray = new String[]{"Missing value indicators", "Study", "Assay Datasets", "Assay Schedule", "Categories", "Cohort Settings",
+                        "CRF Datasets", "Custom Participant View", "Dataset Data", "Participant Comment Settings", "Participant Groups",
+                        "Protocol Documents", "QC State Settings", "Specimen Settings", "Specimens", "Treatment Data", "Visit Map",
+                        "Folder type and active modules",
+                        "Full-text search settings",
+                        "Webpart properties and layout",
+                        "Container specific module properties",
+                        "Role assignments for users and groups",
+                        "Lists",
+                        "Queries",
+                        "Grid Views",
+                        "Reports and Charts",
+                        "External schema definitions",
+                        "Wikis and their attachments",
+                        "Notification settings"};
+                types = new HashSet<>(Arrays.asList(typesArray));
+            }
+
+            // todo: super important boolean false in 17.2 replaced by PHI enum.  what is new correct setting? PHI.Limited
+            FolderExportContext ctx = new FolderExportContext(getUser(), container, types,
+                    "new", false, PHI.NotPHI, false,
+                    false, false, new StaticLoggerGetter(Logger.getLogger(FolderWriterImpl.class)));
+
+            PipeRoot root = PipelineService.get().findPipelineRoot(container);
+            if (root == null || !root.isValid())
+            {
+                throw new NotFoundException("No valid pipeline root found");
+            }
+            File exportDir = root.resolvePath("export");
+            try
+            {
+                writer.write(container, ctx, new FileSystemFile(exportDir));
+            }
+            catch (Container.ContainerException e)
+            {
+                errors.reject(SpringActionController.ERROR_MSG, e.getMessage());
+                response.put("success", false);
+                response.put("reason", e.getMessage());
+                return response;
+            }
+            _successURL = PageFlowUtil.urlProvider(PipelineUrls.class).urlBrowse(container);
+
+            response.put("success", true);
+            return response;
+        }
+    }
+
+
 
     @RequiresPermission(AdminPermission.class)
     public class CubeAdminAction extends FormViewAction<CubeAdminForm>
