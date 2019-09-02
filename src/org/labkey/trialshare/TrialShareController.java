@@ -752,7 +752,7 @@ public class TrialShareController extends SpringActionController
                 VBox v = new VBox();
                 if (null != form.getReturnActionURL())
                 {
-                    v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
+                    v.addView(new HtmlView(PageFlowUtil.link("back").href(form.getReturnActionURL()) + "<br>"));
                 }
                 StudyDetailBean bean = new StudyDetailBean();
                 bean.setStudy(study);
