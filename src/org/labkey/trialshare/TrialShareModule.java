@@ -93,7 +93,7 @@ public class TrialShareModule extends CodeOnlyModule
             ss.addSearchCategory(searchCategoryPublication);
         }
 
-        SpecimenService.get().registerRequestCustomizer(new ITNSpecimenRequestCustomizer());
+        SpecimenService.get().registerRequestCustomizer(new DelegatingSpecimenRequestCustomizer(SpecimenService.get().getRequestCustomizer()));
     }
 
     @Override

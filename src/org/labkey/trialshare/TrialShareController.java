@@ -212,322 +212,322 @@ public class TrialShareController extends SpringActionController
 
     public static class TrialShareExportForm
     {
-        private Boolean missingValueIndicators;
-        private Boolean study;
-        private Boolean assayDatasets;
-        private Boolean assaySchedule;
-        private Boolean categories;
-        private Boolean cohortSettings;
-        private Boolean crfDatasets;
-        private Boolean customParticipantView;
-        private Boolean datasetData;
-        private Boolean participantCommentSettings;
-        private Boolean participantGroups;
-        private Boolean protocolDocuments;
-        private Boolean qcStateSettings;
-        private Boolean specimenSettings;
-        private Boolean specimens;
-        private Boolean treatmentData;
-        private Boolean visitMap;
-        private Boolean folderTypeAndActiveModules;
-        private Boolean fullTextSearchSettings;
-        private Boolean webpartPropertiesAndLayout;
-        private Boolean containerSpecificModuleProperties;
-        private Boolean roleAssignmentsForUsersAndGroups;
-        private Boolean lists;
-        private Boolean queries;
-        private Boolean gridViews;
-        private Boolean reportsAndCharts;
-        private Boolean externalSchemaDefinitions;
-        private Boolean wikisAndTheirAttachments;
-        private Boolean notificationSettings;
+        private boolean missingValueIndicators;
+        private boolean study;
+        private boolean assayDatasets;
+        private boolean assaySchedule;
+        private boolean categories;
+        private boolean cohortSettings;
+        private boolean crfDatasets;
+        private boolean customParticipantView;
+        private boolean datasetData;
+        private boolean participantCommentSettings;
+        private boolean participantGroups;
+        private boolean protocolDocuments;
+        private boolean qcStateSettings;
+        private boolean specimenSettings;
+        private boolean specimens;
+        private boolean treatmentData;
+        private boolean visitMap;
+        private boolean folderTypeAndActiveModules;
+        private boolean fullTextSearchSettings;
+        private boolean webpartPropertiesAndLayout;
+        private boolean containerSpecificModuleProperties;
+        private boolean roleAssignmentsForUsersAndGroups;
+        private boolean lists;
+        private boolean queries;
+        private boolean gridViews;
+        private boolean reportsAndCharts;
+        private boolean externalSchemaDefinitions;
+        private boolean wikisAndTheirAttachments;
+        private boolean notificationSettings;
 
-        public Boolean getMissingValueIndicators()
+        public boolean getMissingValueIndicators()
         {
             return missingValueIndicators;
         }
 
-        public void setMissingValueIndicators(Boolean missingValueIndicators)
+        public void setMissingValueIndicators(boolean missingValueIndicators)
         {
             this.missingValueIndicators = missingValueIndicators;
         }
 
-        public Boolean getStudy()
+        public boolean getStudy()
         {
             return study;
         }
 
-        public void setStudy(Boolean study)
+        public void setStudy(boolean study)
         {
             this.study = study;
         }
 
-        public Boolean getAssayDatasets()
+        public boolean getAssayDatasets()
         {
             return assayDatasets;
         }
 
-        public void setAssayDatasets(Boolean assayDatasets)
+        public void setAssayDatasets(boolean assayDatasets)
         {
             this.assayDatasets = assayDatasets;
         }
 
-        public Boolean getAssaySchedule()
+        public boolean getAssaySchedule()
         {
             return assaySchedule;
         }
 
-        public void setAssaySchedule(Boolean assaySchedule)
+        public void setAssaySchedule(boolean assaySchedule)
         {
             this.assaySchedule = assaySchedule;
         }
 
-        public Boolean getCategories()
+        public boolean getCategories()
         {
             return categories;
         }
 
-        public void setCategories(Boolean categories)
+        public void setCategories(boolean categories)
         {
             this.categories = categories;
         }
 
-        public Boolean getCohortSettings()
+        public boolean getCohortSettings()
         {
             return cohortSettings;
         }
 
-        public void setCohortSettings(Boolean cohortSettings)
+        public void setCohortSettings(boolean cohortSettings)
         {
             this.cohortSettings = cohortSettings;
         }
 
-        public Boolean getCrfDatasets()
+        public boolean getCrfDatasets()
         {
             return crfDatasets;
         }
 
-        public void setCrfDatasets(Boolean crfDatasets)
+        public void setCrfDatasets(boolean crfDatasets)
         {
             this.crfDatasets = crfDatasets;
         }
 
-        public Boolean getCustomParticipantView()
+        public boolean getCustomParticipantView()
         {
             return customParticipantView;
         }
 
-        public void setCustomParticipantView(Boolean customParticipantView)
+        public void setCustomParticipantView(boolean customParticipantView)
         {
             this.customParticipantView = customParticipantView;
         }
 
-        public Boolean getDatasetData()
+        public boolean getDatasetData()
         {
             return datasetData;
         }
 
-        public void setDatasetData(Boolean datasetData)
+        public void setDatasetData(boolean datasetData)
         {
             this.datasetData = datasetData;
         }
 
-        public Boolean getParticipantCommentSettings()
+        public boolean getParticipantCommentSettings()
         {
             return participantCommentSettings;
         }
 
-        public void setParticipantCommentSettings(Boolean participantCommentSettings)
+        public void setParticipantCommentSettings(boolean participantCommentSettings)
         {
             this.participantCommentSettings = participantCommentSettings;
         }
 
-        public Boolean getParticipantGroups()
+        public boolean getParticipantGroups()
         {
             return participantGroups;
         }
 
-        public void setParticipantGroups(Boolean participantGroups)
+        public void setParticipantGroups(boolean participantGroups)
         {
             this.participantGroups = participantGroups;
         }
 
-        public Boolean getProtocolDocuments()
+        public boolean getProtocolDocuments()
         {
             return protocolDocuments;
         }
 
-        public void setProtocolDocuments(Boolean protocolDocuments)
+        public void setProtocolDocuments(boolean protocolDocuments)
         {
             this.protocolDocuments = protocolDocuments;
         }
 
-        public Boolean getQcStateSettings()
+        public boolean getQcStateSettings()
         {
             return qcStateSettings;
         }
 
-        public void setQcStateSettings(Boolean qcStateSettings)
+        public void setQcStateSettings(boolean qcStateSettings)
         {
             this.qcStateSettings = qcStateSettings;
         }
 
-        public Boolean getSpecimenSettings()
+        public boolean getSpecimenSettings()
         {
             return specimenSettings;
         }
 
-        public void setSpecimenSettings(Boolean specimenSettings)
+        public void setSpecimenSettings(boolean specimenSettings)
         {
             this.specimenSettings = specimenSettings;
         }
 
-        public Boolean getSpecimens()
+        public boolean getSpecimens()
         {
             return specimens;
         }
 
-        public void setSpecimens(Boolean specimens)
+        public void setSpecimens(boolean specimens)
         {
             this.specimens = specimens;
         }
 
-        public Boolean getTreatmentData()
+        public boolean getTreatmentData()
         {
             return treatmentData;
         }
 
-        public void setTreatmentData(Boolean treatmentData)
+        public void setTreatmentData(boolean treatmentData)
         {
             this.treatmentData = treatmentData;
         }
 
-        public Boolean getVisitMap()
+        public boolean getVisitMap()
         {
             return visitMap;
         }
 
-        public void setVisitMap(Boolean visitMap)
+        public void setVisitMap(boolean visitMap)
         {
             this.visitMap = visitMap;
         }
 
-        public Boolean getFolderTypeAndActiveModules()
+        public boolean getFolderTypeAndActiveModules()
         {
             return folderTypeAndActiveModules;
         }
 
-        public void setFolderTypeAndActiveModules(Boolean folderTypeAndActiveModules)
+        public void setFolderTypeAndActiveModules(boolean folderTypeAndActiveModules)
         {
             this.folderTypeAndActiveModules = folderTypeAndActiveModules;
         }
 
-        public Boolean getFullTextSearchSettings()
+        public boolean getFullTextSearchSettings()
         {
             return fullTextSearchSettings;
         }
 
-        public void setFullTextSearchSettings(Boolean fullTextSearchSettings)
+        public void setFullTextSearchSettings(boolean fullTextSearchSettings)
         {
             this.fullTextSearchSettings = fullTextSearchSettings;
         }
 
-        public Boolean getWebpartPropertiesAndLayout()
+        public boolean getWebpartPropertiesAndLayout()
         {
             return webpartPropertiesAndLayout;
         }
 
-        public void setWebpartPropertiesAndLayout(Boolean webpartPropertiesAndLayout)
+        public void setWebpartPropertiesAndLayout(boolean webpartPropertiesAndLayout)
         {
             this.webpartPropertiesAndLayout = webpartPropertiesAndLayout;
         }
 
-        public Boolean getContainerSpecificModuleProperties()
+        public boolean getContainerSpecificModuleProperties()
         {
             return containerSpecificModuleProperties;
         }
 
-        public void setContainerSpecificModuleProperties(Boolean containerSpecificModuleProperties)
+        public void setContainerSpecificModuleProperties(boolean containerSpecificModuleProperties)
         {
             this.containerSpecificModuleProperties = containerSpecificModuleProperties;
         }
 
-        public Boolean getRoleAssignmentsForUsersAndGroups()
+        public boolean getRoleAssignmentsForUsersAndGroups()
         {
             return roleAssignmentsForUsersAndGroups;
         }
 
-        public void setRoleAssignmentsForUsersAndGroups(Boolean roleAssignmentsForUsersAndGroups)
+        public void setRoleAssignmentsForUsersAndGroups(boolean roleAssignmentsForUsersAndGroups)
         {
             this.roleAssignmentsForUsersAndGroups = roleAssignmentsForUsersAndGroups;
         }
 
-        public Boolean getLists()
+        public boolean getLists()
         {
             return lists;
         }
 
-        public void setLists(Boolean lists)
+        public void setLists(boolean lists)
         {
             this.lists = lists;
         }
 
-        public Boolean getQueries()
+        public boolean getQueries()
         {
             return queries;
         }
 
-        public void setQueries(Boolean queries)
+        public void setQueries(boolean queries)
         {
             this.queries = queries;
         }
 
-        public Boolean getGridViews()
+        public boolean getGridViews()
         {
             return gridViews;
         }
 
-        public void setGridViews(Boolean gridViews)
+        public void setGridViews(boolean gridViews)
         {
             this.gridViews = gridViews;
         }
 
-        public Boolean getReportsAndCharts()
+        public boolean getReportsAndCharts()
         {
             return reportsAndCharts;
         }
 
-        public void setReportsAndCharts(Boolean reportsAndCharts)
+        public void setReportsAndCharts(boolean reportsAndCharts)
         {
             this.reportsAndCharts = reportsAndCharts;
         }
 
-        public Boolean getExternalSchemaDefinitions()
+        public boolean getExternalSchemaDefinitions()
         {
             return externalSchemaDefinitions;
         }
 
-        public void setExternalSchemaDefinitions(Boolean externalSchemaDefinitions)
+        public void setExternalSchemaDefinitions(boolean externalSchemaDefinitions)
         {
             this.externalSchemaDefinitions = externalSchemaDefinitions;
         }
 
-        public Boolean getWikisAndTheirAttachments()
+        public boolean getWikisAndTheirAttachments()
         {
             return wikisAndTheirAttachments;
         }
 
-        public void setWikisAndTheirAttachments(Boolean wikisAndTheirAttachments)
+        public void setWikisAndTheirAttachments(boolean wikisAndTheirAttachments)
         {
             this.wikisAndTheirAttachments = wikisAndTheirAttachments;
         }
 
-        public Boolean getNotificationSettings()
+        public boolean getNotificationSettings()
         {
             return notificationSettings;
         }
 
-        public void setNotificationSettings(Boolean notificationSettings)
+        public void setNotificationSettings(boolean notificationSettings)
         {
             this.notificationSettings = notificationSettings;
         }

@@ -55,7 +55,7 @@ public class ITNSpecimenRequestCustomizer implements SpecimenService.SpecimenReq
                 "with you.  You can also contact us at " +
                 "<a href='trialsharesupport@immunetolerance.org'>trialsharesupport@immunetolerance.org</a>" +
                 " to follow up with us regarding this request.<br/>" +
-                "You may also also update this request at any calendar to add comments or supporting " +
+                "You may also update this request at any calendar to add comments or supporting " +
                 "documents by clicking here " + textLink("Update Request",
                 PageFlowUtil.urlProvider(SamplesUrls.class).getManageRequestStatusURL(c, requestId)));
     }
