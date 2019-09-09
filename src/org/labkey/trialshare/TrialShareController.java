@@ -1149,7 +1149,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public boolean handlePost(CubeObjectQueryForm form, BindException errors) throws Exception
         {
-            Set<String> ids = DataRegionSelection.getSelected(form.getViewContext(), null, true, true);
+            Set<String> ids = DataRegionSelection.getSelected(form.getViewContext(), null, true);
             if (form.getObjectName() == ObjectName.publication)
             {
                 TrialShareManager.get().deletePublications(getUser(), getContainer(), ids, errors);
