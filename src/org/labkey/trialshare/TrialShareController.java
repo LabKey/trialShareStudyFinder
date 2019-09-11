@@ -221,6 +221,7 @@ public class TrialShareController extends SpringActionController
         private boolean crfDatasets;
         private boolean customParticipantView;
         private boolean datasetData;
+        private boolean etlDefinitions;
         private boolean participantCommentSettings;
         private boolean participantGroups;
         private boolean protocolDocuments;
@@ -310,6 +311,16 @@ public class TrialShareController extends SpringActionController
         public void setCrfDatasets(boolean crfDatasets)
         {
             this.crfDatasets = crfDatasets;
+        }
+
+        public boolean getEtlDefinitions()
+        {
+            return etlDefinitions;
+        }
+
+        public void setEtlDefinitions(boolean etlDefinitions)
+        {
+            this.etlDefinitions = etlDefinitions;
         }
 
         public boolean getCustomParticipantView()
@@ -568,6 +579,7 @@ public class TrialShareController extends SpringActionController
             if(form.getCrfDatasets())types.add("CRF Datasets");
             if(form.getCustomParticipantView())types.add("Custom Participant View");
             if(form.getDatasetData())types.add("Dataset Data");
+            if(form.getEtlDefinitions())types.add("ETL Definitions");
             if(form.getParticipantCommentSettings())types.add("Participant Comment Settings");
             if(form.getParticipantGroups())types.add("Participant Groups");
             if(form.getProtocolDocuments())types.add("Protocol Documents");
@@ -591,19 +603,35 @@ public class TrialShareController extends SpringActionController
 
             if(types.size() < 1)
             {
-                typesArray = new String[]{"Missing value indicators", "Study", "Assay Datasets", "Assay Schedule", "Categories", "Cohort Settings",
-                        "CRF Datasets", "Custom Participant View", "Dataset Data", "Participant Comment Settings", "Participant Groups",
-                        "Protocol Documents", "QC State Settings", "Specimen Settings", "Specimens", "Treatment Data", "Visit Map",
+                typesArray = new String[]{
                         "Folder type and active modules",
                         "Full-text search settings",
                         "Webpart properties and layout",
                         "Container specific module properties",
-                        "Role assignments for users and groups",
-                        "Lists",
+                        "QC State Settings",
+
+                        "Missing value indicators",
+                        "Study",
+                            "Assay Datasets",
+                            "Assay Schedule",
+                            "Categories",
+                            "Cohort Settings",
+                            "CRF Datasets",
+                            "Custom Participant View",
+                            "Dataset Data",
+                            "Participant Comment Settings",
+                            "Participant Groups",
+                            "Protocol Documents",
+                            "Specimen Settings",
+                            "Specimens",
+                            "Treatment Data",
+                            "Visit Map",
                         "Queries",
                         "Grid Views",
                         "Reports and Charts",
                         "External schema definitions",
+                        "ETL Definitions",
+                        "Lists",
                         "Wikis and their attachments",
                         "Notification settings"};
                 types = new HashSet<>(Arrays.asList(typesArray));
