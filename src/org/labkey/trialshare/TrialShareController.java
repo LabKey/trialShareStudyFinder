@@ -1209,7 +1209,7 @@ public class TrialShareController extends SpringActionController
                 VBox v = new VBox();
                 if (null != form.getReturnActionURL())
                 {
-                    v.addView(new HtmlView(PageFlowUtil.textLink("back", form.getReturnActionURL()) + "<br>"));
+                    v.addView(new HtmlView(PageFlowUtil.link("back").href(form.getReturnActionURL()) + "<br>"));
                 }
                 StudyDetailBean bean = new StudyDetailBean();
                 bean.setStudy(study);
@@ -1606,7 +1606,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public boolean handlePost(CubeObjectQueryForm form, BindException errors) throws Exception
         {
-            Set<String> ids = DataRegionSelection.getSelected(form.getViewContext(), null, true, true);
+            Set<String> ids = DataRegionSelection.getSelected(form.getViewContext(), null, true);
             if (form.getObjectName() == ObjectName.publication)
             {
                 TrialShareManager.get().deletePublications(getUser(), getContainer(), ids, errors);
