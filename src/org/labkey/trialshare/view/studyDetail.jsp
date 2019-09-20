@@ -26,8 +26,6 @@
 <%@ page import="org.labkey.trialshare.data.StudyPublicationBean" %>
 <%@ page import="org.labkey.trialshare.data.URLData" %>
 <%@ page import="java.net.URL" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%!
     @Override
@@ -50,9 +48,6 @@
         descriptionHTML = HtmlString.unsafe(description);
 
     String studyUrl = study.getUrl(getUser());
-
-    Map<String, String> linkProps = new HashMap<>();
-    linkProps.put("target", "_blank");
 %>
 
 <div id="studyDetails" class="labkey-study-details">
@@ -88,7 +83,7 @@
             { %>
         <div class="labkey-study-links">
         <%      if (null != studyUrl) { %>
-        <%=link("View study " + study.getShortName()).href(studyUrl).attributes(linkProps)%><br>
+        <%=link("View study " + study.getShortName()).href(studyUrl).target("_blank")%><br>
         <% } %>
         <%
                     if (null != study.getExternalURL())
@@ -100,7 +95,7 @@
                             text = "View study at " + url.getHost();
                         }
         %>
-        <%=link(text).href(study.getExternalURL()).attributes(linkProps)%><br>
+        <%=link(text).href(study.getExternalURL()).target("_blank")%><br>
         <%          } %>
 
         </div>
@@ -130,13 +125,13 @@
                 %><%
                     if (!StringUtils.isEmpty(pub.getPMID()))
                     {
-                        %><br/><%=link("PubMed").href("http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPMID()).attributes(linkProps)%><%
+                        %><br/><%=link("PubMed").href("http://www.ncbi.nlm.nih.gov/pubmed/?term=" + pub.getPMID()).target("_blank")%><%
                     }
                     for (URLData urlData : pub.getUrls())
                     {
                         if (urlData != null && !StringUtils.isEmpty(urlData.getLink()))
                         {
-                        %><br/><%=link(urlData.getLinkText()).href(urlData.getLink()).attributes(linkProps)%><%
+                        %><br/><%=link(urlData.getLinkText()).href(urlData.getLink()).target("_blank")%><%
                         }
                     }
                 %></p><%
