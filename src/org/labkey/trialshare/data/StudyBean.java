@@ -29,9 +29,6 @@ import org.labkey.api.query.FieldKey;
 import org.labkey.api.query.QuerySchema;
 import org.labkey.api.security.User;
 import org.labkey.api.security.permissions.ReadPermission;
-import org.labkey.api.services.ServiceRegistry;
-import org.labkey.api.wiki.WikiRendererType;
-import org.labkey.api.wiki.WikiService;
 import org.labkey.trialshare.TrialShareManager;
 import org.labkey.trialshare.query.TrialShareQuerySchema;
 import org.springframework.validation.Errors;
@@ -318,20 +315,6 @@ public class StudyBean
     {
         return (String) _primaryFields.get(DESCRIPTION_FIELD);
     }
-
-    private String getFormattedHtml(WikiRendererType rendererType, String markup)
-    {
-        WikiService wikiService = WikiService.get();
-
-        if (null == wikiService)
-            return null;
-
-        if (rendererType == null)
-            rendererType = wikiService.getDefaultMessageRendererType();
-
-        return wikiService.getFormattedHtml(rendererType, markup);
-    }
-
 
     public void setDescription(String description)
     {
