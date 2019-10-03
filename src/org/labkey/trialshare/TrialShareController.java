@@ -581,13 +581,13 @@ public class TrialShareController extends SpringActionController
 
             for (FolderDataTypes type : FolderDataTypes.values())
             {
-                if (type.isEnabled(form))
+                if (type.shouldExport(form))
                     types.add(type);
             }
 
             if(types.isEmpty())
             {
-                types = getDefaultExportTypes();
+                types = getDefaultExportDataTypes();
             }
 
             // todo: super important boolean false in 17.2 replaced by PHI enum.  what is new correct setting? PHI.Limited
@@ -620,7 +620,7 @@ public class TrialShareController extends SpringActionController
     }
 
     @NotNull
-    private static Set<FolderDataTypes> getDefaultExportTypes()
+    private static Set<FolderDataTypes> getDefaultExportDataTypes()
     {
         return new HashSet<>(Arrays.asList(
                 FolderDataTypes.folderTypeAndActiveModules,
@@ -688,13 +688,13 @@ public class TrialShareController extends SpringActionController
         wikisAndAttachments("Wikis and their attachments", TrialShareExportForm::getWikisAndTheirAttachments),
         notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings);
 
-        final String _description;
-        final Function<TrialShareExportForm, Boolean> _isEnabled;
+        private final String _description;
+        private final Function<TrialShareExportForm, Boolean> _formChecker;
 
-        FolderDataTypes(String description, Function<TrialShareExportForm, Boolean> isEnabled)
+        FolderDataTypes(String description, Function<TrialShareExportForm, Boolean> formChecker)
         {
             _description = description;
-            _isEnabled = isEnabled;
+            _formChecker = formChecker;
         }
 
         public String getDescription()
@@ -702,9 +702,9 @@ public class TrialShareController extends SpringActionController
             return _description;
         }
 
-        public boolean isEnabled(TrialShareExportForm form)
+        public boolean shouldExport(TrialShareExportForm form)
         {
-            return _isEnabled.apply(form);
+            return _formChecker.apply(form);
         }
     }
 
@@ -1944,15 +1944,19 @@ public class TrialShareController extends SpringActionController
 
             if (!expectedDataTypes.isEmpty())
             {
-                Assert.fail("Did not find expected folder writer(s): " + expectedDataTypes + ". Unaccounted for folder writers: " + actualDataTypes);
+                Assert.fail("Did not find expected data type(s): " + expectedDataTypes + ". Unaccounted for data types: " + actualDataTypes);
             }
         }
 
         @Test
         public void testDefaultDataTypes()
         {
-            final List<String> expectedDataTypes = getDefaultExportTypes().stream().map(FolderDataTypes::getDescription).collect(Collectors.toList());
-            final List<String> actualDefaultDataTypes = new ArrayList<>(getRegisteredDataTypes(true));Collections.sort(expectedDataTypes);            Collections.sort(actualDefaultDataTypes);
+            final List<String> expectedDataTypes = getDefaultExportDataTypes().stream().map(FolderDataTypes::getDescription).collect(Collectors.toList());
+            final List<String> actualDefaultDataTypes = new ArrayList<>(getRegisteredDataTypes(true));
+
+            // Sort to make error message more readable
+            Collections.sort(expectedDataTypes);
+            Collections.sort(actualDefaultDataTypes);
 
             Assert.assertEquals("TrialShareExport default data types do not match core defaults", expectedDataTypes, actualDefaultDataTypes);
         }
