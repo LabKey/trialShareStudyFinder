@@ -26,7 +26,6 @@ import org.labkey.api.module.ModuleContext;
 import org.labkey.api.module.ModuleProperty;
 import org.labkey.api.search.SearchService;
 import org.labkey.api.security.permissions.AdminPermission;
-import org.labkey.api.services.ServiceRegistry;
 import org.labkey.api.settings.AdminConsole;
 import org.labkey.api.study.SpecimenService;
 import org.labkey.api.util.ConfigurationException;
@@ -35,8 +34,11 @@ import org.labkey.api.view.WebPartFactory;
 import org.labkey.trialshare.view.DataFinderWebPart;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TrialShareModule extends CodeOnlyModule
 {
@@ -121,5 +123,14 @@ public class TrialShareModule extends CodeOnlyModule
         if (!mp.isCanSetPerContainer() || null==c)
             c = ContainerManager.getRoot();
         return mp.getEffectiveValue(c);
+    }
+
+    @Override
+    @NotNull
+    public Set<Class> getIntegrationTests()
+    {
+        return new HashSet<>(Arrays.asList(
+            TrialShareController.TrialShareExportTest.class
+        ));
     }
 }

@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
+import org.junit.Test;
 import org.labkey.api.action.ApiResponse;
 import org.labkey.api.action.ApiSimpleResponse;
 import org.labkey.api.action.FormHandlerAction;
@@ -37,7 +39,10 @@ import org.labkey.api.action.SimpleErrorView;
 import org.labkey.api.action.SimpleResponse;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
+import org.labkey.api.admin.AbstractFolderContext;
 import org.labkey.api.admin.FolderExportContext;
+import org.labkey.api.admin.FolderSerializationRegistry;
+import org.labkey.api.admin.FolderWriter;
 import org.labkey.api.admin.FolderWriterImpl;
 import org.labkey.api.admin.StaticLoggerGetter;
 import org.labkey.api.data.Container;
@@ -71,6 +76,7 @@ import org.labkey.api.view.UnauthorizedException;
 import org.labkey.api.view.VBox;
 import org.labkey.api.view.WebPartView;
 import org.labkey.api.writer.FileSystemFile;
+import org.labkey.api.writer.Writer;
 import org.labkey.trialshare.data.CubeConfigBean;
 import org.labkey.trialshare.data.FacetFilter;
 import org.labkey.trialshare.data.PublicationEditBean;
@@ -90,11 +96,16 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Marshal(Marshaller.Jackson)
 public class TrialShareController extends SpringActionController
@@ -566,79 +577,21 @@ public class TrialShareController extends SpringActionController
 
             FolderWriterImpl writer = new FolderWriterImpl();
 
-            String[] typesArray;
-            Set<String> types = new HashSet<>();
+            Set<FolderDataTypes> types = new HashSet<>();
 
-            //DW: there's almost certainly a better way to do this but oh well....
-            if(form.getMissingValueIndicators())types.add("Missing value indicators");
-            if(form.getStudy())types.add("Study");
-            if(form.getAssayDatasets())types.add("Assay Datasets");
-            if(form.getAssaySchedule())types.add("Assay Schedule");
-            if(form.getCategories())types.add("Categories");
-            if(form.getCohortSettings())types.add("Cohort Settings");
-            if(form.getCrfDatasets())types.add("CRF Datasets");
-            if(form.getCustomParticipantView())types.add("Custom Participant View");
-            if(form.getDatasetData())types.add("Dataset Data");
-            if(form.getEtlDefinitions())types.add("ETL Definitions");
-            if(form.getParticipantCommentSettings())types.add("Participant Comment Settings");
-            if(form.getParticipantGroups())types.add("Participant Groups");
-            if(form.getProtocolDocuments())types.add("Protocol Documents");
-            if(form.getQcStateSettings())types.add("QC State Settings");
-            if(form.getSpecimenSettings())types.add("Specimen Settings");
-            if(form.getSpecimens())types.add("Specimens");
-            if(form.getTreatmentData())types.add("Treatment Data");
-            if(form.getVisitMap())types.add("Visit Map");
-            if(form.getFolderTypeAndActiveModules())types.add("Folder type and active modules");
-            if(form.getFullTextSearchSettings())types.add("Full-text search settings");
-            if(form.getWebpartPropertiesAndLayout())types.add("Webpart properties and layout");
-            if(form.getContainerSpecificModuleProperties())types.add("Container specific module properties");
-            if(form.getRoleAssignmentsForUsersAndGroups())types.add("Role assignments for users and groups");
-            if(form.getLists())types.add("Lists");
-            if(form.getQueries())types.add("Queries");
-            if(form.getGridViews())types.add("Grid Views");
-            if(form.getReportsAndCharts())types.add("Reports and Charts");
-            if(form.getExternalSchemaDefinitions())types.add("External schema definitions");
-            if(form.getWikisAndTheirAttachments())types.add("Wikis and their attachments");
-            if(form.getNotificationSettings())types.add("Notification settings");
-
-            if(types.size() < 1)
+            for (FolderDataTypes type : FolderDataTypes.values())
             {
-                typesArray = new String[]{
-                        "Folder type and active modules",
-                        "Full-text search settings",
-                        "Webpart properties and layout",
-                        "Container specific module properties",
-                        "QC State Settings",
+                if (type.isEnabled(form))
+                    types.add(type);
+            }
 
-                        "Missing value indicators",
-                        "Study",
-                            "Assay Datasets",
-                            "Assay Schedule",
-                            "Categories",
-                            "Cohort Settings",
-                            "CRF Datasets",
-                            "Custom Participant View",
-                            "Dataset Data",
-                            "Participant Comment Settings",
-                            "Participant Groups",
-                            "Protocol Documents",
-                            "Specimen Settings",
-                            "Specimens",
-                            "Treatment Data",
-                            "Visit Map",
-                        "Queries",
-                        "Grid Views",
-                        "Reports and Charts",
-                        "External schema definitions",
-                        "ETL Definitions",
-                        "Lists",
-                        "Wikis and their attachments",
-                        "Notification settings"};
-                types = new HashSet<>(Arrays.asList(typesArray));
+            if(types.isEmpty())
+            {
+                types = getDefaultExportTypes();
             }
 
             // todo: super important boolean false in 17.2 replaced by PHI enum.  what is new correct setting? PHI.Limited
-            FolderExportContext ctx = new FolderExportContext(getUser(), container, types,
+            FolderExportContext ctx = new FolderExportContext(getUser(), container, types.stream().map(FolderDataTypes::getDescription).collect(Collectors.toSet()),
                     "new", false, PHI.NotPHI, false,
                     false, false, new StaticLoggerGetter(Logger.getLogger(FolderWriterImpl.class)));
 
@@ -666,7 +619,94 @@ public class TrialShareController extends SpringActionController
         }
     }
 
+    @NotNull
+    private static Set<FolderDataTypes> getDefaultExportTypes()
+    {
+        return new HashSet<>(Arrays.asList(
+                FolderDataTypes.folderTypeAndActiveModules,
+                FolderDataTypes.fullTextSearchSettings,
+                FolderDataTypes.webpartProperties,
+                FolderDataTypes.moduleProperties,
+                FolderDataTypes.qcStateSettings,
 
+                FolderDataTypes.mvIndicators,
+                FolderDataTypes.study,
+                    FolderDataTypes.assayDatasets,
+                    FolderDataTypes.assaySchedule,
+                    FolderDataTypes.categories,
+                    FolderDataTypes.cohortSettings,
+                    FolderDataTypes.crfDatasets,
+                    FolderDataTypes.customParticipantView,
+                    FolderDataTypes.datasetData,
+                    FolderDataTypes.participantCommentSettings,
+                    FolderDataTypes.participantGroups,
+                    FolderDataTypes.protocolDocuments,
+                    FolderDataTypes.specimenSettings,
+                    FolderDataTypes.specimens,
+                    FolderDataTypes.treatmentData,
+                    FolderDataTypes.visitMap,
+                FolderDataTypes.queries,
+                FolderDataTypes.gridViews,
+                FolderDataTypes.reportsAndCharts,
+                FolderDataTypes.externalSchemaDefinitions,
+                FolderDataTypes.etlDefinitions,
+                FolderDataTypes.lists,
+                FolderDataTypes.wikisAndAttachments,
+                FolderDataTypes.notificationSettings));
+    }
+
+    enum FolderDataTypes
+    {
+        mvIndicators("Missing value indicators", TrialShareExportForm::getMissingValueIndicators),
+        study("Study", TrialShareExportForm::getStudy),
+        assayDatasets("Assay Datasets", TrialShareExportForm::getAssayDatasets),
+        assaySchedule("Assay Schedule", TrialShareExportForm::getAssaySchedule),
+        categories("Categories", TrialShareExportForm::getCategories),
+        cohortSettings("Cohort Settings", TrialShareExportForm::getCohortSettings),
+        crfDatasets("CRF Datasets", TrialShareExportForm::getCrfDatasets),
+        customParticipantView("Custom Participant View", TrialShareExportForm::getCustomParticipantView),
+        datasetData("Dataset Data", TrialShareExportForm::getDatasetData),
+        etlDefinitions("ETL Definitions", TrialShareExportForm::getEtlDefinitions),
+        participantCommentSettings("Participant Comment Settings", TrialShareExportForm::getParticipantCommentSettings),
+        participantGroups("Participant Groups", TrialShareExportForm::getParticipantGroups),
+        protocolDocuments("Protocol Documents", TrialShareExportForm::getProtocolDocuments),
+        qcStateSettings("QC State Settings", TrialShareExportForm::getQcStateSettings),
+        specimenSettings("Specimen Settings", TrialShareExportForm::getSpecimenSettings),
+        specimens("Specimens", TrialShareExportForm::getSpecimens),
+        treatmentData("Treatment Data", TrialShareExportForm::getTreatmentData),
+        visitMap("Visit Map", TrialShareExportForm::getVisitMap),
+        folderTypeAndActiveModules("Folder type and active modules", TrialShareExportForm::getFolderTypeAndActiveModules),
+        fullTextSearchSettings("Full-text search settings", TrialShareExportForm::getFullTextSearchSettings),
+        webpartProperties("Webpart properties and layout", TrialShareExportForm::getWebpartPropertiesAndLayout),
+        moduleProperties("Container specific module properties", TrialShareExportForm::getContainerSpecificModuleProperties),
+        roleAssignments("Role assignments for users and groups", TrialShareExportForm::getRoleAssignmentsForUsersAndGroups),
+        lists("Lists", TrialShareExportForm::getLists),
+        queries("Queries", TrialShareExportForm::getQueries),
+        gridViews("Grid Views", TrialShareExportForm::getGridViews),
+        reportsAndCharts("Reports and Charts", TrialShareExportForm::getReportsAndCharts),
+        externalSchemaDefinitions("External schema definitions", TrialShareExportForm::getExternalSchemaDefinitions),
+        wikisAndAttachments("Wikis and their attachments", TrialShareExportForm::getWikisAndTheirAttachments),
+        notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings);
+
+        final String _description;
+        final Function<TrialShareExportForm, Boolean> _isEnabled;
+
+        FolderDataTypes(String description, Function<TrialShareExportForm, Boolean> isEnabled)
+        {
+            _description = description;
+            _isEnabled = isEnabled;
+        }
+
+        public String getDescription()
+        {
+            return _description;
+        }
+
+        public boolean isEnabled(TrialShareExportForm form)
+        {
+            return _isEnabled.apply(form);
+        }
+    }
 
     @RequiresPermission(AdminPermission.class)
     public class CubeAdminAction extends FormViewAction<CubeAdminForm>
@@ -1878,6 +1918,63 @@ public class TrialShareController extends SpringActionController
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
             return objectMapper.reader(c);
+        }
+    }
+
+    public static class TrialShareExportTest
+    {
+        private final Collection<FolderWriter> folderWriters = FolderSerializationRegistry.get().getRegisteredFolderWriters();
+
+        @Test
+        public void testDataTypes()
+        {
+            final Set<String> expectedDataTypes = Arrays.stream(FolderDataTypes.values()).map(FolderDataTypes::getDescription).collect(Collectors.toSet());
+            final Set<String> actualDataTypes = getRegisteredDataTypes(false);
+
+            Iterator<String> iterator = expectedDataTypes.iterator();
+            while (iterator.hasNext())
+            {
+                String expectedDataType = iterator.next();
+                if (actualDataTypes.contains(expectedDataType))
+                {
+                    iterator.remove();
+                    actualDataTypes.remove(expectedDataType);
+                }
+            }
+
+            if (!expectedDataTypes.isEmpty())
+            {
+                Assert.fail("Did not find expected folder writer(s): " + expectedDataTypes + ". Unaccounted for folder writers: " + actualDataTypes);
+            }
+        }
+
+        @Test
+        public void testDefaultDataTypes()
+        {
+            final List<String> expectedDataTypes = getDefaultExportTypes().stream().map(FolderDataTypes::getDescription).collect(Collectors.toList());
+            final List<String> actualDefaultDataTypes = new ArrayList<>(getRegisteredDataTypes(true));Collections.sort(expectedDataTypes);            Collections.sort(actualDefaultDataTypes);
+
+            Assert.assertEquals("TrialShareExport default data types do not match core defaults", expectedDataTypes, actualDefaultDataTypes);
+        }
+
+        public Set<String> getRegisteredDataTypes(boolean onlyDefault)
+        {
+            Set<String> dataTypes = new HashSet<>();
+            Set<FolderWriter> filteredFolderWriters;
+            if (onlyDefault)
+                filteredFolderWriters = folderWriters.stream().filter(fw -> fw.selectedByDefault(AbstractFolderContext.ExportType.ALL)).collect(Collectors.toSet());
+            else
+                filteredFolderWriters = new HashSet<>(folderWriters);
+
+            filteredFolderWriters.forEach(fw -> {
+                dataTypes.add(fw.getDataType());
+                Collection<Writer> children = fw.getChildren(false, false);
+                if (children != null)
+                    children.forEach(w -> dataTypes.add(w.getDataType()));
+            });
+
+            dataTypes.remove(null);
+            return dataTypes;
         }
     }
 }
