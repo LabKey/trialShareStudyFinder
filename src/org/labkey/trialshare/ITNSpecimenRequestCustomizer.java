@@ -12,7 +12,7 @@ import org.labkey.api.util.HtmlString;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.security.xml.GroupEnumType;
 
-import static org.labkey.api.util.PageFlowUtil.textLink;
+import static org.labkey.api.util.PageFlowUtil.link;
 
 public class ITNSpecimenRequestCustomizer implements SpecimenService.SpecimenRequestCustomizer
 {
@@ -51,13 +51,13 @@ public class ITNSpecimenRequestCustomizer implements SpecimenService.SpecimenReq
     @Override
     public HtmlString getSubmittedMessage(Container c, int requestId)
     {
+        SamplesUrls samplesUrls = PageFlowUtil.urlProvider(SamplesUrls.class);
         return HtmlString.unsafe("Thank you for your request.  A representative from the ITN will be in touch " +
                 "with you.  You can also contact us at " +
-                "<a href='trialsharesupport@immunetolerance.org'>trialsharesupport@immunetolerance.org</a>" +
+                link("trialsharesupport@immunetolerance.org").href("mailto:trialsharesupport@immunetolerance.org?Body=" + samplesUrls.getRequestDetailsURL(c, requestId).getURIString()).clearClasses() +
                 " to follow up with us regarding this request.<br/>" +
                 "You may also update this request at any calendar to add comments or supporting " +
-                "documents by clicking here " + textLink("Update Request",
-                PageFlowUtil.urlProvider(SamplesUrls.class).getManageRequestStatusURL(c, requestId)));
+                "documents by clicking here " + link("Update Request").href(samplesUrls.getManageRequestStatusURL(c, requestId)));
     }
 
     @Override
