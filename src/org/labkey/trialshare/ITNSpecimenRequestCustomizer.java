@@ -54,7 +54,7 @@ public class ITNSpecimenRequestCustomizer implements SpecimenService.SpecimenReq
         SamplesUrls samplesUrls = PageFlowUtil.urlProvider(SamplesUrls.class);
         return HtmlString.unsafe("Thank you for your request.  A representative from the ITN will be in touch " +
                 "with you.  You can also contact us at " +
-                link("trialsharesupport@immunetolerance.org").href("mailto:trialsharesupport@immunetolerance.org?Body=" + samplesUrls.getRequestDetailsURL(c, requestId).getURIString()).clearClasses() +
+                link("trialsharesupport@immunetolerance.org").href("mailto:trialsharesupport@immunetolerance.org?Body=" + PageFlowUtil.filter(samplesUrls.getRequestDetailsURL(c, requestId).getURIString())).clearClasses() +
                 " to follow up with us regarding this request.<br/>" +
                 "You may also update this request at any calendar to add comments or supporting " +
                 "documents by clicking here " + link("Update Request").href(samplesUrls.getManageRequestStatusURL(c, requestId)));
