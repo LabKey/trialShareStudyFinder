@@ -1,5 +1,6 @@
 package org.labkey.test.tests.trialshare;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -15,20 +16,22 @@ import org.labkey.test.components.study.specimen.SpecimenDetailGrid;
 import org.labkey.test.pages.study.specimen.ManageRequestPage;
 import org.labkey.test.pages.study.specimen.ManageRequestStatusPage;
 import org.labkey.test.pages.study.specimen.ShowCreateSampleRequestPage;
+import org.labkey.test.pages.study.specimen.TypeSummaryReportPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper.MemberType;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.study.specimen.SpecimenHelper;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.UnexpectedTagNameException;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 @Category({Git.class})
 public class ITNSpecimenTest extends BaseWebDriverTest
@@ -72,11 +75,28 @@ public class ITNSpecimenTest extends BaseWebDriverTest
     @Test
     public void testSpecimenReportCustomization()
     {
-        // TODO: Verify standard report behavior
+        final String primaryType = "Blood (Whole)";
+        final String derivativeType1 = "PBMC Cells, Viable";
+        final String derivativeType2 = "Plasma, Unknown Processing";
 
-        // TODO: type breakdown select is missing
+        TestLogger.log("Check standard specimen report behavior to ensure Locators are accurate");
+        enableITNSpecimenHandling(false);
+        TypeSummaryReportPage typeSummaryReportPage = TypeSummaryReportPage.beginAt(this, getProjectName());
+        assertThat("Default type breakdown.", typeSummaryReportPage.getTypeBreakdown(), CoreMatchers.containsString("Show results by"));
+        assertTextPresent(primaryType, derivativeType1, derivativeType2);
 
-        // TODO: Report looks like 'Derivative Type' report
+        TestLogger.log("Verify customized specimen report behavior");
+        enableITNSpecimenHandling(true);
+        typeSummaryReportPage = TypeSummaryReportPage.beginAt(this, getProjectName());
+        try
+        {
+            typeSummaryReportPage.getTypeBreakdown();
+            Assert.fail("Type breakdown select should be removed from custom ITN specimen report");
+        }
+        catch (NoSuchElementException ignore) { /* expected exception */ }
+
+        assertTextPresent(primaryType);
+        assertTextNotPresent(derivativeType1, derivativeType2);
     }
 
     @Test
@@ -146,7 +166,7 @@ public class ITNSpecimenTest extends BaseWebDriverTest
                 manageRequestStatusPage.getStatus();
                 Assert.fail("Only users in the correct group should see 'status' dropdown");
             }
-            catch (NoSuchElementException | UnexpectedTagNameException ignore) { /* expected exception */ }
+            catch (UnexpectedTagNameException ignore) { /* expected exception */ }
 
             String readOnlyStatus = Locator.input("status").parent().findElement(getDriver()).getText();
             assertEquals("Should see status", "Processing", readOnlyStatus);
