@@ -622,7 +622,7 @@ public class TrialShareController extends SpringActionController
     @NotNull
     private static Set<FolderDataTypes> getDefaultExportDataTypes()
     {
-        return new HashSet<>(Arrays.asList(
+        return Set.of(
                 FolderDataTypes.folderTypeAndActiveModules,
                 FolderDataTypes.fullTextSearchSettings,
                 FolderDataTypes.webpartProperties,
@@ -652,7 +652,7 @@ public class TrialShareController extends SpringActionController
                 FolderDataTypes.etlDefinitions,
                 FolderDataTypes.lists,
                 FolderDataTypes.wikisAndAttachments,
-                FolderDataTypes.notificationSettings));
+                FolderDataTypes.notificationSettings);
     }
 
     enum FolderDataTypes

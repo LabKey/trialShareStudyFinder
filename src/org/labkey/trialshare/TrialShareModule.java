@@ -34,10 +34,8 @@ import org.labkey.api.view.WebPartFactory;
 import org.labkey.trialshare.view.DataFinderWebPart;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 public class TrialShareModule extends CodeOnlyModule
@@ -129,8 +127,8 @@ public class TrialShareModule extends CodeOnlyModule
     @NotNull
     public Set<Class> getIntegrationTests()
     {
-        return new HashSet<>(Arrays.asList(
+        return Set.of(
             TrialShareController.TrialShareExportTest.class
-        ));
+        );
     }
 }
