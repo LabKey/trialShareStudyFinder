@@ -774,7 +774,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public NavTree appendNavTrail(NavTree root)
         {
-            return null;
+            return root.addChild("Data Cube Administration");
         }
     }
 
@@ -1539,7 +1539,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public NavTree appendNavTrail(NavTree root)
         {
-            return null;
+            return root.addChild("Manage Data");
         }
     }
 
