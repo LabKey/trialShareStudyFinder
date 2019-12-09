@@ -1819,7 +1819,7 @@ public class TrialShareController extends SpringActionController
                 }
                 catch (IllegalArgumentException ignore) {} // Don't throw because of bad user input
             }
-            return root;
+            return (null == getPageConfig().getTitle() ? root.addChild(StringUtils.capitalize(getMode()) + " Data") : root);
         }
     }
 
