@@ -774,7 +774,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public NavTree appendNavTrail(NavTree root)
         {
-            return null;
+            return root.addChild("Data Cube Administration");
         }
     }
 
@@ -1539,7 +1539,7 @@ public class TrialShareController extends SpringActionController
         @Override
         public NavTree appendNavTrail(NavTree root)
         {
-            return null;
+            return root.addChild("Manage Data");
         }
     }
 
@@ -1819,7 +1819,7 @@ public class TrialShareController extends SpringActionController
                 }
                 catch (IllegalArgumentException ignore) {} // Don't throw because of bad user input
             }
-            return root;
+            return (root.hasChildren() ? root : root.addChild(StringUtils.capitalize(getMode()) + " Data"));
         }
     }
 
