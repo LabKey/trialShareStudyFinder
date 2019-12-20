@@ -126,6 +126,7 @@ public abstract class DataFinderTestBase extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
         _containerHelper.deleteProject(getDataProjectName(), afterTest);
+        _userHelper.deleteUsers(false, PUBLIC_READER, CASALE_READER, WISPR_READER);
     }
 
     @BeforeClass
