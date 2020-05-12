@@ -303,7 +303,7 @@ public class StudyBean
             TableInfo sp = s.getTable("StudyProperties");
             if (sp.supportsContainerFilter())
             {
-                ContainerFilter cf = new ContainerFilter.AllInProject(user);
+                ContainerFilter cf = ContainerFilter.Type.AllInProject.create(s);
                 ((ContainerFilterable) sp).setContainerFilter(cf);
             }
             return new TableSelector(sp).getMapCollection();
