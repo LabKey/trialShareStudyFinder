@@ -196,9 +196,8 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(ReadPermission.class)
     public class BeginAction extends SimpleViewAction
     {
-        public NavTree appendNavTrail(NavTree root)
+        public void addNavTrail(NavTree root)
         {
-            return root;
         }
 
         @Override
@@ -772,9 +771,9 @@ public class TrialShareController extends SpringActionController
         }
 
         @Override
-        public NavTree appendNavTrail(NavTree root)
+        public void addNavTrail(NavTree root)
         {
-            return root.addChild("Data Cube Administration");
+            root.addChild("Data Cube Administration");
         }
     }
 
@@ -972,9 +971,8 @@ public class TrialShareController extends SpringActionController
             return new DataFinderWebPart(getContainer());
         }
 
-        public NavTree appendNavTrail(NavTree root)
+        public void addNavTrail(NavTree root)
         {
-            return root;
         }
     }
 
@@ -1293,9 +1291,8 @@ public class TrialShareController extends SpringActionController
         }
 
         @Override
-        public NavTree appendNavTrail(NavTree root)
+        public void addNavTrail(NavTree root)
         {
-            return root;
         }
     }
 
@@ -1537,9 +1534,9 @@ public class TrialShareController extends SpringActionController
         }
 
         @Override
-        public NavTree appendNavTrail(NavTree root)
+        public void addNavTrail(NavTree root)
         {
-            return root.addChild("Manage Data");
+            root.addChild("Manage Data");
         }
     }
 
@@ -1806,7 +1803,7 @@ public class TrialShareController extends SpringActionController
         }
 
         @Override
-        public NavTree appendNavTrail(NavTree root)
+        public void addNavTrail(NavTree root)
         {
             String name = getViewContext().getActionURL().getParameter("objectName");
             if (name != null)
@@ -1819,7 +1816,8 @@ public class TrialShareController extends SpringActionController
                 }
                 catch (IllegalArgumentException ignore) {} // Don't throw because of bad user input
             }
-            return (root.hasChildren() ? root : root.addChild(StringUtils.capitalize(getMode()) + " Data"));
+            if (!root.hasChildren())
+                root.addChild(StringUtils.capitalize(getMode()) + " Data");
         }
     }
 
