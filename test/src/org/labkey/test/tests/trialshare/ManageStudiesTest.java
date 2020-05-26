@@ -39,6 +39,7 @@ public class ManageStudiesTest extends DataFinderTestBase
     private static final String PROJECT_NAME = "ManageStudiesTest Project";
     private static final String DATA_PROJECT_NAME = "ManageStudiesTestData Project";
 
+    @Override
     public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;

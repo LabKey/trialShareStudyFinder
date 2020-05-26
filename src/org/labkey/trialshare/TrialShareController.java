@@ -196,6 +196,7 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(ReadPermission.class)
     public class BeginAction extends SimpleViewAction
     {
+        @Override
         public void addNavTrail(NavTree root)
         {
         }
@@ -563,6 +564,7 @@ public class TrialShareController extends SpringActionController
     {
         private ActionURL _successURL;
 
+        @Override
         public ApiResponse execute(TrialShareExportForm form, BindException errors) throws Exception
         {
             // JSONObject json = form.getJsonObject();
@@ -965,12 +967,14 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(ReadPermission.class)
     public class DataFinderAction extends SimpleViewAction
     {
+        @Override
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
             setTitle("Data Finder");
             return new DataFinderWebPart(getContainer());
         }
 
+        @Override
         public void addNavTrail(NavTree root)
         {
         }
@@ -1720,6 +1724,7 @@ public class TrialShareController extends SpringActionController
             }
         }
 
+        @Override
         public void validate(Errors errors)
         {
             if (getObjectName() == null)
@@ -1730,6 +1735,7 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(InsertPermission.class)
     public class InsertDataFormAction extends CubeObjectDetailFormAction
     {
+        @Override
         protected String getMode()
         {
             return "insert";
@@ -1740,6 +1746,7 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(UpdatePermission.class)
     public class UpdateDataAction extends CubeObjectDetailFormAction
     {
+        @Override
         protected String getMode()
         {
             return "update";
@@ -1749,6 +1756,7 @@ public class TrialShareController extends SpringActionController
     @RequiresPermission(ReadPermission.class)
     public class ViewDataAction extends CubeObjectDetailFormAction
     {
+        @Override
         protected String getMode()
         {
             return "view";

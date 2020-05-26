@@ -45,6 +45,7 @@ public class ManageStudiesQueryView extends ManageCubeObjectQueryView
         setSettings(getSchema().getSettings(context, QueryView.DATAREGIONNAME_DEFAULT, TrialShareQuerySchema.STUDY_TABLE));
     }
 
+    @Override
     protected TableInfo getTable(User user, Container container)
     {
         return new TrialShareQuerySchema(user, container).getStudyPropertiesTableInfo();

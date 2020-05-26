@@ -101,6 +101,7 @@ public class TrialShareDataFinderTest extends DataFinderTestBase implements Read
         pubUpdatePage.setPermissionsContainers("/" + getDataProjectName() + "/" + PUBLIC_STUDY_NAME, "/" + getDataProjectName() + "/" + OPERATIONAL_STUDY_NAME);
     }
 
+    @Override
     protected void createUsers()
     {
         log("Creating users and setting permissions");
