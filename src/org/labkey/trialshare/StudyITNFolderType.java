@@ -62,6 +62,7 @@ public class StudyITNFolderType extends MultiPortalFolderType
         return Collections.singleton("Study Redesign (ITN)");
     }
 
+    @Override
     protected String getFolderTitle(ViewContext ctx)
     {
         Study study = StudyService.get().getStudy(ctx.getContainer());
@@ -75,6 +76,7 @@ public class StudyITNFolderType extends MultiPortalFolderType
         return study == null ? "New Study" : study.getLabel();
     }
 
+    @Override
     public List<FolderTab> getDefaultTabs()
     {
         return PAGES;
