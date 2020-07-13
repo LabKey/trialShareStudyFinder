@@ -15,7 +15,8 @@
  */
 package org.labkey.trialshare;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.query.QuerySchema;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 public class StudyDocumentProvider implements SearchService.DocumentProvider
 {
-    private static final Logger _logger = Logger.getLogger(StudyDocumentProvider.class);
+    private static final Logger _logger = LogManager.getLogger(StudyDocumentProvider.class);
     public static Container getDocumentContainer()
     {
         return TrialShareManager.get().getCubeContainer(null);

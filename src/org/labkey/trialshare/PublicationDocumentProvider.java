@@ -15,7 +15,8 @@
  */
 package org.labkey.trialshare;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
@@ -39,7 +40,7 @@ import static org.labkey.trialshare.query.TrialShareQuerySchema.IN_PROGRESS_STAT
 
 public class PublicationDocumentProvider implements SearchService.DocumentProvider
 {
-    private static final Logger _logger = Logger.getLogger(PublicationDocumentProvider.class);
+    private static final Logger _logger = LogManager.getLogger(PublicationDocumentProvider.class);
 
     public static Container getDocumentContainer()
     {

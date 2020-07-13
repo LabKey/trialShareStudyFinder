@@ -1,6 +1,7 @@
 package org.labkey.trialshare;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.labkey.api.data.Container;
 import org.labkey.api.data.ContainerManager;
 import org.labkey.api.security.Group;
@@ -16,7 +17,7 @@ import static org.labkey.api.util.PageFlowUtil.link;
 
 public class ITNSpecimenRequestCustomizer implements SpecimenService.SpecimenRequestCustomizer
 {
-    private static final Logger LOG = Logger.getLogger(ITNSpecimenRequestCustomizer.class);
+    private static final Logger LOG = LogManager.getLogger(ITNSpecimenRequestCustomizer.class);
 
     @Override
     public boolean allowEmptyRequests()

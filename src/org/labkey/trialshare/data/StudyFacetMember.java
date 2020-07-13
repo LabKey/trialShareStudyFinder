@@ -16,7 +16,6 @@
 package org.labkey.trialshare.data;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by susanh on 12/8/15.
