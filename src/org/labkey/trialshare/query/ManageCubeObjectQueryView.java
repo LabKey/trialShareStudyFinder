@@ -18,7 +18,6 @@ package org.labkey.trialshare.query;
 import org.labkey.api.data.ActionButton;
 import org.labkey.api.data.ButtonBar;
 import org.labkey.api.data.Container;
-import org.labkey.api.data.DataRegion;
 import org.labkey.api.data.TableInfo;
 import org.labkey.api.query.DetailsURL;
 import org.labkey.api.query.QueryAction;

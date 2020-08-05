@@ -15,9 +15,6 @@
  */
 package org.labkey.trialshare.data;
 
-import org.labkey.api.action.Marshal;
-import org.labkey.api.action.Marshaller;
-
 /**
  * Created by susanh on 12/14/15.
  */

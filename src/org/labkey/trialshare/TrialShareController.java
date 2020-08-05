@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -594,7 +594,7 @@ public class TrialShareController extends SpringActionController
             // todo: super important boolean false in 17.2 replaced by PHI enum.  what is new correct setting? PHI.Limited
             FolderExportContext ctx = new FolderExportContext(getUser(), container, types.stream().map(FolderDataTypes::getDescription).collect(Collectors.toSet()),
                     "new", false, PHI.NotPHI, false,
-                    false, false, new StaticLoggerGetter(Logger.getLogger(FolderWriterImpl.class)));
+                    false, false, new StaticLoggerGetter(LogManager.getLogger(FolderWriterImpl.class)));
 
             PipeRoot root = PipelineService.get().findPipelineRoot(container);
             if (root == null || !root.isValid())
