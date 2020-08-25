@@ -1,22 +1,23 @@
 <%
-    /*
-     * Copyright (c) 2016 LabKey Corporation
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     */
+/*
+ * Copyright (c) 2016 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 %>
 <%@ page import="org.json.JSONArray" %>
 <%@ page import="org.json.JSONObject" %>
+<%@ page import="org.labkey.api.util.HtmlString" %>
 <%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
@@ -39,7 +40,7 @@
     TrialShareController.CubeObjectDetailForm bean = me.getModelBean();
 
     String renderId = "study-details-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
-    String cubeObjectJson = bean.getCubeObject() == null ? "null" : new JSONObject(bean.getCubeObject()).toString(2);
+    HtmlString cubeObjectJson = bean.getCubeObject() == null ? HtmlString.of("null") : new JSONObject(bean.getCubeObject()).getHtmlString(2);
     List<StudyAccess> accessList = bean.getCubeObject() == null ? null :((StudyBean) bean.getCubeObject()).getStudyAccessList();
 
     JSONArray jsonArray = new JSONArray();
@@ -51,7 +52,7 @@
         }
     }
 
-    String studyaccesslist = jsonArray.toString(2);
+    HtmlString studyaccesslist = jsonArray.getHtmlString(2);
 %>
 <labkey:errors/>
 <div id="<%= h(renderId)%>" class="requests-editor"></div>
@@ -64,8 +65,8 @@
             objectName : 'Study',
             renderTo: <%=q(renderId)%>,
             accessListId : <%= bean.getAccessListId() %>,
-            cubeObject : <%= text( cubeObjectJson )%>,
-            studyaccesslist: <%= text( studyaccesslist )%>,
+            cubeObject : <%= cubeObjectJson %>,
+            studyaccesslist: <%= studyaccesslist %>,
             cubeContainerPath: "<%=h(bean.getCubeContainerPath())%>"
         });
     });
