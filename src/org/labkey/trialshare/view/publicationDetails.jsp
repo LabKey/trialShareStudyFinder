@@ -16,7 +16,7 @@
  */
 %>
 <%@ page import="org.json.JSONObject" %>
-<%@ page import="org.labkey.api.util.HtmlString" %>
+<%@ page import="org.labkey.api.util.JavaScriptFragment" %>
 <%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
@@ -36,7 +36,7 @@
 
     String renderId = "publication-details-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
 
-    HtmlString cubeObjectJson = bean.getCubeObject() == null ? HtmlString.of("null") : new JSONObject(bean.getCubeObject()).getHtmlString(2);
+    JavaScriptFragment cubeObjectJson = bean.getCubeObject() == null ? JavaScriptFragment.NULL : new JSONObject(bean.getCubeObject()).getJavaScriptFragment(2);
 %>
 
 <labkey:errors/>

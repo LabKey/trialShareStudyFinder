@@ -17,7 +17,7 @@
 %>
 <%@ page import="org.json.JSONArray" %>
 <%@ page import="org.json.JSONObject" %>
-<%@ page import="org.labkey.api.util.HtmlString" %>
+<%@ page import="org.labkey.api.util.JavaScriptFragment" %>
 <%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
@@ -40,7 +40,7 @@
     TrialShareController.CubeObjectDetailForm bean = me.getModelBean();
 
     String renderId = "study-details-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
-    HtmlString cubeObjectJson = bean.getCubeObject() == null ? HtmlString.of("null") : new JSONObject(bean.getCubeObject()).getHtmlString(2);
+    JavaScriptFragment cubeObjectJson = bean.getCubeObject() == null ? JavaScriptFragment.NULL : new JSONObject(bean.getCubeObject()).getJavaScriptFragment(2);
     List<StudyAccess> accessList = bean.getCubeObject() == null ? null :((StudyBean) bean.getCubeObject()).getStudyAccessList();
 
     JSONArray jsonArray = new JSONArray();
@@ -52,7 +52,7 @@
         }
     }
 
-    HtmlString studyaccesslist = jsonArray.getHtmlString(2);
+    JavaScriptFragment studyaccesslist = jsonArray.getJavaScriptFragment(2);
 %>
 <labkey:errors/>
 <div id="<%= h(renderId)%>" class="requests-editor"></div>
