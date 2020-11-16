@@ -32,6 +32,7 @@ import org.labkey.api.admin.FolderWriter;
 import org.labkey.api.admin.FolderWriterImpl;
 import org.labkey.api.admin.StaticLoggerGetter;
 import org.labkey.api.data.Container;
+import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.PHI;
 import org.labkey.api.pipeline.PipeRoot;
 import org.labkey.api.pipeline.PipelineService;
@@ -571,7 +572,9 @@ public class TrialShareController extends SpringActionController
 
     public static class TrialShareExportTest
     {
-        private final Collection<FolderWriter> folderWriters = FolderSerializationRegistry.get().getRegisteredFolderWriters();
+        private final Collection<FolderWriter> folderWriters = FolderSerializationRegistry.get().getRegisteredFolderWriters().stream()
+                .filter(fw -> !"Notebooks".equals(fw.getDataType()))
+                .collect(Collectors.toList());
 
         @Test
         public void testDataTypes()
