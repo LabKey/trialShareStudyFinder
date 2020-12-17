@@ -113,6 +113,7 @@ public class TrialShareController extends SpringActionController
         private boolean externalSchemaDefinitions;
         private boolean wikisAndTheirAttachments;
         private boolean notificationSettings;
+        private boolean sampleTypes;
 
         public boolean getMissingValueIndicators()
         {
@@ -413,6 +414,16 @@ public class TrialShareController extends SpringActionController
         {
             this.notificationSettings = notificationSettings;
         }
+
+        public boolean getSampleTypes()
+        {
+            return sampleTypes;
+        }
+
+        public void setSampleTypes(boolean sampleTypes)
+        {
+            this.sampleTypes = sampleTypes;
+        }
     }
 
     /*
@@ -513,7 +524,8 @@ public class TrialShareController extends SpringActionController
                 FolderDataTypes.etlDefinitions,
                 FolderDataTypes.lists,
                 FolderDataTypes.wikisAndAttachments,
-                FolderDataTypes.notificationSettings);
+                FolderDataTypes.notificationSettings,
+                FolderDataTypes.sampleTypes);
     }
 
     enum FolderDataTypes
@@ -547,7 +559,8 @@ public class TrialShareController extends SpringActionController
         reportsAndCharts("Reports and Charts", TrialShareExportForm::getReportsAndCharts),
         externalSchemaDefinitions("External schema definitions", TrialShareExportForm::getExternalSchemaDefinitions),
         wikisAndAttachments("Wikis and their attachments", TrialShareExportForm::getWikisAndTheirAttachments),
-        notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings);
+        notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings),
+        sampleTypes("Sample Types", TrialShareExportForm::getSampleTypes);
 
         private final String _description;
         private final Function<TrialShareExportForm, Boolean> _formChecker;
