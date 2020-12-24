@@ -113,7 +113,7 @@ public class TrialShareController extends SpringActionController
         private boolean externalSchemaDefinitions;
         private boolean wikisAndTheirAttachments;
         private boolean notificationSettings;
-        private boolean sampleTypes;
+        private boolean sampleTypesAndDataClasses;
 
         public boolean getMissingValueIndicators()
         {
@@ -415,14 +415,14 @@ public class TrialShareController extends SpringActionController
             this.notificationSettings = notificationSettings;
         }
 
-        public boolean getSampleTypes()
+        public boolean getSampleTypesAndDataClasses()
         {
-            return sampleTypes;
+            return sampleTypesAndDataClasses;
         }
 
-        public void setSampleTypes(boolean sampleTypes)
+        public void setSampleTypesAndDataClasses(boolean sampleTypesAndDataClasses)
         {
-            this.sampleTypes = sampleTypes;
+            this.sampleTypesAndDataClasses = sampleTypesAndDataClasses;
         }
     }
 
@@ -525,7 +525,7 @@ public class TrialShareController extends SpringActionController
                 FolderDataTypes.lists,
                 FolderDataTypes.wikisAndAttachments,
                 FolderDataTypes.notificationSettings,
-                FolderDataTypes.sampleTypes);
+                FolderDataTypes.sampleTypesAndDataClasses);
     }
 
     enum FolderDataTypes
@@ -560,7 +560,7 @@ public class TrialShareController extends SpringActionController
         externalSchemaDefinitions("External schema definitions", TrialShareExportForm::getExternalSchemaDefinitions),
         wikisAndAttachments("Wikis and their attachments", TrialShareExportForm::getWikisAndTheirAttachments),
         notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings),
-        sampleTypes("Sample Types", TrialShareExportForm::getSampleTypes);
+        sampleTypesAndDataClasses("Sample Types and Data Classes", TrialShareExportForm::getSampleTypesAndDataClasses);
 
         private final String _description;
         private final Function<TrialShareExportForm, Boolean> _formChecker;
