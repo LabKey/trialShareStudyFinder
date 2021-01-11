@@ -4,4 +4,5 @@ plugins {
     id 'org.labkey.build.module'
 }
 
+BuildUtils.addLabKeyDependency(project: project, config: "implementation", depProjectPath: BuildUtils.getPlatformModuleProjectPath(project.gradle, "study"), depProjectConfig: "apiJarFile")
 BuildUtils.addLabKeyDependency(project: project, config: "modules", depProjectPath: BuildUtils.getPlatformModuleProjectPath(project.gradle, "study"), depProjectConfig: "published", depExtension: "module")
