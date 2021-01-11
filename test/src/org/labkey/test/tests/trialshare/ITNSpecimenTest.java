@@ -61,6 +61,7 @@ public class ITNSpecimenTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), "Study");
+        _containerHelper.enableModule("Specimen");
         importStudyFromZip(STUDY_ARCHIVE);
         new SpecimenHelper(this).setupRequestStatuses();
     }
