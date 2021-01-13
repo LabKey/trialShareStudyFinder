@@ -584,8 +584,11 @@ public class TrialShareController extends SpringActionController
 
     public static class TrialShareExportTest
     {
+        // ignore these export types because they won't appear in the folder export UI
+        private static final Set<String> _ignoredFolderWriters = Set.of("Notebooks", "LabBooks");
+
         private final Collection<FolderWriter> folderWriters = FolderSerializationRegistry.get().getRegisteredFolderWriters().stream()
-                .filter(fw -> !"Notebooks".equals(fw.getDataType()))
+                .filter(fw -> !_ignoredFolderWriters.contains(fw.getDataType()))
                 .collect(Collectors.toList());
 
         @Test
