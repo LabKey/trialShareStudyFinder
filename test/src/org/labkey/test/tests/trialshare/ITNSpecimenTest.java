@@ -15,7 +15,7 @@ import org.labkey.test.categories.Git;
 import org.labkey.test.components.study.specimen.SpecimenDetailGrid;
 import org.labkey.test.pages.study.specimen.ManageRequestPage;
 import org.labkey.test.pages.study.specimen.ManageRequestStatusPage;
-import org.labkey.test.pages.study.specimen.ShowCreateSampleRequestPage;
+import org.labkey.test.pages.study.specimen.ShowCreateSpecimenRequestPage;
 import org.labkey.test.pages.study.specimen.TypeSummaryReportPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
@@ -61,6 +61,7 @@ public class ITNSpecimenTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), "Study");
+        _containerHelper.enableModule("Specimen");
         importStudyFromZip(STUDY_ARCHIVE);
         new SpecimenHelper(this).setupRequestStatuses();
     }
@@ -108,10 +109,10 @@ public class ITNSpecimenTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Urine"));
         SpecimenDetailGrid specimenGrid = specimenHelper.findSpecimenDetailGrid();
         specimenGrid.checkCheckbox(0);
-        ShowCreateSampleRequestPage requestPage = specimenGrid.createNewRequest();
+        ShowCreateSpecimenRequestPage requestPage = specimenGrid.createNewRequest();
 
         // TODO: Refactor to use SampleManagementErrorLogger after it has been moved out of sampleManagement
-        TestLogger.log("\"Reqeusting Location\" should not be available for ITN specimen requests");
+        TestLogger.log("\"Requesting Location\" should not be available for ITN specimen requests");
         assertElementNotVisible(Locator.id("destinationLocation"));
 
         ManageRequestPage manageRequestPage = requestPage
@@ -125,7 +126,7 @@ public class ITNSpecimenTest extends BaseWebDriverTest
         specimenGrid.checkCheckbox(0);
         specimenGrid.clickHeaderButtonAndWait("Remove Selected");
 
-        TestLogger.log("Should be able to submit a request without any samples");
+        TestLogger.log("Should be able to submit a request without any specimens");
         manageRequestPage = manageRequestPage
                 .submitRequest();
 
@@ -144,7 +145,7 @@ public class ITNSpecimenTest extends BaseWebDriverTest
         permissions.addMemberToRole(SPECIMEN_COORDINATOR, "Reader", MemberType.user, getProjectName());
         permissions.createGlobalPermissionsGroup(MAGIC_GROUP);
 
-        ManageRequestStatusPage manageRequestStatusPage = ShowCreateSampleRequestPage.beginAt(this, getProjectName())
+        ManageRequestStatusPage manageRequestStatusPage = ShowCreateSpecimenRequestPage.beginAt(this, getProjectName())
                 .setDetails("A", "B")
                 .clickCreateAndViewDetails()
                 .submitRequest()

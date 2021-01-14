@@ -17,6 +17,7 @@ package org.labkey.trialshare;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.module.MultiPortalFolderType;
+import org.labkey.api.specimen.SpecimensPage;
 import org.labkey.api.study.Study;
 import org.labkey.api.study.StudyFolderTabs;
 import org.labkey.api.study.StudyService;
@@ -24,7 +25,6 @@ import org.labkey.api.view.FolderTab;
 import org.labkey.api.view.Portal;
 import org.labkey.api.view.ViewContext;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -37,13 +37,13 @@ public class StudyITNFolderType extends MultiPortalFolderType
 {
     private static final String STUDY_ITN_FOLDER_TYPE_NAME = "Study (ITN)";
 
-    private static final List<FolderTab> PAGES = Arrays.asList(
-            new StudyFolderTabs.OverviewPage("Overview"),
-            new StudyFolderTabs.DataAnalysisPage("Data & Reports"),
-            new StudyFolderTabs.ParticipantsPage("Participants"),
-            new StudyFolderTabs.SpecimensPage("Specimens"),
-            new StudyFolderTabs.ManagePage("Manage")
-        );
+    private static final List<FolderTab> PAGES = List.of(
+        new StudyFolderTabs.OverviewPage("Overview"),
+        new StudyFolderTabs.DataAnalysisPage("Data & Reports"),
+        new StudyFolderTabs.ParticipantsPage("Participants"),
+        new SpecimensPage("Specimens"),
+        new StudyFolderTabs.ManagePage("Manage")
+    );
 
     StudyITNFolderType(TrialShareModule module)
     {
