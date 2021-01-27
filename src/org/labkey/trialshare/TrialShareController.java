@@ -114,6 +114,7 @@ public class TrialShareController extends SpringActionController
         private boolean wikisAndTheirAttachments;
         private boolean notificationSettings;
         private boolean sampleTypesAndDataClasses;
+        private boolean inventoryLocationsAndItems;
 
         public boolean getMissingValueIndicators()
         {
@@ -424,6 +425,16 @@ public class TrialShareController extends SpringActionController
         {
             this.sampleTypesAndDataClasses = sampleTypesAndDataClasses;
         }
+
+        public boolean getInventoryLocationsAndItems()
+        {
+            return inventoryLocationsAndItems;
+        }
+
+        public void setInventoryLocationsAndItems(boolean inventoryLocationsAndItems)
+        {
+            this.inventoryLocationsAndItems = inventoryLocationsAndItems;
+        }
     }
 
     /*
@@ -525,7 +536,9 @@ public class TrialShareController extends SpringActionController
                 FolderDataTypes.lists,
                 FolderDataTypes.wikisAndAttachments,
                 FolderDataTypes.notificationSettings,
-                FolderDataTypes.sampleTypesAndDataClasses);
+                FolderDataTypes.sampleTypesAndDataClasses,
+                FolderDataTypes.inventoryLocationsAndItems
+        );
     }
 
     enum FolderDataTypes
@@ -560,7 +573,8 @@ public class TrialShareController extends SpringActionController
         externalSchemaDefinitions("External schema definitions", TrialShareExportForm::getExternalSchemaDefinitions),
         wikisAndAttachments("Wikis and their attachments", TrialShareExportForm::getWikisAndTheirAttachments),
         notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings),
-        sampleTypesAndDataClasses("Sample Types and Data Classes", TrialShareExportForm::getSampleTypesAndDataClasses);
+        sampleTypesAndDataClasses("Sample Types and Data Classes", TrialShareExportForm::getSampleTypesAndDataClasses),
+        inventoryLocationsAndItems("Inventory locations and items", TrialShareExportForm::getInventoryLocationsAndItems);
 
         private final String _description;
         private final Function<TrialShareExportForm, Boolean> _formChecker;
