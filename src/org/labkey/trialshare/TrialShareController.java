@@ -115,6 +115,7 @@ public class TrialShareController extends SpringActionController
         private boolean notificationSettings;
         private boolean sampleTypesAndDataClasses;
         private boolean inventoryLocationsAndItems;
+        private boolean experimentsAndRuns;
 
         public boolean getMissingValueIndicators()
         {
@@ -435,6 +436,17 @@ public class TrialShareController extends SpringActionController
         {
             this.inventoryLocationsAndItems = inventoryLocationsAndItems;
         }
+
+        public boolean getExperimentsAndRuns()
+        {
+            return experimentsAndRuns;
+        }
+
+        public void setExperimentsAndRuns(boolean experimentsAndRuns)
+        {
+            this.experimentsAndRuns = experimentsAndRuns;
+        }
+
     }
 
     /*
@@ -537,7 +549,8 @@ public class TrialShareController extends SpringActionController
                 FolderDataTypes.wikisAndAttachments,
                 FolderDataTypes.notificationSettings,
                 FolderDataTypes.sampleTypesAndDataClasses,
-                FolderDataTypes.inventoryLocationsAndItems
+                FolderDataTypes.inventoryLocationsAndItems,
+                FolderDataTypes.experiments
         );
     }
 
@@ -574,7 +587,8 @@ public class TrialShareController extends SpringActionController
         wikisAndAttachments("Wikis and their attachments", TrialShareExportForm::getWikisAndTheirAttachments),
         notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings),
         sampleTypesAndDataClasses("Sample Types and Data Classes", TrialShareExportForm::getSampleTypesAndDataClasses),
-        inventoryLocationsAndItems("Inventory locations and items", TrialShareExportForm::getInventoryLocationsAndItems);
+        inventoryLocationsAndItems("Inventory locations and items", TrialShareExportForm::getInventoryLocationsAndItems),
+        experiments("Experiments, Protocols, and Runs", TrialShareExportForm::getExperimentsAndRuns);
 
         private final String _description;
         private final Function<TrialShareExportForm, Boolean> _formChecker;
