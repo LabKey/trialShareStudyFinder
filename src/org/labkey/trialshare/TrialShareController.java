@@ -36,6 +36,7 @@ import org.labkey.api.data.PHI;
 import org.labkey.api.pipeline.PipeRoot;
 import org.labkey.api.pipeline.PipelineService;
 import org.labkey.api.pipeline.PipelineUrls;
+import org.labkey.api.qc.SampleStatusService;
 import org.labkey.api.security.IgnoresTermsOfUse;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.AdminPermission;
@@ -575,7 +576,7 @@ public class TrialShareController extends SpringActionController
         participantCommentSettings("Participant Comment Settings", TrialShareExportForm::getParticipantCommentSettings),
         participantGroups("Participant Groups", TrialShareExportForm::getParticipantGroups),
         protocolDocuments("Protocol Documents", TrialShareExportForm::getProtocolDocuments),
-        qcStateSettings("QC State Settings", TrialShareExportForm::getQcStateSettings),
+        qcStateSettings(SampleStatusService.get().supportsSampleStatus() ? "Sample Status and QC State Settings" : "QC State Settings", TrialShareExportForm::getQcStateSettings),
         specimenSettings("Specimen Settings", TrialShareExportForm::getSpecimenSettings),
         specimens("Specimens", TrialShareExportForm::getSpecimens),
         treatmentData("Treatment Data", TrialShareExportForm::getTreatmentData),
