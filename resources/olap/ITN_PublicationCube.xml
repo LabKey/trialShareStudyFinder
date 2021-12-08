@@ -19,9 +19,6 @@
             <Hierarchy name="Publication Type" hasAll="true" primaryKey="Key">
                 <Level name="PublicationType" visible="true" type="String" column="publicationType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
-            <Hierarchy name="Featured" hasAll="true" primaryKey="Key">
-                <Level name="Featured" visible="true" type="Boolean" column="Featured" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-            </Hierarchy>
             <Hierarchy name="Study" hasAll="true" primaryKey="publicationId" schema="lists" primaryKeyTable="publicationStudy">
                 <Join leftKey="StudyId" rightKey="studyId">
                     <Table name="publicationStudy" schema="lists"/>
