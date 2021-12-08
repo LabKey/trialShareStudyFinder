@@ -19,9 +19,6 @@
             <Hierarchy name="Publication Type" hasAll="true" primaryKey="Key">
                 <Level name="PublicationType" visible="true" type="String" column="publicationType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
-            <Hierarchy name="Submission Status" hasAll="true" primaryKey="Key">
-                <Level name="SubmissionStatus" visible="true" type="String" column="submissionStatus" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-            </Hierarchy>
             <Hierarchy name="Featured" hasAll="true" primaryKey="Key">
                 <Level name="Featured" visible="true" type="Boolean" column="Featured" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
@@ -37,9 +34,6 @@
             </Hierarchy>
             <Hierarchy name="Journal" hasAll="true" primaryKey="Key">
                 <Level name="Journal" visible="true" type="String" column="journal" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-            </Hierarchy>
-            <Hierarchy name="Status" hasAll="true" primaryKey="Key">
-                <Level name="Status" visible="true" type="String" column="status" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
         </Dimension>
 
