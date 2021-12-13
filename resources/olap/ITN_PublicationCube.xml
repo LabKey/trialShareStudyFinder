@@ -15,9 +15,9 @@
             <Hierarchy name="Therapeutic Area" hasAll="true" primaryKey="PublicationId">
                 <Table name="publicationTherapeuticArea" schema="lists"/>
                 <Level name="TherapeuticArea" visible="true" column="therapeuticArea" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-            </Hierarchy>
-            <Hierarchy name="Publication Type" hasAll="true" primaryKey="Key">
-                <Level name="PublicationType" visible="true" type="String" column="publicationType" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+                <Annotations>
+                    <Annotation name="ExcludeAnd">true</Annotation>
+                </Annotations>
             </Hierarchy>
             <Hierarchy name="Study" hasAll="true" primaryKey="publicationId" schema="lists" primaryKeyTable="publicationStudy">
                 <Join leftKey="StudyId" rightKey="studyId">
@@ -28,9 +28,9 @@
             </Hierarchy>
             <Hierarchy name="Year" hasAll="true" primaryKey="Key">
                 <Level name="Year" visible="true" type="Integer" column="year" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
-            </Hierarchy>
-            <Hierarchy name="Journal" hasAll="true" primaryKey="Key">
-                <Level name="Journal" visible="true" type="String" column="journal" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
+                <Annotations>
+                    <Annotation name="ExcludeAnd">true</Annotation>
+                </Annotations>
             </Hierarchy>
         </Dimension>
 
