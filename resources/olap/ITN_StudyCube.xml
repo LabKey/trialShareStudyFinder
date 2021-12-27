@@ -3,7 +3,6 @@
    <Cube name="StudyCube" visible="true" defaultMeasure="RowCount" cache="true" enabled="true">
 
        <Annotations>
-           <!--<Annotation name="ContainerFilter">AllFolders</Annotation>-->
            <Annotation name="AllowMDX">FALSE</Annotation>
        </Annotations>
 
