@@ -14,7 +14,6 @@
                 <Level name="Study" visible="true" column="studyId" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Study Name" hasAll="true" primaryKeyTable="studyAccess" primaryKey="StudyId">
-                <!--<Level name="Container" visible="true" column="studyContainer" type="String" uniqueMembers="true" levelType="Regular"/>-->
                 <Level name="Study" visible="true" column="studyId" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never"/>
             </Hierarchy>
             <Hierarchy name="Visibility" hasAll="true" primaryKey="StudyId">
