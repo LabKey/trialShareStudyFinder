@@ -106,7 +106,7 @@ public class ITNSpecimenTest extends BaseWebDriverTest
         SpecimenHelper specimenHelper = new SpecimenHelper(this);
         clickPortalTab("Specimen Data");
 
-        clickAndWait(Locator.linkWithText("Urine"));
+        waitAndClickAndWait(Locator.linkWithText("Urine"));
         SpecimenDetailGrid specimenGrid = specimenHelper.findSpecimenDetailGrid();
         specimenGrid.checkCheckbox(0);
         ShowCreateSpecimenRequestPage requestPage = specimenGrid.createNewRequest();
