@@ -25,7 +25,6 @@ import org.labkey.api.action.Marshal;
 import org.labkey.api.action.Marshaller;
 import org.labkey.api.action.MutatingApiAction;
 import org.labkey.api.action.SpringActionController;
-import org.labkey.api.admin.AbstractFolderContext;
 import org.labkey.api.admin.AbstractFolderContext.ExportType;
 import org.labkey.api.admin.FolderExportContext;
 import org.labkey.api.admin.FolderSerializationRegistry;
@@ -45,7 +44,6 @@ import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.NotFoundException;
 import org.labkey.api.writer.FileSystemFile;
-import org.labkey.api.writer.Writer;
 import org.springframework.validation.BindException;
 
 import java.io.File;
@@ -674,9 +672,8 @@ public class TrialShareController extends SpringActionController
 
             filteredFolderWriters.forEach(fw -> {
                 dataTypes.add(fw.getDataType());
-                Collection<Writer> children = fw.getChildren(false, false);
-                if (children != null)
-                    children.forEach(w -> dataTypes.add(w.getDataType()));
+                fw.getChildren(false, false)
+                    .forEach(w -> dataTypes.add(w.getDataType()));
             });
 
             dataTypes.remove(null);
