@@ -116,6 +116,8 @@ public class TrialShareController extends SpringActionController
         private boolean sampleTypesAndDataClasses;
         private boolean inventoryLocationsAndItems;
         private boolean experimentsAndRuns;
+        private boolean panoramaQC;
+
 
         public boolean getMissingValueIndicators()
         {
@@ -447,6 +449,15 @@ public class TrialShareController extends SpringActionController
             this.experimentsAndRuns = experimentsAndRuns;
         }
 
+        public boolean getPanoramaQC()
+        {
+            return panoramaQC;
+        }
+
+        public void setPanoramaQC(boolean panoramaQC)
+        {
+            this.panoramaQC = panoramaQC;
+        }
     }
 
     /*
@@ -594,7 +605,8 @@ public class TrialShareController extends SpringActionController
         notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings),
         sampleTypesAndDataClasses("Sample Types and Data Classes", TrialShareExportForm::getSampleTypesAndDataClasses),
         inventoryLocationsAndItems("Inventory locations and items", TrialShareExportForm::getInventoryLocationsAndItems),
-        experiments("Experiments, Protocols, and Runs", TrialShareExportForm::getExperimentsAndRuns);
+        experiments("Experiments, Protocols, and Runs", TrialShareExportForm::getExperimentsAndRuns),
+        panoramaQC("Panorama QC Folder Settings", TrialShareExportForm::getPanoramaQC);
 
         private final String _description;
         private final Function<TrialShareExportForm, Boolean> _formChecker;
