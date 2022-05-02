@@ -116,8 +116,6 @@ public class TrialShareController extends SpringActionController
         private boolean sampleTypesAndDataClasses;
         private boolean inventoryLocationsAndItems;
         private boolean experimentsAndRuns;
-        private boolean panoramaQC;
-
 
         public boolean getMissingValueIndicators()
         {
@@ -448,16 +446,6 @@ public class TrialShareController extends SpringActionController
         {
             this.experimentsAndRuns = experimentsAndRuns;
         }
-
-        public boolean getPanoramaQC()
-        {
-            return panoramaQC;
-        }
-
-        public void setPanoramaQC(boolean panoramaQC)
-        {
-            this.panoramaQC = panoramaQC;
-        }
     }
 
     /*
@@ -605,8 +593,7 @@ public class TrialShareController extends SpringActionController
         notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings),
         sampleTypesAndDataClasses("Sample Types and Data Classes", TrialShareExportForm::getSampleTypesAndDataClasses),
         inventoryLocationsAndItems("Inventory locations and items", TrialShareExportForm::getInventoryLocationsAndItems),
-        experiments("Experiments, Protocols, and Runs", TrialShareExportForm::getExperimentsAndRuns),
-        panoramaQC("Panorama QC Folder Settings", TrialShareExportForm::getPanoramaQC);
+        experiments("Experiments, Protocols, and Runs", TrialShareExportForm::getExperimentsAndRuns);
 
         private final String _description;
         private final Function<TrialShareExportForm, Boolean> _formChecker;
@@ -670,7 +657,9 @@ public class TrialShareController extends SpringActionController
             Collections.sort(expectedDataTypes);
             Collections.sort(actualDefaultDataTypes);
 
-            Assert.assertEquals("TrialShareExport default data types do not match core defaults", expectedDataTypes, actualDefaultDataTypes);
+            expectedDataTypes.removeAll(actualDefaultDataTypes);
+
+            Assert.assertTrue("TrialShareExport default data types missing expected values: " + expectedDataTypes, expectedDataTypes.isEmpty());
         }
 
         public Set<String> getRegisteredDataTypes(boolean onlyDefault)
