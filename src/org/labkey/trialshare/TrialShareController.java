@@ -446,7 +446,6 @@ public class TrialShareController extends SpringActionController
         {
             this.experimentsAndRuns = experimentsAndRuns;
         }
-
     }
 
     /*
@@ -658,7 +657,9 @@ public class TrialShareController extends SpringActionController
             Collections.sort(expectedDataTypes);
             Collections.sort(actualDefaultDataTypes);
 
-            Assert.assertEquals("TrialShareExport default data types do not match core defaults", expectedDataTypes, actualDefaultDataTypes);
+            expectedDataTypes.removeAll(actualDefaultDataTypes);
+
+            Assert.assertTrue("TrialShareExport default data types missing expected values: " + expectedDataTypes, expectedDataTypes.isEmpty());
         }
 
         public Set<String> getRegisteredDataTypes(boolean onlyDefault)
