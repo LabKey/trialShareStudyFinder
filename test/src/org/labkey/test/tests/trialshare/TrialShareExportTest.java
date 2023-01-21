@@ -3,9 +3,8 @@ package org.labkey.test.tests.trialshare;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
@@ -40,7 +39,7 @@ public class TrialShareExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), subfolder);
 
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        Command command = new PostCommand("trialShare", "trialShareExport");
+        SimplePostCommand command = new SimplePostCommand("trialShare", "trialShareExport");
         command.execute(connection, getProjectName() + "/" + subfolder);
 
         goToModule("FileContent");
@@ -57,7 +56,7 @@ public class TrialShareExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), subfolder);
 
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        Command command = new PostCommand("trialShare", "trialShareExport");
+        SimplePostCommand command = new SimplePostCommand("trialShare", "trialShareExport");
         Map<String, Object> params = new HashMap<>();
         params.put("webpartPropertiesAndLayout", true); // Add one custom data type to override default
         command.setParameters(params);
