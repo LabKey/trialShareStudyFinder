@@ -74,7 +74,7 @@ public class TrialShareController extends SpringActionController
 
         example usage (via LabKey Remote Java API):
 
-        PostCommand pc = new PostCommand("pipeline","TrialShareExport");
+        SimplePostCommand pc = new SimplePostCommand("pipeline","TrialShareExport");
         JSONObject jo = new JSONObject();
         pc.setJsonObject(jo);
         CommandResponse cr = pc.execute(cn, "/Studies/ITN027AIOPR/Study Data/");
