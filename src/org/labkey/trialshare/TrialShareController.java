@@ -667,7 +667,7 @@ public class TrialShareController extends SpringActionController
             Set<String> dataTypes = new HashSet<>();
             Set<FolderWriter> filteredFolderWriters;
             if (onlyDefault)
-                filteredFolderWriters = folderWriters.stream().filter(fw -> fw.selectedByDefault(ExportType.ALL)).collect(Collectors.toSet());
+                filteredFolderWriters = folderWriters.stream().filter(fw -> fw.selectedByDefault(ExportType.ALL, false)).collect(Collectors.toSet());
             else
                 filteredFolderWriters = new HashSet<>(folderWriters);
 
