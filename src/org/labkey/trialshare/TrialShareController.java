@@ -106,7 +106,8 @@ public class TrialShareController extends SpringActionController
         private boolean webpartPropertiesAndLayout;
         private boolean containerSpecificModuleProperties;
         private boolean roleAssignmentsForUsersAndGroups;
-        private boolean lists;
+        private boolean listDesigns;
+        private boolean listData;
         private boolean queries;
         private boolean gridViews;
         private boolean reportsAndCharts;
@@ -347,14 +348,24 @@ public class TrialShareController extends SpringActionController
             this.roleAssignmentsForUsersAndGroups = roleAssignmentsForUsersAndGroups;
         }
 
-        public boolean getLists()
+        public boolean isListDesigns()
         {
-            return lists;
+            return listDesigns;
         }
 
-        public void setLists(boolean lists)
+        public void setListDesigns(boolean listDesigns)
         {
-            this.lists = lists;
+            this.listDesigns = listDesigns;
+        }
+
+        public boolean isListData()
+        {
+            return listData;
+        }
+
+        public void setListData(boolean listData)
+        {
+            this.listData = listData;
         }
 
         public boolean getQueries()
@@ -547,7 +558,8 @@ public class TrialShareController extends SpringActionController
                 FolderDataTypes.reportsAndCharts,
                 FolderDataTypes.externalSchemaDefinitions,
                 FolderDataTypes.etlDefinitions,
-                FolderDataTypes.lists,
+                FolderDataTypes.listDesigns,
+                FolderDataTypes.listData,
                 FolderDataTypes.wikisAndAttachments,
                 FolderDataTypes.notificationSettings,
                 FolderDataTypes.sampleTypesAndDataClasses,
@@ -584,7 +596,8 @@ public class TrialShareController extends SpringActionController
         webpartProperties("Webpart properties and layout", TrialShareExportForm::getWebpartPropertiesAndLayout),
         moduleProperties("Container specific module properties", TrialShareExportForm::getContainerSpecificModuleProperties),
         roleAssignments("Role assignments for users and groups", TrialShareExportForm::getRoleAssignmentsForUsersAndGroups),
-        lists("Lists", TrialShareExportForm::getLists),
+        listDesigns("List Designs", TrialShareExportForm::isListDesigns),
+        listData("List Data", TrialShareExportForm::isListData),
         queries("Queries", TrialShareExportForm::getQueries),
         gridViews("Grid Views", TrialShareExportForm::getGridViews),
         reportsAndCharts("Reports and Charts", TrialShareExportForm::getReportsAndCharts),
