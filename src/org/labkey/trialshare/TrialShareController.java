@@ -106,14 +106,18 @@ public class TrialShareController extends SpringActionController
         private boolean webpartPropertiesAndLayout;
         private boolean containerSpecificModuleProperties;
         private boolean roleAssignmentsForUsersAndGroups;
-        private boolean lists;
+        private boolean listDesigns;
+        private boolean listData;
         private boolean queries;
         private boolean gridViews;
         private boolean reportsAndCharts;
         private boolean externalSchemaDefinitions;
         private boolean wikisAndTheirAttachments;
         private boolean notificationSettings;
-        private boolean sampleTypesAndDataClasses;
+        private boolean sampleTypeDesigns;
+        private boolean sampleTypeData;
+        private boolean dataClassDesigns;
+        private boolean dataClassData;
         private boolean inventoryLocationsAndItems;
         private boolean experimentsAndRuns;
 
@@ -347,14 +351,24 @@ public class TrialShareController extends SpringActionController
             this.roleAssignmentsForUsersAndGroups = roleAssignmentsForUsersAndGroups;
         }
 
-        public boolean getLists()
+        public boolean isListDesigns()
         {
-            return lists;
+            return listDesigns;
         }
 
-        public void setLists(boolean lists)
+        public void setListDesigns(boolean listDesigns)
         {
-            this.lists = lists;
+            this.listDesigns = listDesigns;
+        }
+
+        public boolean isListData()
+        {
+            return listData;
+        }
+
+        public void setListData(boolean listData)
+        {
+            this.listData = listData;
         }
 
         public boolean getQueries()
@@ -417,14 +431,44 @@ public class TrialShareController extends SpringActionController
             this.notificationSettings = notificationSettings;
         }
 
-        public boolean getSampleTypesAndDataClasses()
+        public boolean getSampleTypeDesigns()
         {
-            return sampleTypesAndDataClasses;
+            return sampleTypeDesigns;
         }
 
-        public void setSampleTypesAndDataClasses(boolean sampleTypesAndDataClasses)
+        public void setSampleTypeDesigns(boolean sampleTypeDesigns)
         {
-            this.sampleTypesAndDataClasses = sampleTypesAndDataClasses;
+            this.sampleTypeDesigns = sampleTypeDesigns;
+        }
+
+        public boolean getSampleTypeData()
+        {
+            return sampleTypeData;
+        }
+
+        public void setSampleTypeData(boolean sampleTypeData)
+        {
+            this.sampleTypeData = sampleTypeData;
+        }
+
+        public boolean getDataClassDesigns()
+        {
+            return dataClassDesigns;
+        }
+
+        public void setDataClassDesigns(boolean dataClassDesigns)
+        {
+            this.dataClassDesigns = dataClassDesigns;
+        }
+
+        public boolean getDataClassData()
+        {
+            return dataClassData;
+        }
+
+        public void setDataClassData(boolean dataClassData)
+        {
+            this.dataClassData = dataClassData;
         }
 
         public boolean getInventoryLocationsAndItems()
@@ -547,10 +591,14 @@ public class TrialShareController extends SpringActionController
                 FolderDataTypes.reportsAndCharts,
                 FolderDataTypes.externalSchemaDefinitions,
                 FolderDataTypes.etlDefinitions,
-                FolderDataTypes.lists,
+                FolderDataTypes.listDesigns,
+                FolderDataTypes.listData,
                 FolderDataTypes.wikisAndAttachments,
                 FolderDataTypes.notificationSettings,
-                FolderDataTypes.sampleTypesAndDataClasses,
+                FolderDataTypes.sampleTypeDesigns,
+                FolderDataTypes.sampleTypeData,
+                FolderDataTypes.dataClassDesigns,
+                FolderDataTypes.dataClassData,
                 FolderDataTypes.inventoryLocationsAndItems,
                 FolderDataTypes.experiments
         );
@@ -584,14 +632,18 @@ public class TrialShareController extends SpringActionController
         webpartProperties("Webpart properties and layout", TrialShareExportForm::getWebpartPropertiesAndLayout),
         moduleProperties("Container specific module properties", TrialShareExportForm::getContainerSpecificModuleProperties),
         roleAssignments("Role assignments for users and groups", TrialShareExportForm::getRoleAssignmentsForUsersAndGroups),
-        lists("Lists", TrialShareExportForm::getLists),
+        listDesigns("List Designs", TrialShareExportForm::isListDesigns),
+        listData("List Data", TrialShareExportForm::isListData),
         queries("Queries", TrialShareExportForm::getQueries),
         gridViews("Grid Views", TrialShareExportForm::getGridViews),
         reportsAndCharts("Reports and Charts", TrialShareExportForm::getReportsAndCharts),
         externalSchemaDefinitions("External schema definitions", TrialShareExportForm::getExternalSchemaDefinitions),
         wikisAndAttachments("Wikis and their attachments", TrialShareExportForm::getWikisAndTheirAttachments),
         notificationSettings("Notification settings", TrialShareExportForm::getNotificationSettings),
-        sampleTypesAndDataClasses("Sample Types and Data Classes", TrialShareExportForm::getSampleTypesAndDataClasses),
+        sampleTypeDesigns("Sample Type Designs", TrialShareExportForm::getSampleTypeDesigns),
+        sampleTypeData("Sample Type Data", TrialShareExportForm::getSampleTypeData),
+        dataClassDesigns("Data Class Designs", TrialShareExportForm::getDataClassDesigns),
+        dataClassData("Data Class Data", TrialShareExportForm::getDataClassData),
         inventoryLocationsAndItems("Inventory locations and items", TrialShareExportForm::getInventoryLocationsAndItems),
         experiments("Experiments, Protocols, and Runs", TrialShareExportForm::getExperimentsAndRuns);
 
@@ -667,7 +719,7 @@ public class TrialShareController extends SpringActionController
             Set<String> dataTypes = new HashSet<>();
             Set<FolderWriter> filteredFolderWriters;
             if (onlyDefault)
-                filteredFolderWriters = folderWriters.stream().filter(fw -> fw.selectedByDefault(ExportType.ALL)).collect(Collectors.toSet());
+                filteredFolderWriters = folderWriters.stream().filter(fw -> fw.selectedByDefault(ExportType.ALL, false)).collect(Collectors.toSet());
             else
                 filteredFolderWriters = new HashSet<>(folderWriters);
 

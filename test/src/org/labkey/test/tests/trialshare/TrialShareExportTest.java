@@ -45,7 +45,7 @@ public class TrialShareExportTest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.selectFileBrowserItem("/export/folder.xml");
         List<String> fileList = _fileBrowserHelper.getFileList();
-        List<String> expectedFiles = Arrays.asList("etls", "inventory", "sample-types", "wikis", "xar", "data_states.xml", "folder.xml", "pages.xml");
+        List<String> expectedFiles = Arrays.asList("data-classes", "etls", "inventory", "sample-types", "wikis", "xar", "data_states.xml", "folder.xml", "pages.xml");
         assertEquals("Default export should include several folder objects", expectedFiles, fileList);
     }
 
