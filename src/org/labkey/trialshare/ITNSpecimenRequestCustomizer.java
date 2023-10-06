@@ -43,7 +43,7 @@ public class ITNSpecimenRequestCustomizer implements SpecimenService.SpecimenReq
         Group specimenRequestAdmins = GroupManager.getGroup(ContainerManager.getRoot(), "Specimen Request Administrators", GroupEnumType.SITE);
         if (specimenRequestAdmins != null)
         {
-            return user.isInSiteAdminGroup() || user.isInGroup(specimenRequestAdmins.getUserId());
+            return user.hasSiteAdminPermission() || user.isInGroup(specimenRequestAdmins.getUserId());
         }
         LOG.error("Unable to find site group \"Specimen Request Administrators\", allowing user to update specimen request status");
         return true;
