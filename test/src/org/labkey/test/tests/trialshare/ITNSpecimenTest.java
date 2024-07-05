@@ -18,7 +18,7 @@ import org.labkey.test.pages.study.specimen.ManageRequestStatusPage;
 import org.labkey.test.pages.study.specimen.ShowCreateSpecimenRequestPage;
 import org.labkey.test.pages.study.specimen.TypeSummaryReportPage;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper.MemberType;
 import org.labkey.test.util.TestLogger;
@@ -192,7 +192,7 @@ public class ITNSpecimenTest extends BaseWebDriverTest
     public void enableITNSpecimenHandling(boolean enable)
     {
         Connection cn = createDefaultConnection(false);
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, ITN_SPECIMEN_HANDLING, enable);
+        OptionalFeatureHelper.setOptionalFeature(cn, ITN_SPECIMEN_HANDLING, enable);
     }
 
     @Override
