@@ -3,7 +3,7 @@ package org.labkey.trialshare;
 import org.labkey.api.data.Container;
 import org.labkey.api.security.User;
 import org.labkey.api.settings.AdminConsole;
-import org.labkey.api.settings.ExperimentalFeatureService;
+import org.labkey.api.settings.OptionalFeatureService;
 import org.labkey.api.study.SpecimenService;
 import org.labkey.api.util.HtmlString;
 
@@ -20,12 +20,12 @@ public class DelegatingSpecimenRequestCustomizer implements SpecimenService.Spec
     {
         _default = defaultCustomizer;
 
-        _active = ExperimentalFeatureService.get().isFeatureEnabled(ITN_SPECIMEN_HANDLING_FEATURE_NAME) ? _itn : _default;
+        _active = OptionalFeatureService.get().isFeatureEnabled(ITN_SPECIMEN_HANDLING_FEATURE_NAME) ? _itn : _default;
 
         AdminConsole.addExperimentalFeatureFlag(ITN_SPECIMEN_HANDLING_FEATURE_NAME, "ITN specimen behavior",
                 "This feature allows empty specimen requests, adds ITN-specific messages, hides some reporting options, and other tweaks", false);
 
-        ExperimentalFeatureService.get().addFeatureListener(ITN_SPECIMEN_HANDLING_FEATURE_NAME, (feature, enabled) -> _active = enabled ? _itn : _default);
+        OptionalFeatureService.get().addFeatureListener(ITN_SPECIMEN_HANDLING_FEATURE_NAME, (feature, enabled) -> _active = enabled ? _itn : _default);
     }
 
     @Override
